@@ -502,14 +502,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
         emp.nextSkillsStr || '',
         emp.nextEmploymentType || '',
         emp.nextExclude || '',
-        emp.promoYearDeptHead || '',
-        emp.promoYearDeputyHead || '',
-        emp.promoYearDivHead || '',
-        emp.promoYearSecHead || '',
-        emp.promoYearAssistant3 || '',
-        emp.promoYearAssistant2 || '',
+        emp.promoYearChief || '',
         emp.promoYearAssistant1 || '',
-        emp.promoYearChief || ''
+        emp.promoYearAssistant2 || '',
+        emp.promoYearAssistant3 || '',
+        emp.promoYearSecHead || '',
+        emp.promoYearDivHead || '',
+        emp.promoYearDeputyHead || '',
+        emp.promoYearDeptHead || ''
       ];
       return row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',');
     });
@@ -899,14 +899,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                 <Th label="備考" sortKey="nextEmploymentType" className="bg-blue-50/50 border-r" />
                 <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
-                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-l border-r" />
-                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r" />
-                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r" />
-                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r" />
-                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r" />
-                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r" />
+                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r" />
                 <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r" />
-                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50" />
+                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r" />
+                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r" />
+                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r" />
+                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r" />
+                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r" />
+                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50" />
 
               </tr>
             </thead>
@@ -983,14 +983,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                     <td className="bg-blue-50/30"><input type="text" value={emp.nextEmploymentType||''} onChange={e => handleChange(emp.id,'nextEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={inputCls} /></td>
                     <td className="bg-blue-50/30"><input type="text" list="exclude-list-bulk" value={emp.nextExclude||''} onChange={e => handleChange(emp.id,'nextExclude',e.target.value)} placeholder="事務職など" className={inputCls} /></td>
 
-                    <td className="bg-fuchsia-50/30 border-l"><input type="number" value={emp.promoYearDeptHead||''} onChange={e => handleChange(emp.id,'promoYearDeptHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeputyHead||''} onChange={e => handleChange(emp.id,'promoYearDeputyHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDivHead||''} onChange={e => handleChange(emp.id,'promoYearDivHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearSecHead||''} onChange={e => handleChange(emp.id,'promoYearSecHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant3||''} onChange={e => handleChange(emp.id,'promoYearAssistant3',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant2||''} onChange={e => handleChange(emp.id,'promoYearAssistant2',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30 border-l"><input type="number" value={emp.promoYearChief||''} onChange={e => handleChange(emp.id,'promoYearChief',e.target.value)} className={inputCls} /></td>
                     <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant1||''} onChange={e => handleChange(emp.id,'promoYearAssistant1',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearChief||''} onChange={e => handleChange(emp.id,'promoYearChief',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant2||''} onChange={e => handleChange(emp.id,'promoYearAssistant2',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant3||''} onChange={e => handleChange(emp.id,'promoYearAssistant3',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearSecHead||''} onChange={e => handleChange(emp.id,'promoYearSecHead',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDivHead||''} onChange={e => handleChange(emp.id,'promoYearDivHead',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeputyHead||''} onChange={e => handleChange(emp.id,'promoYearDeputyHead',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeptHead||''} onChange={e => handleChange(emp.id,'promoYearDeptHead',e.target.value)} className={inputCls} /></td>
 
                   </tr>
                 );
