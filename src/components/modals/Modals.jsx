@@ -1067,6 +1067,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                 <th colSpan="5" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-100 text-slate-700">今年度</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-blue-100/50 text-[#065084]">来年度</th><th colSpan="8" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦)</th>
+                {historyYears.length > 0 && <th colSpan={historyYears.length} className="px-2 py-1 border-b border-l text-center bg-emerald-100/50 text-emerald-900">履歴</th>}
               </tr>
               <tr>
                 <th className="px-2 py-1 border-b border-slate-300 bg-slate-200 sticky left-0 z-40 text-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" title="すべて選択/解除">
@@ -1109,6 +1110,9 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                 <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r" />
                 <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r" />
                 <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50" />
+                {historyYears.length > 0 && historyYears.map(year => (
+                  <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l" />
+                ))}
 
               </tr>
             </thead>
@@ -1193,6 +1197,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                     <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDivHead||''} onChange={e => handleChange(emp.id,'promoYearDivHead',e.target.value)} className={inputCls} /></td>
                     <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeputyHead||''} onChange={e => handleChange(emp.id,'promoYearDeputyHead',e.target.value)} className={inputCls} /></td>
                     <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeptHead||''} onChange={e => handleChange(emp.id,'promoYearDeptHead',e.target.value)} className={inputCls} /></td>
+                    {historyYears.length > 0 && historyYears.map(year => {
+                      const hist = (emp.history || []).find(h => h.year === year);
+                      return (
+                        <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[120px]">
+                          <input type="text" value={hist ? hist.department : ''} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center"} title={hist ? hist.department : ''} />
+                        </td>
+                      );
+                    })}
 
                   </tr>
                 );
