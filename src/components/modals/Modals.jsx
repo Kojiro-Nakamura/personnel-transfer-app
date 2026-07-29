@@ -370,6 +370,8 @@ export const TitleChangeConfirmModal = ({ isOpen, onClose, onConfirm, data }) =>
   );
 };
 
+const historyYears = Array.from({ length: 2069 - 1985 + 1 }, (_, i) => 1985 + i);
+
 export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments }) => {
   const [localEmps, setLocalEmps] = useState([]); 
   const [localDepts, setLocalDepts] = useState([]);
@@ -424,9 +426,10 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
       "職員番号", "氏名", "生年月日", "最終学歴", "採用年月日", "特記事項", 
       "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
       "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
-      "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級"
+      "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
+      ...historyYears.map(y => getEraFormattedYear(y))
     ].join(',');
-    const sampleRow = "000001,和歌山 太郎,S60.01.01,和歌山大学,H20.04.01,特になし,森林整備課,緑化推進班,班長,班長,補佐級II(班長),1,1,,技術職,森林整備課,緑化推進班,班長,班長,補佐級II(班長),2,1+1,,技術職,2015,2018,2022,,,,,";
+    const sampleRow = `000001,和歌山 太郎,S60.01.01,和歌山大学,H20.04.01,特になし,森林整備課,緑化推進班,班長,班長,補佐級II(班長),1,1,,技術職,森林整備課,緑化推進班,班長,班長,補佐級II(班長),2,1+1,,技術職,2015,2018,2022,,,,,` + historyYears.map(y => ',').join('');
     const content = "\uFEFF" + headers + "\n" + sampleRow + "\n";
     downloadFile(content, 'text/csv;charset=utf-8;', '職員一括編集_ひな型.csv');
   };
@@ -436,7 +439,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
       "職員番号", "氏名", "生年月日", "最終学歴", "採用年月日", "特記事項", 
       "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
       "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
-      "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級"
+      "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
+      ...historyYears.map(y => getEraFormattedYear(y))
     ];
     const dMap = new Map(localDepts.map(d => [d.id, d]));
     
@@ -511,7 +515,11 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
         emp.promoYearSecHead || '',
         emp.promoYearDivHead || '',
         emp.promoYearDeputyHead || '',
-        emp.promoYearDeptHead || ''
+        emp.promoYearDeptHead || '',
+        ...historyYears.map(year => {
+          const hist = (emp.history || []).find(h => h.year === year);
+          return hist ? hist.department : '';
+        })
       ];
       return row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',');
     });
@@ -665,6 +673,30 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
           promoYearDeputyHead: pDep,
           promoYearDeptHead: pDept,
         };
+
+        if (cols.length > 32) {
+          let newHistory = [];
+          for (let k = 0; k < historyYears.length; k++) {
+            if (32 + k < cols.length) {
+              const year = historyYears[k];
+              const deptName = cols[32 + k] || '';
+              if (deptName) {
+                const age = calculateAge(parseJapaneseDate(bStr), year);
+                newHistory.push({
+                  year,
+                  japaneseYear: getEraFormattedYear(year),
+                  age,
+                  department: deptName
+                });
+              }
+            }
+          }
+          newEmpData.history = newHistory;
+        } else if (targetEmp && targetEmp.history) {
+          newEmpData.history = targetEmp.history;
+        } else {
+          newEmpData.history = [];
+        }
 
         if (targetEmp) {
           updates.push({ ...targetEmp, ...newEmpData });
