@@ -453,9 +453,26 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
         if (gradeA !== gradeB) {
           return gradeB - gradeA;
         }
-        const yA = Number(a.currentYears || 0);
-        const yB = Number(b.currentYears || 0);
-        return yB - yA;
+        
+        const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+        const getYear = (emp) => {
+            for (let i = pKeys.length - 1; i >= 0; i--) {
+                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+                if (!isNaN(y)) return y;
+            }
+            return NaN;
+        };
+        const yA = getYear(a);
+        const yB = getYear(b);
+        
+        if (!isNaN(yA) && !isNaN(yB)) {
+            return yA - yB; // Ascending year = Descending tenure
+        } else if (!isNaN(yA)) {
+            return -1;
+        } else if (!isNaN(yB)) {
+            return 1;
+        }
+        return 0;
       });
     }
     return items;
