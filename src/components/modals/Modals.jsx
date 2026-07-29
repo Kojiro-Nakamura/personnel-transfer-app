@@ -370,7 +370,7 @@ export const TitleChangeConfirmModal = ({ isOpen, onClose, onConfirm, data }) =>
   );
 };
 
-export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments }) => {
+export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments, targetYear }) => {
   const [localEmps, setLocalEmps] = useState([]); 
   const [localDepts, setLocalDepts] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -400,6 +400,12 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
       }
     });
     
+    if (targetYear) {
+      hasHistory = true;
+      if (targetYear < min) min = targetYear;
+      if (targetYear > max) max = targetYear;
+    }
+
     if (!hasHistory) {
       min = new Date().getFullYear() - 5;
     }
@@ -543,6 +549,27 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
         emp.promoYearDeputyHead || '',
         emp.promoYearDeptHead || '',
         ...historyYears.map(year => {
+          if (year === targetYear) {
+              let histStr = '';
+              const nDept = dMap.get(emp.departmentId);
+              if (nDept && nDept.id !== 'unassigned' && nDept.id !== 'retired') {
+                  histStr = nDept.name;
+                  if (emp.postId) {
+                    const p = (nDept.posts || []).find(p => p.id === emp.postId);
+                    if (p) histStr += '（' + p.name + '）';
+                  } else if (emp.groupId) {
+                    const g = (nDept.groups || []).find(g => g.id === emp.groupId);
+                    if (g) {
+                      histStr += ' ' + g.name;
+                      if (emp.groupPostId) {
+                        const gp = (g.posts || []).find(p => p.id === emp.groupPostId);
+                        if (gp) histStr += '（' + gp.name + '）';
+                      }
+                    }
+                  }
+              }
+              return histStr;
+          }
           const hist = (emp.history || []).find(h => h.year === year);
           return hist ? hist.department : '';
         })
@@ -1237,10 +1264,33 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                     {renderPromoCell(emp, 'promoYearDeputyHead')}
                     {renderPromoCell(emp, 'promoYearDeptHead')}
                     {historyYears.length > 0 && historyYears.map(year => {
-                      const hist = (emp.history || []).find(h => h.year === year);
+                      let histStr = '';
+                      if (year === targetYear) {
+                          const nDept = localDepts.find(d => d.id === emp.departmentId);
+                          if (nDept && nDept.id !== 'unassigned' && nDept.id !== 'retired') {
+                              histStr = nDept.name;
+                              if (emp.postId) {
+                                const p = (nDept.posts || []).find(p => p.id === emp.postId);
+                                if (p) histStr += '（' + p.name + '）';
+                              } else if (emp.groupId) {
+                                const g = (nDept.groups || []).find(g => g.id === emp.groupId);
+                                if (g) {
+                                  histStr += ' ' + g.name;
+                                  if (emp.groupPostId) {
+                                    const gp = (g.posts || []).find(p => p.id === emp.groupPostId);
+                                    if (gp) histStr += '（' + gp.name + '）';
+                                  }
+                                }
+                              }
+                          }
+                      } else {
+                          const hist = (emp.history || []).find(h => h.year === year);
+                          histStr = hist ? hist.department : '';
+                      }
+                      
                       return (
                         <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[60px] w-[60px]">
-                          <input type="text" value={hist ? hist.department : ''} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center"} title={hist ? hist.department : ''} />
+                          <input type="text" value={histStr} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center"} title={histStr} />
                         </td>
                       );
                     })}
