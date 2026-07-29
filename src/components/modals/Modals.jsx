@@ -446,6 +446,17 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
         if (av > bv) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
+    } else {
+      items.sort((a, b) => {
+        const gradeA = getGradeLevel(a.currentGrade);
+        const gradeB = getGradeLevel(b.currentGrade);
+        if (gradeA !== gradeB) {
+          return gradeB - gradeA;
+        }
+        const yA = Number(a.currentYears || 0);
+        const yB = Number(b.currentYears || 0);
+        return yB - yA;
+      });
     }
     return items;
   }, [localEmps, sortConfig]);
@@ -1100,7 +1111,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                 <th colSpan="5" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-100 text-slate-700">今年度</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-blue-100/50 text-[#065084]">来年度</th>
-<th colSpan="8" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦)</th>
+<th colSpan="9" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦)</th>
                 {historyYears.length > 0 && <th colSpan={historyYears.length} className="px-2 py-1 border-b border-l text-center bg-emerald-100/50 text-emerald-900">履歴</th>}
               </tr>
               <tr>
@@ -1136,14 +1147,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                 <Th label="備考" sortKey="nextEmploymentType" className="bg-blue-50/50 border-r" />
                 <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
-                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="来年度まで" sortKey="" className="bg-fuchsia-50/50 border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
                 {historyYears.length > 0 && historyYears.map(year => (
                   <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l w-14 min-w-[56px] text-[10px]" />
                 ))}
@@ -1176,12 +1188,27 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                 const renderPromoCell = (emp, key, isFirst = false) => {
                   const diff = getDiff(emp, key);
                   return (
-                    <td key={key} className={cx("bg-fuchsia-50/30 p-0.5 align-middle", isFirst ? "border-l" : "")}>
-                      <div className="flex flex-col items-center justify-center">
-                        <input type="text" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center px-1 w-full')} />
-                        <div className="h-[12px] flex items-center justify-center mt-0.5">
-                          {diff !== null && <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded-sm leading-none border border-emerald-100 shadow-sm">{diff}年</span>}
-                        </div>
+                    <td key={key} className={cx("bg-fuchsia-50/30 p-1 align-middle", isFirst ? "border-l" : "")}>
+                      <div className="flex flex-row items-center justify-center gap-1">
+                        <input type="text" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center px-0.5 w-[38px] shrink-0')} />
+                        {diff !== null && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded-sm border border-emerald-100 shadow-sm whitespace-nowrap shrink-0 leading-tight">{diff}年</span>}
+                      </div>
+                    </td>
+                  );
+                };
+                
+                const renderFinalDiffCell = (emp) => {
+                  const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+                  let prevY = NaN;
+                  for (let i = pKeys.length - 1; i >= 0; i--) {
+                    const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+                    if (!isNaN(y)) { prevY = y; break; }
+                  }
+                  const diff = (!isNaN(prevY)) ? targetYear - prevY : null;
+                  return (
+                    <td className="bg-fuchsia-50/30 p-1 align-middle border-r">
+                      <div className="flex items-center justify-center h-full min-h-[26px]">
+                        {diff !== null && <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-sm border border-blue-200 shadow-sm whitespace-nowrap leading-tight">{diff >= 0 ? diff : 0}年</span>}
                       </div>
                     </td>
                   );
@@ -1263,6 +1290,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                     {renderPromoCell(emp, 'promoYearDivHead')}
                     {renderPromoCell(emp, 'promoYearDeputyHead')}
                     {renderPromoCell(emp, 'promoYearDeptHead')}
+                    {renderFinalDiffCell(emp)}
                     {historyYears.length > 0 && historyYears.map(year => {
                       let histStr = '';
                       if (year === targetYear) {
@@ -1289,8 +1317,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                       }
                       
                       return (
-                        <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[60px] w-[60px]">
-                          <input type="text" value={histStr} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center"} title={histStr} />
+                        <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[60px] w-[60px] relative group/hist">
+                          <input type="text" value={histStr} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center cursor-default"} title="" />
+                          {histStr && (
+                            <div className="absolute hidden group-hover/hist:block z-[999] bg-slate-800 text-white text-[11px] rounded py-1 px-2 top-full left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap shadow-xl pointer-events-none">
+                              {histStr}
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
+                            </div>
+                          )}
                         </td>
                       );
                     })}
