@@ -493,17 +493,21 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   const handleExportHTML = () => {
     const scriptStr = `
       function sortTable(n) {
-        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        var table, tbody, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
         table = document.getElementById("empTable");
+        tbody = table.getElementsByTagName("tbody")[0];
+        if (!tbody) return;
         switching = true;
         dir = "asc";
         while (switching) {
           switching = false;
-          rows = table.rows;
-          for (i = 2; i < (rows.length - 1); i++) {
+          rows = tbody.rows;
+          for (i = 0; i < (rows.length - 1); i++) {
             shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
+            var tdsX = rows[i].getElementsByTagName("TD");
+            var tdsY = rows[i + 1].getElementsByTagName("TD");
+            x = tdsX.length > n ? tdsX[n] : null;
+            y = tdsY.length > n ? tdsY[n] : null;
             var valX = x ? (x.getAttribute("data-val") || x.innerText).toLowerCase() : "";
             var valY = y ? (y.getAttribute("data-val") || y.innerText).toLowerCase() : "";
             var numX = Number(valX);
