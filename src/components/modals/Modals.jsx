@@ -554,7 +554,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
 <meta name="google" content="notranslate">
 <title>職員一括編集 HTML保存</title>
 <style>
-  body { font-family: sans-serif; font-size: 11px; margin: 20px; color: #334155; }
+  body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Meiryo", sans-serif; font-size: 11px; margin: 20px; color: #334155; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   table { border-collapse: collapse; width: max-content; }
   th, td { border: 1px solid #cbd5e1; padding: 4px; text-align: center; vertical-align: middle; white-space: nowrap; }
   th { cursor: pointer; user-select: none; }
