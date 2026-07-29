@@ -384,7 +384,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
     let max = min + 1;
     let hasHistory = false;
     
-    const allEmps = [...(employees || [])];
+    const allEmps = [...(localEmps || [])];
     if (importData) {
       if (importData.additions) allEmps.push(...importData.additions);
       if (importData.updates) allEmps.push(...importData.updates);
@@ -405,7 +405,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
     }
     
     return Array.from({ length: max - min + 1 }, (_, i) => min + i);
-  }, [employees, importData]);
+  }, [localEmps, importData]);
 
   useEffect(() => { 
     if (isOpen) {
