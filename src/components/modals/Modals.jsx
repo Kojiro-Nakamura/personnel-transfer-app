@@ -1147,15 +1147,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                 <Th label="備考" sortKey="nextEmploymentType" className="bg-blue-50/50 border-r" />
                 <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
-                <Th label="採用" sortKey="hireDate" className="bg-fuchsia-50/50 border-l border-r w-[48px] min-w-[48px] whitespace-normal leading-tight" />
-                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
-                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[96px] min-w-[96px] whitespace-normal leading-tight" />
+                <Th label="採用" sortKey="hireDate" className="bg-fuchsia-50/50 border-l border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
+                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[110px] min-w-[110px] whitespace-normal leading-tight" />
                 <Th label="来年度まで" sortKey="" className="bg-fuchsia-50/50 border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
                 {historyYears.length > 0 && historyYears.map(year => (
                   <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l w-14 min-w-[56px] text-[10px]" />
