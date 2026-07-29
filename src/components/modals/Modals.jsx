@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getEraFormattedYear, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getEraFormattedYear, extractYearFromHeader, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -571,9 +571,9 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
       const headerCols = parseCSVRow(lines[0]);
       const csvYearsMap = new Map();
       for (let k = 32; k < headerCols.length; k++) {
-        const m = headerCols[k] ? headerCols[k].match(/^(\d{4})/) : null;
-        if (m) {
-          csvYearsMap.set(k, parseInt(m[1], 10));
+        const year = extractYearFromHeader(headerCols[k]);
+        if (year) {
+          csvYearsMap.set(k, year);
         }
       }
       
