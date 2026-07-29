@@ -370,6 +370,15 @@ export const TitleChangeConfirmModal = ({ isOpen, onClose, onConfirm, data }) =>
   );
 };
 
+const getEraSuffixLocal = (year) => {
+  const y = parseInt(year);
+  if (isNaN(y)) return '';
+  if (y >= 2019) return `R${y - 2018}`;
+  if (y >= 1989) return `H${y - 1988}`;
+  if (y >= 1926) return `S${y - 1925}`;
+  return '';
+};
+
 export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments, targetYear }) => {
   const [localEmps, setLocalEmps] = useState([]); 
   const [localDepts, setLocalDepts] = useState([]);
@@ -1446,14 +1455,7 @@ ${scriptStr}
                 const isS = selectedIds.has(emp.id);
                 const handleChange = (id, key, val) => setLocalEmps(prev => prev.map(e => e.id === id ? { ...e, [key]: val } : e));
 
-                const getEraSuffixLocal = (year) => {
-    const y = parseInt(year);
-    if (isNaN(y)) return '';
-    if (y >= 2019) return `R${y - 2018}`;
-    if (y >= 1989) return `H${y - 1988}`;
-    if (y >= 1926) return `S${y - 1925}`;
-    return '';
-  };
+
 
   const getDiff = (emp, currentKey) => {
                   const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
