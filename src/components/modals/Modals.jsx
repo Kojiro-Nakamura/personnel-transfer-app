@@ -556,7 +556,7 @@ ${scriptStr}
       <th colspan="6" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度</th>
       <th colspan="7" class="bg-blue">来年度</th>
-      <th colspan="10" class="bg-fuchsia">昇進年度 (西暦)</th>
+      <th colspan="10" class="bg-fuchsia">昇進年度 (西暦(和暦))</th>
       ${historyYears.length > 0 ? `<th colspan="${historyYears.length}" class="bg-emerald">履歴</th>` : ''}
     </tr>
     <tr>
@@ -581,14 +581,14 @@ ${scriptStr}
       <th onclick="sortTable(18)" class="bg-blue">備考</th>
       <th onclick="sortTable(19)" class="bg-blue">カウント除外</th>
       <th onclick="sortTable(20)" class="bg-fuchsia" style="width: 56px;">採用</th>
-      <th onclick="sortTable(21)" class="bg-fuchsia" style="width: 72px;">係長級(主査)</th>
-      <th onclick="sortTable(22)" class="bg-fuchsia" style="width: 72px;">補佐級I(主任)</th>
-      <th onclick="sortTable(23)" class="bg-fuchsia" style="width: 72px;">補佐級II(班長)</th>
-      <th onclick="sortTable(24)" class="bg-fuchsia" style="width: 72px;">補佐級III</th>
-      <th onclick="sortTable(25)" class="bg-fuchsia" style="width: 72px;">課長級</th>
-      <th onclick="sortTable(26)" class="bg-fuchsia" style="width: 72px;">所属長級</th>
-      <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 72px;">次長級</th>
-      <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 72px;">部長級</th>
+      <th onclick="sortTable(21)" class="bg-fuchsia" style="width: 80px;">係長級(主査)</th>
+      <th onclick="sortTable(22)" class="bg-fuchsia" style="width: 80px;">補佐級I(主任)</th>
+      <th onclick="sortTable(23)" class="bg-fuchsia" style="width: 80px;">補佐級II(班長)</th>
+      <th onclick="sortTable(24)" class="bg-fuchsia" style="width: 80px;">補佐級III</th>
+      <th onclick="sortTable(25)" class="bg-fuchsia" style="width: 80px;">課長級</th>
+      <th onclick="sortTable(26)" class="bg-fuchsia" style="width: 80px;">所属長級</th>
+      <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 80px;">次長級</th>
+      <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 80px;">部長級</th>
       <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 56px;">来年度</th>
       ${historyYears.map((y, idx) => `<th onclick="sortTable(${30 + idx})" class="bg-emerald" style="width: 60px;">${getEraFormattedYear(y)}</th>`).join('')}
     </tr>
@@ -642,7 +642,11 @@ ${scriptStr}
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
-        cellHtml += emp[key] || '';
+        cellHtml += (emp[key] || '');
+        if (emp[key]) {
+          const suffix = getEraSuffixLocal(emp[key]);
+          if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
+        }
         return `<td class="bg-fuchsia" data-val="${emp[key]||''}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
 
@@ -1385,7 +1389,7 @@ ${scriptStr}
                 <th colSpan="5" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-100 text-slate-700">今年度</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-blue-100/50 text-[#065084]">来年度</th>
-<th colSpan="10" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦)</th>
+<th colSpan="10" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦(和暦))</th>
                 {historyYears.length > 0 && <th colSpan={historyYears.length} className="px-2 py-1 border-b border-l text-center bg-emerald-100/50 text-emerald-900">履歴</th>}
               </tr>
               <tr>
@@ -1422,14 +1426,14 @@ ${scriptStr}
                 <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
                 <Th label="採用" sortKey="hireDate" className="bg-fuchsia-50/50 border-l border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
-                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
+                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
                 <Th label="来年度" sortKey="" className="bg-fuchsia-50/50 border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
                 {historyYears.length > 0 && historyYears.map(year => (
                   <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l w-14 min-w-[56px] text-[10px]" />
@@ -1442,7 +1446,16 @@ ${scriptStr}
                 const isS = selectedIds.has(emp.id);
                 const handleChange = (id, key, val) => setLocalEmps(prev => prev.map(e => e.id === id ? { ...e, [key]: val } : e));
 
-                const getDiff = (emp, currentKey) => {
+                const getEraSuffixLocal = (year) => {
+    const y = parseInt(year);
+    if (isNaN(y)) return '';
+    if (y >= 2019) return `R${y - 2018}`;
+    if (y >= 1989) return `H${y - 1988}`;
+    if (y >= 1926) return `S${y - 1925}`;
+    return '';
+  };
+
+  const getDiff = (emp, currentKey) => {
                   const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
                   const currentIdx = pKeys.indexOf(currentKey);
                   if (currentIdx <= 0) return null;
@@ -1472,6 +1485,7 @@ ${scriptStr}
                         )}
                         {diff === null && <ChevronRight className="w-2.5 h-2.5 text-slate-300 shrink-0" />}
                         <input type="text" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center !px-0 !w-[34px] shrink-0')} />
+                        {emp[key] && <span className="text-[9px] text-slate-500 font-bold tracking-tighter shrink-0 select-none">({getEraSuffixLocal(emp[key])})</span>}
                       </div>
                     </td>
                   );

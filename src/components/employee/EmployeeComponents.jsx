@@ -437,7 +437,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           
           <div className="border border-slate-300 rounded p-2.5 my-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2 flex items-center gap-2">
-              昇進年度 (西暦) と経過年数
+              昇進年度 (西暦(和暦)) と経過年数
             </h4>
             <div className="grid grid-cols-[85px_1fr_85px_1fr_85px_1fr_85px_1fr_85px_1fr] gap-y-3 items-end justify-items-center">
               {/* Top Row */}
