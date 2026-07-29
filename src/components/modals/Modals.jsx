@@ -508,8 +508,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
             var tdsY = rows[i + 1].getElementsByTagName("TD");
             x = tdsX.length > n ? tdsX[n] : null;
             y = tdsY.length > n ? tdsY[n] : null;
-            var valX = x ? (x.getAttribute("data-val") || x.innerText).toLowerCase() : "";
-            var valY = y ? (y.getAttribute("data-val") || y.innerText).toLowerCase() : "";
+            var valX = x ? (x.hasAttribute("data-val") ? x.getAttribute("data-val") : x.textContent).toLowerCase() : "";
+            var valY = y ? (y.hasAttribute("data-val") ? y.getAttribute("data-val") : y.textContent).toLowerCase() : "";
             var numX = Number(valX);
             var numY = Number(valY);
             if (!isNaN(numX) && !isNaN(numY) && valX !== "" && valY !== "") {
