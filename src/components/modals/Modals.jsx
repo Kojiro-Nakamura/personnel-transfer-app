@@ -1107,16 +1107,16 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                 <Th label="備考" sortKey="nextEmploymentType" className="bg-blue-50/50 border-r" />
                 <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
-                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r" />
-                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r" />
-                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r" />
-                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r" />
-                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r" />
-                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r" />
-                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r" />
-                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50" />
+                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-14 min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 w-14 min-w-[56px] whitespace-normal leading-tight" />
                 {historyYears.length > 0 && historyYears.map(year => (
-                  <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l" />
+                  <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l w-14 min-w-[56px] text-[10px]" />
                 ))}
 
               </tr>
@@ -1144,12 +1144,12 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                     <td className={cx("sticky left-8 z-10 border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.2)]", isS ? "bg-emerald-50" : emp.isNew ? "bg-sky-50" : "bg-white group-hover:bg-slate-50")}>
                       <input type="text" value={emp.name||''} onChange={e => handleChange(emp.id,'name',e.target.value)} className={cx(inputCls, "font-bold text-slate-800")} />
                     </td>
-                    <td><input type="text" value={emp.employeeNumber||''} onChange={e => handleChange(emp.id,'employeeNumber',e.target.value)} className={inputCls} /></td>
-                    <td><input type="date" value={emp.birthDate||''} onChange={e => handleChange(emp.id,'birthDate',e.target.value)} className={inputCls} /></td>
-                    <td><input type="text" value={emp.education||''} onChange={e => handleChange(emp.id,'education',e.target.value)} className={inputCls} /></td>
-                    <td><input type="date" value={emp.hireDate||''} onChange={e => handleChange(emp.id,'hireDate',e.target.value)} className={inputCls} /></td>
+                    <td><input type="text" value={emp.employeeNumber||''} onChange={e => handleChange(emp.id,'employeeNumber',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td><input type="date" value={emp.birthDate||''} onChange={e => handleChange(emp.id,'birthDate',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td><input type="text" value={emp.education||''} onChange={e => handleChange(emp.id,'education',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td><input type="date" value={emp.hireDate||''} onChange={e => handleChange(emp.id,'hireDate',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="border-r relative group/input">
-                      <input type="text" value={emp.note||''} onChange={e => handleChange(emp.id,'note',e.target.value)} className={inputCls} />
+                      <input type="text" value={emp.note||''} onChange={e => handleChange(emp.id,'note',e.target.value)} className={cx(inputCls, 'text-center px-1')} />
                       {emp.note && (
                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
                           {emp.note}
@@ -1165,16 +1165,16 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                         onChange={v => setLocalEmps(prev => prev.map(e => e.id === emp.id ? { ...e, currentDeptId: v.deptId, currentPostId: v.postId, currentGroupId: v.groupId, currentGroupPostId: v.groupPostId } : e))} 
                       />
                     </td>
-                    <td className="bg-slate-50/30"><input type="text" value={emp.currentTitle||''} onChange={e => handleChange(emp.id,'currentTitle',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-slate-50/30"><input type="text" value={emp.currentTitle||''} onChange={e => handleChange(emp.id,'currentTitle',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-slate-50/30">
-                      <select value={emp.currentGrade||''} onChange={e => handleChange(emp.id,'currentGrade',e.target.value)} className={inputCls}>
+                      <select value={emp.currentGrade||''} onChange={e => handleChange(emp.id,'currentGrade',e.target.value)} className={cx(inputCls, 'text-center px-1')}>
                         {GRADE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </td>
-                    <td className="bg-slate-50/30"><input type="number" value={emp.currentYears||0} onChange={e => handleChange(emp.id,'currentYears',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-slate-50/30"><input type="text" value={emp.currentSkillsStr||''} onChange={e => handleChange(emp.id,'currentSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={inputCls} /></td>
-                    <td className="bg-slate-50/30"><input type="text" value={emp.currentEmploymentType||''} onChange={e => handleChange(emp.id,'currentEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={inputCls} /></td>
-                    <td className="bg-slate-50/30 border-r"><input type="text" list="exclude-list-bulk" value={emp.currentExclude||''} onChange={e => handleChange(emp.id,'currentExclude',e.target.value)} placeholder="事務職など" className={inputCls} /></td>
+                    <td className="bg-slate-50/30"><input type="number" value={emp.currentYears||0} onChange={e => handleChange(emp.id,'currentYears',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-slate-50/30"><input type="text" value={emp.currentSkillsStr||''} onChange={e => handleChange(emp.id,'currentSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-slate-50/30"><input type="text" value={emp.currentEmploymentType||''} onChange={e => handleChange(emp.id,'currentEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-slate-50/30 border-r"><input type="text" list="exclude-list-bulk" value={emp.currentExclude||''} onChange={e => handleChange(emp.id,'currentExclude',e.target.value)} placeholder="事務職など" className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-blue-50/30 p-1">
                       <PlacementSelector 
                         className="h-[26px] gap-1" 
@@ -1183,29 +1183,29 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
                         onChange={v => setLocalEmps(prev => prev.map(e => e.id === emp.id ? { ...e, departmentId: v.deptId, postId: v.postId, groupId: v.groupId, groupPostId: v.groupPostId } : e))} 
                       />
                     </td>
-                    <td className="bg-blue-50/30"><input type="text" value={emp.nextTitle||''} onChange={e => handleChange(emp.id,'nextTitle',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-blue-50/30"><input type="text" value={emp.nextTitle||''} onChange={e => handleChange(emp.id,'nextTitle',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-blue-50/30">
-                      <select value={emp.nextGrade||''} onChange={e => handleChange(emp.id,'nextGrade',e.target.value)} className={inputCls}>
+                      <select value={emp.nextGrade||''} onChange={e => handleChange(emp.id,'nextGrade',e.target.value)} className={cx(inputCls, 'text-center px-1')}>
                         {GRADE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </td>
-                    <td className="bg-blue-50/30"><input type="number" value={emp.nextYears||0} onChange={e => handleChange(emp.id,'nextYears',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-blue-50/30"><input type="text" value={emp.nextSkillsStr||''} onChange={e => handleChange(emp.id,'nextSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={inputCls} /></td>
-                    <td className="bg-blue-50/30"><input type="text" value={emp.nextEmploymentType||''} onChange={e => handleChange(emp.id,'nextEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={inputCls} /></td>
-                    <td className="bg-blue-50/30"><input type="text" list="exclude-list-bulk" value={emp.nextExclude||''} onChange={e => handleChange(emp.id,'nextExclude',e.target.value)} placeholder="事務職など" className={inputCls} /></td>
+                    <td className="bg-blue-50/30"><input type="number" value={emp.nextYears||0} onChange={e => handleChange(emp.id,'nextYears',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-blue-50/30"><input type="text" value={emp.nextSkillsStr||''} onChange={e => handleChange(emp.id,'nextSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-blue-50/30"><input type="text" value={emp.nextEmploymentType||''} onChange={e => handleChange(emp.id,'nextEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-blue-50/30"><input type="text" list="exclude-list-bulk" value={emp.nextExclude||''} onChange={e => handleChange(emp.id,'nextExclude',e.target.value)} placeholder="事務職など" className={cx(inputCls, 'text-center px-1')} /></td>
 
-                    <td className="bg-fuchsia-50/30 border-l"><input type="number" value={emp.promoYearChief||''} onChange={e => handleChange(emp.id,'promoYearChief',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant1||''} onChange={e => handleChange(emp.id,'promoYearAssistant1',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant2||''} onChange={e => handleChange(emp.id,'promoYearAssistant2',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearAssistant3||''} onChange={e => handleChange(emp.id,'promoYearAssistant3',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearSecHead||''} onChange={e => handleChange(emp.id,'promoYearSecHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDivHead||''} onChange={e => handleChange(emp.id,'promoYearDivHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeputyHead||''} onChange={e => handleChange(emp.id,'promoYearDeputyHead',e.target.value)} className={inputCls} /></td>
-                    <td className="bg-fuchsia-50/30"><input type="number" value={emp.promoYearDeptHead||''} onChange={e => handleChange(emp.id,'promoYearDeptHead',e.target.value)} className={inputCls} /></td>
+                    <td className="bg-fuchsia-50/30 border-l"><input type="text" value={emp.promoYearChief||''} onChange={e => handleChange(emp.id,'promoYearChief',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearAssistant1||''} onChange={e => handleChange(emp.id,'promoYearAssistant1',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearAssistant2||''} onChange={e => handleChange(emp.id,'promoYearAssistant2',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearAssistant3||''} onChange={e => handleChange(emp.id,'promoYearAssistant3',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearSecHead||''} onChange={e => handleChange(emp.id,'promoYearSecHead',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearDivHead||''} onChange={e => handleChange(emp.id,'promoYearDivHead',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearDeputyHead||''} onChange={e => handleChange(emp.id,'promoYearDeputyHead',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-fuchsia-50/30"><input type="text" value={emp.promoYearDeptHead||''} onChange={e => handleChange(emp.id,'promoYearDeptHead',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
                     {historyYears.length > 0 && historyYears.map(year => {
                       const hist = (emp.history || []).find(h => h.year === year);
                       return (
-                        <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[120px]">
+                        <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[60px] w-[60px]">
                           <input type="text" value={hist ? hist.department : ''} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center"} title={hist ? hist.department : ''} />
                         </td>
                       );
