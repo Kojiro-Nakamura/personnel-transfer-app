@@ -1349,13 +1349,6 @@ ${scriptStr}
               <DownloadCloud className="w-3.5 h-3.5" />CSV保存
             </button>
             <button 
-              onClick={handleExportHTML} 
-              className="ml-2 px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold flex items-center gap-1 border border-orange-200 hover:bg-orange-200 transition-colors" 
-              title="現在の内容をHTML形式で保存します（閲覧・ソート用）"
-            >
-              <FileCode className="w-3.5 h-3.5" />HTML保存
-            </button>
-            <button 
               onClick={handleDownloadTemplate} 
               className="ml-2 px-3 py-1 bg-slate-100 text-slate-700 rounded text-xs font-bold flex items-center gap-1 border border-slate-300 hover:bg-slate-200 transition-colors" 
               title="インポート用のCSVひな型をダウンロードします"
@@ -1371,6 +1364,13 @@ ${scriptStr}
                 選択削除
               </button>
             )}
+            <button 
+              onClick={handleExportHTML} 
+              className="ml-2 px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold flex items-center gap-1 border border-orange-200 hover:bg-orange-200 transition-colors" 
+              title="現在の内容をHTML形式で保存します（閲覧・ソート用）"
+            >
+              <FileCode className="w-3.5 h-3.5" />HTML保存
+            </button>
           </div>
           <button onClick={onClose} title="閉じる"><X className="w-4 h-4" /></button>
         </div>
