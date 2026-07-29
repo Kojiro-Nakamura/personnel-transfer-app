@@ -387,7 +387,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     } else if (currentIdx === lastFilledIdx + 1) {
       // Final "来年度まで" arrow
       const lastY = pKeys[lastFilledIdx] === 'hire' ? (fd.hireDate ? parseInt(fd.hireDate.substring(0,4)) : NaN) : parseInt(fd[pKeys[lastFilledIdx]]);
-      const diff = !isNaN(lastY) ? (targetYear - lastY) : null;
+      const diff = !isNaN(lastY) ? (targetYear - lastY + 1) : null;
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
           <span className="text-[9px] font-bold text-blue-600 leading-tight whitespace-nowrap">来年度</span>
@@ -489,4 +489,5 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     </div>
   );
 };
-
+
+

@@ -588,7 +588,7 @@ ${scriptStr}
       <th onclick="sortTable(26)" class="bg-fuchsia" style="width: 72px;">所属長級</th>
       <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 72px;">次長級</th>
       <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 72px;">部長級</th>
-      <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 56px;">来年度まで</th>
+      <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 56px;">来年度</th>
       ${historyYears.map((y, idx) => `<th onclick="sortTable(${30 + idx})" class="bg-emerald" style="width: 60px;">${getEraFormattedYear(y)}</th>`).join('')}
     </tr>
   </thead>
@@ -652,7 +652,7 @@ ${scriptStr}
           const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
           if (!isNaN(y)) { prevY = y; break; }
         }
-        const diff = (!isNaN(prevY)) ? targetYear - prevY : null;
+        const diff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
         let cellHtml = '';
         if (diff !== null) {
           cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff >= 0 ? diff : 0}年</span>`;
@@ -1429,7 +1429,7 @@ ${scriptStr}
                 <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
                 <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
                 <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="来年度まで" sortKey="" className="bg-fuchsia-50/50 border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
+                <Th label="来年度" sortKey="" className="bg-fuchsia-50/50 border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
                 {historyYears.length > 0 && historyYears.map(year => (
                   <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l w-14 min-w-[56px] text-[10px]" />
                 ))}
@@ -1483,7 +1483,7 @@ ${scriptStr}
                     const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
                     if (!isNaN(y)) { prevY = y; break; }
                   }
-                  const diff = (!isNaN(prevY)) ? targetYear - prevY : null;
+                  const diff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
                   return (
                     <td className="bg-fuchsia-50/30 p-0.5 align-middle border-r">
                       <div className="flex flex-row items-center justify-start gap-0.5 h-full min-h-[26px] overflow-hidden">
