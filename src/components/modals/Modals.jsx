@@ -523,9 +523,10 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
     `;
 
     let html = `<!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="utf-8">
+<meta name="google" content="notranslate">
 <title>職員一括編集 HTML保存</title>
 <style>
   body { font-family: sans-serif; font-size: 11px; margin: 20px; color: #334155; }
