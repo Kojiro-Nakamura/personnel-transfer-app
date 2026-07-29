@@ -370,9 +370,29 @@ export const TitleChangeConfirmModal = ({ isOpen, onClose, onConfirm, data }) =>
   );
 };
 
-const historyYears = Array.from({ length: 2069 - 1985 + 1 }, (_, i) => 1985 + i);
-
 export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments }) => {
+  const historyYears = useMemo(() => {
+    let min = new Date().getFullYear();
+    let max = min + 1;
+    let hasHistory = false;
+    
+    (employees || []).forEach(emp => {
+      if (emp.history && emp.history.length > 0) {
+        hasHistory = true;
+        emp.history.forEach(h => {
+          if (h.year < min) min = h.year;
+          if (h.year > max) max = h.year;
+        });
+      }
+    });
+    
+    if (!hasHistory) {
+      min = new Date().getFullYear() - 5;
+    }
+    
+    return Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  }, [employees]);
+
   const [localEmps, setLocalEmps] = useState([]); 
   const [localDepts, setLocalDepts] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -548,6 +568,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
         return; 
       }
       
+      const headerCols = parseCSVRow(lines[0]);
+      const csvYearsMap = new Map();
+      for (let k = 32; k < headerCols.length; k++) {
+        const m = headerCols[k] ? headerCols[k].match(/^(\d{4})/) : null;
+        if (m) {
+          csvYearsMap.set(k, parseInt(m[1], 10));
+        }
+      }
+      
       const nDepts = [...localDepts]; 
       const dMap = new Map(nDepts.map(d => [d.name, d])); 
       const adds = []; 
@@ -674,12 +703,11 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
           promoYearDeptHead: pDept,
         };
 
-        if (cols.length > 32) {
+        if (csvYearsMap.size > 0) {
           let newHistory = [];
-          for (let k = 0; k < historyYears.length; k++) {
-            if (32 + k < cols.length) {
-              const year = historyYears[k];
-              const deptName = cols[32 + k] || '';
+          for (let [k, year] of csvYearsMap.entries()) {
+            if (k < cols.length) {
+              const deptName = cols[k] || '';
               if (deptName) {
                 const age = calculateAge(parseJapaneseDate(bStr), year);
                 newHistory.push({
@@ -691,6 +719,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
               }
             }
           }
+          newHistory.sort((a, b) => a.year - b.year);
           newEmpData.history = newHistory;
         } else if (targetEmp && targetEmp.history) {
           newEmpData.history = targetEmp.history;
