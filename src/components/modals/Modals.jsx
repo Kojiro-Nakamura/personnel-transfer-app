@@ -1147,14 +1147,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                 <Th label="備考" sortKey="nextEmploymentType" className="bg-blue-50/50 border-r" />
                 <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
-                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
-                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[72px] min-w-[72px] whitespace-normal leading-tight" />
+                <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-l border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="補佐級I(主任)" sortKey="promoYearAssistant1" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="補佐級II(班長)" sortKey="promoYearAssistant2" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="補佐級III" sortKey="promoYearAssistant3" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="課長級" sortKey="promoYearSecHead" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="所属長級" sortKey="promoYearDivHead" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="次長級" sortKey="promoYearDeputyHead" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
+                <Th label="部長級" sortKey="promoYearDeptHead" className="bg-fuchsia-50/50 border-r w-[82px] min-w-[82px] whitespace-normal leading-tight" />
                 <Th label="来年度まで" sortKey="" className="bg-fuchsia-50/50 border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
                 {historyYears.length > 0 && historyYears.map(year => (
                   <Th key={`hist-h-${year}`} label={getEraFormattedYear(year)} sortKey={`hist_${year}`} className="bg-emerald-50/50 border-l w-14 min-w-[56px] text-[10px]" />
@@ -1190,8 +1190,13 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   return (
                     <td key={key} className={cx("bg-fuchsia-50/30 p-1 align-middle", isFirst ? "border-l" : "")}>
                       <div className="flex flex-row items-center justify-center gap-1">
+                        {diff !== null && (
+                          <div className="flex flex-row items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-0.5 rounded-sm border border-emerald-100 shadow-sm shrink-0 leading-tight whitespace-nowrap">
+                            {diff}年<ChevronRight className="w-2 h-2 ml-0.5 text-emerald-500" />
+                          </div>
+                        )}
+                        {diff === null && <ChevronRight className="w-2 h-2 text-slate-300 shrink-0" />}
                         <input type="text" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center px-0.5 w-[38px] shrink-0')} />
-                        {diff !== null && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded-sm border border-emerald-100 shadow-sm whitespace-nowrap shrink-0 leading-tight">{diff}年</span>}
                       </div>
                     </td>
                   );
@@ -1207,8 +1212,13 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   const diff = (!isNaN(prevY)) ? targetYear - prevY : null;
                   return (
                     <td className="bg-fuchsia-50/30 p-1 align-middle border-r">
-                      <div className="flex items-center justify-center h-full min-h-[26px]">
-                        {diff !== null && <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-sm border border-blue-200 shadow-sm whitespace-nowrap leading-tight">{diff >= 0 ? diff : 0}年</span>}
+                      <div className="flex flex-row items-center justify-start gap-1 h-full min-h-[26px]">
+                        {diff !== null && (
+                          <div className="flex flex-row items-center text-[10px] font-bold text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-200 shadow-sm shrink-0 leading-tight whitespace-nowrap">
+                            {diff >= 0 ? diff : 0}年<ChevronRight className="w-2 h-2 ml-0.5 text-blue-500" />
+                          </div>
+                        )}
+                        {diff === null && <ChevronRight className="w-2 h-2 text-slate-300 shrink-0" />}
                       </div>
                     </td>
                   );
