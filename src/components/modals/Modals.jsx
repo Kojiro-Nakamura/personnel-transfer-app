@@ -529,6 +529,18 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
           }
         }
       }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        var tbody = document.querySelector("#empTable tbody");
+        if(tbody) {
+          tbody.addEventListener("click", function(e) {
+            var tr = e.target.closest("tr");
+            if(tr) {
+              tr.classList.toggle("highlight");
+            }
+          });
+        }
+      });
     `;
 
     let html = `<!DOCTYPE html>
@@ -553,6 +565,11 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   .diff-span { font-size: 10px; font-weight: bold; border-radius: 2px; padding: 1px 3px; margin-right: 2px; border: 1px solid; }
   .diff-emerald { color: #059669; background-color: #ecfdf5; border-color: #d1fae5; }
   .diff-blue { color: #2563eb; background-color: #eff6ff; border-color: #bfdbfe; }
+  thead { position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  thead .sticky-col { z-index: 30; }
+  .highlight > td { background-color: #fef08a !important; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover > td { opacity: 0.9; }
 </style>
 <script>
 ${scriptStr}
