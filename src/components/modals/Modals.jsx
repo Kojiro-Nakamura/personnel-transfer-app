@@ -743,14 +743,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
 
           // 今年度情報
           const cDName = getVal('【今年度】部署名');
-          const cPName = getVal('【今年度】ポスト・役職名');
-          const cGPName = getVal('【今年度】内部ポスト名');
+          const cPName = getVal('【今年度】ポスト・班名');
+          const cGPName = getVal('【今年度】班内ポスト名');
           const cTitle = getVal('【今年度】職名');
           const cGrade = getVal('【今年度】級');
           const cYsStr = getVal('【今年度】年数');
           const cSkStr = getVal('【今年度】詳細');
-          const cNote = getVal('【今年度】人');
-          const cExclude = getVal('【今年度】カウント外');
+          const cNote = getVal('【今年度】備考');
+          const cExclude = getVal('【今年度】カウント除外');
 
           let currP = { dId: 'unassigned', pId: null, gId: null, gpId: null };
           if (cDName !== undefined || cPName !== undefined || cGPName !== undefined) {
@@ -761,14 +761,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments 
 
           // 来年度情報
           const nDName = getVal('【来年度】部署名');
-          const nPName = getVal('【来年度】ポスト・役職名');
-          const nGPName = getVal('【来年度】内部ポスト名');
+          const nPName = getVal('【来年度】ポスト・班名');
+          const nGPName = getVal('【来年度】班内ポスト名');
           const nTitle = getVal('【来年度】職名');
           const nGrade = getVal('【来年度】級');
           const nYsStr = getVal('【来年度】年数');
           const nSkStr = getVal('【来年度】詳細');
-          const nNote = getVal('【来年度】人');
-          const nExclude = getVal('【来年度】カウント外');
+          const nNote = getVal('【来年度】備考');
+          const nExclude = getVal('【来年度】カウント除外');
 
           let nextP = { dId: 'unassigned', pId: null, gId: null, gpId: null };
           if (nDName !== undefined || nPName !== undefined || nGPName !== undefined) {
