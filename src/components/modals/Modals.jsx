@@ -554,7 +554,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
 <meta name="google" content="notranslate">
 <title>職員一括編集 HTML保存</title>
 <style>
-  body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Meiryo", sans-serif; font-size: 11px; margin: 20px; color: #334155; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Meiryo", sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; }
   th, td { border-right: 1px solid #94a3b8; border-bottom: 1px solid #94a3b8; padding: 4px; text-align: center; vertical-align: middle; white-space: nowrap; background-clip: padding-box; }
   th { cursor: pointer; user-select: none; }
@@ -736,7 +736,7 @@ ${scriptStr}
         }
       }
       const nameVal = emp.name || '';
-      const nameWithAge = nameVal + ageStr;
+      const nameWithAge = nameVal + (ageStr ? ' ' + ageStr : '');
 
       html += `
     <tr>
