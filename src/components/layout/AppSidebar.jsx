@@ -90,7 +90,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
 };
 
 export const AppSidebar = () => {
-  const { nextMap, isPickingMode, handleCellClick } = useApp();
+  const { nextMap, isPickingMode, handleCellClick, mutations } = useApp();
   return (
     <div className="w-full md:w-[260px] flex flex-col gap-2 shrink-0 h-full">
       <div 
