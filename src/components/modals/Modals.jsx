@@ -577,12 +577,12 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   tbody td.bg-emerald { background-color: #ecfdf5; }
   
   /* Sticky name column */
-  .sticky-name { position: sticky; left: 0; font-weight: bold; min-width: 120px; width: 120px; box-sizing: border-box; }
+  .sticky-name { position: sticky; left: 0; font-weight: bold; min-width: 90px; width: 90px; box-sizing: border-box; }
   tbody td.sticky-name { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-name { z-index: 30; background-color: #94a3b8; color: #fff; }
 
   /* Sticky age column */
-  .sticky-age { position: sticky; left: 120px; font-weight: bold; min-width: 50px; width: 50px; box-sizing: border-box; }
+  .sticky-age { position: sticky; left: 90px; font-weight: bold; min-width: 50px; width: 50px; box-sizing: border-box; }
   tbody td.sticky-age { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-age { z-index: 30; background-color: #94a3b8; color: #fff; }
   
