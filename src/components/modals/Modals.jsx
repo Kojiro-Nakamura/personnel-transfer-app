@@ -448,10 +448,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
       items.sort((a, b) => {
         let av = a[sortConfig.key] || ''; 
         let bv = b[sortConfig.key] || '';
-        if (sortConfig.key.includes('Years')) { 
-          av = Number(av); 
-          bv = Number(bv); 
+        
+        if (sortConfig.key === 'currentGrade' || sortConfig.key === 'nextGrade') {
+          av = getGradeLevel(av);
+          bv = getGradeLevel(bv);
+        } else if (sortConfig.key.includes('Years') || ['promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'].includes(sortConfig.key)) { 
+          av = Number(av) || 0; 
+          bv = Number(bv) || 0; 
         }
+
         if (av < bv) return sortConfig.direction === 'asc' ? -1 : 1;
         if (av > bv) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
