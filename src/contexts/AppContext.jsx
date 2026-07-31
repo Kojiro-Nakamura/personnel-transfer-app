@@ -4,6 +4,7 @@ import { useAppHistory } from '../hooks/useAppHistory.js';
 import { useAppMutations } from '../hooks/useAppMutations.js';
 import { useExportActions } from '../hooks/useExportActions.js';
 import { STORAGE_KEY } from '../constants/config.js';
+import { getGradeLevel } from '../utils/helpers.js';
 export const AppContext = createContext(null);
 export const useApp = () => useContext(AppContext);
 export function AppProvider({ children }) {
@@ -276,8 +277,28 @@ export function AppProvider({ children }) {
           newHistory.push({ year: history.targetYear, department: histStr });
         }
       }
+      const gradeToPromoKey = {
+        '主任級': 'promoYearChief',
+        '主査級（１）': 'promoYearAssistant1',
+        '主査級（２）': 'promoYearAssistant2',
+        '主査級（３）': 'promoYearAssistant3',
+        '課長級': 'promoYearSecHead',
+        '所属長級': 'promoYearDivHead',
+        '次長級': 'promoYearDeputyHead',
+        '部長級': 'promoYearDeptHead'
+      };
+
+      let promoUpdates = {};
+      if (getGradeLevel(e.nextGrade) > getGradeLevel(e.currentGrade)) {
+        const promoKey = gradeToPromoKey[e.nextGrade];
+        if (promoKey) {
+          promoUpdates[promoKey] = history.targetYear.toString();
+        }
+      }
+
       return { 
         ...e, 
+        ...promoUpdates,
         currentDeptId: e.departmentId, 
         currentPostId: e.postId, 
         currentGroupId: e.groupId, 
