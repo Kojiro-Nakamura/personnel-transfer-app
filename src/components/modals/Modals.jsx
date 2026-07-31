@@ -885,7 +885,13 @@ ${scriptStr}
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `人事異動案_職員一括_${targetYear}年度.html`);
+        const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const dateStr = `${yyyy}${mm}${dd}`;
+    const eraYear = getEraFormattedYear(targetYear);
+    link.setAttribute("download", `${dateStr}_${eraYear}年度_職員一覧.html`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
