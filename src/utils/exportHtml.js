@@ -1,6 +1,12 @@
 import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName } from './helpers.js';
 
 export const generateAndDownloadHTML = (employees, departments, targetYear) => {
+  const yearsSet = new Set();
+  employees.forEach(e => {
+    if (e.history) e.history.forEach(h => yearsSet.add(h.year));
+  });
+  const historyYears = Array.from(yearsSet).sort((a, b) => b - a);
+
 
     const scriptStr = `
       function clearSelection() {
