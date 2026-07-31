@@ -13,7 +13,7 @@ import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialD
 
 import { EmployeeCell } from '../employee/EmployeeComponents.jsx';
 import { CommentButton } from '../ui/CommonUI.jsx';
-export const SidebarCard = ({ emp, isRetired, onClick }) => {
+export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) => {
   const { selectedEmp, isPickingMode, hoveredEmpId, setHoveredEmpId, targetYear, openModal, mutations } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
   
@@ -46,6 +46,20 @@ export const SidebarCard = ({ emp, isRetired, onClick }) => {
       <div className="flex items-center gap-1 shrink-0 z-20">
         {!isPickingMode && (
           <div className="opacity-0 group-hover/side:opacity-100 flex gap-0.5 bg-slate-400/80 p-0.5 rounded-lg shadow mr-1 transition-opacity">
+            <button 
+              onClick={(e) => { if (onMoveUp) { e.stopPropagation(); onMoveUp(); } }} 
+              className={cx("p-0.5 rounded text-white transition-colors", onMoveUp ? "hover:bg-slate-500/70" : "invisible")} 
+              title={onMoveUp ? "上に移動" : ""}
+            >
+              <ArrowUp className="w-3 h-3" />
+            </button>
+            <button 
+              onClick={(e) => { if (onMoveDown) { e.stopPropagation(); onMoveDown(); } }} 
+              className={cx("p-0.5 rounded text-white transition-colors", onMoveDown ? "hover:bg-slate-500/70" : "invisible")} 
+              title={onMoveDown ? "下に移動" : ""}
+            >
+              <ArrowDown className="w-3 h-3" />
+            </button>
             <button 
               onClick={(e) => { e.stopPropagation(); openModal('emp', emp); }} 
               className="p-0.5 rounded text-white hover:bg-slate-500/70 transition-colors" 
@@ -92,12 +106,14 @@ export const AppSidebar = () => {
         </div>
         <div className="px-2 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 border-b border-slate-300 shrink-0">来年度の未配置 ({nextMap.unassigned.length})</div>
         <div className={cx("flex-1 overflow-y-auto p-1 flex flex-col gap-0.5", isPickingMode ? "bg-amber-50/50" : "bg-slate-50")}>
-           {nextMap.unassigned.map(emp => (
+           {nextMap.unassigned.map((emp, i, arr) => (
              <SidebarCard 
                key={emp.id} 
                emp={emp} 
                isRetired={false} 
                onClick={(e) => { e.stopPropagation(); handleCellClick(emp.id, false, 'unassigned', null, null, null); }} 
+               onMoveUp={i > 0 ? () => mutations.moveEmployee(emp.id, false, 'up') : null}
+               onMoveDown={i < arr.length - 1 ? () => mutations.moveEmployee(emp.id, false, 'down') : null}
              />
            ))}
         </div>
@@ -116,12 +132,14 @@ export const AppSidebar = () => {
          </div>
         <div className="px-2 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 border-b border-slate-300 shrink-0">来年度の退職 ({nextMap.retired.length})</div>
         <div className={cx("flex-1 overflow-y-auto p-1 flex flex-col gap-0.5", isPickingMode ? "bg-rose-50/50" : "bg-slate-50")}>
-          {nextMap.retired.map(emp => (
+          {nextMap.retired.map((emp, i, arr) => (
             <SidebarCard 
               key={emp.id} 
               emp={emp} 
               isRetired={true} 
               onClick={(e) => { e.stopPropagation(); handleCellClick(emp.id, false, 'retired', null, null, null); }} 
+              onMoveUp={i > 0 ? () => mutations.moveEmployee(emp.id, false, 'up') : null}
+              onMoveDown={i < arr.length - 1 ? () => mutations.moveEmployee(emp.id, false, 'down') : null}
             />
           ))}
         </div>
@@ -129,4 +147,5 @@ export const AppSidebar = () => {
     </div>
   );
 };
-
+
+
