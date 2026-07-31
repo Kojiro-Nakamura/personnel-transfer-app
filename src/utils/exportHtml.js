@@ -380,6 +380,13 @@ ${scriptStr}
         }
       }
       const nameVal = emp.name || '';
+      
+      const isNextRetired = emp.departmentId === 'retired';
+      const nTitle = isNextRetired ? '' : (emp.nextTitle || '');
+      const nGrade = isNextRetired ? '' : (emp.nextGrade || '');
+      const nSkills = isNextRetired ? '' : (emp.nextSkillsStr || '');
+      const nEmpType = isNextRetired ? '' : (emp.nextEmploymentType || '');
+      const nExclude = isNextRetired ? '' : (emp.nextExclude || '');
 
       html += `
     <tr data-original-index="${index}">
@@ -399,17 +406,18 @@ ${scriptStr}
       <td class="bg-slate" data-val="${emp.currentExclude||''}">${emp.currentExclude||''}</td>
       
       <td class="bg-blue" data-val="${nDeptName}">${nDeptName}</td>
-      <td class="bg-blue" data-val="${emp.nextTitle||''}">${emp.nextTitle||''}</td>
-      <td class="bg-blue" data-val="${emp.nextGrade||''}">${emp.nextGrade||''}</td>
+      <td class="bg-blue" data-val="${nTitle}">${nTitle}</td>
+      <td class="bg-blue" data-val="${nGrade}">${nGrade}</td>
       ${(() => {
+        if (isNextRetired) return \`<td class="bg-blue" data-val=""></td>\`;
         const isPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
         const displayYears = isPromoted ? 1 : (emp.nextYears || '');
         const valYears = isPromoted ? 1 : (emp.nextYears || 0);
-        return `<td class="bg-blue" data-val="${valYears}">${displayYears}</td>`;
+        return \`<td class="bg-blue" data-val="${valYears}">${displayYears}</td>\`;
       })()}
-      <td class="bg-blue" data-val="${emp.nextSkillsStr||''}">${emp.nextSkillsStr||''}</td>
-      <td class="bg-blue" data-val="${emp.nextEmploymentType||''}">${emp.nextEmploymentType||''}</td>
-      <td class="bg-blue" data-val="${emp.nextExclude||''}">${emp.nextExclude||''}</td>
+      <td class="bg-blue" data-val="${nSkills}">${nSkills}</td>
+      <td class="bg-blue" data-val="${nEmpType}">${nEmpType}</td>
+      <td class="bg-blue" data-val="${nExclude}">${nExclude}</td>
       
       ${(() => {
         const hireYear = emp.hireDate ? emp.hireDate.substring(0,4) : '';
