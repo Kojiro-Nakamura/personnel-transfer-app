@@ -1,6 +1,7 @@
 import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName } from './helpers.js';
 
 export const generateAndDownloadHTML = (employees, departments, targetYear) => {
+  const currentEraShort = getEraFormattedYear(targetYear).split('(')[1].replace(')', '');
   const yearsSet = new Set();
   employees.forEach(e => {
     if (e.history) e.history.forEach(h => yearsSet.add(h.year));
@@ -183,7 +184,7 @@ ${scriptStr}
     </tr>
     <tr>
       <th onclick="sortTable(0)" class="sticky-name text-left">氏名</th>
-      <th onclick="sortTable(1)" class="sticky-age">年齢</th>
+      <th onclick="sortTable(1)" class="sticky-age">${currentEraShort}年齢</th>
       <th onclick="sortTable(1)" class="bg-slate">職員番号</th>
       <th onclick="sortTable(3)" class="bg-slate">生年月日</th>
       <th onclick="sortTable(4)" class="bg-slate">最終学歴</th>

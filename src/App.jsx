@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from './utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from './constants/initialData.js';
 
@@ -67,7 +67,7 @@ export const AppContent = () => {
 
   const baseFileName = useMemo(() => { 
     const d = new Date(); 
-    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_R${targetYear - 2018}人事異動案_ver1`; 
+    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${getEraFormattedYear(targetYear + 1)}人事異動案_ver1`; 
   }, [targetYear]);
 
   return (
