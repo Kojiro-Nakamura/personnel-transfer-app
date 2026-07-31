@@ -140,10 +140,15 @@ export function useAppMutations(setEmployees, setDepartments, setNotes, commit) 
       if (!emp) return prev;
       
       const k = src ? 'orderCurrent' : 'orderNext';
-      const sg = prev.filter(e => src 
-        ? (e.currentDeptId === emp.currentDeptId && e.currentPostId === emp.currentPostId && e.currentGroupId === emp.currentGroupId && e.currentGroupPostId === emp.currentGroupPostId) 
-        : (e.departmentId === emp.departmentId && e.postId === emp.postId && e.groupId === emp.groupId && e.groupPostId === emp.groupPostId)
-      ).sort((a, b) => (a[k] || 0) - (b[k] || 0));
+      const sg = prev.filter(e => {
+        if (src) {
+          if (emp.currentDeptId === 'unassigned' || emp.currentDeptId === 'retired') return e.currentDeptId === emp.currentDeptId;
+          return e.currentDeptId === emp.currentDeptId && (e.currentPostId||null) === (emp.currentPostId||null) && (e.currentGroupId||null) === (emp.currentGroupId||null) && (e.currentGroupPostId||null) === (emp.currentGroupPostId||null);
+        } else {
+          if (emp.departmentId === 'unassigned' || emp.departmentId === 'retired') return e.departmentId === emp.departmentId;
+          return e.departmentId === emp.departmentId && (e.postId||null) === (emp.postId||null) && (e.groupId||null) === (emp.groupId||null) && (e.groupPostId||null) === (emp.groupPostId||null);
+        }
+      }).sort((a, b) => (a[k] || 0) - (b[k] || 0));
       
       const idx = sg.findIndex(e => e.id === eId); 
       if (idx < 0 || (dir === 'up' && idx === 0) || (dir === 'down' && idx === sg.length - 1)) return prev;
@@ -167,4 +172,4 @@ export function useAppMutations(setEmployees, setDepartments, setNotes, commit) 
       return [...prev, { id: `note-${Date.now()}`, targetId, text }];
     }),
   }), [updateEmps, updateDepts, updateNotesState]);
-}
+}
