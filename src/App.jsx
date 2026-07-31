@@ -108,15 +108,11 @@ export const AppContent = () => {
             
 
             <div className="flex gap-0.5">
-              <button onClick={expandAll} className="p-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all rounded" title="すべての部署を展開する"><ChevronsDown className="w-4 h-4"/></button>
-              <button onClick={collapseAll} className="p-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all rounded" title="すべての部署を折りたたむ"><ChevronsUp className="w-4 h-4"/></button>
-            </div>
-            <div className="flex gap-0.5">
               <button onClick={undo} disabled={!canUndo} className="p-1.5 bg-slate-700 hover:bg-slate-600 disabled:hover:bg-slate-700 active:scale-95 disabled:active:scale-100 transition-all disabled:opacity-50 rounded" title="直前の操作を取り消す(元に戻す)"><Undo className="w-4 h-4"/></button>
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-slate-700 hover:bg-slate-600 disabled:hover:bg-slate-700 active:scale-95 disabled:active:scale-100 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
-            <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案HTML</button>
-            <button onClick={() => generateAndDownloadHTML(employees, departments, targetYear)} className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をHTMLファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧HTML</button>
+            <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-purple-600 hover:bg-purple-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案HTML</button>
+            <button onClick={() => generateAndDownloadHTML(employees, departments, targetYear)} className="bg-purple-700 hover:bg-purple-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をHTMLファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧HTML</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <label className="bg-emerald-700 hover:bg-emerald-600 active:scale-95 transition-all px-3 py-1.5 rounded cursor-pointer flex items-center justify-center text-xs font-bold" title="保存したJSONファイルを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く<input type="file" accept=".json" onChange={loadJSON} className="hidden" /></label>
           </div>
@@ -138,7 +134,11 @@ export const AppContent = () => {
             {currentFileName && <div className="flex items-center ml-2 px-3 py-1 bg-slate-800 text-slate-400 rounded-full text-[11px] border border-slate-700 select-none"><FileText className="w-3 h-3 mr-1" />{currentFileName}</div>}
           </div>
           <div className="flex gap-2 pb-1.5 items-center">
-                        <div className="flex items-center gap-1.5 ml-2 mr-2">
+            <div className="flex gap-0.5 items-center mr-1">
+              <button onClick={expandAll} className="p-1 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all rounded" title="すべての部署を展開する"><ChevronsDown className="w-4 h-4"/></button>
+              <button onClick={collapseAll} className="p-1 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all rounded" title="すべての部署を折りたたむ"><ChevronsUp className="w-4 h-4"/></button>
+            </div>
+                        <div className="flex items-center gap-1.5 mr-2">
               <Filter className="w-4 h-4 text-sky-300" />
               <select 
                 value={filterLevel} 
@@ -308,10 +308,6 @@ export default function App() {
     </AppProvider>
   );
 }
-
-
-
-
 
 
 
