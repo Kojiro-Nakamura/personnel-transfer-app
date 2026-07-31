@@ -784,7 +784,7 @@ ${scriptStr}
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff >= 0 ? diff : 0}年</span>`;
+          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff >= 0 ? diff : 0}年目</span>`;
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
