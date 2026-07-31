@@ -6,7 +6,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   employees.forEach(e => {
     if (e.history) e.history.forEach(h => yearsSet.add(h.year));
   });
-  const historyYears = Array.from(yearsSet).sort((a, b) => b - a);
+  const historyYears = Array.from(yearsSet).sort((a, b) => a - b);
 
   const getEraSuffixLocal = (y) => {
     const eraStr = getEraFormattedYear(y);
