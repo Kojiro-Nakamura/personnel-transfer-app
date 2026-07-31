@@ -607,7 +607,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   tbody td.bg-emerald { background-color: #ecfdf5; }
   
   /* Sticky name column */
-  .sticky-name { position: sticky; left: 0; font-weight: bold; max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
+  .sticky-name { position: sticky; left: 0; font-weight: bold; max-width: 115px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
   tbody td.sticky-name { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-name { z-index: 30; background-color: #94a3b8; color: #fff; }
 
@@ -638,7 +638,7 @@ ${scriptStr}
 <table id="empTable">
   <thead>
     <tr>
-      <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 2px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 10px; padding: 2px 4px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 4px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 10px; padding: 2px 4px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 4px; color: #334155;">選択解除</button></div></th>
+      <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">選択解除</button></div></th>
       <th class="sticky-age bg-slate"></th>
       <th colspan="5" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度</th>
