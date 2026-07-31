@@ -815,7 +815,12 @@ ${scriptStr}
       <td class="bg-blue" data-val="${nDeptName}">${nDeptName}</td>
       <td class="bg-blue" data-val="${emp.nextTitle||''}">${emp.nextTitle||''}</td>
       <td class="bg-blue" data-val="${emp.nextGrade||''}">${emp.nextGrade||''}</td>
-      <td class="bg-blue" data-val="${emp.nextYears||0}">${emp.nextYears||''}</td>
+      ${(() => {
+        const isPromoted = getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade);
+        const displayYears = isPromoted ? 1 : (emp.nextYears || '');
+        const valYears = isPromoted ? 1 : (emp.nextYears || 0);
+        return `<td class="bg-blue" data-val="${valYears}">${displayYears}</td>`;
+      })()}
       <td class="bg-blue" data-val="${emp.nextSkillsStr||''}">${emp.nextSkillsStr||''}</td>
       <td class="bg-blue" data-val="${emp.nextEmploymentType||''}">${emp.nextEmploymentType||''}</td>
       <td class="bg-blue" data-val="${emp.nextExclude||''}">${emp.nextExclude||''}</td>
