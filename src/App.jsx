@@ -3,7 +3,7 @@ import {
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
-  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
+  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
@@ -130,6 +130,7 @@ export const AppContent = () => {
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-slate-700 hover:bg-slate-600 disabled:hover:bg-slate-700 active:scale-95 disabled:active:scale-100 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
             <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の表をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />表HTML</button>
+            <button onClick={() => generateAndDownloadHTML(employees, departments, targetYear)} className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をHTMLファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧HTML</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <label className="bg-emerald-700 hover:bg-emerald-600 active:scale-95 transition-all px-3 py-1.5 rounded cursor-pointer flex items-center justify-center text-xs font-bold" title="保存したJSONファイルを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く<input type="file" accept=".json" onChange={loadJSON} className="hidden" /></label>
           </div>
