@@ -978,8 +978,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   const Th = ({ label, sortKey, className }) => (
     <th 
       onClick={() => { 
-        let dir = 'asc'; 
-        if (sortConfig.key === sortKey && sortConfig.direction === 'asc') dir = 'desc'; 
+        let dir = 'desc'; 
+        if (sortConfig.key === sortKey && sortConfig.direction === 'desc') dir = 'asc'; 
         setSortConfig({ key: sortKey, direction: dir }); 
       }} 
       className={cx(className, "cursor-pointer hover:brightness-95 transition-all select-none group/th relative")} 
@@ -988,7 +988,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
       <div className="flex items-center gap-1">
         {label}
         <span className={cx("text-[10px]", sortConfig.key === sortKey ? "opacity-100 text-[#0F828C]" : "opacity-0 group-hover/th:opacity-30")}>
-          {sortConfig.key === sortKey ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '▲'}
+          {sortConfig.key === sortKey ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '▼'}
         </span>
       </div>
     </th>
