@@ -492,6 +492,19 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
 
   const handleExportHTML = () => {
     const scriptStr = `
+      function resetSort() {
+        var table = document.getElementById("empTable");
+        var tbody = table.getElementsByTagName("tbody")[0];
+        if (!tbody) return;
+        var rows = Array.from(tbody.rows);
+        rows.sort(function(a, b) {
+          return parseInt(a.getAttribute("data-original-index")) - parseInt(b.getAttribute("data-original-index"));
+        });
+        for (var i = 0; i < rows.length; i++) {
+          tbody.appendChild(rows[i]);
+        }
+      }
+
       function sortTable(n) {
         var table, tbody, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
         table = document.getElementById("empTable");
@@ -613,7 +626,7 @@ ${scriptStr}
 <table id="empTable">
   <thead>
     <tr>
-      <th class="sticky-name bg-slate"></th>
+      <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 2px;"><button onclick="resetSort()" style="cursor: pointer; font-size: 10px; padding: 2px 4px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 4px; color: #334155;">最初に戻す</button></th>
       <th class="sticky-age bg-slate"></th>
       <th colspan="5" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度</th>
@@ -661,7 +674,7 @@ ${scriptStr}
 
     const dMap = new Map(localDepts.map(d => [d.id, d]));
     
-    sortedEmps.forEach(emp => {
+    sortedEmps.forEach((emp, index) => {
       const getDeptName = (deptId, postId, groupId, groupPostId) => {
         if (!deptId || deptId === 'unassigned' || deptId === 'retired') return '';
         const dept = dMap.get(deptId);
@@ -758,7 +771,7 @@ ${scriptStr}
       const nameVal = emp.name || '';
 
       html += `
-    <tr>
+    <tr data-original-index="${index}">
       <td class="sticky-name text-left" data-val="${nameVal}">${nameVal}</td>
       <td class="sticky-age" data-val="${ageNum}">${ageNum !== '' ? ageNum + '歳' : ''}</td>
       <td class="bg-slate" data-val="${emp.employeeNumber||''}">${emp.employeeNumber||''}</td>
