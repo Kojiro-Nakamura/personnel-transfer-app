@@ -576,10 +576,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   tbody td.bg-fuchsia { background-color: #fdf4ff; }
   tbody td.bg-emerald { background-color: #ecfdf5; }
   
-  /* Sticky left column */
-  .sticky-col { position: sticky; left: 0; font-weight: bold; }
-  tbody td.sticky-col { z-index: 10; background-color: #e2e8f0; }
-  thead th.sticky-col { z-index: 30; background-color: #94a3b8; color: #fff; }
+  /* Sticky name column */
+  .sticky-name { position: sticky; left: 0; font-weight: bold; min-width: 120px; width: 120px; box-sizing: border-box; }
+  tbody td.sticky-name { z-index: 10; background-color: #e2e8f0; }
+  thead th.sticky-name { z-index: 30; background-color: #94a3b8; color: #fff; }
+
+  /* Sticky age column */
+  .sticky-age { position: sticky; left: 120px; font-weight: bold; min-width: 50px; width: 50px; box-sizing: border-box; }
+  tbody td.sticky-age { z-index: 10; background-color: #e2e8f0; }
+  thead th.sticky-age { z-index: 30; background-color: #94a3b8; color: #fff; }
   
   /* Thead sticky */
   thead { position: sticky; top: 0; z-index: 20; }
@@ -601,7 +606,8 @@ ${scriptStr}
 <table id="empTable">
   <thead>
     <tr>
-      <th class="sticky-col bg-slate"></th>
+      <th class="sticky-name bg-slate"></th>
+      <th class="sticky-age bg-slate"></th>
       <th colspan="5" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度</th>
       <th colspan="7" class="bg-blue">来年度</th>
@@ -609,37 +615,38 @@ ${scriptStr}
       ${historyYears.length > 0 ? `<th colspan="${historyYears.length}" class="bg-emerald">履歴</th>` : ''}
     </tr>
     <tr>
-      <th onclick="sortTable(0)" class="sticky-col text-left" style="min-width: 100px;">氏名</th>
+      <th onclick="sortTable(0)" class="sticky-name text-left">氏名</th>
+      <th onclick="sortTable(1)" class="sticky-age">年齢</th>
       <th onclick="sortTable(1)" class="bg-slate">職員番号</th>
-      <th onclick="sortTable(2)" class="bg-slate">生年月日</th>
-      <th onclick="sortTable(3)" class="bg-slate">最終学歴</th>
-      <th onclick="sortTable(4)" class="bg-slate">採用年月日</th>
-      <th onclick="sortTable(5)" class="bg-slate">特記事項</th>
-      <th onclick="sortTable(6)" class="bg-slate">配置先</th>
-      <th onclick="sortTable(7)" class="bg-slate">職名</th>
-      <th onclick="sortTable(8)" class="bg-slate">級</th>
-      <th onclick="sortTable(9)" class="bg-slate">年数</th>
-      <th onclick="sortTable(10)" class="bg-slate">詳細</th>
-      <th onclick="sortTable(11)" class="bg-slate">備考</th>
-      <th onclick="sortTable(12)" class="bg-slate">カウント除外</th>
-      <th onclick="sortTable(13)" class="bg-blue">配置先</th>
-      <th onclick="sortTable(14)" class="bg-blue">職名</th>
-      <th onclick="sortTable(15)" class="bg-blue">級</th>
-      <th onclick="sortTable(16)" class="bg-blue">年数</th>
-      <th onclick="sortTable(17)" class="bg-blue">詳細</th>
-      <th onclick="sortTable(18)" class="bg-blue">備考</th>
-      <th onclick="sortTable(19)" class="bg-blue">カウント除外</th>
-      <th onclick="sortTable(20)" class="bg-fuchsia" style="width: 56px;">採用</th>
-      <th onclick="sortTable(21)" class="bg-fuchsia" style="width: 80px;">係長級(主査)</th>
-      <th onclick="sortTable(22)" class="bg-fuchsia" style="width: 80px;">補佐級I(主任)</th>
-      <th onclick="sortTable(23)" class="bg-fuchsia" style="width: 80px;">補佐級II(班長)</th>
-      <th onclick="sortTable(24)" class="bg-fuchsia" style="width: 80px;">補佐級III</th>
-      <th onclick="sortTable(25)" class="bg-fuchsia" style="width: 80px;">課長級</th>
-      <th onclick="sortTable(26)" class="bg-fuchsia" style="width: 80px;">所属長級</th>
-      <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 80px;">次長級</th>
-      <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 80px;">部長級</th>
-      <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 56px;">来年度</th>
-      ${historyYears.map((y, idx) => `<th onclick="sortTable(${30 + idx})" class="bg-emerald" style="width: 60px;">${getEraFormattedYear(y)}</th>`).join('')}
+      <th onclick="sortTable(3)" class="bg-slate">生年月日</th>
+      <th onclick="sortTable(4)" class="bg-slate">最終学歴</th>
+      <th onclick="sortTable(5)" class="bg-slate">採用年月日</th>
+      <th onclick="sortTable(6)" class="bg-slate">特記事項</th>
+      <th onclick="sortTable(7)" class="bg-slate">配置先</th>
+      <th onclick="sortTable(8)" class="bg-slate">職名</th>
+      <th onclick="sortTable(9)" class="bg-slate">級</th>
+      <th onclick="sortTable(10)" class="bg-slate">年数</th>
+      <th onclick="sortTable(11)" class="bg-slate">詳細</th>
+      <th onclick="sortTable(12)" class="bg-slate">備考</th>
+      <th onclick="sortTable(13)" class="bg-slate">カウント除外</th>
+      <th onclick="sortTable(14)" class="bg-blue">配置先</th>
+      <th onclick="sortTable(15)" class="bg-blue">職名</th>
+      <th onclick="sortTable(16)" class="bg-blue">級</th>
+      <th onclick="sortTable(17)" class="bg-blue">年数</th>
+      <th onclick="sortTable(18)" class="bg-blue">詳細</th>
+      <th onclick="sortTable(19)" class="bg-blue">備考</th>
+      <th onclick="sortTable(20)" class="bg-blue">カウント除外</th>
+      <th onclick="sortTable(21)" class="bg-fuchsia" style="width: 56px;">採用</th>
+      <th onclick="sortTable(22)" class="bg-fuchsia" style="width: 80px;">係長級(主査)</th>
+      <th onclick="sortTable(23)" class="bg-fuchsia" style="width: 80px;">補佐級I(主任)</th>
+      <th onclick="sortTable(24)" class="bg-fuchsia" style="width: 80px;">補佐級II(班長)</th>
+      <th onclick="sortTable(25)" class="bg-fuchsia" style="width: 80px;">補佐級III</th>
+      <th onclick="sortTable(26)" class="bg-fuchsia" style="width: 80px;">課長級</th>
+      <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 80px;">所属長級</th>
+      <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 80px;">次長級</th>
+      <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 80px;">部長級</th>
+      <th onclick="sortTable(30)" class="bg-fuchsia" style="width: 56px;">来年度</th>
+      ${historyYears.map((y, idx) => `<th onclick="sortTable(${31 + idx})" class="bg-emerald" style="width: 60px;">${getEraFormattedYear(y)}</th>`).join('')}
     </tr>
   </thead>
   <tbody>
@@ -734,20 +741,19 @@ ${scriptStr}
         histHtml += `<td class="bg-emerald" data-val="${hStr}">${hStr}</td>`;
       });
 
-            let ageStr = '';
+            let ageNum = '';
       if (emp.birthDate) {
         const age = calculateAge(emp.birthDate, targetYear - 1);
         if (age !== null && !isNaN(age)) {
-          ageStr = '(' + age + ')';
+          ageNum = age;
         }
       }
       const nameVal = emp.name || '';
-      const ageStrFormatted = ageStr ? ageStr.replace(')', '歳)') : '';
-      const nameWithAge = nameVal + (ageStrFormatted ? ' ' + ageStrFormatted : '');
 
       html += `
     <tr>
-      <td class="sticky-col text-left" data-val="${nameVal}">${nameWithAge}</td>
+      <td class="sticky-name text-left" data-val="${nameVal}">${nameVal}</td>
+      <td class="sticky-age" data-val="${ageNum}">${ageNum !== '' ? ageNum + '歳' : ''}</td>
       <td class="bg-slate" data-val="${emp.employeeNumber||''}">${emp.employeeNumber||''}</td>
       <td class="bg-slate" data-val="${emp.birthDate||''}">${emp.birthDate||''}</td>
       <td class="bg-slate" data-val="${emp.education||''}">${emp.education||''}</td>
