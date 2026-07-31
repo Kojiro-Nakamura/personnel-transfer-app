@@ -615,6 +615,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   .diff-emerald { color: #059669; background-color: #ecfdf5; border-color: #d1fae5; }
   .diff-blue { color: #2563eb; background-color: #eff6ff; border-color: #bfdbfe; }
   .highlight > td { background-color: #fef08a !important; }
+  .promo-highlight { background-color: #fed7aa !important; }
+  .highlight > td.promo-highlight { background-color: #fdba74 !important; }
   tbody tr { cursor: pointer; }
   tbody tr:hover > td { opacity: 0.9; }
 </style>
@@ -752,8 +754,8 @@ ${scriptStr}
           }
         }
         
-        let styleStr = isNextPromo ? ' style="background-color: #fed7aa;"' : '';
-        return `<td class="bg-fuchsia"${styleStr} data-val="${cellVal||''}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
+        let extraCls = isNextPromo ? ' promo-highlight' : '';
+        return `<td class="bg-fuchsia${extraCls}" data-val="${cellVal||''}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
 
       const renderFinalDiff = () => {
@@ -782,17 +784,17 @@ ${scriptStr}
       let histHtml = '';
       historyYears.forEach(year => {
         let hStr = '';
-        let histStyle = '';
+        let extraCls = '';
         if (year === targetYear) {
           hStr = nDeptName;
           if (getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade)) {
-            histStyle = ' style="background-color: #fed7aa;"';
+            extraCls = ' promo-highlight';
           }
         } else {
           const hist = (emp.history || []).find(h => h.year === year);
           hStr = hist ? hist.department : '';
         }
-        histHtml += `<td class="bg-emerald"${histStyle} data-val="${hStr}">${hStr}</td>`;
+        histHtml += `<td class="bg-emerald${extraCls}" data-val="${hStr}">${hStr}</td>`;
       });
 
             let ageNum = '';
