@@ -665,7 +665,7 @@ ${scriptStr}
       <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 80px;">所属長級</th>
       <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 80px;">次長級</th>
       <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 80px;">部長級</th>
-      <th onclick="sortTable(30)" class="bg-fuchsia" style="width: 56px;">来年度</th>
+      <th onclick="sortTable(30)" class="bg-fuchsia" style="width: 56px; color: #dc2626; font-weight: bold;">来年度</th>
       ${historyYears.map((y, idx) => `<th onclick="sortTable(${31 + idx})" class="bg-emerald" style="width: 60px;">${getEraFormattedYear(y)}</th>`).join('')}
     </tr>
   </thead>
@@ -749,7 +749,7 @@ ${scriptStr}
           }
         }
         
-        let styleStr = isNextPromo ? ' style="background-color: #fef08a;"' : '';
+        let styleStr = isNextPromo ? ' style="background-color: #fed7aa;"' : '';
         return `<td class="bg-fuchsia"${styleStr} data-val="${cellVal||''}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
 
@@ -777,7 +777,7 @@ ${scriptStr}
         if (year === targetYear) {
           hStr = nDeptName;
           if (getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade)) {
-            histStyle = ' style="background-color: #fef08a;"';
+            histStyle = ' style="background-color: #fed7aa;"';
           }
         } else {
           const hist = (emp.history || []).find(h => h.year === year);
