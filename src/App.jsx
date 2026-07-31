@@ -67,7 +67,7 @@ export const AppContent = () => {
 
   const baseFileName = useMemo(() => { 
     const d = new Date(); 
-    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${getEraFormattedYear(targetYear + 1)}人事異動案_ver1`; 
+    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${getEraFormattedYear(targetYear)}人事異動案_ver1`; 
   }, [targetYear]);
 
   return (
