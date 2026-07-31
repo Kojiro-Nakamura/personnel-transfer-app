@@ -5,6 +5,7 @@ import {
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
 } from 'lucide-react';
+import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
