@@ -124,8 +124,10 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; }
   th, td { border-right: 1px solid #94a3b8; border-bottom: 1px solid #94a3b8; padding: 4px; text-align: center; vertical-align: middle; white-space: nowrap; background-clip: padding-box; }
-  th { cursor: pointer; user-select: none; }
+  th { cursor: pointer; user-select: none; position: relative; padding-right: 14px !important; }
   th:hover { opacity: 0.8; }
+  th[onclick]::after { content: '⇅'; font-size: 8px; color: #64748b; position: absolute; right: 3px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+  th[onclick]:hover::after { opacity: 1; color: #334155; }
   
   /* Fix borders */
   thead tr:first-child th { border-top: 1px solid #94a3b8; }
