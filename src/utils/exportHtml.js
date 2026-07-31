@@ -409,11 +409,11 @@ ${scriptStr}
       <td class="bg-blue" data-val="${nTitle}">${nTitle}</td>
       <td class="bg-blue" data-val="${nGrade}">${nGrade}</td>
       ${(() => {
-        if (isNextRetired) return \`<td class="bg-blue" data-val=""></td>\`;
+        if (isNextRetired) return `<td class="bg-blue" data-val=""></td>`;
         const isPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
         const displayYears = isPromoted ? 1 : (emp.nextYears || '');
         const valYears = isPromoted ? 1 : (emp.nextYears || 0);
-        return \`<td class="bg-blue" data-val="${valYears}">${displayYears}</td>\`;
+        return `<td class="bg-blue" data-val="${valYears}">${displayYears}</td>`;
       })()}
       <td class="bg-blue" data-val="${nSkills}">${nSkills}</td>
       <td class="bg-blue" data-val="${nEmpType}">${nEmpType}</td>
