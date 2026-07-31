@@ -695,6 +695,12 @@ ${scriptStr}
         if (emp[key]) {
           const suffix = getEraSuffixLocal(emp[key]);
           if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
+          if (emp.birthDate && !isNaN(currentY)) {
+             const promoAge = calculateAge(emp.birthDate, currentY);
+             if (promoAge !== null && !isNaN(promoAge)) {
+                cellHtml += `<span style="font-size: 10px; color: #334155; margin-left: 2px;">${promoAge}歳</span>`;
+             }
+          }
         }
         return `<td class="bg-fuchsia" data-val="${emp[key]||''}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
@@ -736,7 +742,8 @@ ${scriptStr}
         }
       }
       const nameVal = emp.name || '';
-      const nameWithAge = nameVal + (ageStr ? ' ' + ageStr : '');
+      const ageStrFormatted = ageStr ? ageStr.replace(')', '歳)') : '';
+      const nameWithAge = nameVal + (ageStrFormatted ? ' ' + ageStrFormatted : '');
 
       html += `
     <tr>
@@ -762,7 +769,21 @@ ${scriptStr}
       <td class="bg-blue" data-val="${emp.nextEmploymentType||''}">${emp.nextEmploymentType||''}</td>
       <td class="bg-blue" data-val="${emp.nextExclude||''}">${emp.nextExclude||''}</td>
       
-      <td class="bg-fuchsia" data-val="${emp.hireDate ? emp.hireDate.substring(0,4) : ''}">${emp.hireDate ? emp.hireDate.substring(0,4) : ''}</td>
+      ${(() => {
+        const hireYear = emp.hireDate ? emp.hireDate.substring(0,4) : '';
+        let cellHtml = hireYear;
+        if (hireYear) {
+          const suffix = getEraSuffixLocal(hireYear);
+          if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
+          if (emp.birthDate) {
+             const hAge = calculateAge(emp.birthDate, parseInt(hireYear));
+             if (hAge !== null && !isNaN(hAge)) {
+                cellHtml += `<span style="font-size: 10px; color: #334155; margin-left: 2px;">${hAge}歳</span>`;
+             }
+          }
+        }
+        return `<td class="bg-fuchsia" data-val="${hireYear}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
+      })()}
       ${renderPromo('promoYearChief')}
       ${renderPromo('promoYearAssistant1')}
       ${renderPromo('promoYearAssistant2')}
