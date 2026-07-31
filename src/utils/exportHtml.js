@@ -7,6 +7,24 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   });
   const historyYears = Array.from(yearsSet).sort((a, b) => b - a);
 
+  const getEraSuffixLocal = (y) => {
+    const eraStr = getEraFormattedYear(y);
+    const match = eraStr.match(/([RSHM])(\d+)/);
+    return match ? `${match[1]}${match[2]}` : String(y).substring(2);
+  };
+
+  const gradeToPromoKey = {
+    '主任級': 'promoYearChief',
+    '主査級（１）': 'promoYearAssistant1',
+    '主査級（２）': 'promoYearAssistant2',
+    '主査級（３）': 'promoYearAssistant3',
+    '課長級': 'promoYearSecHead',
+    '所属長級': 'promoYearDivHead',
+    '次長級': 'promoYearDeputyHead',
+    '部長級': 'promoYearDeptHead'
+  };
+
+
 
     const scriptStr = `
       function clearSelection() {
@@ -204,9 +222,9 @@ ${scriptStr}
   <tbody>
 `;
 
-    const dMap = new Map(localDepts.map(d => [d.id, d]));
+    const dMap = new Map(departments.map(d => [d.id, d]));
     
-    sortedEmps.forEach((emp, index) => {
+    employees.forEach((emp, index) => {
       const getDeptName = (deptId, postId, groupId, groupPostId) => {
         if (!deptId || deptId === 'unassigned' || deptId === 'retired') return '';
         const dept = dMap.get(deptId);
@@ -231,7 +249,7 @@ ${scriptStr}
       const cDeptName = getDeptName(emp.currentDeptId, emp.currentPostId, emp.currentGroupId, emp.currentGroupPostId);
       const nDeptName = getDeptName(emp.departmentId, emp.postId, emp.groupId, emp.groupPostId);
 
-      const getGradeLevelLocal = (grade) => {
+      const getGradeLevel = (grade) => {
         const levels = { "部長級": 10, "次長級": 9, "所属長級": 8, "課長級": 7, "補佐級III(補佐兼班長)": 6, "補佐級II(班長)": 5, "補佐級I(主任)": 4, "係長級(主査)": 3, "一般": 1 };
         return levels[grade] || 0;
       };
@@ -241,7 +259,7 @@ ${scriptStr}
       const renderPromo = (key) => {
         let isNextPromo = false;
         let cellVal = emp[key] || '';
-        if (getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
+        if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
            isNextPromo = true;
            cellVal = String(targetYear);
         }
@@ -252,7 +270,7 @@ ${scriptStr}
         if (idx > 0) {
           for (let i = idx - 1; i >= 0; i--) {
             let pVal = pKeys[i] === 'hireDate' ? (emp.hireDate ? emp.hireDate.substring(0,4) : '') : (emp[pKeys[i]] || '');
-            if (getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === pKeys[i]) {
+            if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === pKeys[i]) {
                 pVal = String(targetYear);
             }
             const y = parseInt(pVal || 'NaN');
@@ -287,7 +305,7 @@ ${scriptStr}
 
       const renderFinalDiff = () => {
         let diff = null;
-        if (getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade)) {
+        if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
           diff = 1;
         } else {
           const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
@@ -314,7 +332,7 @@ ${scriptStr}
         let extraCls = '';
         if (year === targetYear) {
           hStr = nDeptName;
-          if (getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade)) {
+          if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
             extraCls = ' promo-highlight';
           }
         } else {
@@ -354,7 +372,7 @@ ${scriptStr}
       <td class="bg-blue" data-val="${emp.nextTitle||''}">${emp.nextTitle||''}</td>
       <td class="bg-blue" data-val="${emp.nextGrade||''}">${emp.nextGrade||''}</td>
       ${(() => {
-        const isPromoted = getGradeLevelLocal(emp.nextGrade) > getGradeLevelLocal(emp.currentGrade);
+        const isPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
         const displayYears = isPromoted ? 1 : (emp.nextYears || '');
         const valYears = isPromoted ? 1 : (emp.nextYears || 0);
         return `<td class="bg-blue" data-val="${valYears}">${displayYears}</td>`;
