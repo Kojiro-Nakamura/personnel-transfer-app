@@ -57,7 +57,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
         tbody = table.getElementsByTagName("tbody")[0];
         if (!tbody) return;
         switching = true;
-        dir = "asc";
+        dir = "desc";
         while (switching) {
           switching = false;
           rows = tbody.rows;
@@ -85,8 +85,8 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
             switching = true;
             switchcount ++;
           } else {
-            if (switchcount == 0 && dir == "asc") {
-              dir = "desc";
+            if (switchcount == 0 && dir == "desc") {
+              dir = "asc";
               switching = true;
             }
           }
