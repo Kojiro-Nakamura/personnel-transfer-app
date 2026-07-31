@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { 
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
@@ -535,6 +535,13 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
       }
 
       document.addEventListener("DOMContentLoaded", function() {
+        var nameCol = document.querySelector("th.sticky-name");
+        if (nameCol) {
+          var w = nameCol.getBoundingClientRect().width;
+          var style = document.createElement("style");
+          style.innerHTML = ".sticky-age { left: " + w + "px !important; }";
+          document.head.appendChild(style);
+        }
         var tbody = document.querySelector("#empTable tbody");
         if(tbody) {
           tbody.addEventListener("click", function(e) {
@@ -577,7 +584,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   tbody td.bg-emerald { background-color: #ecfdf5; }
   
   /* Sticky name column */
-  .sticky-name { position: sticky; left: 0; font-weight: bold; min-width: 90px; width: 90px; box-sizing: border-box; }
+  .sticky-name { position: sticky; left: 0; font-weight: bold; max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
   tbody td.sticky-name { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-name { z-index: 30; background-color: #94a3b8; color: #fff; }
 
