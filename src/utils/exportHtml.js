@@ -3,6 +3,7 @@ import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName } fr
 export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const yearsSet = new Set();
+  yearsSet.add(targetYear);
   employees.forEach(e => {
     if (e.history) e.history.forEach(h => yearsSet.add(h.year));
   });
