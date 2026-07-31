@@ -106,20 +106,6 @@ export const AppContent = () => {
               <button onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} className="p-1.5 hover:bg-slate-600" title="拡大"><ZoomIn className="w-4 h-4"/></button>
             </div>
             
-            <div className="flex items-center gap-1.5 ml-2 mr-2">
-              <Filter className="w-4 h-4 text-sky-300" />
-              <select 
-                value={filterLevel} 
-                onChange={e => setFilterLevel(Number(e.target.value))} 
-                className={cx("text-xs py-1.5 px-2 rounded outline-none font-bold cursor-pointer transition-colors", filterLevel > 0 ? "bg-sky-500 text-white shadow-inner" : "bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white transition-all")}
-                title="表示する職員の条件を切り替える"
-              >
-                <option value={0}>全件表示</option>
-                {GRADE_OPTIONS.filter(g => g !== "").map(g => (
-                  <option key={g} value={GRADE_LEVELS[g]}>{g}以上</option>
-                ))}
-              </select>
-            </div>
 
             <div className="flex gap-0.5">
               <button onClick={expandAll} className="p-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all rounded" title="すべての部署を展開する"><ChevronsDown className="w-4 h-4"/></button>
@@ -129,7 +115,7 @@ export const AppContent = () => {
               <button onClick={undo} disabled={!canUndo} className="p-1.5 bg-slate-700 hover:bg-slate-600 disabled:hover:bg-slate-700 active:scale-95 disabled:active:scale-100 transition-all disabled:opacity-50 rounded" title="直前の操作を取り消す(元に戻す)"><Undo className="w-4 h-4"/></button>
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-slate-700 hover:bg-slate-600 disabled:hover:bg-slate-700 active:scale-95 disabled:active:scale-100 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
-            <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の表をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />表HTML</button>
+            <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案HTML</button>
             <button onClick={() => generateAndDownloadHTML(employees, departments, targetYear)} className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をHTMLファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧HTML</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <label className="bg-emerald-700 hover:bg-emerald-600 active:scale-95 transition-all px-3 py-1.5 rounded cursor-pointer flex items-center justify-center text-xs font-bold" title="保存したJSONファイルを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く<input type="file" accept=".json" onChange={loadJSON} className="hidden" /></label>
@@ -151,7 +137,21 @@ export const AppContent = () => {
             <button onClick={duplicatePlan} className="flex items-center gap-1 px-4 py-2 text-sky-400 text-sm font-bold" title="現在の案を複製して別案を作成する"><Copy className="w-4 h-4" /> 複製</button>
             {currentFileName && <div className="flex items-center ml-2 px-3 py-1 bg-slate-800 text-slate-400 rounded-full text-[11px] border border-slate-700 select-none"><FileText className="w-3 h-3 mr-1" />{currentFileName}</div>}
           </div>
-          <div className="flex gap-2 pb-1.5">
+          <div className="flex gap-2 pb-1.5 items-center">
+                        <div className="flex items-center gap-1.5 ml-2 mr-2">
+              <Filter className="w-4 h-4 text-sky-300" />
+              <select 
+                value={filterLevel} 
+                onChange={e => setFilterLevel(Number(e.target.value))} 
+                className={cx("text-xs py-1 px-2 rounded outline-none font-bold cursor-pointer transition-colors", filterLevel > 0 ? "bg-sky-500 text-white shadow-inner" : "bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white transition-all")}
+                title="表示する職員の条件を切り替える"
+              >
+                <option value={0}>全件表示</option>
+                {GRADE_OPTIONS.filter(g => g !== "").map(g => (
+                  <option key={g} value={GRADE_LEVELS[g]}>{g}以上</option>
+                ))}
+              </select>
+            </div>
             <button onClick={() => openModal('dept')} className="bg-blue-700 hover:bg-blue-600 active:scale-95 transition-all px-3 py-1 rounded text-xs font-bold" title="新しい部署を追加する">部署+</button>
             <button onClick={() => openModal('emp')} className="bg-blue-700 hover:bg-blue-600 active:scale-95 transition-all px-3 py-1 rounded text-xs font-bold" title="新しい職員を追加する">職員+</button>
             <button onClick={() => openModal('bulkEdit')} className="bg-emerald-700 hover:bg-emerald-600 active:scale-95 transition-all px-3 py-1 rounded text-xs font-bold" title="職員データの一括編集やCSVファイルの読み込みを行う">職員一括編集</button>
