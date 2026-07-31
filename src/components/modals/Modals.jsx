@@ -492,6 +492,16 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
 
   const handleExportHTML = () => {
     const scriptStr = `
+      function clearSelection() {
+        var table = document.getElementById("empTable");
+        var tbody = table.getElementsByTagName("tbody")[0];
+        if (!tbody) return;
+        var rows = Array.from(tbody.rows);
+        for (var i = 0; i < rows.length; i++) {
+          rows[i].classList.remove("highlight");
+        }
+      }
+
       function resetSort() {
         var table = document.getElementById("empTable");
         var tbody = table.getElementsByTagName("tbody")[0];
@@ -628,7 +638,7 @@ ${scriptStr}
 <table id="empTable">
   <thead>
     <tr>
-      <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 2px;"><button onclick="resetSort()" style="cursor: pointer; font-size: 10px; padding: 2px 4px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 4px; color: #334155;">最初に戻す</button></th>
+      <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 2px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 10px; padding: 2px 4px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 4px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 10px; padding: 2px 4px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 4px; color: #334155;">選択解除</button></div></th>
       <th class="sticky-age bg-slate"></th>
       <th colspan="5" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度</th>
