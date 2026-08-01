@@ -2,6 +2,7 @@ import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName } fr
 
 export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
+  const targetEraShort = getEraFormattedYear(targetYear).split('(')[1].replace(')', '');
   const yearsSet = new Set();
   yearsSet.add(targetYear);
   employees.forEach(e => {
@@ -119,7 +120,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
 <head>
 <meta charset="utf-8">
 <meta name="google" content="notranslate">
-<title>職員一括編集 HTML保存</title>
+<title>${targetEraShort}職員一覧HTML</title>
 <style>
   body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; }

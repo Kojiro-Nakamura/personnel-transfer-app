@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { 
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
@@ -61,7 +61,7 @@ export const AppContent = () => {
   const nextSummary = useMemo(() => generateGradeSummary(employees, true), [employees]);
 
   useEffect(() => { 
-    document.title = "新・人事異動案作成アプリ"; 
+    document.title = "人事異動案作成アプリ"; 
     document.documentElement.lang = "ja"; 
   }, []);
 
