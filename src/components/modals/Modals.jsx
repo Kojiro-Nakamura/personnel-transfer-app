@@ -1267,7 +1267,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                       <div className="flex flex-row items-center justify-center gap-0.5 overflow-hidden">
                         {diff !== null && (
                           <div className="flex flex-row items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-0.5 rounded-sm border border-emerald-100 shadow-sm shrink-0 leading-none whitespace-nowrap">
-                            {diff}年<ChevronRight className="w-2.5 h-2.5 text-emerald-500" />
+                            {diff + 1}年目<ChevronRight className="w-2.5 h-2.5 text-emerald-500" />
                           </div>
                         )}
                         {diff === null && <ChevronRight className="w-2.5 h-2.5 text-slate-300 shrink-0" />}
@@ -1291,7 +1291,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                       <div className="flex flex-row items-center justify-start gap-0.5 h-full min-h-[26px] overflow-hidden">
                         {diff !== null && (
                           <div className="flex flex-row items-center text-[10px] font-bold text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-200 shadow-sm shrink-0 leading-none whitespace-nowrap">
-                            <ChevronRight className="w-2.5 h-2.5 text-blue-500" />{diff >= 0 ? diff : 0}年
+                            <ChevronRight className="w-2.5 h-2.5 text-blue-500" />{diff >= 0 ? diff : 0}年目
                           </div>
                         )}
                         {diff === null && <ChevronRight className="w-2.5 h-2.5 text-slate-300 shrink-0" />}

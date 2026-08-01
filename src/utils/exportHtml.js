@@ -315,7 +315,7 @@ ${scriptStr}
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="diff-span diff-emerald">${diff}年&gt;</span>`;
+          cellHtml += `<span class="diff-span diff-emerald">${diff + 1}年目&gt;</span>`;
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
