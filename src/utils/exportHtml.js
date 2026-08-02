@@ -403,8 +403,8 @@ ${scriptStr}
 
       html += `
     <tr data-original-index="${index}">
-      <td class="sticky-name text-left" data-val="${nameVal}">${nameVal}</td>
-      <td class="sticky-age" data-val="${ageNum}">${ageNum !== '' ? ageNum + '歳' : ''}</td>
+      <td class="sticky-name text-left" data-val="${nameVal}"${nStyle}>${nameVal}</td>
+      <td class="sticky-age" data-val="${ageNum}"${nStyle}>${ageNum !== '' ? ageNum + '歳' : ''}</td>
       <td class="bg-slate" data-val="${emp.employeeNumber||''}">${emp.employeeNumber||''}</td>
       <td class="bg-slate" data-val="${emp.birthDate||''}">${emp.birthDate||''}</td>
       <td class="bg-slate" data-val="${emp.education||''}">${emp.education||''}</td>
