@@ -336,7 +336,7 @@ ${scriptStr}
           }
         }
         
-        const promoColor = isNextPromo ? getPromotedBgColorCode(emp.nextGrade) : (cellVal && targetGrade ? getPromotedBgColorCode(targetGrade) : '');
+        const promoColor = isNextPromo ? getPromotedBgColorCode(emp.nextGrade) : '';
         const styleStr = promoColor ? ` style="background-color: ${promoColor} !important;"` : '';
         return `<td class="bg-fuchsia" data-val="${cellVal||''}"${styleStr}><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
@@ -377,10 +377,6 @@ ${scriptStr}
         } else {
           const hist = (emp.history || []).find(h => h.year === year);
           hStr = hist ? hist.department : '';
-          if (hist && hist.grade) {
-             const c = getPromotedBgColorCode(hist.grade);
-             if (c) histStyle = ` style="background-color: ${c} !important;"`;
-          }
         }
         histHtml += `<td class="bg-emerald" data-val="${hStr}"${histStyle}>${hStr}</td>`;
       });
