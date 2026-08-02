@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode } from './helpers.js';
 
 export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
@@ -292,13 +292,17 @@ ${scriptStr}
       const renderPromo = (key) => {
         let isNextPromo = false;
         let cellVal = emp[key] || '';
+        let targetGrade = '';
+        const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+        const gradeList = ['', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級'];
+        const idx = pKeys.indexOf(key);
+        if (idx > 0) targetGrade = gradeList[idx];
+
         if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
            isNextPromo = true;
            cellVal = String(targetYear);
         }
 
-        const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
-        const idx = pKeys.indexOf(key);
         let prevY = NaN;
         if (idx > 0) {
           for (let i = idx - 1; i >= 0; i--) {
@@ -332,11 +336,12 @@ ${scriptStr}
           }
         }
         
-        let extraCls = isNextPromo ? ' promo-highlight' : '';
-        return `<td class="bg-fuchsia${extraCls}" data-val="${cellVal||''}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
+        const promoColor = isNextPromo ? getPromotedBgColorCode(emp.nextGrade) : (cellVal && targetGrade ? getPromotedBgColorCode(targetGrade) : '');
+        const styleStr = promoColor ? ` style="background-color: ${promoColor} !important;"` : '';
+        return `<td class="bg-fuchsia" data-val="${cellVal||''}"${styleStr}><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
 
-      const renderFinalDiff = () => {
+      const renderFinalDiff = (nStyle) => {
         let diff = null;
         if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
           diff = 1;
@@ -356,23 +361,28 @@ ${scriptStr}
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
-        return `<td class="bg-fuchsia" data-val="${diff !== null ? (diff >= 0 ? diff : 0) : ''}"><div style="display:flex;align-items:center;justify-content:flex-start;">${cellHtml}</div></td>`;
+        return `<td class="bg-fuchsia" data-val="${diff !== null ? (diff >= 0 ? diff : 0) : ''}"${nStyle}><div style="display:flex;align-items:center;justify-content:flex-start;">${cellHtml}</div></td>`;
       };
 
       let histHtml = '';
       historyYears.forEach(year => {
         let hStr = '';
-        let extraCls = '';
+        let histStyle = '';
         if (year === targetYear) {
           hStr = nDeptName;
           if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-            extraCls = ' promo-highlight';
+            const c = getPromotedBgColorCode(emp.nextGrade);
+            if (c) histStyle = ` style="background-color: ${c} !important;"`;
           }
         } else {
           const hist = (emp.history || []).find(h => h.year === year);
           hStr = hist ? hist.department : '';
+          if (hist && hist.grade) {
+             const c = getPromotedBgColorCode(hist.grade);
+             if (c) histStyle = ` style="background-color: ${c} !important;"`;
+          }
         }
-        histHtml += `<td class="bg-emerald${extraCls}" data-val="${hStr}">${hStr}</td>`;
+        histHtml += `<td class="bg-emerald" data-val="${hStr}"${histStyle}>${hStr}</td>`;
       });
 
             let ageNum = '';
@@ -390,6 +400,10 @@ ${scriptStr}
       const nSkills = isNextRetired ? '' : (emp.nextSkillsStr || '');
       const nEmpType = isNextRetired ? '' : (emp.nextEmploymentType || '');
       const nExclude = isNextRetired ? '' : (emp.nextExclude || '');
+      
+      const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
+      const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : '';
+      const nStyle = nextPromoColor ? ` style="background-color: ${nextPromoColor} !important;"` : '';
 
       html += `
     <tr data-original-index="${index}">
@@ -408,19 +422,19 @@ ${scriptStr}
       <td class="bg-slate" data-val="${emp.currentEmploymentType||''}">${emp.currentEmploymentType||''}</td>
       <td class="bg-slate" data-val="${emp.currentExclude||''}">${emp.currentExclude||''}</td>
       
-      <td class="bg-blue" data-val="${nDeptName}">${nDeptName}</td>
-      <td class="bg-blue" data-val="${nTitle}">${nTitle}</td>
-      <td class="bg-blue" data-val="${nGrade}">${nGrade}</td>
+      <td class="bg-blue" data-val="${nDeptName}"${nStyle}>${nDeptName}</td>
+      <td class="bg-blue" data-val="${nTitle}"${nStyle}>${nTitle}</td>
+      <td class="bg-blue" data-val="${nGrade}"${nStyle}>${nGrade}</td>
       ${(() => {
-        if (isNextRetired) return `<td class="bg-blue" data-val=""></td>`;
+        if (isNextRetired) return `<td class="bg-blue" data-val=""${nStyle}></td>`;
         const isPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
         const displayYears = isPromoted ? 1 : (emp.nextYears || '');
         const valYears = isPromoted ? 1 : (emp.nextYears || 0);
-        return `<td class="bg-blue" data-val="${valYears}">${displayYears}</td>`;
+        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${displayYears}</td>`;
       })()}
-      <td class="bg-blue" data-val="${nSkills}">${nSkills}</td>
-      <td class="bg-blue" data-val="${nEmpType}">${nEmpType}</td>
-      <td class="bg-blue" data-val="${nExclude}">${nExclude}</td>
+      <td class="bg-blue" data-val="${nSkills}"${nStyle}>${nSkills}</td>
+      <td class="bg-blue" data-val="${nEmpType}"${nStyle}>${nEmpType}</td>
+      <td class="bg-blue" data-val="${nExclude}"${nStyle}>${nExclude}</td>
       
       ${(() => {
         const hireYear = emp.hireDate ? emp.hireDate.substring(0,4) : '';
@@ -445,7 +459,7 @@ ${scriptStr}
       ${renderPromo('promoYearDivHead')}
       ${renderPromo('promoYearDeputyHead')}
       ${renderPromo('promoYearDeptHead')}
-      ${renderFinalDiff()}
+      ${renderFinalDiff(nStyle)}
       
       ${histHtml}
     </tr>`;
