@@ -501,10 +501,10 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {fd.history && fd.history.length > 0 ? (
                 [...fd.history].sort((a, b) => a.year - b.year).map((h, i) => (
-                  <div key={i} className="flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center min-w-[80px]">
+                  <div key={i} className="flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center w-full">
                     <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5">
                       {h.year} ({getEraSuffix(h.year)})
                     </span>
