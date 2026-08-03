@@ -175,21 +175,22 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
           });
           
           tbody.addEventListener("mousedown", function(e) {
-            if (e.target.classList.contains("drag-handle")) {
+            var td = e.target.closest("td");
+            if (td && (td.classList.contains("sticky-name") || td.classList.contains("sticky-age"))) {
               var tr = e.target.closest("tr");
               if (tr) tr.setAttribute("draggable", "true");
             }
           });
           
           tbody.addEventListener("mouseup", function(e) {
-            if (e.target.classList.contains("drag-handle")) {
+            var td = e.target.closest("td");
+            if (td && (td.classList.contains("sticky-name") || td.classList.contains("sticky-age"))) {
               var tr = e.target.closest("tr");
               if (tr) tr.removeAttribute("draggable");
             }
           });
 
           tbody.addEventListener("click", function(e) {
-            if (e.target.classList.contains("drag-handle")) return;
             var tr = e.target.closest("tr");
             if(tr) {
               tr.classList.toggle("highlight");
@@ -248,6 +249,9 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   .drag-over-top td { box-shadow: inset 0 2px 0 0 #2563eb !important; }
   .drag-over-bottom td { box-shadow: inset 0 -2px 0 0 #2563eb !important; }
   
+  td.sticky-name, td.sticky-age { cursor: grab; user-select: none; }
+  td.sticky-name:active, td.sticky-age:active { cursor: grabbing; }
+
   .diff-span { font-size: 10px; font-weight: bold; border-radius: 2px; padding: 1px 3px; margin-right: 2px; border: 1px solid; }
   .diff-emerald { color: #059669; background-color: #ecfdf5; border-color: #d1fae5; }
   .diff-blue { color: #2563eb; background-color: #eff6ff; border-color: #bfdbfe; }
