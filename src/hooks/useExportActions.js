@@ -61,13 +61,19 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       let rowsHtml = ''; let lastDept = null; let lastGroup = null; let lastPost = null;
       
       traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
-        const deptName = dept.name;
-        const groupName = group ? group.name : '';
+        const deptName = dept.nextName && dept.nextName !== dept.name ? \${dept.name} / \ : dept.name;
+        const groupName = group ? (group.nextName && group.nextName !== group.name ? \${group.name} / \ : group.name) : '';
+        
+        let formattedPostName = postName;
+        if (post && post.nextName && post.nextName !== post.name) {
+          formattedPostName = \${post.name} / \;
+        }
+
         const isNewDept = deptName !== lastDept;
         const isNewGroup = isNewDept || groupName !== lastGroup;
-        const displayPost = (isNewGroup || postName !== lastPost) ? postName : '';
+        const displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
         
-        lastDept = deptName; lastGroup = groupName; lastPost = postName;
+        lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
 
         let deptNoteText = '';
         if (isNewDept && dept.id) {
@@ -347,4 +353,4 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
 }
 
 // ==========================================
-// 4. アプリケーションコンテキストプロバイダー
+// 4. アプリケーションコンテキストプロバイダー
