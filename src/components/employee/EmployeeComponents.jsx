@@ -501,12 +501,14 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-5 gap-y-2 gap-x-5">
               {fd.history && fd.history.length > 0 ? (
-                [...fd.history].sort((a, b) => a.year - b.year).map((h, i) => {
+                [...fd.history].sort((a, b) => a.year - b.year).map((h, i, arr) => {
                   const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
+                  const isLastInRow = (i + 1) % 5 === 0;
+                  const isLast = i === arr.length - 1;
                   return (
-                    <div key={i} className="flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center w-full">
+                    <div key={i} className="relative flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center w-full">
                       <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap">
                         {h.year} ({getEraSuffix(h.year)})
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
@@ -514,6 +516,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                       <span className="text-xs font-bold text-slate-700">
                         {h.department || '-'}
                       </span>
+                      {!isLast && !isLastInRow && (
+                        <ChevronRight className="absolute -right-[18px] top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      )}
                     </div>
                   );
                 })
