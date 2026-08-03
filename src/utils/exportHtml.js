@@ -210,6 +210,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
   table { border-collapse: separate; border-spacing: 0; width: max-content; }
   th, td { border-right: 1px solid #94a3b8; border-bottom: 1px solid #94a3b8; padding: 4px; text-align: center; vertical-align: middle; white-space: nowrap; background-clip: padding-box; }
+  th, strong, b { font-weight: 600; }
   th { cursor: pointer; user-select: none; position: relative; padding-right: 14px !important; }
   th:hover { filter: brightness(0.95); }
   th[onclick]::after { content: '⇅'; font-size: 8px; color: #64748b; position: absolute; right: 3px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
@@ -232,12 +233,12 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   tbody td.bg-emerald { background-color: #ecfdf5; }
   
   /* Sticky name column */
-  .sticky-name { position: sticky; left: 0; font-weight: bold; max-width: 115px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
+  .sticky-name { position: sticky; left: 0; font-weight: 600; max-width: 115px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
   tbody td.sticky-name { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-name { z-index: 30; background-color: #94a3b8; color: #fff; }
 
   /* Sticky age column */
-  .sticky-age { position: sticky; left: 90px; font-weight: bold; min-width: 50px; width: 50px; box-sizing: border-box; }
+  .sticky-age { position: sticky; left: 90px; font-weight: 600; min-width: 50px; width: 50px; box-sizing: border-box; }
   tbody td.sticky-age { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-age { z-index: 30; background-color: #94a3b8; color: #fff; }
   
@@ -252,7 +253,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   tbody td { cursor: grab; user-select: none; }
   tbody td:active { cursor: grabbing; }
 
-  .diff-span { font-size: 10px; font-weight: bold; border-radius: 2px; padding: 1px 3px; margin-right: 2px; border: 1px solid; }
+  .diff-span { font-size: 10px; font-weight: 600; border-radius: 2px; padding: 1px 3px; margin-right: 2px; border: 1px solid; }
   .diff-emerald { color: #059669; background-color: #ecfdf5; border-color: #d1fae5; }
   .diff-blue { color: #2563eb; background-color: #eff6ff; border-color: #bfdbfe; }
   .highlight > td { background-color: #fef08a !important; }
