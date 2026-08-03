@@ -61,12 +61,12 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       let rowsHtml = ''; let lastDept = null; let lastGroup = null; let lastPost = null;
       
       traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
-        const deptName = dept.nextName && dept.nextName !== dept.name ? \${dept.name} / \ : dept.name;
-        const groupName = group ? (group.nextName && group.nextName !== group.name ? \${group.name} / \ : group.name) : '';
+        const deptName = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
+        const groupName = group ? (group.nextName && group.nextName !== group.name ? `${group.name} / ${group.nextName}` : group.name) : '';
         
         let formattedPostName = postName;
         if (post && post.nextName && post.nextName !== post.name) {
-          formattedPostName = \${post.name} / \;
+          formattedPostName = `${post.name} / ${post.nextName}`;
         }
 
         const isNewDept = deptName !== lastDept;
