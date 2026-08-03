@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { 
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
@@ -291,29 +291,40 @@ const getEraSuffix = (year) => {
   return '';
 };
 
-const YearInput = ({ label, value, onChange }) => (
-  <div className="flex flex-col w-full">
-    <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
-    <div className="flex items-center w-full px-1.5 py-1 text-sm border border-slate-300 rounded bg-white shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden">
-      <input 
-        type="text" 
-        maxLength={4}
-        value={value || ''} 
-        onChange={e => {
-          const val = e.target.value.replace(/[^0-9]/g, '');
-          onChange(val);
-        }} 
-        placeholder="YYYY"
-        className="w-[36px] outline-none bg-transparent placeholder-slate-300" 
-      />
-      {value && (
-        <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
-          {getEraSuffix(value)}
-        </span>
-      )}
+const YearInput = ({ label, value, onChange, birthDate }) => {
+  let promoAge = null;
+  if (birthDate && value && !isNaN(parseInt(value))) {
+    promoAge = calculateAge(birthDate, parseInt(value));
+  }
+  return (
+    <div className="flex flex-col w-full">
+      <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
+      <div className="flex items-center w-full px-1.5 py-1 text-sm border border-slate-300 rounded bg-white shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden">
+        <input 
+          type="text" 
+          maxLength={4}
+          value={value || ''} 
+          onChange={e => {
+            const val = e.target.value.replace(/[^0-9]/g, '');
+            onChange(val);
+          }} 
+          placeholder="YYYY"
+          className="w-[36px] outline-none bg-transparent placeholder-slate-300" 
+        />
+        {value && (
+          <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
+            {getEraSuffix(value)}
+          </span>
+        )}
+        {promoAge !== null && !isNaN(promoAge) && (
+          <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
+            {promoAge}歳
+          </span>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, departments }) => {
   const def = { employeeNumber: '', name: '', birthDate: '', education: '', hireDate: '', note: '', currentDeptId: 'unassigned', currentPostId: null, currentGroupId: null, currentGroupPostId: null, currentTitle: '', currentGrade: '', currentYears: 0, currentSkillsStr: '', currentEmploymentType: '', currentExclude: '', departmentId: 'unassigned', postId: null, groupId: null, groupPostId: null, nextTitle: '', nextGrade: '', nextYears: 1, nextSkillsStr: '', nextEmploymentType: '', nextExclude: '', promoYearDeptHead: '', promoYearDeputyHead: '', promoYearDivHead: '', promoYearSecHead: '', promoYearAssistant3: '', promoYearAssistant2: '', promoYearAssistant1: '', promoYearChief: '' };
@@ -380,7 +391,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       const diff = (!isNaN(currentY) && !isNaN(prevY)) ? currentY - prevY : null;
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
-          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded mb-0.5">{diff !== null && diff >= 0 ? diff : 0}年</span>
+          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded mb-0.5 whitespace-nowrap">{diff !== null && diff >= 0 ? diff + 1 : 1}年目</span>
           <ChevronRight className="w-4 h-4 text-emerald-500" />
         </div>
       );
@@ -391,7 +402,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
           <span className="text-[9px] font-bold text-blue-600 leading-tight whitespace-nowrap">来年度</span>
-          <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1 rounded border border-blue-200 mb-0.5 whitespace-nowrap">{diff !== null && diff >= 0 ? diff : 0}年</span>
+          <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1 rounded border border-blue-200 mb-0.5 whitespace-nowrap">{diff !== null && diff >= 0 ? diff : 0}年目</span>
           <ChevronRight className="w-4 h-4 text-blue-500" />
         </div>
       );
@@ -453,25 +464,25 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 </div>
               </div>
               <ArrowDiff currentKey="promoYearChief" />
-              <YearInput label="係長級(主査)" value={fd.promoYearChief} onChange={v => setFd({...fd, promoYearChief: v})} />
+              <YearInput birthDate={fd.birthDate} label="係長級(主査)" value={fd.promoYearChief} onChange={v => setFd({...fd, promoYearChief: v})} />
               <ArrowDiff currentKey="promoYearAssistant1" />
-              <YearInput label="補佐級I(主任)" value={fd.promoYearAssistant1} onChange={v => setFd({...fd, promoYearAssistant1: v})} />
+              <YearInput birthDate={fd.birthDate} label="補佐級I(主任)" value={fd.promoYearAssistant1} onChange={v => setFd({...fd, promoYearAssistant1: v})} />
               <ArrowDiff currentKey="promoYearAssistant2" />
-              <YearInput label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} />
+              <YearInput birthDate={fd.birthDate} label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} />
               <ArrowDiff currentKey="promoYearAssistant3" />
-              <YearInput label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} />
+              <YearInput birthDate={fd.birthDate} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} />
               <div className="w-full opacity-0 pointer-events-none"></div>
 
               {/* Bottom Row */}
               <div className="w-full opacity-0 pointer-events-none"></div>
               <ArrowDiff currentKey="promoYearSecHead" />
-              <YearInput label="課長級" value={fd.promoYearSecHead} onChange={v => setFd({...fd, promoYearSecHead: v})} />
+              <YearInput birthDate={fd.birthDate} label="課長級" value={fd.promoYearSecHead} onChange={v => setFd({...fd, promoYearSecHead: v})} />
               <ArrowDiff currentKey="promoYearDivHead" />
-              <YearInput label="所属長級" value={fd.promoYearDivHead} onChange={v => setFd({...fd, promoYearDivHead: v})} />
+              <YearInput birthDate={fd.birthDate} label="所属長級" value={fd.promoYearDivHead} onChange={v => setFd({...fd, promoYearDivHead: v})} />
               <ArrowDiff currentKey="promoYearDeputyHead" />
-              <YearInput label="次長級" value={fd.promoYearDeputyHead} onChange={v => setFd({...fd, promoYearDeputyHead: v})} />
+              <YearInput birthDate={fd.birthDate} label="次長級" value={fd.promoYearDeputyHead} onChange={v => setFd({...fd, promoYearDeputyHead: v})} />
               <ArrowDiff currentKey="promoYearDeptHead" />
-              <YearInput label="部長級" value={fd.promoYearDeptHead} onChange={v => setFd({...fd, promoYearDeptHead: v})} />
+              <YearInput birthDate={fd.birthDate} label="部長級" value={fd.promoYearDeptHead} onChange={v => setFd({...fd, promoYearDeptHead: v})} />
               <ArrowDiff currentKey="finalArrow" />
             </div>
           </div>
