@@ -503,16 +503,20 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
             <div className="grid grid-cols-5 gap-2">
               {fd.history && fd.history.length > 0 ? (
-                [...fd.history].sort((a, b) => a.year - b.year).map((h, i) => (
-                  <div key={i} className="flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center w-full">
-                    <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5">
-                      {h.year} ({getEraSuffix(h.year)})
-                    </span>
-                    <span className="text-xs font-bold text-slate-700">
-                      {h.department || '-'}
-                    </span>
-                  </div>
-                ))
+                [...fd.history].sort((a, b) => a.year - b.year).map((h, i) => {
+                  const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
+                  return (
+                    <div key={i} className="flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center w-full">
+                      <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap">
+                        {h.year} ({getEraSuffix(h.year)})
+                        {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
+                      </span>
+                      <span className="text-xs font-bold text-slate-700">
+                        {h.department || '-'}
+                      </span>
+                    </div>
+                  );
+                })
               ) : (
                 <span className="text-sm text-slate-500">履歴情報はありません</span>
               )}
