@@ -192,11 +192,14 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <style>
     table { border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 12px; } 
     th, td { border: 1px solid #ccc; padding: 4px 8px; vertical-align: top; } 
-    th { background-color: #f0f0f0; position: sticky; top: 0; border-bottom: 2px solid #94a3b8; z-index: 10; } 
+    thead { position: sticky; top: 0; z-index: 20; }
+    th { background-color: #f0f0f0; border-bottom: 2px solid #94a3b8; background-clip: padding-box; } 
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: bold; color: #0369a1; background-color: #e0f2fe; } 
-    th:nth-child(4), td:nth-child(4), th:nth-child(10), td:nth-child(10), th:nth-child(16), td:nth-child(16) { border-left: 2px solid #475569; } 
+    td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #475569; } 
+    thead tr:first-child th:nth-child(4), thead tr:first-child th:nth-child(5), thead tr:first-child th:nth-child(6) { border-left: 2px solid #475569; }
+    thead tr:nth-child(2) th:nth-child(1), thead tr:nth-child(2) th:nth-child(7) { border-left: 2px solid #475569; } 
     .filter-container { margin-bottom:16px; font-family:sans-serif; font-size:14px; background:#fff; padding:12px; border:1px solid #e2e8f0; border-radius:6px; display:inline-block; } 
     .filter-container label { margin-right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size: 13px; }
     tr.border-dept-top td { border-top: 3px solid #475569 !important; }
@@ -334,7 +337,30 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <div class="filter-container">
   </div>
   <table>
-    <thead><tr>${headers.map(s => `<th>${s}</th>`).join('')}</tr></thead>
+    <thead>
+      <tr>
+        <th rowspan="2" style="background-color: #cbd5e1;">部署名</th>
+        <th rowspan="2" style="background-color: #cbd5e1;">班・グループ</th>
+        <th rowspan="2" style="background-color: #cbd5e1;">ポスト</th>
+        <th colspan="6" style="background-color: #cbd5e1;">今年度</th>
+        <th colspan="6" style="background-color: #bfdbfe;">来年度</th>
+        <th rowspan="2" style="background-color: #f0f0f0;">メモ</th>
+      </tr>
+      <tr>
+        <th style="background-color: #cbd5e1;">職名</th>
+        <th style="background-color: #cbd5e1;">氏名</th>
+        <th style="background-color: #cbd5e1;">級</th>
+        <th style="background-color: #cbd5e1;">年齢</th>
+        <th style="background-color: #cbd5e1;">在籍</th>
+        <th style="background-color: #cbd5e1;">備考</th>
+        <th style="background-color: #bfdbfe;">職名</th>
+        <th style="background-color: #bfdbfe;">氏名</th>
+        <th style="background-color: #bfdbfe;">級</th>
+        <th style="background-color: #bfdbfe;">年齢</th>
+        <th style="background-color: #bfdbfe;">在籍</th>
+        <th style="background-color: #bfdbfe;">備考</th>
+      </tr>
+    </thead>
     <tbody>${tbodyAll}</tbody>
     <tfoot class="print-only">
       <tr>
