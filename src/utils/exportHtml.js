@@ -258,29 +258,31 @@ ${scriptStr}
     });
 
     sortedEmployees.forEach((emp, index) => {
-      const getDeptName = (deptId, postId, groupId, groupPostId) => {
+      const getDeptName = (deptId, postId, groupId, groupPostId, isNext) => {
         if (!deptId || deptId === 'unassigned' || deptId === 'retired') return '';
         const dept = dMap.get(deptId);
         if (!dept) return '';
-        let str = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
+        
+        let str = isNext ? (dept.nextName || dept.name) : dept.name;
+        
         if (postId) {
           const p = (dept.posts || []).find(p => p.id === postId);
-          if (p) str += '（' + (p.nextName && p.nextName !== p.name ? `${p.name} / ${p.nextName}` : p.name) + '）';
+          if (p) str += '（' + (isNext ? (p.nextName || p.name) : p.name) + '）';
         } else if (groupId) {
           const g = (dept.groups || []).find(g => g.id === groupId);
           if (g) {
-            str += ' ' + (g.nextName && g.nextName !== g.name ? `${g.name} / ${g.nextName}` : g.name);
+            str += ' ' + (isNext ? (g.nextName || g.name) : g.name);
             if (groupPostId) {
               const gp = (g.posts || []).find(p => p.id === groupPostId);
-              if (gp) str += '（' + (gp.nextName && gp.nextName !== gp.name ? `${gp.name} / ${gp.nextName}` : gp.name) + '）';
+              if (gp) str += '（' + (isNext ? (gp.nextName || gp.name) : gp.name) + '）';
             }
           }
         }
         return str;
       };
 
-      const cDeptName = getDeptName(emp.currentDeptId, emp.currentPostId, emp.currentGroupId, emp.currentGroupPostId);
-      const nDeptName = getDeptName(emp.departmentId, emp.postId, emp.groupId, emp.groupPostId);
+      const cDeptName = getDeptName(emp.currentDeptId, emp.currentPostId, emp.currentGroupId, emp.currentGroupPostId, false);
+      const nDeptName = getDeptName(emp.departmentId, emp.postId, emp.groupId, emp.groupPostId, true);
 
       const getGradeLevel = (grade) => {
         const levels = { "部長級": 10, "次長級": 9, "所属長級": 8, "課長級": 7, "補佐級III(補佐兼班長)": 6, "補佐級II(班長)": 5, "補佐級I(主任)": 4, "係長級(主査)": 3, "一般": 1 };
@@ -336,14 +338,14 @@ ${scriptStr}
           }
         }
         
-        const promoColor = isNextPromo ? '#fff1f2' : '';
+        const promoColor = isNextPromo ? getPromotedBgColorCode(emp.nextGrade) : '';
         const styleStr = promoColor ? ` style="background-color: ${promoColor} !important;"` : '';
         return `<td class="bg-fuchsia" data-val="${cellVal||''}"${styleStr}><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
 
       const renderFinalDiff = (nStyle) => {
         let diff = null;
-        if (isNextPromoted) {
+        if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
           diff = 1;
         } else {
           const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
@@ -371,7 +373,7 @@ ${scriptStr}
         if (year === targetYear) {
           hStr = nDeptName;
           if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-            const c = '#fff1f2';
+            const c = getPromotedBgColorCode(emp.nextGrade);
             if (c) histStyle = ` style="background-color: ${c} !important;"`;
           }
         } else {
@@ -398,7 +400,7 @@ ${scriptStr}
       const nExclude = isNextRetired ? '' : (emp.nextExclude || '');
       
       const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
-      const nextPromoColor = isNextPromoted ? '#fff1f2' : '';
+      const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : '';
       const nStyle = nextPromoColor ? ` style="background-color: ${nextPromoColor} !important;"` : '';
 
       html += `
