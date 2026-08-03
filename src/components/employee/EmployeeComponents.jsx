@@ -446,7 +446,12 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="w-full" />
           </div>
           
-          <div className="border border-slate-300 rounded p-2.5 my-3 bg-slate-50/50">
+          <div className="grid grid-cols-2 gap-3 my-3">
+            <EmployeeFormSection title="今年度（現行）" isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
+            <EmployeeFormSection title="来年度（新）" isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
+          </div>
+
+          <div className="border border-slate-300 rounded p-2.5 mb-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2 flex items-center gap-2">
               昇進年度 (西暦(和暦)) と経過年数
             </h4>
@@ -494,9 +499,42 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <EmployeeFormSection title="今年度（現行）" isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
-            <EmployeeFormSection title="来年度（新）" isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
+          <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
+            <h4 className="font-bold text-sm text-slate-700 mb-2">略歴サマリー</h4>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-600">
+              {(() => {
+                const history = [];
+                if (fd.hireDate) {
+                  const hYear = parseInt(fd.hireDate.substring(0, 4));
+                  if (!isNaN(hYear)) history.push({ label: '採用', year: hYear });
+                }
+                const pKeys = [
+                  { key: 'promoYearChief', label: '係長級' },
+                  { key: 'promoYearAssistant1', label: '補佐級I' },
+                  { key: 'promoYearAssistant2', label: '補佐級II' },
+                  { key: 'promoYearAssistant3', label: '補佐級III' },
+                  { key: 'promoYearSecHead', label: '課長級' },
+                  { key: 'promoYearDivHead', label: '所属長級' },
+                  { key: 'promoYearDeputyHead', label: '次長級' },
+                  { key: 'promoYearDeptHead', label: '部長級' }
+                ];
+                for (const pk of pKeys) {
+                  if (fd[pk.key]) history.push({ label: pk.label, year: parseInt(fd[pk.key]) });
+                }
+                history.push({ label: `来年度(${fd.nextGrade || '未定'})`, year: targetYear });
+
+                return history.map((h, i) => (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1 bg-white border px-2 py-1 rounded shadow-sm">
+                      <span className="text-slate-500">{h.label}</span>
+                      <span className="text-[#065084]">{h.year}</span>
+                      {h.year ? <span className="text-[9px] text-slate-400 font-normal">({getEraSuffix(h.year)})</span> : null}
+                    </div>
+                    {i < history.length - 1 && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+                  </div>
+                ));
+              })()}
+            </div>
           </div>
         </div>
         <div className="mt-3 pt-3 border-t flex justify-end gap-3">
