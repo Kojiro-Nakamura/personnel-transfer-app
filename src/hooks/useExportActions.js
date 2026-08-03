@@ -177,8 +177,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     const nextSummaryStr = generateGradeSummary(employees, true);
     const summaryHtml = `
       <div style="margin-bottom:16px;font-family:sans-serif;font-size:14px;background:#f8fafc;padding:12px;border:1px solid #e2e8f0;border-radius:6px;">
-        <div style="margin-bottom:8px;"><strong>【全体集計（今年度）】</strong> ${escapeHtml(currSummaryStr)}</div>
-        <div><strong>【全体集計（来年度）】</strong> <span style="color:#0369a1;font-weight:bold;">${escapeHtml(nextSummaryStr)}</span></div>
+        <div style="margin-bottom:8px;"><strong>【全体集計（今年度）】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(currSummaryStr)}</span></div>
+        <div><strong>【全体集計（来年度）】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(nextSummaryStr)}</span></div>
       </div>`;
 
     const gradeLevelsHtml = JSON.stringify(GRADE_LEVELS);
@@ -193,11 +193,12 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
     table { border-collapse: collapse; width: 100%; } 
     th, td { border: 1px solid #ccc; padding: 4px 8px; vertical-align: top; } 
+    th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; }
     th { background-color: #f0f0f0; border-bottom: 2px solid #94a3b8; background-clip: padding-box; } 
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
-    .post-cell { font-weight: bold; color: #0369a1; background-color: #e0f2fe; } 
+    .post-cell { font-weight: 600; color: #0369a1; background-color: #e0f2fe; } 
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #475569; } 
     thead tr:first-child th:nth-child(4), thead tr:first-child th:nth-child(5), thead tr:first-child th:nth-child(6) { border-left: 2px solid #475569; }
     thead tr:nth-child(2) th:nth-child(1), thead tr:nth-child(2) th:nth-child(7) { border-left: 2px solid #475569; } 
