@@ -421,7 +421,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-5 max-w-2xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg p-5 max-w-3xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
           <div>
             <h3 className="text-xl font-bold text-[#065084]">職員情報編集</h3>
