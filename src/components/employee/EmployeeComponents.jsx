@@ -500,40 +500,22 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
-            <h4 className="font-bold text-sm text-slate-700 mb-2">略歴サマリー</h4>
-            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-600">
-              {(() => {
-                const history = [];
-                if (fd.hireDate) {
-                  const hYear = parseInt(fd.hireDate.substring(0, 4));
-                  if (!isNaN(hYear)) history.push({ label: '採用', year: hYear });
-                }
-                const pKeys = [
-                  { key: 'promoYearChief', label: '係長級' },
-                  { key: 'promoYearAssistant1', label: '補佐級I' },
-                  { key: 'promoYearAssistant2', label: '補佐級II' },
-                  { key: 'promoYearAssistant3', label: '補佐級III' },
-                  { key: 'promoYearSecHead', label: '課長級' },
-                  { key: 'promoYearDivHead', label: '所属長級' },
-                  { key: 'promoYearDeputyHead', label: '次長級' },
-                  { key: 'promoYearDeptHead', label: '部長級' }
-                ];
-                for (const pk of pKeys) {
-                  if (fd[pk.key]) history.push({ label: pk.label, year: parseInt(fd[pk.key]) });
-                }
-                history.push({ label: `来年度(${fd.nextGrade || '未定'})`, year: targetYear });
-
-                return history.map((h, i) => (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <div className="flex items-center gap-1 bg-white border px-2 py-1 rounded shadow-sm">
-                      <span className="text-slate-500">{h.label}</span>
-                      <span className="text-[#065084]">{h.year}</span>
-                      {h.year ? <span className="text-[9px] text-slate-400 font-normal">({getEraSuffix(h.year)})</span> : null}
-                    </div>
-                    {i < history.length - 1 && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+            <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
+            <div className="flex flex-wrap gap-2">
+              {fd.history && fd.history.length > 0 ? (
+                [...fd.history].sort((a, b) => a.year - b.year).map((h, i) => (
+                  <div key={i} className="flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center min-w-[80px]">
+                    <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5">
+                      {h.year} ({getEraSuffix(h.year)})
+                    </span>
+                    <span className="text-xs font-bold text-slate-700">
+                      {h.department || '-'}
+                    </span>
                   </div>
-                ));
-              })()}
+                ))
+              ) : (
+                <span className="text-sm text-slate-500">履歴情報はありません</span>
+              )}
             </div>
           </div>
         </div>
