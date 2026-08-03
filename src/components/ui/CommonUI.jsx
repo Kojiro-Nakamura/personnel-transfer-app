@@ -116,7 +116,7 @@ export const PlacementSelector = ({ deptId, postId, groupId, groupPostId, depart
       >
         <option value="unassigned">配置待ち</option>
         {departments.filter(d => d.id !== 'retired' && d.id !== 'unassigned').map(d => (
-          <option key={d.id} value={d.id}>{isNext ? (d.nextName || d.name) : d.name}</option>
+          <option key={d.id} value={d.id}>{isNext ? (d.nextName && d.nextName !== d.name ? `${d.name} / ${d.nextName}` : (d.nextName || d.name)) : d.name}</option>
         ))}
         <option value="retired">退職・転出</option>
       </select>
@@ -131,7 +131,7 @@ export const PlacementSelector = ({ deptId, postId, groupId, groupPostId, depart
         {departments.find(d => d.id === deptId)?.posts?.length > 0 && (
           <optgroup label="課直属ポスト">
             {departments.find(d => d.id === deptId).posts.map(p => (
-              <option key={p.id} value={`post:${p.id}`}>{isNext ? (p.nextName || p.name) : p.name}</option>
+              <option key={p.id} value={`post:${p.id}`}>{isNext ? (p.nextName && p.nextName !== p.name ? `${p.name} / ${p.nextName}` : (p.nextName || p.name)) : p.name}</option>
             ))}
           </optgroup>
         )}
@@ -140,7 +140,7 @@ export const PlacementSelector = ({ deptId, postId, groupId, groupPostId, depart
             {departments.find(d => d.id === deptId).groups.map(g => (
               <React.Fragment key={g.id}>
                 {(g.posts || []).map(gp => (
-                  <option key={gp.id} value={`groupPost:${g.id}:${gp.id}`}>■ {isNext ? (g.nextName || g.name) : g.name} - {isNext ? (gp.nextName || gp.name) : gp.name}</option>
+                  <option key={gp.id} value={`groupPost:${g.id}:${gp.id}`}>■ {isNext ? (g.nextName && g.nextName !== g.name ? `${g.name} / ${g.nextName}` : (g.nextName || g.name)) : g.name} - {isNext ? (gp.nextName && gp.nextName !== gp.name ? `${gp.name} / ${gp.nextName}` : (gp.nextName || gp.name)) : gp.name}</option>
                 ))}
                 <option value={`group:${g.id}`}>└ {isNext ? (g.nextName || g.name) : g.name}（班員）</option>
               </React.Fragment>

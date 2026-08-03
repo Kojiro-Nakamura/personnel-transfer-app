@@ -262,17 +262,17 @@ ${scriptStr}
         if (!deptId || deptId === 'unassigned' || deptId === 'retired') return '';
         const dept = dMap.get(deptId);
         if (!dept) return '';
-        let str = dept.name;
+        let str = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
         if (postId) {
           const p = (dept.posts || []).find(p => p.id === postId);
-          if (p) str += '（' + p.name + '）';
+          if (p) str += '（' + (p.nextName && p.nextName !== p.name ? `${p.name} / ${p.nextName}` : p.name) + '）';
         } else if (groupId) {
           const g = (dept.groups || []).find(g => g.id === groupId);
           if (g) {
-            str += ' ' + g.name;
+            str += ' ' + (g.nextName && g.nextName !== g.name ? `${g.name} / ${g.nextName}` : g.name);
             if (groupPostId) {
               const gp = (g.posts || []).find(p => p.id === groupPostId);
-              if (gp) str += '（' + gp.name + '）';
+              if (gp) str += '（' + (gp.nextName && gp.nextName !== gp.name ? `${gp.name} / ${gp.nextName}` : gp.name) + '）';
             }
           }
         }

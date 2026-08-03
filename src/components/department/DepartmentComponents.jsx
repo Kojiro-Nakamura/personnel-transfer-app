@@ -43,7 +43,7 @@ export const AddSlotRow = ({ label, indentClass, onClickNext, anchorId }) => {
 
 export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   const { deptMap, filterLevel, collapsedDepts, toggleDept, openModal, mutations, handleCellClick } = useApp();
-  const isCollapsed = !!collapsedDepts[dept.id]; 
+  const isCollapsed = !!collapsedDepts[dept.id]; console.log('DEPT RENDER:', dept.name, dept.nextName); 
   const dm = deptMap[dept.id];
   
   const deptCurrEmps = [...dm.direct.current];
@@ -85,8 +85,8 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             onClick={() => toggleDept(dept.id)} 
             title={isCollapsed ? "展開する" : "折りたたむ"}
           >
-            {dept.name} 
-            {dept.nextName && <span className="text-[10px] text-slate-300 font-normal">（来年: {dept.nextName}）</span>}
+
+            {dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name}
           </span>
           <span className="text-[10px] bg-slate-600 px-2 py-0.5 rounded text-slate-200 ml-2 shadow-inner pointer-events-none">
             今年度: {formatCountText(cCounts)} / 来年度: {formatCountText(nCounts)}
@@ -173,7 +173,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                   isFirst={i === 0} 
                   isPost={true} 
                   titleIcon={<Award className="w-3.5 h-3.5 text-sky-600 shrink-0" />} 
-                  titleText={post.nextName || post.name} 
+                  titleText={post.nextName && post.nextName !== post.name ? `${post.name} / ${post.nextName}` : post.name} 
                   onTitleEdit={() => openModal('post', { deptId: dept.id, post })} 
                   onTitleDelete={() => openModal('delConfirm', { type: 'post', deptId: dept.id, id: post.id, title: post.name })} 
                   onMoveUp={pIdx > 0 ? () => mutations.movePost(dept.id, post.id, 'up') : undefined} 
@@ -209,9 +209,9 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
               <React.Fragment key={grp.id}>
                 <div className="flex border-b border-slate-400 bg-slate-200 group/grp relative z-10">
                   <div className="w-full px-2 py-1 text-[11px] font-bold text-slate-700 flex justify-between items-center">
-                    <div className="flex items-center gap-1.5" title={grp.nextName || grp.name}>
+                    <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
-                      {grp.nextName || grp.name}
+                      {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
                       <span className="text-[9px] bg-slate-300/80 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-slate-300">
                         今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
                       </span>
@@ -290,7 +290,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         isIndent={true} 
                         isPost={true} 
                         titleIcon={<Award className="w-3 h-3 text-sky-600 shrink-0" />} 
-                        titleText={gp.nextName || gp.name} 
+                        titleText={gp.nextName && gp.nextName !== gp.name ? `${gp.name} / ${gp.nextName}` : gp.name} 
                         onTitleEdit={() => openModal('groupPost', { deptId: dept.id, groupId: grp.id, post: gp })} 
                         onTitleDelete={() => openModal('delConfirm', { type: 'groupPost', deptId: dept.id, groupId: grp.id, id: gp.id, title: gp.name })} 
                         onMoveUp={gpIdx > 0 ? () => mutations.moveGroupPost(dept.id, grp.id, gp.id, 'up') : undefined} 
