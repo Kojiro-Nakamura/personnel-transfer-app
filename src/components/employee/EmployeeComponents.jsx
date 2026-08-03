@@ -450,17 +450,24 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <h4 className="font-bold text-sm text-slate-700 mb-2 flex items-center gap-2">
               昇進年度 (西暦(和暦)) と経過年数
             </h4>
-            <div className="grid grid-cols-[85px_1fr_85px_1fr_85px_1fr_85px_1fr_85px_1fr] gap-y-3 items-end justify-items-center">
+            <div className="grid grid-cols-[98px_1fr_98px_1fr_98px_1fr_98px_1fr_98px_1fr] gap-y-3 items-end justify-items-center">
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
                 <span className="text-[11px] font-bold text-slate-600 mb-1">採用</span>
                 <div className="px-1 py-1 bg-slate-200 text-slate-700 rounded text-xs font-bold shadow-inner border border-slate-300 h-[30px] flex items-center justify-center tracking-tighter overflow-hidden">
-                  {fd.hireDate ? (
-                    <div className="flex items-baseline">
-                      <span>{fd.hireDate.substring(0, 4)}</span>
-                      <span className="ml-2 text-[10px] text-slate-500 font-bold">{getEraSuffix(fd.hireDate.substring(0, 4))}</span>
-                    </div>
-                  ) : '----'}
+                  {fd.hireDate ? (() => {
+                    const hYear = parseInt(fd.hireDate.substring(0, 4));
+                    const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
+                    return (
+                      <div className="flex items-baseline">
+                        <span>{hYear}</span>
+                        <span className="ml-1 text-[10px] text-slate-500 font-bold">{getEraSuffix(hYear)}</span>
+                        {hAge !== null && !isNaN(hAge) && (
+                          <span className="ml-1 text-[10px] text-slate-500 font-bold">{hAge}歳</span>
+                        )}
+                      </div>
+                    );
+                  })() : '----'}
                 </div>
               </div>
               <ArrowDiff currentKey="promoYearChief" />
