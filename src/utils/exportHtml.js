@@ -336,14 +336,14 @@ ${scriptStr}
           }
         }
         
-        const promoColor = isNextPromo ? getPromotedBgColorCode(emp.nextGrade) : '';
+        const promoColor = isNextPromo ? '#fff1f2' : '';
         const styleStr = promoColor ? ` style="background-color: ${promoColor} !important;"` : '';
         return `<td class="bg-fuchsia" data-val="${cellVal||''}"${styleStr}><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       };
 
       const renderFinalDiff = (nStyle) => {
         let diff = null;
-        if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
+        if (isNextPromoted) {
           diff = 1;
         } else {
           const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
@@ -371,7 +371,7 @@ ${scriptStr}
         if (year === targetYear) {
           hStr = nDeptName;
           if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-            const c = getPromotedBgColorCode(emp.nextGrade);
+            const c = '#fff1f2';
             if (c) histStyle = ` style="background-color: ${c} !important;"`;
           }
         } else {
@@ -398,7 +398,7 @@ ${scriptStr}
       const nExclude = isNextRetired ? '' : (emp.nextExclude || '');
       
       const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
-      const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : '';
+      const nextPromoColor = isNextPromoted ? '#fff1f2' : '';
       const nStyle = nextPromoColor ? ` style="background-color: ${nextPromoColor} !important;"` : '';
 
       html += `
