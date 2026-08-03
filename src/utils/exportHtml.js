@@ -105,7 +105,90 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
         }
         var tbody = document.querySelector("#empTable tbody");
         if(tbody) {
+          let draggedRow = null;
+          
+          tbody.addEventListener("dragstart", function(e) {
+            if (e.target.tagName === "TR") {
+              draggedRow = e.target;
+              e.target.style.opacity = '0.5';
+              e.dataTransfer.effectAllowed = 'move';
+            }
+          });
+          
+          tbody.addEventListener("dragend", function(e) {
+            if (e.target.tagName === "TR") {
+              e.target.style.opacity = '1';
+              draggedRow = null;
+              var rows = Array.from(tbody.rows);
+              for (var i = 0; i < rows.length; i++) {
+                 rows[i].classList.remove('drag-over-top', 'drag-over-bottom');
+              }
+            }
+          });
+          
+          tbody.addEventListener("dragover", function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            var targetRow = e.target.closest("tr");
+            if (targetRow && draggedRow && targetRow !== draggedRow && targetRow.parentNode === tbody) {
+              var bounding = targetRow.getBoundingClientRect();
+              var offset = bounding.y + (bounding.height / 2);
+              
+              var rows = Array.from(tbody.rows);
+              for (var i = 0; i < rows.length; i++) {
+                 if (rows[i] !== targetRow) rows[i].classList.remove('drag-over-top', 'drag-over-bottom');
+              }
+              
+              if (e.clientY - offset > 0) {
+                targetRow.classList.remove('drag-over-top');
+                targetRow.classList.add('drag-over-bottom');
+              } else {
+                targetRow.classList.remove('drag-over-bottom');
+                targetRow.classList.add('drag-over-top');
+              }
+            }
+          });
+          
+          tbody.addEventListener("dragleave", function(e) {
+            var targetRow = e.target.closest("tr");
+            if (targetRow) {
+              targetRow.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
+          });
+          
+          tbody.addEventListener("drop", function(e) {
+            e.preventDefault();
+            var targetRow = e.target.closest("tr");
+            if (targetRow && draggedRow && targetRow !== draggedRow && targetRow.parentNode === tbody) {
+              var bounding = targetRow.getBoundingClientRect();
+              var offset = bounding.y + (bounding.height / 2);
+              if (e.clientY - offset > 0) {
+                tbody.insertBefore(draggedRow, targetRow.nextSibling);
+              } else {
+                tbody.insertBefore(draggedRow, targetRow);
+              }
+            }
+            if (targetRow) {
+              targetRow.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
+          });
+          
+          tbody.addEventListener("mouseover", function(e) {
+            if (e.target.classList.contains("drag-handle")) {
+              var tr = e.target.closest("tr");
+              if (tr) tr.setAttribute("draggable", "true");
+            }
+          });
+          
+          tbody.addEventListener("mouseout", function(e) {
+            if (e.target.classList.contains("drag-handle")) {
+              var tr = e.target.closest("tr");
+              if (tr) tr.removeAttribute("draggable");
+            }
+          });
+
           tbody.addEventListener("click", function(e) {
+            if (e.target.classList.contains("drag-handle")) return;
             var tr = e.target.closest("tr");
             if(tr) {
               tr.classList.toggle("highlight");
@@ -161,6 +244,9 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
   
   .text-left { text-align: left; }
   .arrow { color: #64748b; font-size: 10px; margin: 0 2px; }
+  .drag-over-top td { box-shadow: inset 0 2px 0 0 #2563eb !important; }
+  .drag-over-bottom td { box-shadow: inset 0 -2px 0 0 #2563eb !important; }
+  
   .diff-span { font-size: 10px; font-weight: bold; border-radius: 2px; padding: 1px 3px; margin-right: 2px; border: 1px solid; }
   .diff-emerald { color: #059669; background-color: #ecfdf5; border-color: #d1fae5; }
   .diff-blue { color: #2563eb; background-color: #eff6ff; border-color: #bfdbfe; }
@@ -405,7 +491,7 @@ ${scriptStr}
 
       html += `
     <tr data-original-index="${index}">
-      <td class="sticky-name text-left" data-val="${nameVal}"${nStyle}>${nameVal}</td>
+      <td class="sticky-name text-left" data-val="${nameVal}"${nStyle}><span class="drag-handle" style="cursor: grab; margin-right: 4px; color: #94a3b8;" title="ドラッグで並べ替え">≡</span>${nameVal}</td>
       <td class="sticky-age" data-val="${ageNum}"${nStyle}>${ageNum !== '' ? ageNum + '歳' : ''}</td>
       <td class="bg-slate" data-val="${emp.employeeNumber||''}">${emp.employeeNumber||''}</td>
       <td class="bg-slate" data-val="${emp.birthDate||''}">${emp.birthDate||''}</td>
