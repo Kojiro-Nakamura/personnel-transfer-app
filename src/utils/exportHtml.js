@@ -118,6 +118,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
           tbody.addEventListener("dragend", function(e) {
             if (e.target.tagName === "TR") {
               e.target.style.opacity = '1';
+              e.target.removeAttribute("draggable");
               draggedRow = null;
               var rows = Array.from(tbody.rows);
               for (var i = 0; i < rows.length; i++) {
@@ -173,14 +174,14 @@ export const generateAndDownloadHTML = (employees, departments, targetYear) => {
             }
           });
           
-          tbody.addEventListener("mouseover", function(e) {
+          tbody.addEventListener("mousedown", function(e) {
             if (e.target.classList.contains("drag-handle")) {
               var tr = e.target.closest("tr");
               if (tr) tr.setAttribute("draggable", "true");
             }
           });
           
-          tbody.addEventListener("mouseout", function(e) {
+          tbody.addEventListener("mouseup", function(e) {
             if (e.target.classList.contains("drag-handle")) {
               var tr = e.target.closest("tr");
               if (tr) tr.removeAttribute("draggable");
