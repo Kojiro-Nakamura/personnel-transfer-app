@@ -190,7 +190,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <meta charset="UTF-8">
   <title>${escapeHtml(fileName.replace(/\.html$/, ''))} - 人事異動案</title>
   <style>
-    table { border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 12px; } 
+    body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
+    table { border-collapse: collapse; width: 100%; } 
     th, td { border: 1px solid #ccc; padding: 4px 8px; vertical-align: top; } 
     thead { position: sticky; top: 0; z-index: 20; }
     th { background-color: #f0f0f0; border-bottom: 2px solid #94a3b8; background-clip: padding-box; } 
