@@ -239,6 +239,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
 );
 
 export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, departments, editCurrent, setEditCurrent }) => {
+  const { targetYear } = useApp();
   const p = isCurrent ? 'current' : 'next'; 
   const pd = isCurrent ? 'currentDeptId' : 'departmentId'; 
   const pp = isCurrent ? 'currentPostId' : 'postId'; 
@@ -268,10 +269,10 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
           </div>
           <div className="flex gap-2">
             <FormInput label="職名" disabled={disabled} value={fd[`${p}Title`]} onChange={v => setFd({...fd, [`${p}Title`]: v})} className="flex-1" />
-            <FormSelect label="級" disabled={disabled} value={fd[`${p}Grade`]} onChange={v => setFd({...fd, [`${p}Grade`]: v})} options={GRADE_OPTIONS} className="w-[140px]" selectClassName={promoBg} />
+            <FormSelect label="級" disabled={disabled} value={fd[`${p}Grade`]} onChange={handleGradeChange} options={GRADE_OPTIONS} className="w-[140px]" selectClassName={promoBg} />
           </div>
           <div className="flex gap-2">
-            <FormInput label="年数" type="number" disabled={disabled} value={fd[`${p}Years`]} onChange={v => setFd({...fd, [`${p}Years`]: v})} className="w-16" />
+            <FormInput label="年数" type="number" disabled={disabled} value={fd[`${p}Years`]} onChange={v => setFd({...fd, [`${p}Years`]: v})} className="w-16" inputClassName={promoBg} />
             <FormInput label="年数詳細" disabled={disabled} placeholder="派1+治1、1+1など" value={fd[`${p}SkillsStr`]} onChange={v => setFd({...fd, [`${p}SkillsStr`]: v})} className="flex-1" />
           </div>
           <div className="flex gap-2">

@@ -50,7 +50,7 @@ export const CommentButton = ({ targetId, theme = 'light', tooltipPos = 'right',
   );
 };
 
-export const FormInput = ({ label, value, onChange, type = "text", disabled = false, placeholder = "", className = "" }) => (
+export const FormInput = ({ label, value, onChange, type = "text", disabled = false, placeholder = "", className = "", inputClassName = "" }) => (
   <div className={className}>
     <label className={cx("block text-xs mb-1", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
     <input 
@@ -59,7 +59,7 @@ export const FormInput = ({ label, value, onChange, type = "text", disabled = fa
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
       placeholder={placeholder} 
-      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : "bg-white", placeholder ? "placeholder:text-slate-400" : "")} 
+      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (inputClassName || "bg-white"), placeholder ? "placeholder:text-slate-400" : "")} 
     />
   </div>
 );
