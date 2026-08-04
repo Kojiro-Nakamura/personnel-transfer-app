@@ -265,7 +265,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
           </div>
           <div className="flex gap-2">
             <FormInput label="職名" disabled={disabled} value={fd[`${p}Title`]} onChange={v => setFd({...fd, [`${p}Title`]: v})} className="flex-1" />
-            <FormSelect label="級" disabled={disabled} value={fd[`${p}Grade`]} onChange={v => setFd({...fd, [`${p}Grade`]: v})} options={GRADE_OPTIONS} className="w-[140px]" />
+            <FormSelect label="級" disabled={disabled} value={fd[`${p}Grade`]} onChange={v => setFd({...fd, [`${p}Grade`]: v})} options={GRADE_OPTIONS} className="w-[140px]" selectClassName={promoBg} />
           </div>
           <div className="flex gap-2">
             <FormInput label="年数" type="number" disabled={disabled} value={fd[`${p}Years`]} onChange={v => setFd({...fd, [`${p}Years`]: v})} className="w-16" />
@@ -360,6 +360,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     onClose(); 
   };
 
+
+  const isPromoted = isPromotedGrade(fd.currentGrade, fd.nextGrade);
+  const promoBg = isPromoted ? getPromotedBgClass(fd.nextGrade) : "";
 
   const pKeys = ['hire', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
   

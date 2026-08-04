@@ -82,14 +82,14 @@ export const FormInputWithList = ({ label, value, onChange, disabled = false, pl
   </div>
 );
 
-export const FormSelect = ({ label, value, onChange, options, disabled = false, className = "" }) => (
+export const FormSelect = ({ label, value, onChange, options, disabled = false, className = "", selectClassName = "" }) => (
   <div className={className}>
     <label className={cx("block text-xs mb-1", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
     <select 
       value={value !== undefined ? value : ''} 
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
-      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : "bg-white")}
+      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (selectClassName || "bg-white"))}
     >
       {options.map(o => <option key={o} value={o}>{o}</option>)}
     </select>
