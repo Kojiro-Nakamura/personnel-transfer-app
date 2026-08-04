@@ -402,6 +402,24 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
   const promoBg = isPromoted ? getPromotedBgClass(fd.nextGrade) : "";
   const activePromoKey = isPromoted ? GRADE_TO_PROMO_KEY[fd.nextGrade] : null;
 
+  React.useEffect(() => {
+    if (isPromoted && activePromoKey) {
+      let shouldUpdate = false;
+      let updates = {};
+      if (!fd[activePromoKey]) {
+        updates[activePromoKey] = String(targetYear);
+        shouldUpdate = true;
+      }
+      if (fd.nextYears !== 1 && fd.nextYears !== "1") {
+        updates.nextYears = 1;
+        shouldUpdate = true;
+      }
+      if (shouldUpdate) {
+        setFd(prev => ({ ...prev, ...updates }));
+      }
+    }
+  }, [isPromoted, activePromoKey, targetYear, fd.nextYears, fd[activePromoKey]]);
+
   const pKeys = ['hire', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
   
   // Find index of last filled
