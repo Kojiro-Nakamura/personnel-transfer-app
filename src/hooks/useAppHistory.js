@@ -19,6 +19,7 @@ export function useAppHistory(initialState) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
       targetYear, 
       activePlanId, 
+      currentFileName,
       plans: plans.map(p => p.id === activePlanId ? { ...p, employees, departments, notes } : p) 
     })); 
   }, [targetYear, activePlanId, plans, employees, departments, notes, currentFileName]);
