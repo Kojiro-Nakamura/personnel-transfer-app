@@ -245,6 +245,9 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
   const pg = isCurrent ? 'currentGroupId' : 'groupId'; 
   const pgp = isCurrent ? 'currentGroupPostId' : 'groupPostId';
 
+  const isPromoted = !isCurrent && isPromotedGrade(fd.currentGrade, fd.nextGrade);
+  const promoBg = isPromoted ? getPromotedBgClass(fd.nextGrade) : '';
+
   return (
     <div className={cx("p-2 rounded border flex flex-col", isCurrent ? "bg-slate-50 border-slate-200" : "bg-blue-50/50 border-blue-200")}>
       <div className="flex justify-between items-center mb-1.5 border-b pb-1">
@@ -291,7 +294,7 @@ const getEraSuffix = (year) => {
   return '';
 };
 
-const YearInput = ({ label, value, onChange, birthDate }) => {
+const YearInput = ({ label, value, onChange, birthDate, bgClass }) => {
   let promoAge = null;
   if (birthDate && value && !isNaN(parseInt(value))) {
     promoAge = calculateAge(birthDate, parseInt(value));
@@ -299,7 +302,7 @@ const YearInput = ({ label, value, onChange, birthDate }) => {
   return (
     <div className="flex flex-col w-full">
       <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
-      <div className="flex items-center w-full px-1.5 py-1 text-sm border border-slate-300 rounded bg-white shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden">
+      <div className={cx("flex items-center w-full px-1.5 py-1 text-sm border border-slate-300 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", bgClass || "bg-white")}>
         <input 
           type="text" 
           maxLength={4}
@@ -520,8 +523,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   const isLastInRow = (i + 1) % 5 === 0;
                   const isLast = i === arr.length - 1;
                   const isRowStart = i % 5 === 0 && i !== 0;
+                  const cellBg = (h.isNext && isPromoted) ? promoBg : "bg-white";
                   return (
-                    <div key={i} className="relative flex flex-col bg-white border px-2 py-1 rounded shadow-sm w-full min-w-0" title={h.department || '-'}>
+                    <div key={i} className={cx("relative flex flex-col border px-2 py-1 rounded shadow-sm w-full min-w-0", cellBg)} title={h.department || '-'}>
                       {isRowStart && (
                         <ChevronRight className="absolute -left-[16px] top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       )}
