@@ -574,7 +574,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 }
 
                 const colorMap = {};
-                const textColors = ["text-sky-500", "text-orange-500", "text-fuchsia-500"];
+                const textColors = ["text-sky-500", "text-orange-500", "text-lime-600"];
                 let colorIdx = 0;
                 displayHistory.forEach(h => {
                   const dept = h.department || '-';
