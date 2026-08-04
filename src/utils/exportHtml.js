@@ -459,20 +459,34 @@ ${scriptStr}
       };
 
       let histHtml = '';
+      const colorMap = {};
+      const textColors = ["#FF8000", "#00BFFF", "#4B0082"];
+      let colorIdx = 0;
+      
       historyYears.forEach(year => {
         let hStr = '';
-        let histStyle = '';
+        let histStyleCss = '';
         if (year === targetYear) {
           hStr = nDeptName;
           if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
             const c = getPromotedBgColorCode(emp.nextGrade);
-            if (c) histStyle = ` style="background-color: ${c} !important;"`;
+            if (c) histStyleCss += `background-color: ${c} !important; `;
           }
         } else {
           const hist = (emp.history || []).find(h => h.year === year);
           hStr = hist ? hist.department : '';
         }
-        histHtml += `<td class="bg-emerald" data-val="${hStr}"${histStyle}>${hStr}</td>`;
+        
+        if (hStr && hStr !== ' / 課直属' && hStr !== '未配置' && hStr !== '-') {
+          if (!colorMap[hStr]) {
+            colorMap[hStr] = textColors[colorIdx % textColors.length];
+            colorIdx++;
+          }
+          histStyleCss += `color: ${colorMap[hStr]}; font-weight: bold;`;
+        }
+
+        const histStyleAttr = histStyleCss ? ` style="${histStyleCss}"` : '';
+        histHtml += `<td class="bg-emerald" data-val="${hStr}"${histStyleAttr}>${hStr}</td>`;
       });
 
             let ageNum = '';
