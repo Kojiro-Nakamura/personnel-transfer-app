@@ -13,7 +13,7 @@ export function useAppHistory(initialState) {
   const [past, setPast] = useState([]); 
   const [future, setFuture] = useState([]);
   const [selectedEmp, setSelectedEmp] = useState(null); 
-  const [currentFileName, setCurrentFileName] = useState('');
+  const [currentFileName, setCurrentFileName] = useState(initialState.currentFileName || '');
 
   useEffect(() => { 
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
@@ -21,7 +21,7 @@ export function useAppHistory(initialState) {
       activePlanId, 
       plans: plans.map(p => p.id === activePlanId ? { ...p, employees, departments, notes } : p) 
     })); 
-  }, [targetYear, activePlanId, plans, employees, departments, notes]);
+  }, [targetYear, activePlanId, plans, employees, departments, notes, currentFileName]);
 
   const commit = useCallback(() => { 
     setPast(prev => { 

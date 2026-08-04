@@ -1,6 +1,6 @@
 import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode } from './helpers.js';
 
-export const generateAndDownloadHTML = (employees, departments, targetYear) => {
+export const generateAndDownloadHTML = (employees, departments, targetYear, fileName) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const targetEraShort = getEraFormattedYear(targetYear).split('(')[1].replace(')', '');
   const yearsSet = new Set();
@@ -571,7 +571,7 @@ ${scriptStr}
     const dd = String(today.getDate()).padStart(2, '0');
     const dateStr = `${yyyy}${mm}${dd}`;
     const eraYear = getEraFormattedYear(targetYear);
-    link.setAttribute("download", `${dateStr}_${eraYear}年度_職員一覧.html`);
+    link.setAttribute("download", fileName ? (fileName.endsWith('.html') ? fileName : fileName + '.html') : `${dateStr}_${eraYear}年度_職員一覧.html`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
