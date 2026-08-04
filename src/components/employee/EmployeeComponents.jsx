@@ -501,7 +501,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
-            <div className="grid grid-cols-5 gap-y-2 gap-x-5">
+            <div className="grid grid-cols-5 gap-y-2 gap-x-4 pl-3 pr-1">
               {(() => {
                 const baseHistory = [...(fd.history || [])].sort((a, b) => a.year - b.year);
                 const nextDeptStr = getPlacementName(fd.departmentId, fd.postId, fd.groupId, fd.groupPostId, departments);
@@ -520,7 +520,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   return (
                     <div key={i} className="relative flex flex-col bg-white border px-2 py-1 rounded shadow-sm w-full min-w-0" title={h.department || '-'}>
                       {isRowStart && (
-                        <span className="absolute -left-[16px] top-1/2 -translate-y-1/2 font-bold text-slate-400 text-xs">＞</span>
+                        <span className="absolute -left-[14px] top-1/2 -translate-y-1/2 font-bold text-slate-400 text-xs">＞</span>
                       )}
                       <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap text-center">
                         {h.year} ({getEraSuffix(h.year)})
