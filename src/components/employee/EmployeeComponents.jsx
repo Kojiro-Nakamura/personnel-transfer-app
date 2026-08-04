@@ -249,6 +249,28 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
   const isPromoted = !isCurrent && isPromotedGrade(fd.currentGrade, fd.nextGrade);
   const promoBg = isPromoted ? getPromotedBgClass(fd.nextGrade) : '';
 
+  const handleGradeChange = (v) => {
+    let updates = { [`${p}Grade`]: v };
+    if (!isCurrent && isPromotedGrade(fd.currentGrade, v)) {
+      updates.nextYears = 1;
+      const gradeToPromoKey = {
+        "係長級(主査)": "promoYearChief",
+        "補佐級I(主任)": "promoYearAssistant1",
+        "補佐級II(班長)": "promoYearAssistant2",
+        "補佐級III(補佐兼班長)": "promoYearAssistant3",
+        "課長級": "promoYearSecHead",
+        "所属長級": "promoYearDivHead",
+        "次長級": "promoYearDeputyHead",
+        "部長級": "promoYearDeptHead"
+      };
+      const promoKey = gradeToPromoKey[v];
+      if (promoKey) {
+        updates[promoKey] = String(targetYear);
+      }
+    }
+    setFd({ ...fd, ...updates });
+  };
+
   return (
     <div className={cx("p-2 rounded border flex flex-col", isCurrent ? "bg-slate-50 border-slate-200" : "bg-blue-50/50 border-blue-200")}>
       <div className="flex justify-between items-center mb-1.5 border-b pb-1">
