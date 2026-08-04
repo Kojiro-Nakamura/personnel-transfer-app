@@ -520,7 +520,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   return (
                     <div key={i} className="relative flex flex-col bg-white border px-2 py-1 rounded shadow-sm w-full min-w-0" title={h.department || '-'}>
                       {isRowStart && (
-                        <span className="absolute -left-[14px] top-1/2 -translate-y-1/2 font-bold text-slate-400 text-xs">＞</span>
+                        <ChevronRight className="absolute -left-[16px] top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       )}
                       <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap text-center">
                         {h.year} ({getEraSuffix(h.year)})
