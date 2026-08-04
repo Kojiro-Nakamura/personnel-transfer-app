@@ -562,7 +562,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
-            <div className="grid grid-cols-5 gap-y-2 gap-x-4 pl-3 pr-1">
+            <div className="grid grid-cols-5 gap-y-2 gap-x-4 pl-4 pr-1">
               {(() => {
                 const baseHistory = [...(fd.history || [])].sort((a, b) => a.year - b.year);
                 const nextDeptStr = getPlacementName(fd.departmentId, fd.postId, fd.groupId, fd.groupPostId, departments);
@@ -572,6 +572,17 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                     displayHistory.push({ year: targetYear, department: nextDeptStr, isNext: true });
                   }
                 }
+
+                const colorMap = {};
+                const textColors = ["text-red-600", "text-blue-700", "text-emerald-700"];
+                let colorIdx = 0;
+                displayHistory.forEach(h => {
+                  const dept = h.department || '-';
+                  if (dept !== '-' && !colorMap[dept]) {
+                    colorMap[dept] = textColors[colorIdx % textColors.length];
+                    colorIdx++;
+                  }
+                });
 
                 return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
                   const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
@@ -589,7 +600,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
                         {h.isNext && <span className="ml-1 text-[9px] text-[#065084]">(予定)</span>}
                       </span>
-                      <span className="text-[11px] font-bold text-slate-700 text-left truncate w-full">
+                      <span className={cx("text-[11px] font-bold text-left truncate w-full", colorMap[h.department || '-'] || "text-slate-700")}>
                         {h.department || '-'}
                       </span>
                       {!isLast && !isLastInRow && (
