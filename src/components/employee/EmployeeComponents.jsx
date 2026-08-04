@@ -502,18 +502,32 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
             <div className="grid grid-cols-5 gap-y-2 gap-x-5">
-              {fd.history && fd.history.length > 0 ? (
-                [...fd.history].sort((a, b) => a.year - b.year).map((h, i, arr) => {
+              {(() => {
+                const baseHistory = [...(fd.history || [])].sort((a, b) => a.year - b.year);
+                const nextDeptStr = getPlacementName(fd.departmentId, fd.postId, fd.groupId, fd.groupPostId, departments);
+                const displayHistory = [...baseHistory];
+                if (nextDeptStr && nextDeptStr !== ' / 課直属' && nextDeptStr !== '未配置') {
+                  if (!displayHistory.find(h => h.year === targetYear)) {
+                    displayHistory.push({ year: targetYear, department: nextDeptStr, isNext: true });
+                  }
+                }
+
+                return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
                   const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
                   const isLastInRow = (i + 1) % 5 === 0;
                   const isLast = i === arr.length - 1;
+                  const isRowStart = i % 5 === 0 && i !== 0;
                   return (
-                    <div key={i} className="relative flex flex-col items-center bg-white border px-2 py-1 rounded shadow-sm text-center w-full">
-                      <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap">
+                    <div key={i} className="relative flex flex-col bg-white border px-2 py-1 rounded shadow-sm w-full min-w-0" title={h.department || '-'}>
+                      {isRowStart && (
+                        <span className="absolute -left-[16px] top-1/2 -translate-y-1/2 font-bold text-slate-400 text-xs">＞</span>
+                      )}
+                      <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap text-center">
                         {h.year} ({getEraSuffix(h.year)})
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
+                        {h.isNext && <span className="ml-1 text-[9px] text-[#065084]">(予定)</span>}
                       </span>
-                      <span className="text-xs font-bold text-slate-700">
+                      <span className="text-[11px] font-bold text-slate-700 text-left truncate w-full">
                         {h.department || '-'}
                       </span>
                       {!isLast && !isLastInRow && (
@@ -521,10 +535,8 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                       )}
                     </div>
                   );
-                })
-              ) : (
-                <span className="text-sm text-slate-500">履歴情報はありません</span>
-              )}
+                }) : <span className="text-sm text-slate-500">履歴情報はありません</span>;
+              })()}
             </div>
           </div>
         </div>
