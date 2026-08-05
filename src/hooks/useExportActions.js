@@ -288,7 +288,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       updateBorders();
       
       const filterContainer = document.querySelector(".filter-container");
-      let radioHtml = '<strong>表示切り替え：</strong> <label title="すべての職員を表示する"><input type="radio" name="filter" value="0" checked> 全件表示</label>';
+      let radioHtml = '<strong>表示切替：</strong> <label title="すべての職員を表示する"><input type="radio" name="filter" value="0" checked> 全件表示</label>';
       
       const filteredOptions = GRADE_OPTIONS.filter(g => g !== "");
       filteredOptions.forEach(g => {
