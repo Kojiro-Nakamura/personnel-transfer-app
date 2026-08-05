@@ -209,14 +209,15 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     td:nth-child(9), td:nth-child(15), thead tr:nth-child(2) th:nth-child(6), thead tr:nth-child(2) th:nth-child(12) { width: 50px; max-width: 50px; word-break: break-word; }
     td:nth-child(5), td:nth-child(11), thead tr:nth-child(2) th:nth-child(2), thead tr:nth-child(2) th:nth-child(8) { white-space: nowrap; width: 70px; min-width: 70px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; padding-left: 2px; padding-right: 2px; text-align: center; }
     td:nth-child(7), td:nth-child(13), thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(10) { white-space: nowrap; width: 28px; min-width: 28px; max-width: 28px; padding-left: 2px; padding-right: 2px; text-align: center; overflow: hidden; }
-    .filter-container { margin-bottom:16px; font-family:sans-serif; font-size:14px; background:#fff; padding:12px; border:1px solid #e2e8f0; border-radius:6px; display:inline-block; } 
-    .filter-container label { margin-right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size: 13px; }
+    .filter-container { position:fixed; bottom:20px; right:20px; z-index:100; margin:0; font-family:sans-serif; font-size:12px; background:rgba(255,255,255,0.95); padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); display:flex; align-items:center; gap:12px; flex-wrap:wrap; max-width:800px; } 
+    .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; }
     tr.border-dept-top td { border-top: 3px solid #475569 !important; }
     tr.border-group-top td { border-top: 2px solid #94a3b8 !important; }
 
     /* ========== 印刷用最適化設定 ========== */
     .print-only { display: none; }
     @media print {
+      .filter-container { display: none !important; }
       @page {
         size: A4 landscape; /* 自動でA4横向きに設定 */
         margin: 10mm; /* 用紙の余白 */
