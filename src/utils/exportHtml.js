@@ -16,6 +16,21 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
     return match ? `${match[1]}${match[2]}` : String(y).substring(2);
   };
 
+  const formatWithEra = (dateStr) => {
+    if (!dateStr) return '';
+    const match = dateStr.match(/^(\d{4})[-/]/);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      let era = '';
+      if (year >= 2019) era = `(R${year - 2018})`;
+      else if (year >= 1989) era = `(H${year - 1988})`;
+      else if (year >= 1926) era = `(S${year - 1925})`;
+      else if (year >= 1912) era = `(T${year - 1911})`;
+      return era ? `${era}${dateStr}` : dateStr;
+    }
+    return dateStr;
+  };
+
   const gradeToPromoKey = {
     '主任級': 'promoYearChief',
     '主査級（１）': 'promoYearAssistant1',
@@ -519,9 +534,9 @@ ${scriptStr}
       <td class="sticky-name text-left" data-val="${nameVal}"${nStyle}><span class="drag-handle" style="cursor: grab; margin-right: 4px; color: #94a3b8;" title="ドラッグで並べ替え">≡</span>${nameVal}</td>
       <td class="sticky-age" data-val="${ageNum}"${nStyle}>${ageNum !== '' ? ageNum + '歳' : ''}</td>
       <td class="bg-slate" data-val="${emp.employeeNumber||''}">${emp.employeeNumber||''}</td>
-      <td class="bg-slate" data-val="${emp.birthDate||''}">${emp.birthDate||''}</td>
+      <td class="bg-slate" data-val="${emp.birthDate||''}">${formatWithEra(emp.birthDate)}</td>
       <td class="bg-slate" data-val="${emp.education||''}">${emp.education||''}</td>
-      <td class="bg-slate" data-val="${emp.hireDate||''}">${emp.hireDate||''}</td>
+      <td class="bg-slate" data-val="${emp.hireDate||''}">${formatWithEra(emp.hireDate)}</td>
       <td class="bg-slate" data-val="${emp.note||''}">${emp.note||''}</td>
       <td class="bg-slate" data-val="${cDeptName}">${cDeptName}</td>
       <td class="bg-slate" data-val="${emp.currentTitle||''}">${emp.currentTitle||''}</td>
