@@ -459,9 +459,7 @@ ${scriptStr}
       };
 
       let histHtml = '';
-      const colorMap = {};
-      const textColors = ["#FF8000", "#00BFFF", "#4B0082"];
-      let colorIdx = 0;
+      let prevDept = null;
       
       historyYears.forEach(year => {
         let hStr = '';
@@ -477,16 +475,21 @@ ${scriptStr}
           hStr = hist ? hist.department : '';
         }
         
+        let displayStr = hStr;
         if (hStr && hStr !== ' / 課直属' && hStr !== '未配置' && hStr !== '-') {
-          if (!colorMap[hStr]) {
-            colorMap[hStr] = textColors[colorIdx % textColors.length];
-            colorIdx++;
+          if (prevDept !== null && hStr !== prevDept) {
+            histStyleCss += `color: #2563eb; font-weight: bold; `;
           }
-          histStyleCss += `color: ${colorMap[hStr]}; font-weight: bold;`;
+          prevDept = hStr;
+
+          const histAge = (emp.birthDate && !isNaN(year)) ? calculateAge(emp.birthDate, year) : null;
+          if (histAge !== null && !isNaN(histAge)) {
+            displayStr = `${hStr} ${histAge}歳`;
+          }
         }
 
         const histStyleAttr = histStyleCss ? ` style="${histStyleCss}"` : '';
-        histHtml += `<td class="bg-emerald" data-val="${hStr}"${histStyleAttr}>${hStr}</td>`;
+        histHtml += `<td class="bg-emerald" data-val="${hStr}"${histStyleAttr}>${displayStr}</td>`;
       });
 
             let ageNum = '';
