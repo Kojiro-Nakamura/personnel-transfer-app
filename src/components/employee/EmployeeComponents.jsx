@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -369,6 +369,16 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
   const [fd, setFd] = useState(def); 
   const [editCurrent, setEditCurrent] = useState(false);
   
+  const getEraStr = (dateStr) => {
+    if (!dateStr) return '';
+    const match = dateStr.match(/^(\d{4})/);
+    if (!match) return '';
+    const y = parseInt(match[1], 10);
+    const eraFormatted = getEraFormattedYear(y);
+    const eraMatch = eraFormatted.match(/\((.*?)\)/);
+    return eraMatch ? `(${eraMatch[1]})` : '';
+  };
+  
   useEffect(() => { 
     if (isOpen) { 
       setFd(initialData ? { 
@@ -500,9 +510,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <div className="flex gap-2 w-full">
               <FormInput label="職員番号" value={fd.employeeNumber} onChange={v => setFd({...fd, employeeNumber: v})} className="w-[75px] shrink-0" />
               <FormInput label="氏名" value={fd.name} onChange={v => setFd({...fd, name: v})} className="flex-1 min-w-0" />
-              <FormInput label="生年月日" type="date" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} className="w-[115px] shrink-0" />
+              <FormInput label={`生年月日${getEraStr(fd.birthDate)}`} type="date" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} className="w-[130px] shrink-0" />
               <FormInput label="学歴" value={fd.education} onChange={v => setFd({...fd, education: v})} className="flex-1 min-w-0" />
-              <FormInput label="採用年月" type="date" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} className="w-[115px] shrink-0" />
+              <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="date" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} className="w-[130px] shrink-0" />
             </div>
             <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="w-full" />
           </div>
