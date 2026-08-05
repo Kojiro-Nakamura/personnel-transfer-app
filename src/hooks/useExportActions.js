@@ -191,8 +191,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <title>${escapeHtml(fileName.replace(/\.html$/, ''))} - 人事異動案</title>
   <style>
     body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
-    table { border-collapse: collapse; width: max-content; } 
-    th, td { border: 1px solid #ccc; padding: 4px 8px; vertical-align: top; } 
+    table { border-collapse: collapse; table-layout: fixed; width: max-content; } 
+    th, td { border: 1px solid #ccc; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
     thead th { border: 1px solid #333 !important; outline: 1px solid #333; outline-offset: -1px; }
@@ -201,15 +201,10 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: 600; color: #0369a1; background-color: #e0f2fe; } 
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #475569; } 
-    thead tr:first-child th:nth-child(4), thead tr:first-child th:nth-child(5), thead tr:first-child th:nth-child(6) { border-left: 2px solid #475569; }
-    thead tr:nth-child(2) th:nth-child(1), thead tr:nth-child(2) th:nth-child(7) { border-left: 2px solid #475569; } 
-    td:nth-child(1), thead tr:first-child th:nth-child(1) { width: 100px; max-width: 100px; word-break: break-word; }
-    td:nth-child(2), thead tr:first-child th:nth-child(2) { width: 100px; max-width: 100px; word-break: break-word; }
-    td:nth-child(3), thead tr:first-child th:nth-child(3) { width: 50px; max-width: 50px; word-break: break-word; }
-    td:nth-child(4), td:nth-child(10), thead tr:nth-child(2) th:nth-child(1), thead tr:nth-child(2) th:nth-child(7) { width: 50px; max-width: 50px; word-break: break-word; }
-    td:nth-child(9), td:nth-child(15), thead tr:nth-child(2) th:nth-child(6), thead tr:nth-child(2) th:nth-child(12) { width: 50px; max-width: 50px; word-break: break-word; }
-    td:nth-child(5), td:nth-child(11), thead tr:nth-child(2) th:nth-child(2), thead tr:nth-child(2) th:nth-child(8) { white-space: nowrap; width: 70px; min-width: 70px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; padding-left: 2px; padding-right: 2px; text-align: center; }
-    td:nth-child(7), td:nth-child(13), thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(10) { white-space: nowrap; width: 28px; min-width: 28px; max-width: 28px; padding-left: 2px; padding-right: 2px; text-align: center; overflow: hidden; }
+    thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 2px solid #475569 !important; }
+    thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 2px solid #475569 !important; } 
+    td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: center; }
+    td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
     tr.border-dept-top td { border-top: 3px solid #475569 !important; }
@@ -347,6 +342,24 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <h2>${targetYear}年度(R${targetYear - 2018})人事異動案</h2>
   ${summaryHtml}
   <table>
+    <colgroup>
+      <col style="width: 90px;" />
+      <col style="width: 90px;" />
+      <col style="width: 50px;" />
+      <col style="width: 50px;" />
+      <col style="width: 80px;" />
+      <col style="width: 130px;" />
+      <col style="width: 40px;" />
+      <col style="width: 70px;" />
+      <col style="width: 60px;" />
+      <col style="width: 50px;" />
+      <col style="width: 80px;" />
+      <col style="width: 130px;" />
+      <col style="width: 40px;" />
+      <col style="width: 70px;" />
+      <col style="width: 60px;" />
+      <col style="width: 60px;" />
+    </colgroup>
     <thead>
       <tr class="print-hide">
         <th colspan="16" style="background-color: #cbd5e1; border-bottom: 1px solid #94a3b8; text-align: left; padding: 6px 12px;">
