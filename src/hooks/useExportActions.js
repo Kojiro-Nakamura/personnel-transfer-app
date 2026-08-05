@@ -206,6 +206,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     td:nth-child(2), thead tr:first-child th:nth-child(2) { width: 100px; max-width: 100px; word-break: break-word; }
     td:nth-child(3), thead tr:first-child th:nth-child(3) { width: 50px; max-width: 50px; word-break: break-word; }
     td:nth-child(4), td:nth-child(10), thead tr:nth-child(2) th:nth-child(1), thead tr:nth-child(2) th:nth-child(7) { width: 50px; max-width: 50px; word-break: break-word; }
+    td:nth-child(9), td:nth-child(15), thead tr:nth-child(2) th:nth-child(6), thead tr:nth-child(2) th:nth-child(12) { width: 50px; max-width: 50px; word-break: break-word; }
     td:nth-child(5), td:nth-child(11), thead tr:nth-child(2) th:nth-child(2), thead tr:nth-child(2) th:nth-child(8) { white-space: nowrap; width: 70px; min-width: 70px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; padding-left: 2px; padding-right: 2px; text-align: center; }
     td:nth-child(7), td:nth-child(13), thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(10) { white-space: nowrap; width: 28px; min-width: 28px; max-width: 28px; padding-left: 2px; padding-right: 2px; text-align: center; overflow: hidden; }
     .filter-container { margin-bottom:16px; font-family:sans-serif; font-size:14px; background:#fff; padding:12px; border:1px solid #e2e8f0; border-radius:6px; display:inline-block; } 
