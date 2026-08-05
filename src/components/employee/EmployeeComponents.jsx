@@ -518,8 +518,8 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
           
           <div className="grid grid-cols-2 gap-3 my-3">
-            <EmployeeFormSection title="今年度（現行）" isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
-            <EmployeeFormSection title="来年度（新）" isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
+            <EmployeeFormSection title={`今年度（現行）${getEraFormattedYear(targetYear - 1)}`} isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
+            <EmployeeFormSection title={`来年度（新）${getEraFormattedYear(targetYear)}`} isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mb-3 bg-slate-50/50">
@@ -583,18 +583,16 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   }
                 }
 
-                const colorMap = {};
-                const textColors = ["text-[#FF8000]", "text-[#00BFFF]", "text-[#4B0082]"];
-                let colorIdx = 0;
-                displayHistory.forEach(h => {
-                  const dept = h.department || '-';
-                  if (dept !== '-' && !colorMap[dept]) {
-                    colorMap[dept] = textColors[colorIdx % textColors.length];
-                    colorIdx++;
-                  }
-                });
+                let prevDept = null;
 
                 return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
+                  const dept = h.department || '-';
+                  let isChange = false;
+                  if (dept !== '-' && (h.isNext || prevDept === null || dept !== prevDept)) {
+                    isChange = true;
+                  }
+                  if (dept !== '-') prevDept = dept;
+
                   const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
                   const isLastInRow = (i + 1) % 5 === 0;
                   const isLast = i === arr.length - 1;
@@ -610,7 +608,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
                         {h.isNext && <span className="ml-1 text-[9px] text-[#065084]">(予定)</span>}
                       </span>
-                      <span className={cx("text-[11px] font-bold text-left truncate w-full", colorMap[h.department || '-'] || "text-slate-700")}>
+                      <span className={cx("text-[11px] text-left truncate w-full", isChange ? "font-bold text-slate-900" : "font-normal text-slate-700")}>
                         {h.department || '-'}
                       </span>
                       {!isLast && !isLastInRow && (
