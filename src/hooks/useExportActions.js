@@ -353,13 +353,13 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         <th style="background-color: #cbd5e1;">職名</th>
         <th style="background-color: #cbd5e1;">氏名</th>
         <th style="background-color: #cbd5e1;">級</th>
-        <th style="background-color: #cbd5e1;">年齢</th>
+        <th style="background-color: #cbd5e1; width: 32px; min-width: 32px;">年齢</th>
         <th style="background-color: #cbd5e1;">在籍</th>
         <th style="background-color: #cbd5e1;">備考</th>
         <th style="background-color: #bfdbfe;">職名</th>
         <th style="background-color: #bfdbfe;">氏名</th>
         <th style="background-color: #bfdbfe;">級</th>
-        <th style="background-color: #bfdbfe;">年齢</th>
+        <th style="background-color: #bfdbfe; width: 32px; min-width: 32px;">年齢</th>
         <th style="background-color: #bfdbfe;">在籍</th>
         <th style="background-color: #bfdbfe;">備考</th>
       </tr>
