@@ -290,7 +290,7 @@ ${scriptStr}
       <th colspan="5" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度（現行）${getEraFormattedYear(targetYear - 1)}</th>
       <th colspan="7" class="bg-blue">来年度（新組織）${getEraFormattedYear(targetYear)}</th>
-      <th colspan="10" class="bg-fuchsia">昇進年度 (西暦(和暦))</th>
+      <th colspan="10" class="bg-fuchsia">昇進年度</th>
       ${historyYears.length > 0 ? `<th colspan="${historyYears.length}" class="bg-emerald">履歴</th>` : ''}
     </tr>
     <tr>
