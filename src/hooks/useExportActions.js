@@ -177,8 +177,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     const nextSummaryStr = generateGradeSummary(employees, true);
     const summaryHtml = `
       <div style="margin-bottom:16px;font-family:sans-serif;font-size:12px;background:#f8fafc;padding:12px;border:1px solid #e2e8f0;border-radius:6px;">
-        <div style="margin-bottom:8px;"><strong>【全体集計（今年度）】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(currSummaryStr)}</span></div>
-        <div><strong>【全体集計（来年度）】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(nextSummaryStr)}</span></div>
+        <div style="margin-bottom:8px;"><strong>【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(currSummaryStr)}</span></div>
+        <div><strong>【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(nextSummaryStr)}</span></div>
       </div>`;
 
     const gradeLevelsHtml = JSON.stringify(GRADE_LEVELS);
@@ -371,8 +371,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         <th rowspan="2" style="background-color: #cbd5e1;">部署名</th>
         <th rowspan="2" style="background-color: #cbd5e1;">班・グループ</th>
         <th rowspan="2" style="background-color: #cbd5e1;">ポスト</th>
-        <th colspan="6" style="background-color: #cbd5e1;">今年度</th>
-        <th colspan="6" style="background-color: #bfdbfe;">来年度</th>
+        <th colspan="6" style="background-color: #cbd5e1;">今年度（${targetYear - 1}(R${targetYear - 2019})）</th>
+        <th colspan="6" style="background-color: #bfdbfe;">来年度（${targetYear}(R${targetYear - 2018})）</th>
         <th rowspan="2" style="background-color: #f0f0f0;">メモ</th>
       </tr>
       <tr>
