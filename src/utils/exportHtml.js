@@ -1,5 +1,20 @@
 import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode } from './helpers.js';
 
+const getBorderHexColor = (grade) => {
+  switch (grade) {
+    case "部長級": return "#c084fc";
+    case "次長級": return "#f87171";
+    case "所属長級": return "#fb923c";
+    case "課長級": return "#facc15";
+    case "補佐級III(補佐兼班長)": return "#38bdf8";
+    case "補佐級II(班長)": return "#34d399";
+    case "補佐級I(主任)": return "#f472b6";
+    case "係長級(主査)": return "#94a3b8";
+    case "一般": return "#a5b4fc";
+    default: return "#cbd5e1";
+  }
+};
+
 export const generateAndDownloadHTML = (employees, departments, targetYear, fileName) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const targetEraShort = getEraFormattedYear(targetYear).split('(')[1].replace(')', '');
@@ -316,14 +331,14 @@ ${scriptStr}
       <th onclick="sortTable(19)" class="bg-blue">備考</th>
       <th onclick="sortTable(20)" class="bg-blue">カウント除外</th>
       <th onclick="sortTable(21)" class="bg-fuchsia" style="width: 56px;">採用</th>
-      <th onclick="sortTable(22)" class="bg-fuchsia" style="width: 80px;">係長級(主査)</th>
-      <th onclick="sortTable(23)" class="bg-fuchsia" style="width: 80px;">補佐級I(主任)</th>
-      <th onclick="sortTable(24)" class="bg-fuchsia" style="width: 80px;">補佐級II(班長)</th>
-      <th onclick="sortTable(25)" class="bg-fuchsia" style="width: 80px;">補佐級III</th>
-      <th onclick="sortTable(26)" class="bg-fuchsia" style="width: 80px;">課長級</th>
-      <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 80px;">所属長級</th>
-      <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 80px;">次長級</th>
-      <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 80px;">部長級</th>
+      <th onclick="sortTable(22)" style="width: 80px; background-color: ${getPromotedBgColorCode('係長級(主査)')};">係長級(主査)</th>
+      <th onclick="sortTable(23)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級I(主任)')};">補佐級I(主任)</th>
+      <th onclick="sortTable(24)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級II(班長)')};">補佐級II(班長)</th>
+      <th onclick="sortTable(25)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級III(補佐兼班長)')};">補佐級III</th>
+      <th onclick="sortTable(26)" style="width: 80px; background-color: ${getPromotedBgColorCode('課長級')};">課長級</th>
+      <th onclick="sortTable(27)" style="width: 80px; background-color: ${getPromotedBgColorCode('所属長級')};">所属長級</th>
+      <th onclick="sortTable(28)" style="width: 80px; background-color: ${getPromotedBgColorCode('次長級')};">次長級</th>
+      <th onclick="sortTable(29)" style="width: 80px; background-color: ${getPromotedBgColorCode('部長級')};">部長級</th>
       <th onclick="sortTable(30)" class="bg-fuchsia" style="width: 56px;">来年度<br>${getEraFormattedYear(targetYear)}</th>
             ${historyYears.map((y, idx) => {
         const hStyle = y === targetYear ? "width: 60px; color: #dc2626; font-weight: bold;" : "width: 60px;";
@@ -473,6 +488,16 @@ ${scriptStr}
         return `<td class="bg-fuchsia" data-val="${diff !== null ? (diff >= 0 ? diff : 0) : ''}"${nStyle}><div style="display:flex;align-items:center;justify-content:flex-start;">${cellHtml}</div></td>`;
       };
 
+      const promoYearMap = {};
+      if (emp.promoYearChief) promoYearMap[emp.promoYearChief] = "係長級(主査)";
+      if (emp.promoYearAssistant1) promoYearMap[emp.promoYearAssistant1] = "補佐級I(主任)";
+      if (emp.promoYearAssistant2) promoYearMap[emp.promoYearAssistant2] = "補佐級II(班長)";
+      if (emp.promoYearAssistant3) promoYearMap[emp.promoYearAssistant3] = "補佐級III(補佐兼班長)";
+      if (emp.promoYearSecHead) promoYearMap[emp.promoYearSecHead] = "課長級";
+      if (emp.promoYearDivHead) promoYearMap[emp.promoYearDivHead] = "所属長級";
+      if (emp.promoYearDeputyHead) promoYearMap[emp.promoYearDeputyHead] = "次長級";
+      if (emp.promoYearDeptHead) promoYearMap[emp.promoYearDeptHead] = "部長級";
+
       let histHtml = '';
       let prevDept = null;
       
@@ -501,6 +526,11 @@ ${scriptStr}
           if (histAge !== null && !isNaN(histAge)) {
             displayStr = `${hStr} <span style="font-size: 0.85em;">(${histAge}歳)</span>`;
           }
+        }
+
+        const promoGrade = promoYearMap[year];
+        if (promoGrade) {
+          histStyleCss += `box-shadow: inset 0 0 0 2px ${getBorderHexColor(promoGrade)}; `;
         }
 
         const histStyleAttr = histStyleCss ? ` style="${histStyleCss}"` : '';
