@@ -343,22 +343,22 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   ${summaryHtml}
   <table>
     <colgroup>
-      <col style="width: calc((100% - 730px) * 0.21);" />
-      <col style="width: calc((100% - 730px) * 0.21);" />
+      <col style="width: calc((100% - 550px) * 0.15);" />
+      <col style="width: calc((100% - 550px) * 0.15);" />
       <col style="width: 50px;" />
-      <col style="width: calc((100% - 730px) * 0.12);" />
+      <col style="width: calc((100% - 550px) * 0.08);" />
       <col style="width: 80px;" />
       <col style="width: 130px;" />
       <col style="width: 40px;" />
-      <col style="width: calc((100% - 730px) * 0.17);" />
-      <col style="width: 60px;" />
-      <col style="width: calc((100% - 730px) * 0.12);" />
+      <col style="width: calc((100% - 550px) * 0.12);" />
+      <col style="width: calc((100% - 550px) * 0.10);" />
+      <col style="width: calc((100% - 550px) * 0.08);" />
       <col style="width: 80px;" />
       <col style="width: 130px;" />
       <col style="width: 40px;" />
-      <col style="width: calc((100% - 730px) * 0.17);" />
-      <col style="width: 60px;" />
-      <col style="width: 60px;" />
+      <col style="width: calc((100% - 550px) * 0.12);" />
+      <col style="width: calc((100% - 550px) * 0.10);" />
+      <col style="width: calc((100% - 550px) * 0.10);" />
     </colgroup>
     <thead>
       <tr class="print-hide">
