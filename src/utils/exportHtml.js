@@ -568,7 +568,7 @@ ${scriptStr}
       const isNextRetired = emp.departmentId === 'retired';
       const nTitle = isNextRetired ? '' : (emp.nextTitle || '');
       const nGrade = isNextRetired ? '' : (emp.nextGrade || '');
-      const nSkills = isNextRetired ? '' : (emp.nextSkillsStr || '');
+      const nSkills = isNextRetired ? '' : ((emp.nextSkills || []).join('、') || '');
       const nEmpType = isNextRetired ? '' : (emp.nextEmploymentType || '');
       const nExclude = isNextRetired ? '' : (emp.nextExclude || '');
       
@@ -589,7 +589,7 @@ ${scriptStr}
       <td class="bg-slate" data-val="${emp.currentTitle||''}">${emp.currentTitle||''}</td>
       <td class="bg-slate" data-val="${emp.currentGrade||''}">${emp.currentGrade||''}</td>
       <td class="bg-slate" data-val="${emp.currentYears||0}">${emp.currentYears||''}</td>
-      <td class="bg-slate" data-val="${emp.currentSkillsStr||''}">${emp.currentSkillsStr||''}</td>
+      <td class="bg-slate" data-val="${(emp.currentSkills || []).join('、')||''}">${(emp.currentSkills || []).join('、')||''}</td>
       <td class="bg-slate" data-val="${emp.currentEmploymentType||''}">${emp.currentEmploymentType||''}</td>
       <td class="bg-slate" data-val="${emp.currentExclude||''}">${emp.currentExclude||''}</td>
       
