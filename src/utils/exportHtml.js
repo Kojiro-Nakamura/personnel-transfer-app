@@ -61,7 +61,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
 
     const scriptStr = `
       function saveHTML() {
-        var htmlContent = "<!DOCTYPE html>\n<html>\n" + document.documentElement.innerHTML + "\n</html>";
+        var htmlContent = "<!DOCTYPE html><html>" + document.documentElement.innerHTML + "</html>";
         var blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
         var url = URL.createObjectURL(blob);
         var a = document.createElement("a");
