@@ -484,7 +484,7 @@ ${scriptStr}
 
           const histAge = (emp.birthDate && !isNaN(year)) ? calculateAge(emp.birthDate, year) : null;
           if (histAge !== null && !isNaN(histAge)) {
-            displayStr = `${hStr}(${histAge}歳)`;
+            displayStr = `${hStr}<span style="font-size: 0.85em;">(${histAge}歳)</span>`;
           }
         }
 
