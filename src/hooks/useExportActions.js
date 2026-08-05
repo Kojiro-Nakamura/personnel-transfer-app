@@ -195,7 +195,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     th, td { border: 1px solid #ccc; padding: 4px 8px; vertical-align: top; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
-    th { background-color: #f0f0f0; border-bottom: 2px solid #94a3b8; } 
+    thead th { border: 1px solid #333 !important; outline: 1px solid #333; outline-offset: -1px; }
+    th { background-color: #f0f0f0; border-bottom: 2px solid #333; } 
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: 600; color: #0369a1; background-color: #e0f2fe; } 
