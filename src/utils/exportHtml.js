@@ -282,7 +282,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
   tbody td.bg-emerald { background-color: #ecfdf5; }
   
   /* Sticky name column */
-  .sticky-name { position: sticky; left: 0; font-weight: 600; max-width: 115px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
+  .sticky-name { position: sticky; left: 0; font-weight: 600; min-width: 125px; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
   tbody td.sticky-name { z-index: 10; background-color: #e2e8f0; }
   thead th.sticky-name { z-index: 30; background-color: #94a3b8; color: #fff; }
 
