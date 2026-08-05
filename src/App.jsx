@@ -168,11 +168,11 @@ export const AppContent = () => {
               <div className="flex bg-slate-100 border-b-2 border-slate-400 font-bold text-xs sticky top-0 z-20 shrink-0">
                 <div className="w-[140px] p-2 border-r flex items-center justify-center text-slate-600">配置先</div>
                 <div className="flex-1 p-2 text-center border-r bg-slate-200/50 flex flex-col justify-center">
-                  <div>今年度（現行）</div>
+                  <div>今年度（現行）{getEraFormattedYear(targetYear - 1)}</div>
                   <div className="text-[10px] font-normal text-slate-900 mt-0.5">{currentSummary}</div>
                 </div>
                 <div className="flex-1 p-2 text-[#065084] text-center bg-blue-100/50 flex flex-col justify-center">
-                  <div>来年度（新組織）</div>
+                  <div>来年度（新組織）{getEraFormattedYear(targetYear)}</div>
                   <div className="text-[10px] font-normal text-blue-950 mt-0.5">{nextSummary}</div>
                 </div>
                 <div className="w-[40px] border-l border-slate-300 flex items-center justify-center bg-slate-200 text-[10px] text-slate-600">メモ</div>

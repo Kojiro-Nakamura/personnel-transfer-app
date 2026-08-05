@@ -288,8 +288,8 @@ ${scriptStr}
       <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">選択解除</button></div></th>
       <th class="sticky-age bg-slate"></th>
       <th colspan="5" class="bg-slate">基本情報</th>
-      <th colspan="7" class="bg-slate">今年度</th>
-      <th colspan="7" class="bg-blue">来年度</th>
+      <th colspan="7" class="bg-slate">今年度（現行）${getEraFormattedYear(targetYear - 1)}</th>
+      <th colspan="7" class="bg-blue">来年度（新組織）${getEraFormattedYear(targetYear)}</th>
       <th colspan="10" class="bg-fuchsia">昇進年度 (西暦(和暦))</th>
       ${historyYears.length > 0 ? `<th colspan="${historyYears.length}" class="bg-emerald">履歴</th>` : ''}
     </tr>
@@ -324,7 +324,7 @@ ${scriptStr}
       <th onclick="sortTable(27)" class="bg-fuchsia" style="width: 80px;">所属長級</th>
       <th onclick="sortTable(28)" class="bg-fuchsia" style="width: 80px;">次長級</th>
       <th onclick="sortTable(29)" class="bg-fuchsia" style="width: 80px;">部長級</th>
-      <th onclick="sortTable(30)" class="bg-fuchsia" style="width: 56px;">来年度</th>
+      <th onclick="sortTable(30)" class="bg-fuchsia" style="width: 56px;">来年度<br>${getEraFormattedYear(targetYear)}</th>
             ${historyYears.map((y, idx) => {
         const hStyle = y === targetYear ? "width: 60px; color: #dc2626; font-weight: bold;" : "width: 60px;";
         return `<th onclick="sortTable(${31 + idx})" class="bg-emerald" style="${hStyle}">${getEraFormattedYear(y)}</th>`;
