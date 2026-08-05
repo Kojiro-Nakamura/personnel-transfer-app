@@ -191,7 +191,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <title>${escapeHtml(fileName.replace(/\.html$/, ''))} - 人事異動案</title>
   <style>
     body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
-    table { border-collapse: collapse; table-layout: fixed; width: max-content; } 
+    table { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 1150px; } 
     th, td { border: 1px solid #ccc; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
@@ -343,20 +343,20 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   ${summaryHtml}
   <table>
     <colgroup>
-      <col style="width: 90px;" />
-      <col style="width: 90px;" />
+      <col style="width: calc((100% - 730px) * 0.21);" />
+      <col style="width: calc((100% - 730px) * 0.21);" />
       <col style="width: 50px;" />
-      <col style="width: 50px;" />
+      <col style="width: calc((100% - 730px) * 0.12);" />
       <col style="width: 80px;" />
       <col style="width: 130px;" />
       <col style="width: 40px;" />
-      <col style="width: 70px;" />
+      <col style="width: calc((100% - 730px) * 0.17);" />
       <col style="width: 60px;" />
-      <col style="width: 50px;" />
+      <col style="width: calc((100% - 730px) * 0.12);" />
       <col style="width: 80px;" />
       <col style="width: 130px;" />
       <col style="width: 40px;" />
-      <col style="width: 70px;" />
+      <col style="width: calc((100% - 730px) * 0.17);" />
       <col style="width: 60px;" />
       <col style="width: 60px;" />
     </colgroup>
