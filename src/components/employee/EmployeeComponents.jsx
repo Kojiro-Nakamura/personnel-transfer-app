@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -553,7 +553,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               <ArrowDiff currentKey="promoYearAssistant2" />
               <YearInput birthDate={fd.birthDate} label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} bgClass={activePromoKey === "promoYearAssistant2" ? promoBg : ""} />
               <ArrowDiff currentKey="promoYearAssistant3" />
-              <YearInput birthDate={fd.birthDate} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} bgClass={activePromoKey === "promoYearAssistant3" ? promoBg : ""} />
+              <YearInput birthDate={fd.birthDate} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} bgClass={activePromoKey === "promoYearAssistant3" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級III(補佐兼班長)")} />
               <div className="w-full opacity-0 pointer-events-none"></div>
 
               {/* Bottom Row */}
@@ -584,6 +584,15 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 }
 
                 let prevDept = null;
+                const promoYearMap = {};
+                if (fd.promoYearChief) promoYearMap[fd.promoYearChief] = "係長級(主査)";
+                if (fd.promoYearAssistant1) promoYearMap[fd.promoYearAssistant1] = "補佐級I(主任)";
+                if (fd.promoYearAssistant2) promoYearMap[fd.promoYearAssistant2] = "補佐級II(班長)";
+                if (fd.promoYearAssistant3) promoYearMap[fd.promoYearAssistant3] = "補佐級III(補佐兼班長)";
+                if (fd.promoYearSecHead) promoYearMap[fd.promoYearSecHead] = "課長級";
+                if (fd.promoYearDivHead) promoYearMap[fd.promoYearDivHead] = "所属長級";
+                if (fd.promoYearDeputyHead) promoYearMap[fd.promoYearDeputyHead] = "次長級";
+                if (fd.promoYearDeptHead) promoYearMap[fd.promoYearDeptHead] = "部長級";
 
                 return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
                   const dept = h.department || '-';
@@ -598,8 +607,12 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   const isLast = i === arr.length - 1;
                   const isRowStart = i % 5 === 0 && i !== 0;
                   const cellBg = (h.isNext && isPromoted) ? promoBg : "bg-white";
+                  
+                  const promoGradeForYear = promoYearMap[h.year];
+                  const histBorderClass = promoGradeForYear ? `border-2 ${getPromotedBorderClass(promoGradeForYear)}` : "border border-slate-300";
+                  
                   return (
-                    <div key={i} className={cx("relative flex flex-col border px-2 py-1 rounded shadow-sm w-full min-w-0", cellBg)} title={h.department || '-'}>
+                    <div key={i} className={cx("relative flex flex-col px-2 py-1 rounded shadow-sm w-full min-w-0", histBorderClass, cellBg)} title={h.department || '-'}>
                       {isRowStart && (
                         <ChevronRight className="absolute -left-[16px] top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       )}
