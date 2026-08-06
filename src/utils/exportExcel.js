@@ -112,7 +112,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const leftB = (col === 'A' || col === 'D' || col === 'J' || col === 'P') ? 'thick' : true;
       const rightB = (col === 'C' || col === 'I' || col === 'O' || col === 'P') ? 'thick' : true;
       
-      cell.border = getCellBorders(topB, bottomB, leftB, rightB);
+      const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
+      cell.border = { ...(cell.border || {}), ...newBorder };
     });
   });
 
