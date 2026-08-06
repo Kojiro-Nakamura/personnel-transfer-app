@@ -88,16 +88,16 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       className={cellClasses} 
       title={isPickingMode && isNext ? "選択中の職員をここに配置します" : ""}
     >
-      <div className={cx("w-14 truncate text-[10px]", isNext ? "text-blue-900" : "text-slate-800")} title={isNext ? emp.nextTitle : emp.currentTitle}>
+      <div className={cx("w-14 truncate text-[10px]", isNext ? "text-[#02213d] font-bold" : "text-slate-800")} title={isNext ? emp.nextTitle : emp.currentTitle}>
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[12px] font-bold", isConflict ? "text-rose-700" : isNext ? "text-[#065084]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[12px] font-bold", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
       
-      <div className={cx("w-12 truncate text-[10px] text-center", isNext ? "text-blue-900" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
+      <div className={cx("w-12 truncate text-[10px] text-center", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
         {isNext ? emp.nextGrade : emp.currentGrade}
       </div>
       
@@ -285,7 +285,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
   return (
     <div className={cx("p-2 rounded border flex flex-col", isCurrent ? "bg-slate-50 border-slate-200" : "bg-blue-50/50 border-blue-200")}>
       <div className="flex justify-between items-center mb-1.5 border-b pb-1">
-        <h4 className={cx("font-bold text-sm", isCurrent ? "text-slate-700" : "text-[#065084]")}>{title}</h4>
+        <h4 className={cx("font-bold text-sm", isCurrent ? "text-slate-700" : "text-[#02213d]")}>{title}</h4>
         {isCurrent && setEditCurrent && (
           <label className="flex items-center gap-1 text-xs cursor-pointer" title="今年度のデータを直接編集する">
             <input type="checkbox" checked={editCurrent} onChange={(e) => setEditCurrent(e.target.checked)} className="cursor-pointer"/>
@@ -622,7 +622,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                       <span className="text-[10px] text-slate-500 font-bold border-b w-full pb-0.5 mb-0.5 whitespace-nowrap text-center">
                         {h.year} ({getEraSuffix(h.year)})
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
-                        {h.isNext && <span className="ml-1 text-[9px] text-[#065084]">(予定)</span>}
+                        {h.isNext && <span className="ml-1 text-[9px] text-[#02213d] font-bold">(予定)</span>}
                       </span>
                       <span className={cx("text-[11px] text-left truncate w-full", isChange ? "font-bold italic text-slate-900" : "font-normal text-slate-700")}>
                         {h.department || '-'}
