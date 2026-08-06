@@ -207,8 +207,9 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
-    tr.border-dept-top td { border-top: 3px solid #475569 !important; }
-    tr.border-group-top td { border-top: 2px solid #94a3b8 !important; }
+    tr.border-dept-top td { border-top: 2px solid #333 !important; }
+    tr.border-group-top td { border-top: 1px solid #333 !important; }
+    td:not(.post-cell):nth-child(1), td:not(.post-cell):nth-child(2), td:not(.post-cell):nth-child(3) { border-top: none !important; border-bottom: none !important; }
 
     /* ========== 印刷用最適化設定 ========== */
     .print-only { display: none; }
