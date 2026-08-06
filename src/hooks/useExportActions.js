@@ -192,23 +192,23 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <style>
     body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
     table { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 1150px; } 
-    th, td { border: 1px solid #333; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
+    th, td { border: 1px solid #94a3b8; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
-    thead th { border: 1px solid #333 !important; outline: 1px solid #333; outline-offset: -1px; }
-    th { background-color: #f0f0f0; border-bottom: 2px solid #333; } 
+    thead th { border: 1px solid #94a3b8 !important; outline: 1px solid #94a3b8; outline-offset: -1px; }
+    th { background-color: #f0f0f0; border-bottom: 1.5px solid #475569; } 
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: 600; color: #0369a1; background-color: #e0f2fe; } 
-    td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #475569; } 
-    thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 2px solid #475569 !important; }
-    thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 2px solid #475569 !important; } 
+    td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 1.5px solid #475569; } 
+    thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 1.5px solid #475569 !important; }
+    thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 1.5px solid #475569 !important; } 
     td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: left; }
     td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
-    tr.border-dept-top td { border-top: 2px solid #333 !important; }
-    tr.border-group-top td { border-top: 1px solid #333 !important; }
+    tr.border-dept-top td { border-top: 1.5px solid #475569 !important; }
+    tr.border-group-top td { border-top: 1px solid #94a3b8 !important; }
     td:not(.post-cell):nth-child(1), td:not(.post-cell):nth-child(2), td:not(.post-cell):nth-child(3) { border-top: none !important; border-bottom: none !important; }
 
     /* ========== 印刷用最適化設定 ========== */
