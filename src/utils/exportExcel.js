@@ -697,7 +697,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   ws.columns.forEach((col, i) => {
     let maxLength = 0;
     col.eachCell({ includeEmpty: true }, cell => {
-      if (cell.row <= 3) return; 
+      if (cell.row <= 4) return; 
       const v = cell.value ? cell.value.toString() : '';
       if (v) {
         const lines = v.split('\n');
@@ -708,6 +708,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
         }
       }
     });
+    if (maxLength > 40) maxLength = 40; // cap maximum width
     if (maxLength > 0) {
        let padding = 1.5;
        if (i === 4 || i === 6 || (i >= 22 && i <= 30)) {
