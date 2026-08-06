@@ -709,6 +709,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
        let padding = 1.5;
        if (i === 4 || i === 6 || (i >= 22 && i <= 30)) {
            padding = 4.0;
+       } else if (i === 12 || i === 19) { // 詳細列
+           padding = 5.0;
        }
        col.width = maxLength + padding;
     }
