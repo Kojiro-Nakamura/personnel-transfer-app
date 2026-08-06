@@ -34,7 +34,7 @@ const saveWorkbook = async (workbook, fileName) => {
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel) => {
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
-    views: [{ state: 'frozen', xSplit: 3, ySplit: 2 }],
+    views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }],
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
@@ -57,23 +57,41 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     { width: 25 }  // メモ
   ];
 
+  const currSummaryStr = generateGradeSummary(employees, false);
+  const nextSummaryStr = generateGradeSummary(employees, true);
+
   const r1 = ws.getRow(1);
-  r1.values = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ'];
-  r1.height = 20;
+  r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
+  r1.font = { name: 'BIZ UDPGothic', size: 14, bold: true };
+  r1.height = 24;
 
   const r2 = ws.getRow(2);
-  r2.values = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', ''];
-  r2.height = 20;
+  r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
+  r2.font = { name: 'BIZ UDPGothic', size: 10, bold: true, color: { argb: 'FF0369A1' } };
+  r2.height = 18;
 
-  ws.mergeCells('A1:A2');
-  ws.mergeCells('B1:B2');
-  ws.mergeCells('C1:C2');
-  ws.mergeCells('D1:I1');
-  ws.mergeCells('J1:O1');
-  ws.mergeCells('P1:P2');
+  const r3 = ws.getRow(3);
+  r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
+  r3.font = { name: 'BIZ UDPGothic', size: 10, bold: true, color: { argb: 'FF0369A1' } };
+  r3.height = 18;
+
+  const r4 = ws.getRow(4);
+  r4.values = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ'];
+  r4.height = 20;
+
+  const r5 = ws.getRow(5);
+  r5.values = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', ''];
+  r5.height = 20;
+
+  ws.mergeCells('A4:A5');
+  ws.mergeCells('B4:B5');
+  ws.mergeCells('C4:C5');
+  ws.mergeCells('D4:I4');
+  ws.mergeCells('J4:O4');
+  ws.mergeCells('P4:P5');
 
   ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P'].forEach((col, i) => {
-    [1, 2].forEach(rn => {
+    [4, 5].forEach(rn => {
       const cell = ws.getCell(`${col}${rn}`);
       cell.font = headerFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -82,7 +100,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       if (i === 15) argb = 'FFF0F0F0';
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       const isLeftEdge = col === 'A' || col === 'D' || col === 'J' || col === 'P';
-      cell.border = getCellBorders(rn === 1, rn === 2, isLeftEdge ? 'thick' : true, true);
+      cell.border = getCellBorders(rn === 4, rn === 5, isLeftEdge ? 'thick' : true, true);
     });
   });
 
@@ -99,7 +117,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     return age !== '' ? `${age}歳` : '';
   };
 
-  let rowIndex = 3;
+  let rowIndex = 6;
   let lastDept = null;
   let lastGroup = null;
   let lastPost = null;
@@ -247,7 +265,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     rowIndex++;
   });
 
-  if (rowIndex > 3) {
+  if (rowIndex > 6) {
     const lastRow = ws.getRow(rowIndex - 1);
     lastRow.eachCell({ includeEmpty: true }, (cell) => {
       cell.border = { ...cell.border, bottom: thickBorderStyle };

@@ -393,7 +393,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   </script>
 </head>
 <body>
-  <h2>${targetYear}年度(R${targetYear - 2018})人事異動案</h2>
+  <h2>${targetYear}年度(R${targetYear - 2018})人事異動案 【${escapeHtml(fileName.replace(/\.html$/, ''))}】</h2>
   ${summaryHtml}
   <table border="1">
     <colgroup>
