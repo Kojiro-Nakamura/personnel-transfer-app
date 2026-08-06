@@ -628,7 +628,10 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       cell.border = getCellBorders(true, true, true, true);
       
       let argb = 'FFFFFFFF'; 
-      if (colNumber <= 2) argb = 'FFE2E8F0';
+      if (colNumber <= 2) {
+         argb = 'FFE2E8F0';
+         if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
+      }
       else if (colNumber <= 15) argb = 'FFF8FAFC';
       else if (colNumber <= 22) {
          argb = 'FFEFF6FF';
