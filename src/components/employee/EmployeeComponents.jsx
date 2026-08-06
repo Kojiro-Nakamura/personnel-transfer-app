@@ -493,7 +493,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-5 max-w-3xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg p-5 max-w-4xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
           <div>
             <h3 className="text-xl font-bold text-[#065084]">職員情報編集</h3>
@@ -528,7 +528,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <h4 className="font-bold text-sm text-slate-700 mb-2 flex items-center gap-2">
               昇進年度と経過年数
             </h4>
-            <div className="grid grid-cols-[98px_1fr_98px_1fr_98px_1fr_98px_1fr_98px_1fr] gap-y-3 items-end justify-items-center">
+            <div className="grid grid-cols-[110px_1fr_110px_1fr_110px_1fr_110px_1fr_110px_1fr] gap-y-3 items-end justify-items-center">
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
                 <span className="text-[11px] font-bold text-slate-600 mb-1">採用</span>
