@@ -8,12 +8,18 @@ const headerFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
 const borderStyle = { style: 'thin', color: { argb: 'FF000000' } };
 const thickBorderStyle = { style: 'medium', color: { argb: 'FF000000' } };
 
-const getCellBorders = (top = false, bottom = false, left = false, right = false) => {
+const grayBorderStyle = { style: 'thin', color: { argb: 'FF94A3B8' } };
+const grayThickBorderStyle = { style: 'medium', color: { argb: 'FF475569' } };
+
+const getCellBorders = (top = false, bottom = false, left = false, right = false, isGray = false) => {
   const b = {};
-  if (top) b.top = top === 'thick' ? thickBorderStyle : borderStyle;
-  if (bottom) b.bottom = bottom === 'thick' ? thickBorderStyle : borderStyle;
-  if (left) b.left = left === 'thick' ? thickBorderStyle : borderStyle;
-  if (right) b.right = right === 'thick' ? thickBorderStyle : borderStyle;
+  const thinStyle = isGray ? grayBorderStyle : borderStyle;
+  const thickStyle = isGray ? grayThickBorderStyle : thickBorderStyle;
+
+  if (top) b.top = top === 'thick' ? thickStyle : thinStyle;
+  if (bottom) b.bottom = bottom === 'thick' ? thickStyle : thinStyle;
+  if (left) b.left = left === 'thick' ? thickStyle : thinStyle;
+  if (right) b.right = right === 'thick' ? thickStyle : thinStyle;
   return b;
 };
 
@@ -462,7 +468,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = listHeaderFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-      cell.border = getCellBorders(true, true, true, true);
+      cell.border = getCellBorders(true, true, true, true, true);
       
       if (colNumber <= 8) cell.fill = fillSlate;
       else if (colNumber <= 15) cell.fill = fillAmber;
@@ -665,7 +671,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = listDefaultFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-      cell.border = getCellBorders(true, true, true, true);
+      cell.border = getCellBorders(true, true, true, true, true);
       
       let argb = 'FFFFFFFF'; 
       if (colNumber <= 2) {
