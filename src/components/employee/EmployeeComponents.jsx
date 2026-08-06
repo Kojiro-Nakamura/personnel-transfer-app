@@ -347,7 +347,7 @@ const YearInput = ({ label, value, onChange, birthDate, bgClass, borderClass }) 
             onChange(val);
           }} 
           placeholder="YYYY"
-          className="w-[36px] outline-none bg-transparent placeholder-slate-300" 
+          className="w-[42px] outline-none bg-transparent placeholder-slate-300" 
         />
         {value && (
           <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
