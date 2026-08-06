@@ -706,7 +706,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
             cell.border = { top: hBorder, bottom: hBorder, left: hBorder, right: hBorder };
          }
          if (histIsChange[hcOffset]) {
-            cell.font = { ...listDefaultFont, bold: true };
+            cell.font = { ...listDefaultFont, bold: true, italic: true };
          }
       }
     });

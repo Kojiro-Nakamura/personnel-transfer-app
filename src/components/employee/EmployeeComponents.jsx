@@ -624,7 +624,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
                         {h.isNext && <span className="ml-1 text-[9px] text-[#065084]">(予定)</span>}
                       </span>
-                      <span className={cx("text-[11px] text-left truncate w-full", isChange ? "font-bold text-slate-900" : "font-normal text-slate-700")}>
+                      <span className={cx("text-[11px] text-left truncate w-full", isChange ? "font-bold italic text-slate-900" : "font-normal text-slate-700")}>
                         {h.department || '-'}
                       </span>
                       {!isLast && !isLastInRow && (
