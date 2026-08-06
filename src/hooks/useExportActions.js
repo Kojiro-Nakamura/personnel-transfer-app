@@ -192,14 +192,14 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <style>
     body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
     table { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 1150px; } 
-    th, td { border: 1px solid #94a3b8; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
+    th, td { border: 1px solid #94a3b8; padding: 2px 4px; vertical-align: top; overflow: hidden; word-break: break-word; line-height: 1.25; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
     thead th { border: 1px solid #94a3b8 !important; outline: 1px solid #94a3b8; outline-offset: -1px; }
     th { background-color: #f0f0f0; border-bottom: 1.5px solid #475569; } 
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
-    .post-cell { font-weight: 600; color: #0369a1; background-color: #e0f2fe; } 
+    .post-cell { font-weight: 600; color: #0c4a6e; background-color: #e0f2fe; } 
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 1.5px solid #475569; } 
     thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 1.5px solid #475569 !important; }
     thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 1.5px solid #475569 !important; } 
