@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { 
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
@@ -59,7 +59,7 @@ export const FormInput = ({ label, value, onChange, type = "text", disabled = fa
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
       placeholder={placeholder} 
-      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (inputClassName || "bg-white"), placeholder ? "placeholder:text-slate-400" : "")} 
+      className={cx("w-full h-[34px] border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (inputClassName || "bg-white"), placeholder ? "placeholder:text-slate-400" : "")} 
     />
   </div>
 );
@@ -74,7 +74,7 @@ export const FormInputWithList = ({ label, value, onChange, disabled = false, pl
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
       placeholder={placeholder} 
-      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : "bg-white", placeholder ? "placeholder:text-slate-400" : "")} 
+      className={cx("w-full h-[34px] border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : "bg-white", placeholder ? "placeholder:text-slate-400" : "")} 
     />
     <datalist id={listId}>
       {options.map(o => <option key={o} value={o} />)}
@@ -89,7 +89,7 @@ export const FormSelect = ({ label, value, onChange, options, disabled = false, 
       value={value !== undefined ? value : ''} 
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
-      className={cx("w-full border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (selectClassName || "bg-white"))}
+      className={cx("w-full h-[34px] border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (selectClassName || "bg-white"))}
     >
       {options.map(o => <option key={o} value={o}>{o}</option>)}
     </select>
