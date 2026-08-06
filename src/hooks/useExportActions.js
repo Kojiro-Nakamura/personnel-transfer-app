@@ -164,7 +164,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         const currTds = generateTds(currEmp, currEmp?.id, false, isPostLevelHighlight);
         const nextTds = generateTds(nextEmp, nextEmp?.id, true, isPostLevelHighlight);
         
-        const trAttr = ` data-dept="${escapeHtml(deptName)}" data-group="${escapeHtml(groupName)}"`;
+        const trAttr = ` data-dept="${escapeHtml(deptName)}" data-group="${escapeHtml(groupName)}" data-post="${escapeHtml(formattedPostName)}"`;
         rowsHtml += `<tr${trAttr}><td${deptClass}>${displayDeptHtml}</td><td${groupClass}>${displayGroupHtml}</td><td${postClass}>${escapeHtml(displayPost)}</td>${currTds}${nextTds}${rowNoteHtml}</tr>\n`;
       });
       return rowsHtml;
@@ -192,7 +192,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <style>
     body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
     table { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 1150px; } 
-    th, td { border: 1px solid #ccc; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
+    th, td { border: 1px solid #333; padding: 4px 6px; vertical-align: top; overflow: hidden; word-break: break-word; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
     thead th { border: 1px solid #333 !important; outline: 1px solid #333; outline-offset: -1px; }
@@ -307,7 +307,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
                return;
             }
             
-            const postName = row.cells[2] ? row.cells[2].textContent.trim() : "";
+            const postName = row.cells[2] ? row.getAttribute('data-post') : "";
             const currName = row.cells[4] ? row.cells[4].textContent.trim() : "";
             const currGrade = row.cells[5] ? row.cells[5].textContent.trim() : "";
             const nextName = row.cells[10] ? row.cells[10].textContent.trim() : "";
