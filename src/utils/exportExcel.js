@@ -34,7 +34,7 @@ const saveWorkbook = async (workbook, fileName) => {
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel) => {
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
-    views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }],
+    views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false }],
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
@@ -328,7 +328,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('職員一覧', {
-    views: [{ state: 'frozen', xSplit: 2, ySplit: 5 }], // 氏名・年齢まで固定
+    views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false }], // 氏名・年齢まで固定
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
@@ -406,7 +406,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['氏名', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度\n${getEraFormattedYear(targetYear)}`];
+  const headersR5 = ['氏名', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
