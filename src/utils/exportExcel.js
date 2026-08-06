@@ -708,7 +708,13 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
         }
       }
     });
-    if (maxLength > 0) col.width = maxLength + 1.5;
+    if (maxLength > 0) {
+       let padding = 1.5;
+       if (i === 4 || i === 6 || (i >= 22 && i <= 30)) {
+           padding = 4.0;
+       }
+       col.width = maxLength + padding;
+    }
   });
 
   await saveWorkbook(workbook, fileName);
