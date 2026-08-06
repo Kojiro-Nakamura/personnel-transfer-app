@@ -440,6 +440,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   // Header coloring
   const fillSlate = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
+  const fillAmber = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
   const fillBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } };
   const fillFuchsia = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5D0FE' } };
   const fillEmerald = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } };
@@ -463,7 +464,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.border = getCellBorders(true, true, true, true);
       
-      if (colNumber <= 15) cell.fill = fillSlate;
+      if (colNumber <= 8) cell.fill = fillSlate;
+      else if (colNumber <= 15) cell.fill = fillAmber;
       else if (colNumber <= 22) cell.fill = fillBlue;
       else if (colNumber <= 32) {
         if (rn === 5 && promoColors[colNumber]) {
@@ -673,7 +675,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       else if (colNumber <= 15) argb = 'FFF8FAFC';
       else if (colNumber <= 22) {
          argb = 'FFEFF6FF';
-         if (nextPromoColor && (colNumber === 16 || colNumber === 17 || colNumber === 18)) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
+         if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
       else if (colNumber <= 32) {
          argb = 'FFFDF4FF';
