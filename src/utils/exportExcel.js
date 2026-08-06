@@ -388,8 +388,6 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   historyYears.forEach(y => headersR2.push(getEraFormattedYear(y)));
   r2.values = headersR2;
 
-  ws.mergeCells('A1:A2');
-  ws.mergeCells('B1:B2');
   ws.mergeCells('C1:H1');
   ws.mergeCells('I1:O1');
   ws.mergeCells('P1:V1');
