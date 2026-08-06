@@ -323,6 +323,9 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     }
   };
 
+  const listDefaultFont = { name: 'BIZ UDPGothic', size: 8 };
+  const listHeaderFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
+
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('職員一覧', {
     views: [{ state: 'frozen', xSplit: 2, ySplit: 2 }], // 氏名・年齢まで固定
@@ -417,7 +420,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   [1, 2].forEach(rn => {
     const row = ws.getRow(rn);
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      cell.font = headerFont;
+      cell.font = listHeaderFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.border = getCellBorders(true, true, true, true);
       
@@ -515,7 +518,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     let hireStr = hireYear;
     if (hireYear) {
       const suffix = getEraSuffixLocal(hireYear);
-      if (suffix) hireStr += `\n(${suffix})`;
+      if (suffix) hireStr += `(${suffix})`;
     }
     vals.push(hireStr);
 
@@ -545,13 +548,13 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       const diff = (!isNaN(prevY) && !isNaN(currentY) && currentY >= prevY) ? currentY - prevY : null;
       
       let cellStr = '';
-      if (diff !== null) cellStr += `${diff + 1}年目>\n`;
-      else cellStr += `>\n`;
+      if (diff !== null) cellStr += `${diff + 1}年目> `;
+      else cellStr += `> `;
       
       cellStr += cellVal;
       if (cellVal) {
         const suffix = getEraSuffixLocal(cellVal);
-        if (suffix) cellStr += `\n(${suffix})`;
+        if (suffix) cellStr += `(${suffix})`;
       }
       vals.push(cellStr);
     }
@@ -568,7 +571,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       }
       finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
     }
-    vals.push(`>\n${finalDiff !== null ? (finalDiff >= 0 ? finalDiff : 0) + '年目' : ''}`);
+    vals.push(`> ${finalDiff !== null ? (finalDiff >= 0 ? finalDiff : 0) + '年目' : ''}`);
 
     // 履歴
     const promoYearMap = {};
@@ -600,7 +603,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
 
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      cell.font = defaultFont;
+      cell.font = listDefaultFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.border = getCellBorders(true, true, true, true);
       
