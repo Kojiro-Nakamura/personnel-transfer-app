@@ -93,10 +93,8 @@ export const AppContent = () => {
         <div className="flex justify-between items-center p-2 border-b border-slate-700">
           <div className="flex items-center gap-3">
             <Building2 className="w-5 h-5 text-sky-400" />
-            <div className="flex items-center bg-slate-700 rounded overflow-hidden">
-              <button onClick={() => setTargetYear(y => y - 1)} className="p-1 hover:bg-slate-600" title="前年度へ"><ChevronDown className="w-4 h-4"/></button>
-              <input type="number" value={targetYear} onChange={(e) => setTargetYear(Number(e.target.value))} className="w-16 bg-transparent text-center text-sm font-bold outline-none" title="対象年度" />
-              <button onClick={() => setTargetYear(y => y + 1)} className="p-1 hover:bg-slate-600" title="次年度へ"><ChevronUp className="w-4 h-4"/></button>
+            <div className="flex items-center bg-slate-700 rounded overflow-hidden p-1">
+              <input type="number" value={targetYear} onChange={(e) => setTargetYear(Number(e.target.value))} className="w-16 bg-transparent text-center text-sm font-bold outline-none always-show-spinners" title="対象年度" />
             </div>
             <h1 className="text-base font-bold">年度(R{targetYear - 2018})人事異動案</h1>
           </div>

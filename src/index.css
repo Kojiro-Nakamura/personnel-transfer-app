@@ -14,3 +14,15 @@
     font-weight: 600;
   }
 }
+
+@layer utilities {
+  .always-show-spinners::-webkit-inner-spin-button,
+  .always-show-spinners::-webkit-outer-spin-button {
+    -webkit-appearance: inner-spin-button !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+  .always-show-spinners {
+    -moz-appearance: number-input !important;
+  }
+}
