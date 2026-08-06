@@ -118,7 +118,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       </div>
       
       {!isPickingMode && (
-        <div className="absolute top-1/2 -translate-y-1/2 right-1 flex gap-0.5 opacity-0 group-hover/emp:opacity-100 z-30 bg-slate-400/60 p-1 rounded-lg">
+        <div className={cx("absolute top-1/2 -translate-y-1/2 right-1 flex gap-0.5 z-30 bg-slate-400/60 p-1 rounded-lg transition-opacity", emp.id === hoveredEmpId ? "opacity-100" : "opacity-0 pointer-events-none")}>
           {moveProps && (moveProps.onMoveUp || moveProps.onMoveDown) && (
             <>
               <button 
