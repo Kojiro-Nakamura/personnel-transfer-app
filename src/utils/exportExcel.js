@@ -628,16 +628,30 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     if (emp.promoYearDeptHead) promoYearMap[emp.promoYearDeptHead] = "部長級";
 
     const histBorderColors = [];
-    historyYears.forEach(year => {
-      let hStr = '';
+    const histIsChange = [];
+    
+    const hStrs = historyYears.map(year => {
       if (year === targetYear) {
-        hStr = nDeptName;
+        return nDeptName;
       } else {
         const hist = (emp.history || []).find(h => h.year === year);
-        hStr = hist ? hist.department : '';
+        return hist ? hist.department : '';
       }
+    });
+
+    historyYears.forEach((year, i) => {
+      const hStr = hStrs[i];
+      let isChange = false;
+      if (hStr !== '' && hStr !== '-') {
+         const prevHStr = i > 0 ? hStrs[i-1] : '-';
+         if (hStr !== (prevHStr || '-')) {
+            isChange = true;
+         }
+      }
+      
       vals.push(hStr);
       histBorderColors.push(promoYearMap[year] ? getBorderHexColor(promoYearMap[year]) : null);
+      histIsChange.push(isChange);
     });
 
     const row = ws.getRow(rowIndex);
@@ -683,10 +697,14 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
       // 履歴セルの枠線色 (太枠)
       if (colNumber > 32) {
-         const hc = histBorderColors[colNumber - 33];
+         const hcOffset = colNumber - 33;
+         const hc = histBorderColors[hcOffset];
          if (hc) {
             const hBorder = { style: 'medium', color: { argb: hc } };
             cell.border = { top: hBorder, bottom: hBorder, left: hBorder, right: hBorder };
+         }
+         if (histIsChange[hcOffset]) {
+            cell.font = { ...listDefaultFont, bold: true };
          }
       }
     });

@@ -585,7 +585,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   }
                 }
 
-                let prevDept = null;
+
                 const promoYearMap = {};
                 if (fd.promoYearChief) promoYearMap[fd.promoYearChief] = "係長級(主査)";
                 if (fd.promoYearAssistant1) promoYearMap[fd.promoYearAssistant1] = "補佐級I(主任)";
@@ -599,10 +599,11 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
                   const dept = h.department || '-';
                   let isChange = false;
-                  if (dept !== '-' && (h.isNext || prevDept === null || dept !== prevDept)) {
+                  const olderH = arr[i + 1];
+                  const olderDept = olderH ? (olderH.department || '-') : '-';
+                  if (dept !== '-' && dept !== olderDept) {
                     isChange = true;
                   }
-                  if (dept !== '-') prevDept = dept;
 
                   const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
                   const isLastInRow = (i + 1) % 5 === 0;
