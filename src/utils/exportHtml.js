@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary } from './helpers.js';
 
 const getBorderHexColor = (grade) => {
   switch (grade) {
@@ -59,7 +59,17 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
 
 
 
-    const scriptStr = `
+  const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+  const currSummaryStr = generateGradeSummary(employees, false);
+  const nextSummaryStr = generateGradeSummary(employees, true);
+
+  const summaryHtml = `
+    <div style="font-weight:bold; margin-bottom: 4px; font-size:12px; color:#0369A1;">【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}</div>
+    <div style="font-weight:bold; margin-bottom: 12px; font-size:12px; color:#0369A1;">【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}</div>
+  `;
+
+  const scriptStr = `
       function saveHTML() {
         var htmlContent = "<!DOCTYPE html><html>" + document.documentElement.innerHTML + "</html>";
         var blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
@@ -316,6 +326,8 @@ ${scriptStr}
 </script>
 </head>
 <body>
+<h2 style="margin-bottom: 8px;">${targetYear}年度(R${targetYear - 2018})人事異動案 【${escapeHtml(fileName.replace(/\.html$/, ''))}】</h2>
+${summaryHtml}
 <table id="empTable">
   <thead>
       <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">選択解除</button></div></th>

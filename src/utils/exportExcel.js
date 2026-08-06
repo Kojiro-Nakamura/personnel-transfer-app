@@ -328,7 +328,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('職員一覧', {
-    views: [{ state: 'frozen', xSplit: 2, ySplit: 2 }], // 氏名・年齢まで固定
+    views: [{ state: 'frozen', xSplit: 2, ySplit: 5 }], // 氏名・年齢まで固定
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
@@ -373,28 +373,46 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   ws.columns = columns;
 
+  const currSummaryStr = generateGradeSummary(employees, false);
+  const nextSummaryStr = generateGradeSummary(employees, true);
+
   const r1 = ws.getRow(1);
-  r1.height = 20;
-  const headersR1 = ['', '', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
-  historyYears.forEach((y, i) => {
-    if (i === 0) headersR1.push('履歴');
-    else headersR1.push('');
-  });
-  r1.values = headersR1;
+  r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
+  r1.font = { name: 'BIZ UDPGothic', size: 14, bold: true };
+  r1.height = 24;
 
   const r2 = ws.getRow(2);
-  r2.height = 30;
-  const headersR2 = ['氏名', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度\n${getEraFormattedYear(targetYear)}`];
-  historyYears.forEach(y => headersR2.push(getEraFormattedYear(y)));
-  r2.values = headersR2;
+  r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
+  r2.font = { name: 'BIZ UDPGothic', size: 10, bold: true, color: { argb: 'FF0369A1' } };
+  r2.height = 18;
 
-  ws.mergeCells('C1:H1');
-  ws.mergeCells('I1:O1');
-  ws.mergeCells('P1:V1');
-  ws.mergeCells('W1:AF1');
+  const r3 = ws.getRow(3);
+  r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
+  r3.font = { name: 'BIZ UDPGothic', size: 10, bold: true, color: { argb: 'FF0369A1' } };
+  r3.height = 18;
+
+  const r4 = ws.getRow(4);
+  r4.height = 20;
+  const headersR4 = ['', '', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
+  historyYears.forEach((y, i) => {
+    if (i === 0) headersR4.push('履歴');
+    else headersR4.push('');
+  });
+  r4.values = headersR4;
+
+  const r5 = ws.getRow(5);
+  r5.height = 30;
+  const headersR5 = ['氏名', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度\n${getEraFormattedYear(targetYear)}`];
+  historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
+  r5.values = headersR5;
+
+  ws.mergeCells('C4:H4');
+  ws.mergeCells('I4:O4');
+  ws.mergeCells('P4:V4');
+  ws.mergeCells('W4:AF4');
   if (historyYears.length > 0) {
     const endColCode = ws.getColumn(32 + historyYears.length).letter;
-    ws.mergeCells(`AG1:${endColCode}1`);
+    ws.mergeCells(`AG4:${endColCode}4`);
   }
 
   // Header coloring
@@ -415,7 +433,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     31: getPromotedBgColorCode('部長級'),
   };
 
-  [1, 2].forEach(rn => {
+  [4, 5].forEach(rn => {
     const row = ws.getRow(rn);
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = listHeaderFont;
@@ -425,7 +443,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       if (colNumber <= 15) cell.fill = fillSlate;
       else if (colNumber <= 22) cell.fill = fillBlue;
       else if (colNumber <= 32) {
-        if (rn === 2 && promoColors[colNumber]) {
+        if (rn === 5 && promoColors[colNumber]) {
            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[colNumber].replace('#', '').toUpperCase() } };
         } else {
            cell.fill = fillFuchsia;
@@ -456,7 +474,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       return 0;
   });
 
-  let rowIndex = 3;
+  let rowIndex = 6;
   sortedEmployees.forEach(emp => {
     const getDeptName = (deptId, postId, groupId, groupPostId, isNext) => {
       if (!deptId || deptId === 'unassigned' || deptId === 'retired') return '';
