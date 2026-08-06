@@ -661,7 +661,12 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
          argb = 'FFEFF6FF';
          if (nextPromoColor && (colNumber === 16 || colNumber === 17 || colNumber === 18)) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 32) argb = 'FFFDF4FF';
+      else if (colNumber <= 32) {
+         argb = 'FFFDF4FF';
+         if (colNumber === 32 && nextPromoColor) {
+             argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
+         }
+      }
       else argb = 'FFECFDF5';
       
       // 昇進ハイライト (昇進年度の枠)
