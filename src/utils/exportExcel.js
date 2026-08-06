@@ -3,8 +3,8 @@ import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCod
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
-const defaultFont = { name: 'BIZ UDPGothic', size: 10 };
-const headerFont = { name: 'BIZ UDPGothic', size: 10, bold: true };
+const defaultFont = { name: 'BIZ UDPGothic', size: 8 };
+const headerFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
 const borderStyle = { style: 'thin', color: { argb: 'FF94A3B8' } };
 const thickBorderStyle = { style: 'medium', color: { argb: 'FF475569' } };
 
@@ -62,18 +62,22 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   const r1 = ws.getRow(1);
   r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
-  r1.font = { name: 'BIZ UDPGothic', size: 14, bold: true };
-  r1.height = 24;
+  r1.font = { name: 'BIZ UDPGothic', size: 8, bold: true };
+  r1.height = 13;
 
   const r2 = ws.getRow(2);
   r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
-  r2.font = { name: 'BIZ UDPGothic', size: 10, bold: true, color: { argb: 'FF0369A1' } };
-  r2.height = 18;
+  r2.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
+  r2.height = 13;
 
   const r3 = ws.getRow(3);
   r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
-  r3.font = { name: 'BIZ UDPGothic', size: 10, bold: true, color: { argb: 'FF0369A1' } };
-  r3.height = 18;
+  r3.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
+  r3.height = 13;
+
+  [1, 2, 3].forEach(rn => {
+    ws.getRow(rn).getCell(1).alignment = { vertical: 'middle' };
+  });
 
   const r4 = ws.getRow(4);
   r4.values = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ'];
@@ -230,7 +234,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       cell.font = defaultFont;
       cell.alignment = { vertical: 'middle', wrapText: true };
       
-      if (colNumber >= 4 && colNumber <= 15 && colNumber !== 5 && colNumber !== 11) {
+      if (colNumber >= 3) {
         cell.alignment = { ...cell.alignment, horizontal: 'center' };
       }
       
