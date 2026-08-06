@@ -228,6 +228,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       
       thead { display: table-header-group; } /* 複数ページにまたがる際、各ページ上部にヘッダーを表示 */
       tr { page-break-inside: avoid; } /* 行の途中で分断させない */
+      table { min-width: 100% !important; max-width: 100% !important; width: 100% !important; box-sizing: border-box; }
     }
   </style>
   <style id="page-style">@page { size: A4 portrait; margin: 10mm; }</style>
