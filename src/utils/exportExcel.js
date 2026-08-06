@@ -379,24 +379,24 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   const r1 = ws.getRow(1);
   r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
   r1.font = { name: 'BIZ UDPGothic', size: 8, bold: true };
-  r1.height = 24;
+  r1.height = 13;
 
   const r2 = ws.getRow(2);
   r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
   r2.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
-  r2.height = 18;
+  r2.height = 13;
 
   const r3 = ws.getRow(3);
   r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
   r3.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
-  r3.height = 18;
+  r3.height = 13;
 
   [1, 2, 3].forEach(rn => {
     ws.getRow(rn).getCell(1).alignment = { vertical: 'middle' };
   });
 
   const r4 = ws.getRow(4);
-  r4.height = 20;
+  r4.height = 13;
   const headersR4 = ['', '', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
   historyYears.forEach((y, i) => {
     if (i === 0) headersR4.push('履歴');
@@ -405,7 +405,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   r4.values = headersR4;
 
   const r5 = ws.getRow(5);
-  r5.height = 30;
+  r5.height = 13;
   const headersR5 = ['氏名', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度\n${getEraFormattedYear(targetYear)}`];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
@@ -618,6 +618,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     });
 
     const row = ws.getRow(rowIndex);
+    row.height = 13;
     row.values = vals;
     
     const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
@@ -667,6 +668,23 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const lastColLetter = ws.getColumn(32 + historyYears.length).letter;
   ws.autoFilter = `A5:${lastColLetter}${rowIndex - 1}`;
+
+  ws.columns.forEach((col, i) => {
+    let maxLength = 0;
+    col.eachCell({ includeEmpty: true }, cell => {
+      if (cell.row <= 3) return; 
+      const v = cell.value ? cell.value.toString() : '';
+      if (v) {
+        const lines = v.split('\n');
+        for (let l of lines) {
+           let lw = 0;
+           for(let c of l) lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+           if (lw > maxLength) maxLength = lw;
+        }
+      }
+    });
+    if (maxLength > 0) col.width = maxLength + 1.5;
+  });
 
   await saveWorkbook(workbook, fileName);
 };
