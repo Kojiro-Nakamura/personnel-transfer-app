@@ -511,6 +511,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <div className="flex gap-2 w-full">
               <FormInput label="職員番号" value={fd.employeeNumber} onChange={v => setFd({...fd, employeeNumber: v})} className="w-[75px] shrink-0" />
               <FormInput label="氏名" value={fd.name} onChange={v => setFd({...fd, name: v})} className="flex-1 min-w-0" />
+              <FormSelect label="性別" options={['', '男', '女']} value={fd.gender || ''} onChange={v => setFd({...fd, gender: v})} className="w-[60px] shrink-0" />
               <FormInput label={`生年月日${getEraStr(fd.birthDate)}`} type="date" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} className="w-[130px] shrink-0" />
               <FormInput label="学歴" value={fd.education} onChange={v => setFd({...fd, education: v})} className="flex-1 min-w-0" />
               <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="date" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} className="w-[130px] shrink-0" />
