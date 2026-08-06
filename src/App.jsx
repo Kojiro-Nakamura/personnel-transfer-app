@@ -6,6 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
+import { exportListToExcel } from './utils/exportExcel.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
@@ -22,7 +23,7 @@ export const AppContent = () => {
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
     undo, redo, canUndo, canRedo, handleRollOver, activePlanId, plans, openModal, mutations, modals, closeModal, 
     targetYear, setTargetYear, switchPlan, duplicatePlan, deletePlan, updatePlanName, expandAll, collapseAll, 
-    exportToJSON, exportToHTML, loadJSON, handleCellClick, handleAssign 
+    exportToJSON, exportToHTML, exportToExcel, loadJSON, handleCellClick, handleAssign 
   } = useApp();
   
   const [isDragging, setIsDragging] = useState(false);
@@ -113,6 +114,8 @@ export const AppContent = () => {
             </div>
             <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案HTML' : baseFileName + '_人事異動案HTML' })} className="bg-purple-600 hover:bg-purple-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案HTML</button>
             <button onClick={() => openModal('saveFile', { type: 'html_list', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_職員一覧HTML' : baseFileName + '_職員一覧HTML' })} className="bg-purple-700 hover:bg-purple-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をHTMLファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧HTML</button>
+            <button onClick={() => openModal('saveFile', { type: 'excel', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案Excel' : baseFileName + '_人事異動案Excel' })} className="bg-green-600 hover:bg-green-500 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をExcelファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案Excel</button>
+            <button onClick={() => openModal('saveFile', { type: 'excel_list', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_職員一覧Excel' : baseFileName + '_職員一覧Excel' })} className="bg-green-700 hover:bg-green-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をExcelファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧Excel</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <label className="bg-emerald-700 hover:bg-emerald-600 active:scale-95 transition-all px-3 py-1.5 rounded cursor-pointer flex items-center justify-center text-xs font-bold" title="保存したJSONファイルを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く<input type="file" accept=".json" onChange={loadJSON} className="hidden" /></label>
           </div>
@@ -271,7 +274,7 @@ export const AppContent = () => {
       <NameEditModal isOpen={modals.groupPost.isOpen} title="班内ポスト編集" data={modals.groupPost.data?.post} onClose={() => closeModal('groupPost')} onSave={d => modals.groupPost.data?.post ? mutations.updateGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, modals.groupPost.data.post.id, d) : mutations.addGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, d)} />
       <NameEditModal isOpen={modals.planName.isOpen} title="名前変更" data={{ name: modals.planName.data }} onClose={() => closeModal('planName')} onSave={d => updatePlanName(activePlanId, d.name)} />
       <DeleteConfirmModal isOpen={modals.delConfirm.isOpen} data={modals.delConfirm.data} onClose={() => closeModal('delConfirm')} onConfirm={d => { if (d.type === 'dept') mutations.deleteDepartment(d.id); else if (d.type === 'post') mutations.deletePost(d.deptId, d.id); else if (d.type === 'group') mutations.deleteGroup(d.deptId, d.id); else if (d.type === 'groupPost') mutations.deleteGroupPost(d.deptId, d.groupId, d.id); else if (d.type === 'emp') mutations.deleteEmployee(d.id); }} />
-      <FileSaveModal isOpen={modals.saveFile.isOpen} defaultName={modals.saveFile.data?.defaultName} extension={modals.saveFile.data?.type === 'json' ? '.json' : '.html'} onClose={() => closeModal('saveFile')} onSave={(fileName) => { if (modals.saveFile.data.type === 'json') exportToJSON(fileName); else if (modals.saveFile.data.type === 'html') exportToHTML(fileName); else if (modals.saveFile.data.type === 'html_list') generateAndDownloadHTML(employees, departments, targetYear, fileName); }} />
+      <FileSaveModal isOpen={modals.saveFile.isOpen} defaultName={modals.saveFile.data?.defaultName} extension={modals.saveFile.data?.type === 'json' ? '.json' : (modals.saveFile.data?.type.startsWith('excel') ? '.xlsx' : '.html')} onClose={() => closeModal('saveFile')} onSave={(fileName) => { if (modals.saveFile.data.type === 'json') exportToJSON(fileName); else if (modals.saveFile.data.type === 'html') exportToHTML(fileName); else if (modals.saveFile.data.type === 'html_list') generateAndDownloadHTML(employees, departments, targetYear, fileName); else if (modals.saveFile.data.type === 'excel') exportToExcel(fileName); else if (modals.saveFile.data.type === 'excel_list') exportListToExcel(fileName, targetYear, employees, departments); }} />
       
       {modals.rollOver.isOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">

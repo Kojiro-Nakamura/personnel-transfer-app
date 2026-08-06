@@ -401,7 +401,8 @@ export function AppProvider({ children }) {
     cancelSelection: () => history.setSelectedEmp(null), 
     mutations,
     exportToJSON: exports.exportToJSON,
-    exportToHTML: exports.exportToHTML
+    exportToHTML: exports.exportToHTML,
+    exportToExcel: exports.exportToExcel
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
