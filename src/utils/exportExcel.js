@@ -247,12 +247,13 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       }
       
       const isLeftEdge = colNumber === 1 || colNumber === 4 || colNumber === 10 || colNumber === 16;
+      const isRightEdge = colNumber === 16;
       let topBorder = true;
       if (isNewDept) topBorder = 'thick';
       else if (isNewGroup) topBorder = true;
       else if (colNumber <= 3 && !isPostLevelHighlight) topBorder = false; 
 
-      cell.border = getCellBorders(topBorder, false, isLeftEdge ? 'thick' : true, true);
+      cell.border = getCellBorders(topBorder, false, isLeftEdge ? 'thick' : true, isRightEdge ? 'thick' : true);
 
       let argb = 'FFFFFFFF'; 
       if (colNumber === 1 && isDeptLevelHighlight) argb = 'FFE0F2FE'; 
@@ -280,7 +281,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   if (rowIndex > 6) {
     const lastRow = ws.getRow(rowIndex - 1);
     lastRow.eachCell({ includeEmpty: true }, (cell) => {
-      cell.border = { ...cell.border, bottom: thickBorderStyle };
+       if (cell.border) {
+         cell.border = { ...cell.border, bottom: thickBorderStyle };
+       } else {
+         cell.border = { bottom: thickBorderStyle };
+       }
     });
   }
 
