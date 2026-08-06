@@ -514,7 +514,11 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
     const vals = [
       emp.name || '',
-      emp.birthDate ? calculateAge(emp.birthDate, targetYear - 1) : '',
+      (() => {
+        if (!emp.birthDate) return '';
+        const a = calculateAge(emp.birthDate, targetYear - 1);
+        return (a !== null && !isNaN(a)) ? a + '歳' : '';
+      })(),
       emp.employeeNumber || '',
       emp.gender || '',
       formatWithEra(emp.birthDate),
