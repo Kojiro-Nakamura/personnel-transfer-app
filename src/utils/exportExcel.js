@@ -658,5 +658,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     rowIndex++;
   });
 
+  const lastColLetter = ws.getColumn(32 + historyYears.length).letter;
+  ws.autoFilter = `A5:${lastColLetter}${rowIndex - 1}`;
+
   await saveWorkbook(workbook, fileName);
 };
