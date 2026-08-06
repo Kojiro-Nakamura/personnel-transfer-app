@@ -299,7 +299,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       radioHtml += '</div>';
       
       radioHtml += '<div style="display: flex; gap: 16px; align-items: center;">';
-      radioHtml += '<div><strong>印刷向き：</strong> <label><input type="radio" name="orientation" value="landscape"> 横</label> <label><input type="radio" name="orientation" value="portrait" checked> 縦</label></div>';
+      radioHtml += '<div><label><input type="radio" name="orientation" value="landscape"> 横</label> <label><input type="radio" name="orientation" value="portrait" checked> 縦</label></div>';
       radioHtml += '<button onclick="window.print()" style="padding: 4px 12px; background-color: #0ea5e9; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">印刷</button>';
       radioHtml += '</div>';
       
