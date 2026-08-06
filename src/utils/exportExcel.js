@@ -5,8 +5,8 @@ import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 // 基本のフォント設定
 const defaultFont = { name: 'BIZ UDPGothic', size: 8 };
 const headerFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
-const borderStyle = { style: 'thin', color: { argb: 'FF94A3B8' } };
-const thickBorderStyle = { style: 'medium', color: { argb: 'FF475569' } };
+const borderStyle = { style: 'thin', color: { argb: 'FF000000' } };
+const thickBorderStyle = { style: 'medium', color: { argb: 'FF000000' } };
 
 const getCellBorders = (top = false, bottom = false, left = false, right = false) => {
   const b = {};
