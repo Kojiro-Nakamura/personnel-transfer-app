@@ -359,7 +359,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
 <body>
   <h2>${targetYear}年度(R${targetYear - 2018})人事異動案</h2>
   ${summaryHtml}
-  <table>
+  <table border="1">
     <colgroup>
       <col style="width: calc((100% - 550px) * 0.15);" />
       <col style="width: calc((100% - 550px) * 0.15);" />
