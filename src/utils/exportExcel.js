@@ -683,7 +683,12 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
-      else argb = 'FFECFDF5';
+      else {
+         argb = 'FFECFDF5';
+         if (colNumber === 32 + historyYears.length && nextPromoColor) {
+             argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
+         }
+      }
       
       // 昇進ハイライト (昇進年度の枠)
       if (colNumber >= 24 && colNumber <= 31) {
