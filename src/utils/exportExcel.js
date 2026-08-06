@@ -35,7 +35,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
     views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false }],
-    pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.787, bottom: 0.4, header: 0.1, footer: 0.1 } }
+    pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.984, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
 
@@ -105,12 +105,16 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       if (i === 15) argb = 'FFF0F0F0';
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
-      const topB = rn === 4 ? 'thick' : false;
+      let topB = false;
+      if (rn === 4) {
+         if (col === 'A' || col === 'B' || col === 'C' || col === 'P') topB = 'thick';
+         else topB = true;
+      }
       let bottomB = rn === 5 ? 'thick' : false;
       if (rn === 4 && i >= 3 && i <= 14) bottomB = true; 
       
       const leftB = (col === 'A' || col === 'D' || col === 'J' || col === 'P') ? 'thick' : true;
-      const rightB = col === 'P' ? 'thick' : true;
+      const rightB = (col === 'C' || col === 'I' || col === 'O' || col === 'P') ? 'thick' : true;
       
       cell.border = getCellBorders(topB, bottomB, leftB, rightB);
     });
@@ -247,7 +251,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       }
       
       const isLeftEdge = colNumber === 1 || colNumber === 4 || colNumber === 10 || colNumber === 16;
-      const isRightEdge = colNumber === 16;
+      const isRightEdge = colNumber === 3 || colNumber === 9 || colNumber === 15 || colNumber === 16;
       let topBorder = true;
       if (isNewDept) topBorder = 'thick';
       else if (isNewGroup) topBorder = true;
