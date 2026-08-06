@@ -216,10 +216,6 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     @media print {
       .print-hide { display: none !important; }
       .filter-container { display: none !important; }
-      @page {
-        size: A4 landscape; /* 自動でA4横向きに設定 */
-        margin: 10mm; /* 用紙の余白 */
-      }
       body {
         -webkit-print-color-adjust: exact !important; /* 背景色・グラデーションを強制印刷 */
         print-color-adjust: exact !important;
@@ -234,6 +230,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       tr { page-break-inside: avoid; } /* 行の途中で分断させない */
     }
   </style>
+  <style id="page-style">@page { size: A4 landscape; margin: 10mm; }</style>
   <script>
     const GRADE_LEVELS = ${gradeLevelsHtml};
     const GRADE_OPTIONS = ${gradeOptionsHtml};
