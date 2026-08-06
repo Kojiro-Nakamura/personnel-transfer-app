@@ -272,16 +272,50 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const currentDept = row.getAttribute('data-dept');
             const currentGroup = row.getAttribute('data-group');
             
-            if (currentDept !== lastDept) {
+            const isNewDept = currentDept !== lastDept;
+            const isNewGroup = !isNewDept && currentGroup !== lastGroup;
+            
+            for(let i = 0; i < row.cells.length; i++) {
+              const cell = row.cells[i];
+              const isHeaderCell = (i <= 2 && !cell.classList.contains('post-cell'));
+              
+              if (isNewDept) {
+                cell.style.borderTop = '1.5px solid #475569';
+              } else if (isNewGroup) {
+                cell.style.borderTop = '1px solid #94a3b8';
+              } else {
+                if (isHeaderCell) {
+                  cell.style.borderTop = 'none';
+                } else {
+                  cell.style.borderTop = '1px solid #94a3b8';
+                }
+              }
+              
+              if (isHeaderCell) {
+                cell.style.borderBottom = 'none';
+              } else {
+                cell.style.borderBottom = '1px solid #94a3b8';
+              }
+            }
+            
+            if (isNewDept) {
               row.classList.add('border-dept-top');
               lastDept = currentDept;
               lastGroup = currentGroup;
-            } else if (currentGroup !== lastGroup) {
+            } else if (isNewGroup) {
               row.classList.add('border-group-top');
               lastGroup = currentGroup;
             }
           }
         });
+        
+        const visibleRows = rows.filter(r => r.style.display !== 'none');
+        if (visibleRows.length > 0) {
+          const lastRow = visibleRows[visibleRows.length - 1];
+          for(let i = 0; i < lastRow.cells.length; i++) {
+            lastRow.cells[i].style.borderBottom = '1.5px solid #475569';
+          }
+        }
       };
       
       updateBorders();
