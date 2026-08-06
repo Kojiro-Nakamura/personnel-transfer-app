@@ -100,9 +100,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const cell = ws.getCell(`${col}${rn}`);
       cell.font = headerFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      let argb = 'FFCBD5E1'; 
-      if (i >= 9 && i <= 14) argb = 'FFBFDBFE'; 
-      if (i === 15) argb = 'FFF0F0F0';
+      let argb = 'FFCBD5E1'; // A, B, C (slate-300)
+      if (i >= 3 && i <= 8) argb = 'FFFEF3C7'; // 今年度 (amber-100)
+      if (i >= 9 && i <= 14) argb = 'FFDBEAFE'; // 来年度 (blue-100)
+      if (i === 15) argb = 'FFF1F5F9'; // メモ (slate-100)
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
       const topB = rn === 4 ? 'thick' : false;
