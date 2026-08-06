@@ -105,11 +105,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       if (i === 15) argb = 'FFF0F0F0';
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
-      let topB = false;
-      if (rn === 4) {
-         if (col === 'A' || col === 'B' || col === 'C' || col === 'P') topB = 'thick';
-         else topB = true;
-      }
+      const topB = rn === 4 ? 'thick' : false;
       let bottomB = rn === 5 ? 'thick' : false;
       if (rn === 4 && i >= 3 && i <= 14) bottomB = true; 
       
