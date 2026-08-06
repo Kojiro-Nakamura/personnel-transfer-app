@@ -203,7 +203,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #475569; } 
     thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 2px solid #475569 !important; }
     thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 2px solid #475569 !important; } 
-    td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: center; }
+    td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: left; }
     td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
