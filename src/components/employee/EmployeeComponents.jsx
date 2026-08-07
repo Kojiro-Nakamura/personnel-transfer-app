@@ -18,8 +18,14 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyTextColor = isNext 
-      ? (isPickingMode ? "text-slate-800" : (hasPeer ? "text-blue-500" : "text-slate-400")) 
+      ? (isPickingMode ? "text-slate-800" : (hasPeer ? "text-rose-500" : "text-rose-400")) 
       : "text-slate-400";
+
+    const emptyBgClass = isNext 
+      ? (isPickingMode 
+          ? "hover:ring-2 hover:ring-inset hover:ring-amber-400 bg-amber-50 border-slate-300" 
+          : "bg-[repeating-linear-gradient(45deg,#fff1f2,#fff1f2_8px,#ffe4e6_8px,#ffe4e6_16px)] hover:bg-[repeating-linear-gradient(45deg,#ffe4e6,#ffe4e6_8px,#fecdd3_8px,#fecdd3_16px)] border-rose-200 hover:border-rose-400 hover:text-rose-600 shadow-[inset_0_0_4px_rgba(251,113,133,0.1)]")
+      : "bg-slate-50/30 border-slate-300 cursor-default";
 
     return (
       <div 
@@ -27,14 +33,17 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         className={cx(
           "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r transition-all border-dashed",
           emptyTextColor,
-          isPost ? "border-sky-400" : "border-slate-300",
-          isNext 
-            ? cx("cursor-pointer", isPickingMode ? "hover:ring-2 hover:ring-inset hover:ring-amber-400 bg-amber-50" : "bg-slate-50/30 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300")
-            : "bg-slate-50/30 cursor-default"
+          isPost && !isNext ? "border-sky-400" : emptyBgClass,
+          isNext ? "cursor-pointer" : ""
         )}
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
-        {!isNext ? '' : (isPickingMode ? '+ ここに配置' : '+ 職員を選択')}
+        {!isNext ? '' : (
+          <span className="flex items-center gap-1">
+            {!isPickingMode && <UserPlus className="w-3.5 h-3.5" />}
+            {isPickingMode ? '+ ここに配置' : '職員を選択'}
+          </span>
+        )}
       </div>
     );
   }
