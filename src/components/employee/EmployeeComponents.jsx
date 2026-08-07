@@ -18,13 +18,13 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyTextColor = isNext 
-      ? (isPickingMode ? "text-slate-800" : "text-slate-400") 
+      ? (isPickingMode ? "text-slate-800" : "text-sky-600") 
       : "text-slate-300";
 
     const emptyBgClass = isNext 
       ? (isPickingMode 
           ? "hover:ring-2 hover:ring-inset hover:ring-amber-400 bg-amber-50 border-slate-300" 
-          : "bg-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.08)] border-slate-300 hover:bg-slate-200 hover:border-slate-400 hover:text-slate-600")
+          : "bg-sky-100 bg-[image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] bg-[size:8px_8px] border-sky-300 hover:bg-sky-200 hover:border-sky-400 hover:text-sky-700")
       : "bg-slate-50/20 border-slate-200 cursor-default";
 
     return (
@@ -39,7 +39,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
         {!isNext ? '' : (
-          <span className="flex items-center gap-1 opacity-70">
+          <span className="flex items-center gap-1 opacity-90">
             {isPickingMode ? '+ ここに配置' : '未配置 (クリックで選択)'}
           </span>
         )}
