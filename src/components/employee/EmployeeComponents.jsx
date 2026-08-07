@@ -18,14 +18,14 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyTextColor = isNext 
-      ? (isPickingMode ? "text-slate-800" : (hasPeer ? "text-rose-500" : "text-rose-400")) 
-      : "text-slate-400";
+      ? (isPickingMode ? "text-slate-800" : "text-slate-400") 
+      : "text-slate-300";
 
     const emptyBgClass = isNext 
       ? (isPickingMode 
           ? "hover:ring-2 hover:ring-inset hover:ring-amber-400 bg-amber-50 border-slate-300" 
-          : "bg-[repeating-linear-gradient(45deg,#fff1f2,#fff1f2_8px,#ffe4e6_8px,#ffe4e6_16px)] hover:bg-[repeating-linear-gradient(45deg,#ffe4e6,#ffe4e6_8px,#fecdd3_8px,#fecdd3_16px)] border-rose-200 hover:border-rose-400 hover:text-rose-600 shadow-[inset_0_0_4px_rgba(251,113,133,0.1)]")
-      : "bg-slate-50/30 border-slate-300 cursor-default";
+          : "bg-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.08)] border-slate-300 hover:bg-slate-200 hover:border-slate-400 hover:text-slate-600")
+      : "bg-slate-50/20 border-slate-200 cursor-default";
 
     return (
       <div 
@@ -39,9 +39,8 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
         {!isNext ? '' : (
-          <span className="flex items-center gap-1">
-            {!isPickingMode && <UserPlus className="w-3.5 h-3.5" />}
-            {isPickingMode ? '+ ここに配置' : '職員を選択'}
+          <span className="flex items-center gap-1 opacity-70">
+            {isPickingMode ? '+ ここに配置' : '未配置 (クリックで選択)'}
           </span>
         )}
       </div>
