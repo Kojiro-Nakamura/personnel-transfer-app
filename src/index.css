@@ -26,3 +26,26 @@
     -moz-appearance: number-input !important;
   }
 }
+
+@layer utilities {
+  .bg-stripes-construction {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      #fde047,
+      #fde047 10px,
+      #1f2937 10px,
+      #1f2937 20px
+    );
+    background-size: 28.28px 28.28px;
+    animation: move-stripes 1s linear infinite;
+  }
+}
+
+@keyframes move-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 28.28px 0;
+  }
+}

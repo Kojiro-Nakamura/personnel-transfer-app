@@ -17,30 +17,28 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
   
   if (isEmpty || !emp) {
-    const emptyTextColor = isNext 
-      ? (isPickingMode ? "text-slate-800" : "text-sky-600") 
-      : "text-slate-300";
-
     const emptyBgClass = isNext 
       ? (isPickingMode 
           ? "hover:ring-2 hover:ring-inset hover:ring-amber-400 bg-amber-50 border-slate-300" 
-          : "bg-sky-100 bg-[image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] bg-[size:8px_8px] border-sky-300 hover:bg-sky-200 hover:border-sky-400 hover:text-sky-700")
+          : "bg-stripes-construction border-yellow-500 hover:border-yellow-400 opacity-90 hover:opacity-100")
       : "bg-slate-50/20 border-slate-200 cursor-default";
 
     return (
       <div 
         onClick={isNext ? onClick : undefined} 
         className={cx(
-          "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r transition-all border-dashed",
-          emptyTextColor,
+          "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r transition-all border-dashed overflow-hidden relative",
           isPost && !isNext ? "border-sky-400" : emptyBgClass,
           isNext ? "cursor-pointer" : ""
         )}
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
         {!isNext ? '' : (
-          <span className="flex items-center gap-1 opacity-90">
-            {isPickingMode ? '+ ここに配置' : '未配置 (クリックで選択)'}
+          <span className={cx(
+            "flex items-center gap-1 px-2 py-0.5 rounded shadow-sm z-10",
+            isPickingMode ? "bg-amber-100 text-slate-800" : "bg-black text-yellow-400 border border-yellow-500/50"
+          )}>
+            {isPickingMode ? '+ ここに配置' : '工事中 (未配置)'}
           </span>
         )}
       </div>
