@@ -454,14 +454,14 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   
   // Specific promo headers colors
   const promoColors = {
-    24: getPromotedBgColorCode('係長級(主査)'),
-    25: getPromotedBgColorCode('補佐級I(主任)'),
-    26: getPromotedBgColorCode('補佐級II(班長)'),
-    27: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
-    28: getPromotedBgColorCode('課長級'),
-    29: getPromotedBgColorCode('所属長級'),
-    30: getPromotedBgColorCode('次長級'),
-    31: getPromotedBgColorCode('部長級'),
+    25: getPromotedBgColorCode('係長級(主査)'),
+    26: getPromotedBgColorCode('補佐級I(主任)'),
+    27: getPromotedBgColorCode('補佐級II(班長)'),
+    28: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
+    29: getPromotedBgColorCode('課長級'),
+    30: getPromotedBgColorCode('所属長級'),
+    31: getPromotedBgColorCode('次長級'),
+    32: getPromotedBgColorCode('部長級'),
   };
 
   [4, 5].forEach(rn => {
@@ -474,7 +474,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       if (colNumber <= 8) cell.fill = fillSlate;
       else if (colNumber <= 15) cell.fill = fillAmber;
       else if (colNumber <= 22) cell.fill = fillBlue;
-      else if (colNumber <= 32) {
+      else if (colNumber <= 33) {
         if (rn === 5 && promoColors[colNumber]) {
            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[colNumber].replace('#', '').toUpperCase() } };
         } else {
@@ -680,27 +680,27 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
          argb = 'FFE2E8F0';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 15) argb = 'FFF8FAFC';
-      else if (colNumber <= 22) {
+      else if (colNumber <= 16) argb = 'FFF8FAFC';
+      else if (colNumber <= 23) {
          argb = 'FFEFF6FF';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 32) {
+      else if (colNumber <= 33) {
          argb = 'FFFDF4FF';
-         if (colNumber === 32 && nextPromoColor) {
+         if (colNumber === 33 && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
       else {
          argb = 'FFECFDF5';
-         if (colNumber === 32 + historyYears.length && nextPromoColor) {
+         if (colNumber === 33 + historyYears.length && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
       
       // 昇進ハイライト (昇進年度の枠)
-      if (colNumber >= 24 && colNumber <= 31) {
-         const pKeysOffset = colNumber - 23;
+      if (colNumber >= 25 && colNumber <= 32) {
+         const pKeysOffset = colNumber - 24;
          const key = pKeys[pKeysOffset];
          if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
              const pc = getPromotedBgColorCode(emp.nextGrade);
@@ -711,8 +711,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
 
       // 履歴セルの枠線色 (太枠)
-      if (colNumber > 32) {
-         const hcOffset = colNumber - 33;
+      if (colNumber > 33) {
+         const hcOffset = colNumber - 34;
          const hc = histBorderColors[hcOffset];
          if (hc) {
             const hBorder = { style: 'medium', color: { argb: hc } };
@@ -727,7 +727,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     rowIndex++;
   });
 
-  const lastColLetter = ws.getColumn(32 + historyYears.length).letter;
+  const lastColLetter = ws.getColumn(33 + historyYears.length).letter;
   ws.autoFilter = `A5:${lastColLetter}${rowIndex - 1}`;
 
   ws.columns.forEach((col, i) => {
