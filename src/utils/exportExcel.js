@@ -359,8 +359,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const columns = [
     { width: 16 }, // 氏名
-    { width: 16 }, // フリガナ
     { width: 8 }, // 年齢
+    { width: 16 }, // フリガナ
     { width: 12 }, // 職員番号
     { width: 6 }, // 性別
     { width: 14 }, // 生年月日
@@ -432,7 +432,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['氏名', 'フリガナ', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
+  const headersR5 = ['氏名', `${currentEraShort}年齢`, 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
@@ -538,12 +538,12 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
     const vals = [
       emp.name || '',
-      emp.furigana || '',
       (() => {
         if (!emp.birthDate) return '';
         const a = calculateAge(emp.birthDate, targetYear - 1);
         return (a !== null && !isNaN(a)) ? a + '歳' : '';
       })(),
+      emp.furigana || '',
       emp.employeeNumber || '',
       emp.gender || '',
       formatWithEra(emp.birthDate),
