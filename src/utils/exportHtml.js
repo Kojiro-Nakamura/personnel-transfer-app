@@ -332,7 +332,7 @@ ${summaryHtml}
   <thead>
       <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">選択解除</button></div></th>
       <th class="sticky-age bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; justify-content:center;"><button onclick="saveHTML()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">保存</button></div></th>
-      <th colspan="7" class="bg-slate">基本情報</th>
+      <th colspan="8" class="bg-slate">基本情報</th>
       <th colspan="7" class="bg-slate">今年度（現行）${getEraFormattedYear(targetYear - 1)}</th>
       <th colspan="7" class="bg-blue">来年度（新組織）${getEraFormattedYear(targetYear)}</th>
       <th colspan="10" class="bg-fuchsia">昇進年度</th>
@@ -341,36 +341,37 @@ ${summaryHtml}
     <tr>
       <th onclick="sortTable(0)" class="sticky-name text-left">氏名</th>
       <th onclick="sortTable(1)" class="sticky-age">${currentEraShort}年齢</th>
-      <th onclick="sortTable(2)" class="bg-slate">職員番号</th>
-      <th onclick="sortTable(3)" class="bg-slate">性別</th>
-      <th onclick="sortTable(4)" class="bg-slate">生年月日</th>
-      <th onclick="sortTable(5)" class="bg-slate">最終学歴</th>
-      <th onclick="sortTable(6)" class="bg-slate">採用年月日</th>
-      <th onclick="sortTable(7)" class="bg-slate">特記事項</th>
-      <th onclick="sortTable(8)" class="bg-slate">配置先</th>
-      <th onclick="sortTable(9)" class="bg-slate">職名</th>
-      <th onclick="sortTable(10)" class="bg-slate">級</th>
-      <th onclick="sortTable(11)" class="bg-slate">年数</th>
-      <th onclick="sortTable(12)" class="bg-slate">詳細</th>
-      <th onclick="sortTable(13)" class="bg-slate">備考</th>
-      <th onclick="sortTable(14)" class="bg-slate">カウント除外</th>
-      <th onclick="sortTable(15)" class="bg-blue">配置先</th>
-      <th onclick="sortTable(16)" class="bg-blue">職名</th>
-      <th onclick="sortTable(17)" class="bg-blue">級</th>
-      <th onclick="sortTable(18)" class="bg-blue">年数</th>
-      <th onclick="sortTable(19)" class="bg-blue">詳細</th>
-      <th onclick="sortTable(20)" class="bg-blue">備考</th>
-      <th onclick="sortTable(21)" class="bg-blue">カウント除外</th>
-      <th onclick="sortTable(22)" class="bg-fuchsia" style="width: 56px;">採用</th>
-      <th onclick="sortTable(23)" style="width: 80px; background-color: ${getPromotedBgColorCode('係長級(主査)')};">係長級(主査)</th>
-      <th onclick="sortTable(24)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級I(主任)')};">補佐級I(主任)</th>
-      <th onclick="sortTable(25)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級II(班長)')};">補佐級II(班長)</th>
-      <th onclick="sortTable(26)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級III(補佐兼班長)')};">補佐級III</th>
-      <th onclick="sortTable(27)" style="width: 80px; background-color: ${getPromotedBgColorCode('課長級')};">課長級</th>
-      <th onclick="sortTable(28)" style="width: 80px; background-color: ${getPromotedBgColorCode('所属長級')};">所属長級</th>
-      <th onclick="sortTable(29)" style="width: 80px; background-color: ${getPromotedBgColorCode('次長級')};">次長級</th>
-      <th onclick="sortTable(30)" style="width: 80px; background-color: ${getPromotedBgColorCode('部長級')};">部長級</th>
-      <th onclick="sortTable(31)" class="bg-fuchsia" style="width: 56px;">来年度<br>${getEraFormattedYear(targetYear)}</th>
+      <th onclick="sortTable(2)" class="bg-slate">フリガナ</th>
+      <th onclick="sortTable(3)" class="bg-slate">職員番号</th>
+      <th onclick="sortTable(4)" class="bg-slate">性別</th>
+      <th onclick="sortTable(5)" class="bg-slate">生年月日</th>
+      <th onclick="sortTable(6)" class="bg-slate">最終学歴</th>
+      <th onclick="sortTable(7)" class="bg-slate">採用年月日</th>
+      <th onclick="sortTable(8)" class="bg-slate">特記事項</th>
+      <th onclick="sortTable(9)" class="bg-slate">配置先</th>
+      <th onclick="sortTable(10)" class="bg-slate">職名</th>
+      <th onclick="sortTable(11)" class="bg-slate">級</th>
+      <th onclick="sortTable(12)" class="bg-slate">年数</th>
+      <th onclick="sortTable(13)" class="bg-slate">詳細</th>
+      <th onclick="sortTable(14)" class="bg-slate">備考</th>
+      <th onclick="sortTable(15)" class="bg-slate">カウント除外</th>
+      <th onclick="sortTable(16)" class="bg-blue">配置先</th>
+      <th onclick="sortTable(17)" class="bg-blue">職名</th>
+      <th onclick="sortTable(18)" class="bg-blue">級</th>
+      <th onclick="sortTable(19)" class="bg-blue">年数</th>
+      <th onclick="sortTable(20)" class="bg-blue">詳細</th>
+      <th onclick="sortTable(21)" class="bg-blue">備考</th>
+      <th onclick="sortTable(22)" class="bg-blue">カウント除外</th>
+      <th onclick="sortTable(23)" class="bg-fuchsia" style="width: 56px;">採用</th>
+      <th onclick="sortTable(24)" style="width: 80px; background-color: ${getPromotedBgColorCode('係長級(主査)')};">係長級(主査)</th>
+      <th onclick="sortTable(25)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級I(主任)')};">補佐級I(主任)</th>
+      <th onclick="sortTable(26)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級II(班長)')};">補佐級II(班長)</th>
+      <th onclick="sortTable(27)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級III(補佐兼班長)')};">補佐級III</th>
+      <th onclick="sortTable(28)" style="width: 80px; background-color: ${getPromotedBgColorCode('課長級')};">課長級</th>
+      <th onclick="sortTable(29)" style="width: 80px; background-color: ${getPromotedBgColorCode('所属長級')};">所属長級</th>
+      <th onclick="sortTable(30)" style="width: 80px; background-color: ${getPromotedBgColorCode('次長級')};">次長級</th>
+      <th onclick="sortTable(31)" style="width: 80px; background-color: ${getPromotedBgColorCode('部長級')};">部長級</th>
+      <th onclick="sortTable(32)" class="bg-fuchsia" style="width: 56px;">来年度<br>${getEraFormattedYear(targetYear)}</th>
             ${historyYears.map((y, idx) => {
         const hStyle = y === targetYear ? "width: 60px; color: #dc2626; font-weight: bold;" : "width: 60px;";
         return `<th onclick="sortTable(${32 + idx})" class="bg-emerald" style="${hStyle}">${getEraFormattedYear(y)}</th>`;

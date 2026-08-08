@@ -511,13 +511,16 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           <div className="flex flex-col gap-2 w-full">
             <div className="flex gap-2 w-full">
               <FormInput label="職員番号" value={fd.employeeNumber} onChange={v => setFd({...fd, employeeNumber: v})} className="w-[75px] shrink-0" />
-              <FormInput label="氏名" value={fd.name} onChange={v => setFd({...fd, name: v})} className="flex-1 min-w-0" />
-              <FormSelect label="性別" options={['', '男', '女']} value={fd.gender || ''} onChange={v => setFd({...fd, gender: v})} className="w-[60px] shrink-0" />
-              <FormInput label={`生年月日${getEraStr(fd.birthDate)}`} type="date" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} className="w-[130px] shrink-0" />
-              <FormInput label="学歴" value={fd.education} onChange={v => setFd({...fd, education: v})} className="flex-1 min-w-0" />
-              <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="date" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} className="w-[130px] shrink-0" />
+              <FormInput label="氏名" value={fd.name} onChange={v => setFd({...fd, name: v})} className="w-[100px] flex-1 min-w-0" />
+              <FormInput label="フリガナ" value={fd.furigana} onChange={v => setFd({...fd, furigana: v})} className="w-[100px] flex-1 min-w-0" />
+              <FormSelect label="性別" options={['', '男', '女']} value={fd.gender || ''} onChange={v => setFd({...fd, gender: v})} className="w-[50px] shrink-0" />
+              <FormInput label={`生年月日${getEraStr(fd.birthDate)}${fd.birthDate ? ` (R${targetYear - 2018 - 1}年齢:${calculateAge(fd.birthDate, targetYear - 1)}歳)` : ''}`} type="date" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} className="w-[200px] shrink-0" />
+              <FormInput label="学歴" value={fd.education} onChange={v => setFd({...fd, education: v})} className="w-[80px] shrink-0" />
             </div>
-            <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="w-full" />
+            <div className="flex gap-2 w-full">
+              <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="date" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} className="w-[130px] shrink-0" />
+              <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="flex-1 min-w-0" />
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-3 my-3">

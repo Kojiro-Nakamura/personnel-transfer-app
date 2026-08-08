@@ -530,20 +530,20 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   };;
   const handleDownloadTemplate = () => {
     const headers = [
-      "職員番号", "性別", "氏名", "生年月日", "最終学歴", "採用年月日", "特記事項", 
+      "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", 
       "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
       "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
       "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
       ...historyYears.map(y => getEraFormattedYear(y))
     ].join(',');
-    const sampleRow = `000001,男,和歌山 太郎,S60.01.01,和歌山大学,H20.04.01,特になし,森林整備課,緑化推進班,班長,班長,補佐級II(班長),1,1,,技術職,森林整備課,緑化推進班,班長,班長,補佐級II(班長),2,1+1,,技術職,2015,2018,2022,,,,,` + historyYears.map(y => ',').join('');
+    const sampleRow = `000001,男,和歌山 太郎,ワカヤマ タロウ,S60.01.01,和歌山大学,H20.04.01,特になし,森林整備課,緑化推進班,班長,班長,補佐級II(班長),1,1,,技術職,森林整備課,緑化推進班,班長,班長,補佐級II(班長),2,1+1,,技術職,2015,2018,2022,,,,,` + historyYears.map(y => ',').join('');
     const content = "\uFEFF" + headers + "\n" + sampleRow + "\n";
     downloadFile(content, 'text/csv;charset=utf-8;', '職員一括編集_ひな型.csv');
   };
 
   const handleExportCSV = () => {
     const headers = [
-      "職員番号", "性別", "氏名", "生年月日", "最終学歴", "採用年月日", "特記事項", 
+      "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", 
       "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
       "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
       "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
@@ -594,6 +594,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
         emp.employeeNumber || '',
         emp.gender || '',
         emp.name || '',
+        emp.furigana || '',
         emp.birthDate || '',
         emp.education || '',
         emp.hireDate || '',
@@ -757,6 +758,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
               employeeNumber: empNum,
               gender: getVal('性別'),
               name: empName,
+              furigana: getVal('フリガナ'),
               birthDate: getVal('生年月日'),
               hireDate: getVal('採用年月日'),
               history: []
@@ -807,6 +809,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
             employeeNumber: g.employeeNumber !== undefined ? g.employeeNumber : (targetEmp ? targetEmp.employeeNumber : ''), 
             gender: g.gender !== undefined ? g.gender : (targetEmp ? targetEmp.gender : ''),
             name: g.name !== undefined ? g.name : (targetEmp ? targetEmp.name : ''), 
+            furigana: g.furigana !== undefined ? g.furigana : (targetEmp ? targetEmp.furigana : ''), 
             birthDate: bDate,
             hireDate: hDate,
             history: newHistory
@@ -843,6 +846,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
           if (!targetEmp) targetEmp = existingEmpNameMap.get(empName);
 
           // 基本情報の取得
+          const furiganaStr = getVal('フリガナ');
           const genderStr = getVal('性別');
           const bStr = getVal('生年月日');
           const hStr = getVal('採用年月日');
@@ -899,6 +903,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
             employeeNumber: empNum !== undefined ? empNum : (targetEmp ? targetEmp.employeeNumber : ''), 
             gender: genderStr !== undefined ? genderStr : (targetEmp ? targetEmp.gender : ''),
             name: empName !== undefined ? empName : (targetEmp ? targetEmp.name : ''), 
+            furigana: furiganaStr !== undefined ? furiganaStr : (targetEmp ? targetEmp.furigana : ''), 
             birthDate: bStr !== undefined ? parseJapaneseDate(bStr) : (targetEmp ? targetEmp.birthDate : ''), 
             education: edu !== undefined ? edu : (targetEmp ? targetEmp.education : ''), 
             hireDate: hStr !== undefined ? parseJapaneseDate(hStr) : (targetEmp ? targetEmp.hireDate : ''), 
@@ -1185,10 +1190,10 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
               <tr>
                 <th className="px-2 py-1 border-b border-slate-300 bg-slate-200 sticky left-0 z-40 w-8 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"></th>
                 <th className="px-2 py-1 border-b border-r-2 border-slate-300 bg-slate-200 sticky left-8 z-30 min-w-[8rem] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.2)] text-center text-slate-800">氏名</th>
-                <th colSpan="6" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
+                <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-100 text-slate-700">今年度</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-blue-100/50 text-[#065084]">来年度</th>
-<th colSpan="10" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦(和暦))</th>
+                <th colSpan="10" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦(和暦))</th>
                 {historyYears.length > 0 && <th colSpan={historyYears.length} className="px-2 py-1 border-b border-l text-center bg-emerald-100/50 text-emerald-900">履歴</th>}
               </tr>
               <tr>
@@ -1204,6 +1209,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   />
                 </th>
                 <Th label="氏名" sortKey="name" className="px-2 py-1 border-b border-r-2 border-slate-300 bg-slate-200 sticky left-8 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.2)] text-left" />
+                <Th label="フリガナ" sortKey="furigana" className="border-r" />
                 <Th label="職員番号" sortKey="employeeNumber" className="border-r" />
                 <Th label="性別" sortKey="gender" className="border-r" />
                 <Th label="生年月日" sortKey="birthDate" className="border-r" />
@@ -1324,6 +1330,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                     <td className={cx("sticky left-8 z-10 border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.2)]", isS ? "bg-emerald-50" : emp.isNew ? "bg-sky-50" : "bg-white group-hover:bg-slate-50")}>
                       <input type="text" value={emp.name||''} onChange={e => handleChange(emp.id,'name',e.target.value)} className={cx(inputCls, "font-bold text-slate-800")} />
                     </td>
+                    <td><input type="text" value={emp.furigana||''} onChange={e => handleChange(emp.id,'furigana',e.target.value)} className={cx(inputCls, 'text-left px-1')} /></td>
                     <td><input type="text" value={emp.employeeNumber||''} onChange={e => handleChange(emp.id,'employeeNumber',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
                     <td>
                       <select value={emp.gender||''} onChange={e => handleChange(emp.id,'gender',e.target.value)} className={cx(inputCls, 'text-center px-1')}>

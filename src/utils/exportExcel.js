@@ -359,6 +359,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const columns = [
     { width: 16 }, // 氏名
+    { width: 16 }, // フリガナ
     { width: 8 }, // 年齢
     { width: 12 }, // 職員番号
     { width: 6 }, // 性別
@@ -422,7 +423,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r4 = ws.getRow(4);
   r4.height = 13;
-  const headersR4 = ['', '', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
+  const headersR4 = ['', '', '', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
   historyYears.forEach((y, i) => {
     if (i === 0) headersR4.push('履歴');
     else headersR4.push('');
@@ -431,17 +432,17 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['氏名', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
+  const headersR5 = ['氏名', 'フリガナ', `${currentEraShort}年齢`, '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
-  ws.mergeCells('C4:H4');
-  ws.mergeCells('I4:O4');
-  ws.mergeCells('P4:V4');
-  ws.mergeCells('W4:AF4');
+  ws.mergeCells('D4:I4');
+  ws.mergeCells('J4:P4');
+  ws.mergeCells('Q4:W4');
+  ws.mergeCells('X4:AG4');
   if (historyYears.length > 0) {
-    const endColCode = ws.getColumn(32 + historyYears.length).letter;
-    ws.mergeCells(`AG4:${endColCode}4`);
+    const endColCode = ws.getColumn(33 + historyYears.length).letter;
+    ws.mergeCells(`AH4:${endColCode}4`);
   }
 
   // Header coloring
