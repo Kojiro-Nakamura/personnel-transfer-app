@@ -593,6 +593,7 @@ ${summaryHtml}
     <tr data-original-index="${index}">
       <td class="sticky-name text-left" data-val="${nameVal}"${nStyle}><span class="drag-handle" style="cursor: grab; margin-right: 4px; color: #94a3b8;" title="ドラッグで並べ替え">≡</span>${nameVal}</td>
       <td class="sticky-age" data-val="${ageNum}"${nStyle}>${ageNum !== '' ? ageNum + '歳' : ''}</td>
+      <td class="bg-slate" data-val="${emp.furigana||''}">${emp.furigana||''}</td>
       <td class="bg-slate" data-val="${emp.employeeNumber||''}">${emp.employeeNumber||''}</td>
       <td class="bg-slate" data-val="${emp.gender||''}">${emp.gender||''}</td>
       <td class="bg-slate" data-val="${emp.birthDate||''}">${formatWithEra(emp.birthDate)}</td>
