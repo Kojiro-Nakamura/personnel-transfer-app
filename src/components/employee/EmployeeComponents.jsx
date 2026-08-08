@@ -18,7 +18,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyBgClass = isNext 
-      ? cx("bg-checkerboard border-slate-300 shadow-[inset_0_-2px_0_rgba(255,255,255,0.8)] opacity-90 hover:opacity-100 transition-opacity duration-200", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-slate-400")
+      ? cx("bg-checkerboard border-slate-300 shadow-[inset_0_-1px_0_#94a3b8] opacity-90 hover:opacity-100 transition-opacity duration-200", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-slate-400")
       : "bg-slate-50/20 border-slate-200 cursor-default";
 
     return (
