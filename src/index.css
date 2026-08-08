@@ -31,13 +31,13 @@
   .bg-stripes-construction {
     background-image: repeating-linear-gradient(
       -45deg,
-      #fde047,
-      #fde047 10px,
-      #1f2937 10px,
-      #1f2937 20px
+      rgba(253, 224, 71, 0.4),
+      rgba(253, 224, 71, 0.4) 10px,
+      rgba(31, 41, 55, 0.25) 10px,
+      rgba(31, 41, 55, 0.25) 20px
     );
     background-size: 28.28px 28.28px;
-    animation: move-stripes 1s linear infinite;
+    animation: move-stripes 1.5s linear infinite;
   }
 }
 

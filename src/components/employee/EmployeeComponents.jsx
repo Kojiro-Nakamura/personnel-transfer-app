@@ -36,9 +36,9 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         {!isNext ? '' : (
           <span className={cx(
             "flex items-center gap-1 px-2 py-0.5 rounded shadow-sm z-10",
-            isPickingMode ? "bg-amber-100 text-slate-800" : "bg-black text-yellow-400 border border-yellow-500/50"
+            isPickingMode ? "bg-amber-100 text-slate-800" : "bg-black/80 text-yellow-300 border border-yellow-500/30"
           )}>
-            {isPickingMode ? '+ ここに配置' : '工事中 (未配置)'}
+            {isPickingMode ? '+ ここに配置' : '未配置'}
           </span>
         )}
       </div>
