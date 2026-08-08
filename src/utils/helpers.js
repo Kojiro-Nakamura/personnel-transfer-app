@@ -385,8 +385,8 @@ export const isDeptVisible = (dept, dm, filterLevel) => {
 
   if (hasVisible) return true;
 
-  dm.direct?.current?.forEach(checkEmp);
-  dm.direct?.next?.forEach(checkEmp);
+  dm.direct?.current?.forEach(checkCurrent);
+  dm.direct?.next?.forEach(checkNext);
 
   return hasVisible;
 };
