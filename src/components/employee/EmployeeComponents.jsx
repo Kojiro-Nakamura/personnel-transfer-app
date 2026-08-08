@@ -32,10 +32,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
         {!isNext ? '' : (
-          <span className={cx(
-            "flex items-center gap-1 px-2 py-0.5 rounded shadow-sm z-10",
-            isPickingMode ? "bg-amber-100 text-slate-800" : "bg-black/80 text-yellow-300 border border-yellow-500/30"
-          )}>
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded shadow-sm z-10 bg-amber-100 text-slate-800 border border-amber-200">
             {isPickingMode ? '+ ここに配置' : '未配置'}
           </span>
         )}
