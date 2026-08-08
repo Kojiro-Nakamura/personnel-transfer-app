@@ -74,16 +74,16 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
     <div className="border-b-4 border-slate-400 relative">
       {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-100/30 pointer-events-none z-[5]" />}
       
-      <div className="bg-slate-700 text-white px-2 py-1.5 flex justify-between items-center sticky top-0 z-10 group/dept">
+      <div className="bg-slate-500 text-white px-2 py-1.5 flex justify-between items-center sticky top-0 z-10 group/dept shadow-sm">
         <div className="flex items-center gap-2">
           <div 
-            className="cursor-pointer hover:bg-slate-600 rounded p-0.5" 
+            className="cursor-pointer hover:bg-slate-400 rounded p-0.5" 
             onClick={() => toggleDept(dept.id)} 
             title={isCollapsed ? "展開する" : "折りたたむ"}
           >
-            <ChevronDown className="w-4 h-4 text-slate-300" />
+            <ChevronDown className="w-4 h-4 text-slate-100" />
           </div>
-          <Building2 className="w-4 h-4 text-sky-300" />
+          <Building2 className="w-4 h-4 text-sky-200" />
           <span 
             className="font-bold text-sm cursor-pointer select-none" 
             onClick={() => toggleDept(dept.id)} 
@@ -92,7 +92,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
 
             {dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name}
           </span>
-          <span className="text-[10px] bg-slate-600 px-2 py-0.5 rounded text-slate-200 ml-2 shadow-inner pointer-events-none">
+          <span className="text-[10px] bg-slate-400 px-2 py-0.5 rounded text-slate-50 ml-2 shadow-inner pointer-events-none">
             今年度: {formatCountText(cCounts)} / 来年度: {formatCountText(nCounts)}
           </span>
           
@@ -100,14 +100,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             <div className="opacity-0 group-hover/dept:opacity-100 flex gap-0.5 ml-2">
               <button 
                 onClick={onMoveUp} 
-                className={cx("p-0.5 rounded text-slate-300", onMoveUp ? "hover:bg-slate-600 hover:text-white" : "invisible")} 
+                className={cx("p-0.5 rounded text-slate-200", onMoveUp ? "hover:bg-slate-400 hover:text-white" : "invisible")} 
                 title={onMoveUp ? "部署を上に移動" : ""}
               >
                 <ArrowUp className="w-4 h-4"/>
               </button>
               <button 
                 onClick={onMoveDown} 
-                className={cx("p-0.5 rounded text-slate-300", onMoveDown ? "hover:bg-slate-600 hover:text-white" : "invisible")} 
+                className={cx("p-0.5 rounded text-slate-200", onMoveDown ? "hover:bg-slate-400 hover:text-white" : "invisible")} 
                 title={onMoveDown ? "部署を下に移動" : ""}
               >
                 <ArrowDown className="w-4 h-4"/>
@@ -141,13 +141,13 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             </button>
             <button 
               onClick={() => openModal('delConfirm', { type: 'dept', id: dept.id, title: dept.name })} 
-              className="p-1 hover:bg-rose-500/50 text-rose-300 rounded" 
+              className="p-1 hover:bg-rose-500 text-white rounded" 
               title="部署を削除"
             >
               <Trash2 className="w-3 h-3"/>
             </button>
           </div>
-          <div className="w-[32px] flex justify-center border-l border-slate-600 pl-1 ml-1">
+          <div className="w-[32px] flex justify-center border-l border-slate-400 pl-1 ml-1">
             <CommentButton targetId={`dept-${dept.id}`} theme="dark" tooltipPos="left" hoverClass="group-hover/dept:opacity-100" />
           </div>
         </div>
@@ -380,4 +380,4 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
     </div>
   );
 };
-
+
