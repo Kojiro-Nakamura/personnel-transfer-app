@@ -18,14 +18,14 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyBgClass = isNext 
-      ? cx("bg-stripes-construction border-yellow-500 opacity-90 hover:opacity-100 transition-opacity duration-200", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-yellow-400")
+      ? cx("bg-stripes-construction border-yellow-500/50 shadow-[inset_0_-2px_0_rgba(255,255,255,0.8)] opacity-90 hover:opacity-100 transition-opacity duration-200", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-yellow-400")
       : "bg-slate-50/20 border-slate-200 cursor-default";
 
     return (
       <div 
         onClick={isNext ? onClick : undefined} 
         className={cx(
-          "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r border-b transition-all border-dashed overflow-hidden relative",
+          "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r transition-all border-dashed overflow-hidden relative",
           isPost && !isNext ? "border-sky-400" : emptyBgClass,
           isNext ? "cursor-pointer" : ""
         )}
