@@ -25,7 +25,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       <div 
         onClick={isNext ? onClick : undefined} 
         className={cx(
-          "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r transition-all border-dashed overflow-hidden relative",
+          "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r border-b transition-all border-dashed overflow-hidden relative",
           isPost && !isNext ? "border-sky-400" : emptyBgClass,
           isNext ? "cursor-pointer" : ""
         )}
