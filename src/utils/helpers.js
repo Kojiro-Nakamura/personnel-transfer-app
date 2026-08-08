@@ -280,10 +280,125 @@ export const downloadFile = (content, mimeType, filename) => {
   link.click();
 };
 
+export const getMaxGroupLevel = (group, gm) => {
+  let maxLevel = 0;
+  const checkCurrent = (emp) => {
+    if (!emp) return;
+    maxLevel = Math.max(maxLevel, emp.currentGrade ? getGradeLevel(emp.currentGrade) : 0);
+  };
+  const checkNext = (emp) => {
+    if (!emp) return;
+    maxLevel = Math.max(maxLevel, emp.nextGrade ? getGradeLevel(emp.nextGrade) : 0);
+  };
+  group.posts?.forEach(post => {
+    const gpd = gm.posts[post.id];
+    if (!gpd) return;
+    gpd.current.forEach(checkCurrent);
+    gpd.next.forEach(checkNext);
+  });
+  gm.direct?.current?.forEach(checkCurrent);
+  gm.direct?.next?.forEach(checkNext);
+  return maxLevel;
+};
+
+export const getMaxDeptLevel = (dept, dm) => {
+  let maxLevel = 0;
+  const checkCurrent = (emp) => {
+    if (!emp) return;
+    maxLevel = Math.max(maxLevel, emp.currentGrade ? getGradeLevel(emp.currentGrade) : 0);
+  };
+  const checkNext = (emp) => {
+    if (!emp) return;
+    maxLevel = Math.max(maxLevel, emp.nextGrade ? getGradeLevel(emp.nextGrade) : 0);
+  };
+  dept.posts?.forEach(post => {
+    const pd = dm.posts[post.id];
+    if (!pd) return;
+    pd.current.forEach(checkCurrent);
+    pd.next.forEach(checkNext);
+  });
+  dept.groups?.forEach(group => {
+    const gm = dm.groups[group.id];
+    maxLevel = Math.max(maxLevel, getMaxGroupLevel(group, gm));
+  });
+  dm.direct?.current?.forEach(checkCurrent);
+  dm.direct?.next?.forEach(checkNext);
+  return maxLevel;
+};
+
+export const isGroupVisible = (group, gm, filterLevel) => {
+  if (filterLevel === 0) return true;
+  let hasVisible = false;
+
+  const checkCurrent = (emp) => {
+    if (!emp) return;
+    if ((emp.currentGrade ? getGradeLevel(emp.currentGrade) : 0) >= filterLevel) hasVisible = true;
+  };
+  const checkNext = (emp) => {
+    if (!emp) return;
+    if ((emp.nextGrade ? getGradeLevel(emp.nextGrade) : 0) >= filterLevel) hasVisible = true;
+  };
+
+  group.posts?.forEach(post => {
+    const gpd = gm.posts[post.id];
+    if (!gpd) return;
+    gpd.current.forEach(checkCurrent);
+    gpd.next.forEach(checkNext);
+  });
+  
+  if (hasVisible) return true;
+
+  gm.direct?.current?.forEach(checkCurrent);
+  gm.direct?.next?.forEach(checkNext);
+
+  return hasVisible;
+};
+
+export const isDeptVisible = (dept, dm, filterLevel) => {
+  if (filterLevel === 0) return true;
+  let hasVisible = false;
+
+  const checkCurrent = (emp) => {
+    if (!emp) return;
+    if ((emp.currentGrade ? getGradeLevel(emp.currentGrade) : 0) >= filterLevel) hasVisible = true;
+  };
+  const checkNext = (emp) => {
+    if (!emp) return;
+    if ((emp.nextGrade ? getGradeLevel(emp.nextGrade) : 0) >= filterLevel) hasVisible = true;
+  };
+
+  dept.posts?.forEach(post => {
+    const pd = dm.posts[post.id];
+    if (!pd) return;
+    pd.current.forEach(checkCurrent);
+    pd.next.forEach(checkNext);
+  });
+
+  if (hasVisible) return true;
+
+  dept.groups?.forEach(group => {
+    const gm = dm.groups[group.id];
+    if (isGroupVisible(group, gm, filterLevel)) {
+      hasVisible = true;
+    }
+  });
+
+  if (hasVisible) return true;
+
+  dm.direct?.current?.forEach(checkEmp);
+  dm.direct?.next?.forEach(checkEmp);
+
+  return hasVisible;
+};
+
 export const traverseOrgTree = (departments, deptMap, currMap, nextMap, filterLevel, callback) => {
   departments.filter(dept => dept.type === 'regular').forEach(dept => {
     const dm = deptMap[dept.id];
     
+    if (filterLevel > 0 && !isDeptVisible(dept, dm, filterLevel)) {
+      return;
+    }
+
     dept.posts.forEach(post => { 
       const pd = dm.posts[post.id]; 
       const maxRows = Math.max(pd.current.length, pd.next.length, 1);
@@ -294,6 +409,11 @@ export const traverseOrgTree = (departments, deptMap, currMap, nextMap, filterLe
 
     dept.groups.forEach(group => { 
       const gm = dm.groups[group.id]; 
+      
+      if (filterLevel > 0 && !isGroupVisible(group, gm, filterLevel)) {
+        return;
+      }
+
       group.posts.forEach(post => { 
         const gpd = gm.posts[post.id]; 
         const maxRows = Math.max(gpd.current.length, gpd.next.length, 1);

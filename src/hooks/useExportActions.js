@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary } from '../utils/helpers.js';
+import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 import { exportPlanToExcel } from '../utils/exportExcel.js';
 
@@ -166,7 +166,11 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         const currTds = generateTds(currEmp, currEmp?.id, false, isPostLevelHighlight);
         const nextTds = generateTds(nextEmp, nextEmp?.id, true, isPostLevelHighlight);
         
-        const trAttr = ` data-dept="${escapeHtml(deptName)}" data-group="${escapeHtml(groupName)}" data-post="${escapeHtml(formattedPostName)}"`;
+        const dm = deptMap[dept.id];
+        const deptMaxLvl = dm ? getMaxDeptLevel(dept, dm) : 0;
+        const groupMaxLvl = (group && dm) ? getMaxGroupLevel(group, dm.groups[group.id]) : deptMaxLvl;
+        
+        const trAttr = ` data-dept="${escapeHtml(deptName)}" data-group="${escapeHtml(groupName)}" data-post="${escapeHtml(formattedPostName)}" data-dept-max="${deptMaxLvl}" data-group-max="${groupMaxLvl}"`;
         rowsHtml += `<tr${trAttr}><td${deptClass}>${displayDeptHtml}</td><td${groupClass}>${displayGroupHtml}</td><td${postClass}>${escapeHtml(displayPost)}</td>${currTds}${nextTds}${rowNoteHtml}</tr>\n`;
       });
       return rowsHtml;
@@ -358,6 +362,14 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
           rows.forEach(row => {
             if (filterLevel === 0) {
                row.style.display = "";
+               return;
+            }
+            
+            const deptMaxLvl = parseInt(row.getAttribute('data-dept-max') || '0', 10);
+            const groupMaxLvl = parseInt(row.getAttribute('data-group-max') || '0', 10);
+            
+            if (deptMaxLvl < filterLevel || groupMaxLvl < filterLevel) {
+               row.style.display = "none";
                return;
             }
             

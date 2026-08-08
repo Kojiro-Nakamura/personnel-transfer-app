@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, isDeptVisible, isGroupVisible } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -45,6 +45,10 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   const { deptMap, filterLevel, collapsedDepts, toggleDept, openModal, mutations, handleCellClick } = useApp();
   const isCollapsed = !!collapsedDepts[dept.id]; console.log('DEPT RENDER:', dept.name, dept.nextName); 
   const dm = deptMap[dept.id];
+  
+  if (filterLevel > 0 && !isDeptVisible(dept, dm, filterLevel)) {
+    return null;
+  }
   
   const deptCurrEmps = [...dm.direct.current];
   const deptNextEmps = [...dm.direct.next];
@@ -194,6 +198,10 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
           {/* グループ一覧 */}
           {dept.groups.map((grp, gIdx) => {
             const groupData = dm.groups[grp.id];
+            console.log('isGroupVisible:', grp.name, filterLevel, isGroupVisible(grp, groupData, filterLevel), groupData);
+            if (filterLevel > 0 && !isGroupVisible(grp, groupData, filterLevel)) {
+              return null;
+            }
             const grpCurrEmps = [...groupData.direct.current];
             const grpNextEmps = [...groupData.direct.next];
             
