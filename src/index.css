@@ -37,15 +37,5 @@
       rgba(31, 41, 55, 0.25) 20px
     );
     background-size: 28.28px 28.28px;
-    animation: move-stripes 1.5s linear infinite;
-  }
-}
-
-@keyframes move-stripes {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 28.28px 0;
   }
 }

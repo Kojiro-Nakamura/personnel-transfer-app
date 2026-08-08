@@ -18,9 +18,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyBgClass = isNext 
-      ? (isPickingMode 
-          ? "hover:ring-2 hover:ring-inset hover:ring-amber-400 bg-amber-50 border-slate-300" 
-          : "bg-stripes-construction border-yellow-500 hover:border-yellow-400 opacity-90 hover:opacity-100")
+      ? cx("bg-stripes-construction border-yellow-500 opacity-90 hover:opacity-100 transition-opacity duration-200", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-yellow-400")
       : "bg-slate-50/20 border-slate-200 cursor-default";
 
     return (
