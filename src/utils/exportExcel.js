@@ -40,7 +40,7 @@ const saveWorkbook = async (workbook, fileName) => {
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel) => {
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
-    views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false }],
+    views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false, style: 'pageBreakPreview', zoomScale: 100 }],
     pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.984, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
@@ -394,7 +394,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('職員一覧', {
-    views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false }], // 氏名・年齢まで固定
+    views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false, style: 'pageBreakPreview', zoomScale: 100 }], // 氏名・年齢まで固定
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
