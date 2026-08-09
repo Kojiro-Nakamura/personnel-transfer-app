@@ -61,7 +61,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     const generateTbody = () => {
       let rowsHtml = ''; let lastDept = null; let lastGroup = null; let lastPost = null;
       
-      traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
+      traverseOrgTree(departments, deptMap, currMap, nextMap, filterLevel, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
         const deptName = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
         const groupName = group ? (group.nextName && group.nextName !== group.name ? `${group.name} / ${group.nextName}` : group.name) : '';
         

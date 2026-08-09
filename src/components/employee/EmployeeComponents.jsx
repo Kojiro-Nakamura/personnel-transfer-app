@@ -13,7 +13,7 @@ import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialD
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
 export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer }) => {
-  const { isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp } = useApp();
+  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
   
   if (isEmpty || !emp) {
@@ -26,7 +26,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         onClick={isNext ? onClick : undefined} 
         className={cx(
           "flex-1 flex items-center justify-center px-2 py-1 font-bold text-[11px] border-r transition-all border-dashed overflow-hidden relative",
-          isPost && !isNext ? "border-sky-400" : emptyBgClass,
+          (isPost && filterLevel === 0) && !isNext ? "border-sky-400" : emptyBgClass,
           isNext ? "cursor-pointer" : ""
         )}
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
@@ -50,8 +50,8 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const isFutureUnassigned = !isNext && emp.departmentId === 'unassigned';
   const isFutureRetired = !isNext && emp.departmentId === 'retired';
 
-  const defaultBorder = isPost ? "border-sky-400" : "border-slate-300";
-  const defaultBg = isPost ? (isNext ? "bg-sky-200/50" : "bg-sky-100/50") : (isNext ? "bg-blue-50/10" : "bg-white");
+  const defaultBorder = (isPost && filterLevel === 0) ? "border-sky-400" : "border-slate-300";
+  const defaultBg = (isPost && filterLevel === 0) ? (isNext ? "bg-sky-200/50" : "bg-sky-100/50") : (isNext ? "bg-blue-50/10" : "bg-white");
 
   const borderClass = isConflict 
     ? "border-2 border-rose-500 z-10 shadow-[0_0_5px_rgba(225,29,72,0.4)]" 
@@ -160,9 +160,12 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   );
 };
 
-export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId }) => (
-  <div className={cx("flex border-b relative group/row", isPost ? "border-sky-400 bg-sky-50/20" : "border-slate-300 hover:bg-slate-50")}>
-    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", isPost ? "border-sky-400 bg-sky-200/40 border-l-4 border-l-sky-600" : "border-slate-400 bg-slate-50 border-l-4 border-l-transparent")}>
+export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId }) => {
+  const { filterLevel } = useApp();
+  const applyPostStyle = isPost && filterLevel === 0;
+  return (
+  <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50/20" : "border-slate-300 hover:bg-slate-50")}>
+    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-200/40 border-l-4 border-l-sky-600" : "border-slate-400 bg-slate-50 border-l-4 border-l-transparent")}>
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}
@@ -236,8 +239,9 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
     <div className="w-[40px] border-l border-slate-300 flex items-center justify-center shrink-0 bg-white/50 z-20">
       {isFirst && <CommentButton targetId={rowAnchorId} tooltipPos="left" />}
     </div>
-  </div>
-);
+    </div>
+  );
+};
 
 const GRADE_TO_PROMO_KEY = {
   "係長級(主査)": "promoYearChief",
