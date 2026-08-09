@@ -76,13 +76,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         
         lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
 
-        let deptNoteText = '';
-        if (isNewDept && dept.id) {
-           const dNote = notes.find(n => n.targetId === `dept-${dept.id}`);
-           if (dNote && dNote.text) {
-             deptNoteText = `<br><span style="color:#0ea5e9;font-size:10px;">[メモ] ${escapeHtml(dNote.text)}</span>`;
-           }
-        }
+
 
         let displayDeptHtml = '';
         if (isNewDept) {
@@ -106,19 +100,13 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             
             const cCounts = getCounts(deptCurrEmps, false);
             const nCounts = getCounts(deptNextEmps, true);
-            displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）</span>${deptNoteText}`;
+            displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）</span>`;
           } else {
-            displayDeptHtml = escapeHtml(deptName) + deptNoteText;
+            displayDeptHtml = escapeHtml(deptName);
           }
         }
 
-        let groupNoteText = '';
-        if (isNewGroup && group && group.id) {
-           const gNote = notes.find(n => n.targetId === `groupHeader-${dept.id}-${group.id}`);
-           if (gNote && gNote.text) {
-             groupNoteText = `<br><span style="color:#0ea5e9;font-size:10px;">[メモ] ${escapeHtml(gNote.text)}</span>`;
-           }
-        }
+
 
         let displayGroupHtml = '';
         if (isNewGroup && groupName !== '') {
@@ -134,9 +122,9 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             
             const gCCounts = getCounts(grpCurrEmps, false);
             const gNCounts = getCounts(grpNextEmps, true);
-            displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）</span>${groupNoteText}`;
+            displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）</span>`;
           } else {
-            displayGroupHtml = escapeHtml(groupName) + groupNoteText;
+            displayGroupHtml = escapeHtml(groupName);
           }
         }
 
@@ -148,8 +136,25 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         else if (rowType === 'system') targetId = `side-${nextEmp ? nextEmp.id : currEmp?.id}`;
 
         const note = notes.find(n => n.targetId === targetId);
-        const rowNoteHtml = note && note.text 
-          ? `<td style="color:#0369a1; white-space:pre-wrap; max-width:200px; font-size:11px;">${escapeHtml(note.text)}</td>` 
+        let noteStr = note && note.text ? note.text : '';
+
+        if (isNewDept && dept.id) {
+           const dNote = notes.find(n => n.targetId === `dept-${dept.id}`);
+           if (dNote && dNote.text) {
+             if (noteStr) noteStr += '\n';
+             noteStr += `[部署メモ] ${dNote.text}`;
+           }
+        }
+        if (isNewGroup && group && group.id) {
+           const gNote = notes.find(n => n.targetId === `groupHeader-${dept.id}-${group.id}`);
+           if (gNote && gNote.text) {
+             if (noteStr) noteStr += '\n';
+             noteStr += `[班メモ] ${gNote.text}`;
+           }
+        }
+
+        const rowNoteHtml = noteStr
+          ? `<td style="color:#0369a1; white-space:pre-wrap; max-width:200px; font-size:11px;">${escapeHtml(noteStr)}</td>` 
           : '<td></td>';
 
         const isPostCell = postName !== '' && postName !== '班員';
