@@ -61,7 +61,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     const generateTbody = () => {
       let rowsHtml = ''; let lastDept = null; let lastGroup = null; let lastPost = null;
       
-      traverseOrgTree(departments, deptMap, currMap, nextMap, filterLevel, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
+      traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
         const deptName = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
         const groupName = group ? (group.nextName && group.nextName !== group.name ? `${group.name} / ${group.nextName}` : group.name) : '';
         
@@ -330,11 +330,12 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       let radioHtml = '<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">';
       
       radioHtml += '<div style="display: flex; gap: 12px; align-items: center;">';
-      radioHtml += '<div><strong>表示切替：</strong> <label title="すべての職員を表示する"><input type="radio" name="filter" value="0" checked> 全件表示</label>';
+      radioHtml += '<div><strong>表示切替：</strong> <label title="すべての職員を表示する"><input type="radio" name="filter" value="0" ' + (${filterLevel} === 0 ? "checked" : "") + '> 全件表示</label>';
       
       const filteredOptions = GRADE_OPTIONS.filter(g => g !== "");
       filteredOptions.forEach(g => {
-         radioHtml += '<label title="' + g + '以上の職員のみを表示する"><input type="radio" name="filter" value="' + GRADE_LEVELS[g] + '"> ' + g + '以上</label>';
+         const isChecked = ${filterLevel} === GRADE_LEVELS[g] ? "checked" : "";
+         radioHtml += '<label title="' + g + '以上の職員のみを表示する"><input type="radio" name="filter" value="' + GRADE_LEVELS[g] + '" ' + isChecked + '> ' + g + '以上</label>';
       });
       radioHtml += '</div>';
       radioHtml += '</div>';
@@ -407,6 +408,11 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
           updateBorders();
         });
       });
+      
+      const initRadio = document.querySelector("input[name='filter']:checked");
+      if (initRadio) {
+        initRadio.dispatchEvent(new Event("change"));
+      }
     });
   </script>
 </head>
