@@ -98,17 +98,17 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         <span className="truncate">{emp.name}</span>
       </div>
       
-      <div className={cx("w-16 truncate text-[11px] text-center", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
+      <div className={cx("w-20 truncate text-[11px] text-center", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
         {isNext ? emp.nextGrade : emp.currentGrade}
       </div>
       
       <div className="w-8 text-[12px] text-slate-800 text-right" title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
-      <div className={cx("w-16 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>
+      <div className={cx("w-20 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>
         {yd}
       </div>
       
-      <div className="w-20 text-[11px] text-slate-700 text-left shrink-0 ml-1 relative group/note flex items-center">
+      <div className="w-24 text-[11px] text-slate-700 text-left shrink-0 ml-1 relative group/note flex items-center">
         <span className="truncate w-full block">{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
