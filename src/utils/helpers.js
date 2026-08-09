@@ -169,10 +169,22 @@ export const generateGradeSummary = (emps, isNext) => {
     total++;
   });
 
+  let upperSubtotal = 0;
+  const upperGrades = ["部長級", "次長級", "所属長級", "課長級"];
+  upperGrades.forEach(g => {
+    if (counts[g]) upperSubtotal += counts[g];
+  });
+
   const summaryParts = [];
   const order = ["部長級", "次長級", "所属長級", "課長級", "補佐級III(補佐兼班長)", "補佐級II(班長)", "補佐級I(主任)", "係長級(主査)", "一般"];
   order.forEach(grade => {
-    if (counts[grade]) summaryParts.push(`${grade}${counts[grade]}人`);
+    if (grade === "課長級") {
+      if (counts[grade] || upperSubtotal > 0) {
+        summaryParts.push(`${grade}${counts[grade] || 0}人（課長級以上小計${upperSubtotal}人）`);
+      }
+    } else {
+      if (counts[grade]) summaryParts.push(`${grade}${counts[grade]}人`);
+    }
   });
   Object.keys(counts).forEach(k => {
     if (!order.includes(k)) summaryParts.push(`${k}${counts[k]}人`);
