@@ -83,7 +83,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   r3.height = 13;
 
   [1, 2, 3].forEach(rn => {
-    ws.getRow(rn).getCell(1).alignment = { vertical: 'middle' };
+    ws.getRow(rn).getCell(1).alignment = { vertical: 'middle', wrapText: false };
   });
 
   const r4 = ws.getRow(4);
@@ -259,10 +259,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
 
         if (colNumber === 1 && dNoteText) {
-          cell.note = { texts: [{ font: { size: 10, name: 'BIZ UDPGothic' }, text: dNoteText }] };
+          cell.note = dNoteText;
         }
         if (colNumber === 2 && gNoteText) {
-          cell.note = { texts: [{ font: { size: 10, name: 'BIZ UDPGothic' }, text: gNoteText }] };
+          cell.note = gNoteText;
         }
         
         const isLeftEdge = colNumber === 1 || colNumber === 4 || colNumber === 10 || colNumber === 16;
