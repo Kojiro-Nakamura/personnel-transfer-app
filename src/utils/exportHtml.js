@@ -65,8 +65,8 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
   const nextSummaryStr = generateGradeSummary(employees, true);
 
   const summaryHtml = `
-    <div style="font-weight:bold; margin-bottom: 4px; font-size:12px; color:#0369A1;">【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}</div>
-    <div style="font-weight:bold; margin-bottom: 12px; font-size:12px; color:#0369A1;">【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}</div>
+    <div style="font-weight:bold; margin-bottom: 2px; font-size:12px; color:#0369A1;">【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}</div>
+    <div style="font-weight:bold; margin-bottom: 4px; font-size:12px; color:#0369A1;">【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}</div>
   `;
 
   const scriptStr = `
@@ -326,7 +326,7 @@ ${scriptStr}
 </script>
 </head>
 <body>
-<h2 style="margin-bottom: 8px;">${targetYear}年度(R${targetYear - 2018})人事異動案 【${escapeHtml(fileName.replace(/\.html$/, ''))}】</h2>
+<h2 style="margin-top: 0; margin-bottom: 2px;">${targetYear}年度(R${targetYear - 2018})人事異動案 【${escapeHtml(fileName.replace(/\.html$/, ''))}】</h2>
 ${summaryHtml}
 <table id="empTable">
   <thead>
@@ -341,7 +341,7 @@ ${summaryHtml}
       legendLabels.forEach((label, i) => {
         const bgColor = i === 0 ? '#ffffff' : getPromotedBgColorCode(label);
         const fw = i === 0 ? 'bold' : 'normal';
-        legendHtml += `<th style="background-color: ${bgColor}; border: 1px solid #94a3b8; font-size: 9px; font-weight: ${fw}; text-align: center;">${label}</th>`;
+        legendHtml += `<th style="background-color: ${bgColor}; border: 1px solid #94a3b8; font-size: 11px; font-weight: ${fw}; text-align: center;">${label}</th>`;
       });
       if (legendEndCol < totalCols) legendHtml += `<th colspan="${totalCols - legendEndCol}" style="background: white; border: none;"></th>`;
       legendHtml += '</tr>';
