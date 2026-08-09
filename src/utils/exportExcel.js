@@ -242,9 +242,9 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     const isPostCell = formattedPostName !== '' && formattedPostName !== '班員';
     const isDeptPost = isPostCell && groupName === ''; 
     const isGroupPost = isPostCell && groupName !== '';
-    const isDeptLevelHighlight = (isNewDept || isDeptPost);
-    const isGroupLevelHighlight = (isDeptLevelHighlight || isNewGroup || isGroupPost);
-    const isPostLevelHighlight = (isGroupLevelHighlight || isPostCell);
+    const isDeptLevelHighlight = (isNewDept || isDeptPost) && filterLevel === 0;
+    const isGroupLevelHighlight = (isDeptLevelHighlight || isNewGroup || isGroupPost) && filterLevel === 0;
+    const isPostLevelHighlight = (isGroupLevelHighlight || isPostCell) && filterLevel === 0;
 
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = defaultFont;

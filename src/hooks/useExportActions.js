@@ -155,9 +155,9 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         const isPostCell = postName !== '' && postName !== '班員';
         const isDeptPost = isPostCell && groupName === ''; 
         const isGroupPost = isPostCell && groupName !== '';
-        const isDeptLevelHighlight = (isNewDept || isDeptPost);
-        const isGroupLevelHighlight = (isDeptLevelHighlight || isNewGroup || isGroupPost);
-        const isPostLevelHighlight = (isGroupLevelHighlight || isPostCell);
+        const isDeptLevelHighlight = (isNewDept || isDeptPost) && filterLevel === 0;
+        const isGroupLevelHighlight = (isDeptLevelHighlight || isNewGroup || isGroupPost) && filterLevel === 0;
+        const isPostLevelHighlight = (isGroupLevelHighlight || isPostCell) && filterLevel === 0;
         
         const deptClass = isDeptLevelHighlight ? ' class="post-cell"' : ''; 
         const groupClass = isGroupLevelHighlight ? ' class="post-cell"' : ''; 
