@@ -395,8 +395,6 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   historyYears.forEach(() => {
     columns.push({ width: 12 });
-  });
-
   ws.columns = columns;
 
   const currSummaryStr = generateGradeSummary(employees, false);
@@ -423,7 +421,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r4 = ws.getRow(4);
   r4.height = 13;
-  const headersR4 = ['', '', '', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
+  const headersR4 = ['氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', ''];
   historyYears.forEach((y, i) => {
     if (i === 0) headersR4.push('履歴');
     else headersR4.push('');
@@ -432,7 +430,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['氏名', `${currentEraShort}年齢`, 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
+  const headersR5 = ['', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
