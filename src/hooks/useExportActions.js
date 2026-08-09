@@ -205,6 +205,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: 600; color: #0c4a6e; background-color: #e0f2fe; } 
+    .table-filtered .post-cell { font-weight: normal; color: inherit; background-color: transparent; }
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 1.5px solid #475569; } 
     thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 1.5px solid #475569 !important; }
     thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 1.5px solid #475569 !important; } 
@@ -357,6 +358,12 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       document.querySelectorAll("input[name='filter']").forEach(r => {
         r.addEventListener("change", (e) => {
           const filterLevel = parseInt(e.target.value, 10);
+          const tableElement = document.querySelector('table');
+          if (filterLevel === 0) {
+            tableElement.classList.remove('table-filtered');
+          } else {
+            tableElement.classList.add('table-filtered');
+          }
           
           rows.forEach(row => {
             if (filterLevel === 0) {
