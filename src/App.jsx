@@ -255,7 +255,7 @@ export const AppContent = () => {
               <div className="w-14 truncate text-[11px] text-slate-800" title={dispTitle}>{dispTitle}</div>
               <div className="flex-1 truncate text-sm font-bold text-[#065084]" title={selEmp.name}>{selEmp.name}</div>
               <div className="w-20 truncate text-[11px] text-slate-800 text-center" title={dispGrade}>{dispGrade}</div>
-              <div className="w-8 text-[12px] text-slate-800 text-right" title={`${dispAge}歳`}>{dispAge !== '' ? `${dispAge}歳` : ''}</div>
+              <div className="w-10 text-[12px] text-slate-800 text-right" title={`${dispAge}歳`}>{dispAge !== '' ? `${dispAge}歳` : ''}</div>
               <div className={cx("w-20 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>{yd}</div>
               <div className="w-24 truncate text-[11px] text-slate-700 text-left shrink-0 ml-1" title={noteText}>{noteText}</div>
             </div>
