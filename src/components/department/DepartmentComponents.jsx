@@ -73,7 +73,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   return (
     <div className="border-b-4 border-slate-400 relative">
       {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-100/30 pointer-events-none z-[5]" />}
-      <div className="bg-slate-500 text-white px-2 py-1.5 flex justify-between items-center group/dept">
+      <div className="bg-slate-500 text-white px-2 py-1.5 flex justify-between items-center relative z-10 group/dept">
         <div className="flex items-center gap-2">
           <div 
             className="cursor-pointer hover:bg-slate-400 rounded p-0.5" 
