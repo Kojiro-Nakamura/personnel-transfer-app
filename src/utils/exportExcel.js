@@ -666,7 +666,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       if (hStr && hStr !== ' / 課直轄' && hStr !== '未配置' && hStr !== '-') {
         const histAge = (emp.birthDate && !isNaN(year)) ? calculateAge(emp.birthDate, year) : null;
         if (histAge !== null && !isNaN(histAge)) {
-          displayStr = `${hStr}\n(${histAge}歳)`;
+          displayStr = `${hStr} (${histAge}歳)`;
         }
       }
       vals.push(displayStr);
