@@ -449,9 +449,32 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     r1.height = 13;
 
   const r2 = ws.getRow(2);
-  r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
+  r2.getCell(1).value = `【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`;
   r2.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r2.height = 13;
+
+  const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
+  const legendEndCol = 34 + currYearIndex;
+  const legendLabels = ["凡例", "一般", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐・班長)", "課長級", "所属長級", "次長級", "部長級"];
+  const legendStartCol = legendEndCol - 9;
+
+  for (let i = 0; i < legendLabels.length; i++) {
+    const colNumber = legendStartCol + i;
+    if (colNumber > 1) { 
+      const cell = r2.getCell(colNumber);
+      cell.value = legendLabels[i];
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = getCellBorders(true, true, true, true, true);
+      if (i === 0) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
+      } else {
+        const colorHex = getPromotedBgColorCode(legendLabels[i])?.replace('#', '')?.toUpperCase() || 'FFFFFF';
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorHex } };
+        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: false, color: { argb: 'FF000000' } };
+      }
+    }
+  }
 
   const r3 = ws.getRow(3);
   r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];

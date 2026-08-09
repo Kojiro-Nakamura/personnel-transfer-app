@@ -330,6 +330,24 @@ ${scriptStr}
 ${summaryHtml}
 <table id="empTable">
   <thead>
+    ${(() => {
+      const currYearIdx = Math.max(0, historyYears.indexOf(targetYear - 1));
+      const legendEndCol = 34 + currYearIdx;
+      const legendStartCol = legendEndCol - 9;
+      const totalCols = 34 + historyYears.length;
+      const legendLabels = ["凡例", "一般", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐・班長)", "課長級", "所属長級", "次長級", "部長級"];
+      let legendHtml = '<tr>';
+      if (legendStartCol > 1) legendHtml += `<th colspan="${legendStartCol - 1}" style="background: white; border: none;"></th>`;
+      legendLabels.forEach((label, i) => {
+        const bgColor = i === 0 ? '#ffffff' : getPromotedBgColorCode(label);
+        const fw = i === 0 ? 'bold' : 'normal';
+        legendHtml += `<th style="background-color: ${bgColor}; border: 1px solid #94a3b8; font-size: 9px; font-weight: ${fw}; text-align: center;">${label}</th>`;
+      });
+      if (legendEndCol < totalCols) legendHtml += `<th colspan="${totalCols - legendEndCol}" style="background: white; border: none;"></th>`;
+      legendHtml += '</tr>';
+      return legendHtml;
+    })()}
+    <tr>
       <th class="sticky-name bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; gap:2px; justify-content:center;"><button onclick="resetSort()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">最初に戻す</button><button onclick="clearSelection()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">選択解除</button></div></th>
       <th class="sticky-age bg-slate" style="vertical-align: middle; padding: 1px;"><div style="display:flex; justify-content:center;"><button onclick="saveHTML()" style="cursor: pointer; font-size: 9px; padding: 1px 3px; background: #e2e8f0; border: 1px solid #94a3b8; border-radius: 3px; color: #334155;">保存</button></div></th>
       <th colspan="8" class="bg-slate">基本情報</th>
