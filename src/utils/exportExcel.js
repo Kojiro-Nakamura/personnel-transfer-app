@@ -180,7 +180,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         });
         const cCounts = getCounts(deptCurrEmps, false);
         const nCounts = getCounts(deptNextEmps, true);
-        displayDeptStr = `${deptName}\n（今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）`;
+        displayDeptStr = `${deptName} （今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）`;
       } else {
         displayDeptStr = deptName;
       }
@@ -195,7 +195,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         Object.values(gm.posts).forEach(gp => { grpCurrEmps.push(...gp.current); grpNextEmps.push(...gp.next); });
         const gCCounts = getCounts(grpCurrEmps, false);
         const gNCounts = getCounts(grpNextEmps, true);
-        displayGroupStr = `${groupName}\n（今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）`;
+        displayGroupStr = `${groupName} （今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）`;
       } else {
         displayGroupStr = groupName;
       }
@@ -252,10 +252,17 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
         cell.font = defaultFont;
-        cell.alignment = { vertical: 'middle', wrapText: true };
+        cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
         
         if (colNumber >= 3) {
           cell.alignment = { ...cell.alignment, horizontal: 'center' };
+        }
+
+        if (colNumber === 1 && dNoteText) {
+          cell.note = { texts: [{ font: { size: 10, name: 'BIZ UDPGothic' }, text: dNoteText }] };
+        }
+        if (colNumber === 2 && gNoteText) {
+          cell.note = { texts: [{ font: { size: 10, name: 'BIZ UDPGothic' }, text: gNoteText }] };
         }
         
         const isLeftEdge = colNumber === 1 || colNumber === 4 || colNumber === 10 || colNumber === 16;
@@ -708,7 +715,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = listDefaultFont;
-      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
       cell.border = getCellBorders(true, true, true, true, true);
       
       let argb = 'FFFFFFFF'; 
