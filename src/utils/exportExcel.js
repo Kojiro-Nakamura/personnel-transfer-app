@@ -272,7 +272,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       
       if (nextEmp && isPromotedGrade(nextEmp.currentGrade, nextEmp.nextGrade)) {
         const promoColor = getPromotedBgColorCode(nextEmp.nextGrade); 
-        if (promoColor && (colNumber === 11 || colNumber === 12)) {
+        if (promoColor && (colNumber >= 10 && colNumber <= 15)) {
           argb = 'FF' + promoColor.replace('#', '').toUpperCase();
         }
       }
