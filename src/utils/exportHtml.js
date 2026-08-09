@@ -135,7 +135,11 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
             if (!isNaN(numX) && !isNaN(numY) && valX !== "" && valY !== "") {
                valX = numX; valY = numY;
             }
-            if (dir == "asc") {
+            if (valX === "" && valY !== "") {
+              shouldSwitch = true; break;
+            } else if (valX !== "" && valY === "") {
+              shouldSwitch = false;
+            } else if (dir == "asc") {
               if (valX > valY) { shouldSwitch = true; break; }
             } else if (dir == "desc") {
               if (valX < valY) { shouldSwitch = true; break; }
@@ -391,7 +395,7 @@ ${summaryHtml}
       <th onclick="sortTable(32)" class="bg-fuchsia" style="width: 56px;">来年度<br>${getEraFormattedYear(targetYear)}</th>
             ${historyYears.map((y, idx) => {
         const hStyle = y === targetYear ? "width: 60px; color: #dc2626; font-weight: bold;" : "width: 60px;";
-        return `<th onclick="sortTable(${32 + idx})" class="bg-emerald" style="${hStyle}">${getEraFormattedYear(y)}</th>`;
+        return `<th onclick="sortTable(${33 + idx})" class="bg-emerald" style="${hStyle}">${getEraFormattedYear(y)}</th>`;
       }).join('')}
     </tr>
   </thead>
