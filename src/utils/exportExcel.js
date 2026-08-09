@@ -640,7 +640,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     if (emp.promoYearDeputyHead) promoYearMap[emp.promoYearDeputyHead] = "次長級";
     if (emp.promoYearDeptHead) promoYearMap[emp.promoYearDeptHead] = "部長級";
 
-    const histBorderColors = [];
+    const histBgColors = [];
     const histIsChange = [];
     
     const hStrs = historyYears.map(year => {
@@ -663,7 +663,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       }
       
       vals.push(hStr);
-      histBorderColors.push(promoYearMap[year] ? getBorderHexColor(promoYearMap[year]) : null);
+      histBgColors.push(promoYearMap[year] ? getPromotedBgColorCode(promoYearMap[year]) : null);
       histIsChange.push(isChange);
     });
 
