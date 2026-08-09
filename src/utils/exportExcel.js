@@ -405,7 +405,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   const r1 = ws.getRow(1);
   r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
   r1.font = { name: 'BIZ UDPGothic', size: 8, bold: true };
-  r1.height = 13;
+    r1.height = 13;
 
   const r2 = ws.getRow(2);
   r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
@@ -436,6 +436,9 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
+  ws.mergeCells('A4:A5');
+  ws.mergeCells('B4:B5');
+  ws.mergeCells('C4:C5');
   ws.mergeCells('D4:I4');
   ws.mergeCells('J4:P4');
   ws.mergeCells('Q4:W4');
@@ -471,9 +474,9 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.border = getCellBorders(true, true, true, true, true);
       
-      if (colNumber <= 8) cell.fill = fillSlate;
-      else if (colNumber <= 15) cell.fill = fillAmber;
-      else if (colNumber <= 22) cell.fill = fillBlue;
+      if (colNumber <= 9) cell.fill = fillSlate;
+      else if (colNumber <= 16) cell.fill = fillAmber;
+      else if (colNumber <= 23) cell.fill = fillBlue;
       else if (colNumber <= 33) {
         if (rn === 5 && promoColors[colNumber]) {
            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[colNumber].replace('#', '').toUpperCase() } };
