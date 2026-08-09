@@ -562,7 +562,7 @@ ${summaryHtml}
 
         const promoGrade = promoYearMap[year];
         if (promoGrade) {
-          histStyleCss += `box-shadow: inset 0 0 0 2px ${getBorderHexColor(promoGrade)}; `;
+          histStyleCss += `background-color: ${getPromotedBgColorCode(promoGrade)} !important; `;
         }
 
         const histStyleAttr = histStyleCss ? ` style="${histStyleCss}"` : '';
