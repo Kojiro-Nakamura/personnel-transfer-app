@@ -455,8 +455,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
   const legendEndCol = 34 + currYearIndex;
-  const legendLabels = ["凡例", "一般", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐・班長)", "課長級", "所属長級", "次長級", "部長級"];
-  const legendStartCol = legendEndCol - 9;
+  const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
+  const legendStartCol = legendEndCol - 8;
 
   for (let i = 0; i < legendLabels.length; i++) {
     const colNumber = legendStartCol + i;
@@ -496,7 +496,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
+  const headersR5 = ['', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 

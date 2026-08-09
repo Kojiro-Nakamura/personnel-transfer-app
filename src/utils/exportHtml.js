@@ -333,9 +333,9 @@ ${summaryHtml}
     ${(() => {
       const currYearIdx = Math.max(0, historyYears.indexOf(targetYear - 1));
       const legendEndCol = 34 + currYearIdx;
-      const legendStartCol = legendEndCol - 9;
+      const legendStartCol = legendEndCol - 8;
       const totalCols = 34 + historyYears.length;
-      const legendLabels = ["凡例", "一般", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐・班長)", "課長級", "所属長級", "次長級", "部長級"];
+      const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
       let legendHtml = '<tr>';
       if (legendStartCol > 1) legendHtml += `<th colspan="${legendStartCol - 1}" style="background: white; border: none;"></th>`;
       legendLabels.forEach((label, i) => {
@@ -384,7 +384,7 @@ ${summaryHtml}
       <th onclick="sortTable(24)" style="width: 80px; background-color: ${getPromotedBgColorCode('係長級(主査)')};">係長級(主査)</th>
       <th onclick="sortTable(25)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級I(主任)')};">補佐級I(主任)</th>
       <th onclick="sortTable(26)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級II(班長)')};">補佐級II(班長)</th>
-      <th onclick="sortTable(27)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級III(補佐兼班長)')};">補佐級III</th>
+      <th onclick="sortTable(27)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級III(補佐兼班長)')};">補佐級III(補佐兼班長)</th>
       <th onclick="sortTable(28)" style="width: 80px; background-color: ${getPromotedBgColorCode('課長級')};">課長級</th>
       <th onclick="sortTable(29)" style="width: 80px; background-color: ${getPromotedBgColorCode('所属長級')};">所属長級</th>
       <th onclick="sortTable(30)" style="width: 80px; background-color: ${getPromotedBgColorCode('次長級')};">次長級</th>
