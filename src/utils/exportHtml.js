@@ -340,8 +340,7 @@ ${summaryHtml}
       if (legendStartCol > 1) legendHtml += `<th colspan="${legendStartCol - 1}" style="background: white; border: none;"></th>`;
       legendLabels.forEach((label, i) => {
         const bgColor = i === 0 ? '#ffffff' : getPromotedBgColorCode(label);
-        const fw = i === 0 ? 'bold' : 'normal';
-        legendHtml += `<th style="background-color: ${bgColor}; border: 1px solid #94a3b8; font-size: 11px; font-weight: ${fw}; text-align: center;">${label}</th>`;
+        legendHtml += `<th style="background-color: ${bgColor}; border: 1px solid #94a3b8; font-size: 11px; font-weight: bold; text-align: center;">${label}</th>`;
       });
       if (legendEndCol < totalCols) legendHtml += `<th colspan="${totalCols - legendEndCol}" style="background: white; border: none;"></th>`;
       legendHtml += '</tr>';
