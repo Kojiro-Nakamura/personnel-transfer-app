@@ -89,26 +89,26 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       className={cellClasses} 
       title={isPickingMode && isNext ? "選択中の職員をここに配置します" : ""}
     >
-      <div className={cx("w-14 truncate text-[10px]", isNext ? "text-[#02213d] font-bold" : "text-slate-800")} title={isNext ? emp.nextTitle : emp.currentTitle}>
+      <div className={cx("w-14 truncate text-[11px]", isNext ? "text-[#02213d] font-bold" : "text-slate-800")} title={isNext ? emp.nextTitle : emp.currentTitle}>
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[12px] font-bold", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[13px] font-bold", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
       
-      <div className={cx("w-12 truncate text-[10px] text-center", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
+      <div className={cx("w-16 truncate text-[11px] text-center", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
         {isNext ? emp.nextGrade : emp.currentGrade}
       </div>
       
-      <div className="w-8 text-[11px] text-slate-800 text-right" title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
+      <div className="w-8 text-[12px] text-slate-800 text-right" title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
-      <div className={cx("w-14 text-[11px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>
+      <div className={cx("w-16 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>
         {yd}
       </div>
       
-      <div className="w-16 text-[10px] text-slate-700 text-left shrink-0 ml-1 relative group/note flex items-center">
+      <div className="w-20 text-[11px] text-slate-700 text-left shrink-0 ml-1 relative group/note flex items-center">
         <span className="truncate w-full block">{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
