@@ -212,22 +212,19 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     const rowNote = notes.find(n => n.targetId === targetId);
     if (rowNote && rowNote.text) noteStr += rowNote.text;
 
-    if (isNewDept && typeof dNoteText !== 'undefined' && dNoteText) {
-       if (noteStr) noteStr += ' / ';
-       noteStr += `[部署メモ] ${dNoteText}`;
-    }
-    if (isNewGroup && typeof gNoteText !== 'undefined' && gNoteText) {
-       if (noteStr) noteStr += ' / ';
-       noteStr += `[班メモ] ${gNoteText}`;
-    }
-    
     if (isNewDept && dept.id) {
        const dNote = notes.find(n => n.targetId === `dept-${dept.id}`);
-       if (dNote && dNote.text) displayDeptStr += `\n[メモ] ${dNote.text}`;
+       if (dNote && dNote.text) {
+         if (noteStr) noteStr += ' / ';
+         noteStr += `[部署メモ] ${dNote.text}`;
+       }
     }
     if (isNewGroup && group && group.id) {
        const gNote = notes.find(n => n.targetId === `groupHeader-${dept.id}-${group.id}`);
-       if (gNote && gNote.text) displayGroupStr += `\n[メモ] ${gNote.text}`;
+       if (gNote && gNote.text) {
+         if (noteStr) noteStr += ' / ';
+         noteStr += `[班メモ] ${gNote.text}`;
+       }
     }
 
     const row = ws.getRow(rowIndex);
