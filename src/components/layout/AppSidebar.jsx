@@ -92,7 +92,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
 export const AppSidebar = () => {
   const { nextMap, isPickingMode, handleCellClick, mutations } = useApp();
   return (
-    <div className="w-full md:w-[260px] flex flex-col gap-2 shrink-0 h-full">
+    <div className="w-full md:w-[300px] flex flex-col gap-2 shrink-0 h-full">
       <div 
         className={cx("bg-white rounded shadow-sm border border-slate-400 flex flex-col flex-1 border-t-4 border-amber-500 overflow-hidden transition-all", isPickingMode && "ring-2 ring-amber-400 ring-offset-1 cursor-pointer")}
         onClick={() => { if (isPickingMode) handleCellClick(null, false, 'unassigned', null, null, null); }}
