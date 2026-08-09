@@ -93,7 +93,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[13px] font-bold", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
