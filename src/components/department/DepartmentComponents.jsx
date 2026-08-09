@@ -73,7 +73,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   return (
     <div className="border-b-4 border-slate-400 relative">
       {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-100/30 pointer-events-none z-[5]" />}
-      <div className="bg-slate-500 text-white px-2 py-1.5 flex justify-between items-center relative z-10 group/dept">
+      <div className="bg-slate-500 text-white px-2 py-1 flex justify-between items-center relative z-10 group/dept">
         <div className="flex items-center gap-2">
           <div 
             className="cursor-pointer hover:bg-slate-400 rounded p-0.5" 
@@ -84,7 +84,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
           </div>
           <Building2 className="w-4 h-4 text-sky-200" />
           <span 
-            className="font-bold text-sm cursor-pointer select-none" 
+            className="font-bold text-[13px] cursor-pointer select-none" 
             onClick={() => toggleDept(dept.id)} 
             title={isCollapsed ? "展開する" : "折りたたむ"}
           >
@@ -133,14 +133,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             </button>
             <button 
               onClick={() => openModal('dept', dept)} 
-              className="p-1 hover:bg-slate-600 rounded" 
+              className="p-0.5 hover:bg-slate-600 rounded" 
               title="部署名を編集"
             >
               <Edit2 className="w-3 h-3"/>
             </button>
             <button 
               onClick={() => openModal('delConfirm', { type: 'dept', id: dept.id, title: dept.name })} 
-              className="p-1 hover:bg-rose-500 text-white rounded" 
+              className="p-0.5 hover:bg-rose-500 text-white rounded" 
               title="部署を削除"
             >
               <Trash2 className="w-3 h-3"/>
