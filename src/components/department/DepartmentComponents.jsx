@@ -84,7 +84,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
           </div>
           <Building2 className="w-4 h-4 text-sky-200" />
           <span 
-            className="font-bold text-[13px] cursor-pointer select-none" 
+            className="font-bold text-sm cursor-pointer select-none" 
             onClick={() => toggleDept(dept.id)} 
             title={isCollapsed ? "展開する" : "折りたたむ"}
           >
