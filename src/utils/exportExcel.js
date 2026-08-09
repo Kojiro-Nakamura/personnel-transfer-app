@@ -395,6 +395,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   historyYears.forEach(() => {
     columns.push({ width: 12 });
+  });
+
   ws.columns = columns;
 
   const currSummaryStr = generateGradeSummary(employees, false);
