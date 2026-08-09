@@ -211,6 +211,15 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     let noteStr = '';
     const rowNote = notes.find(n => n.targetId === targetId);
     if (rowNote && rowNote.text) noteStr += rowNote.text;
+
+    if (isNewDept && typeof dNoteText !== 'undefined' && dNoteText) {
+       if (noteStr) noteStr += ' / ';
+       noteStr += `[部署メモ] ${dNoteText}`;
+    }
+    if (isNewGroup && typeof gNoteText !== 'undefined' && gNoteText) {
+       if (noteStr) noteStr += ' / ';
+       noteStr += `[班メモ] ${gNoteText}`;
+    }
     
     if (isNewDept && dept.id) {
        const dNote = notes.find(n => n.targetId === `dept-${dept.id}`);
@@ -258,12 +267,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           cell.alignment = { ...cell.alignment, horizontal: 'center' };
         }
 
-        if (colNumber === 1 && dNoteText) {
-          cell.note = dNoteText;
-        }
-        if (colNumber === 2 && gNoteText) {
-          cell.note = gNoteText;
-        }
+
         
         const isLeftEdge = colNumber === 1 || colNumber === 4 || colNumber === 10 || colNumber === 16;
         const isRightEdge = colNumber === 3 || colNumber === 9 || colNumber === 15 || colNumber === 16;
