@@ -214,12 +214,12 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             
             return (
               <React.Fragment key={grp.id}>
-                <div className="flex border-b border-slate-400 bg-slate-200 group/grp relative z-10">
+                <div className="flex border-b border-slate-400 bg-slate-300 group/grp relative z-10">
                   <div className="w-full px-2 py-1 text-[11px] font-bold text-slate-700 flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
-                      <span className="text-[9px] bg-slate-300/80 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-slate-300">
+                      <span className="text-[9px] bg-slate-400/60 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-slate-400">
                         今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
                       </span>
                       
@@ -227,14 +227,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         <div className="opacity-0 group-hover/grp:opacity-100 flex gap-0.5 ml-2">
                           <button 
                             onClick={gIdx > 0 ? () => mutations.moveGroup(dept.id, grp.id, 'up') : undefined} 
-                            className={cx("p-0.5 rounded text-slate-500", gIdx > 0 ? "hover:bg-slate-300" : "invisible")} 
+                            className={cx("p-0.5 rounded text-slate-500", gIdx > 0 ? "hover:bg-slate-400 text-slate-600" : "invisible")} 
                             title={gIdx > 0 ? "班を上に移動" : ""}
                           >
                             <ArrowUp className="w-3.5 h-3.5"/>
                           </button>
                           <button 
                             onClick={gIdx < dept.groups.length - 1 ? () => mutations.moveGroup(dept.id, grp.id, 'down') : undefined} 
-                            className={cx("p-0.5 rounded text-slate-500", gIdx < dept.groups.length - 1 ? "hover:bg-slate-300" : "invisible")} 
+                            className={cx("p-0.5 rounded text-slate-500", gIdx < dept.groups.length - 1 ? "hover:bg-slate-400 text-slate-600" : "invisible")} 
                             title={gIdx < dept.groups.length - 1 ? "班を下に移動" : ""}
                           >
                             <ArrowDown className="w-3.5 h-3.5"/>
@@ -247,14 +247,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                       <div className="opacity-0 group-hover/grp:opacity-100 flex gap-1 items-center">
                         <button 
                           onClick={() => openModal('groupPost', { deptId: dept.id, groupId: grp.id })} 
-                          className="px-1 bg-white rounded text-[10px] border border-slate-300" 
+                          className="px-1 bg-slate-50 hover:bg-white rounded text-[10px] border border-slate-400" 
                           title="この班にポストを追加"
                         >
                           班内ポスト
                         </button>
                         <button 
                           onClick={() => openModal('group', { deptId: dept.id, group: grp })} 
-                          className="p-0.5 hover:bg-slate-300" 
+                          className="p-0.5 hover:bg-slate-400 text-slate-600 rounded" 
                           title="班名を編集"
                         >
                           <Edit2 className="w-3 h-3"/>
@@ -267,7 +267,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                           <Trash2 className="w-3 h-3"/>
                         </button>
                       </div>
-                      <div className="w-[32px] flex justify-center border-l border-slate-300 pl-1 ml-1">
+                      <div className="w-[32px] flex justify-center border-l border-slate-400 pl-1 ml-1">
                         <CommentButton targetId={`groupHeader-${dept.id}-${grp.id}`} tooltipPos="left" hoverClass="group-hover/grp:opacity-100" />
                       </div>
                     </div>
