@@ -215,7 +215,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             return (
               <React.Fragment key={grp.id}>
                 <div className="flex border-b border-slate-400 bg-slate-300 group/grp relative z-10">
-                  <div className="w-full px-2 py-1 text-[11px] font-bold text-slate-700 flex justify-between items-center">
+                  <div className="w-full px-2 py-1 text-[12px] font-bold text-slate-700 flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
