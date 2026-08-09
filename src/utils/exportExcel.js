@@ -662,7 +662,14 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
          }
       }
       
-      vals.push(hStr);
+      let displayStr = hStr;
+      if (hStr && hStr !== ' / 課直轄' && hStr !== '未配置' && hStr !== '-') {
+        const histAge = (emp.birthDate && !isNaN(year)) ? calculateAge(emp.birthDate, year) : null;
+        if (histAge !== null && !isNaN(histAge)) {
+          displayStr = `${hStr}\n(${histAge}歳)`;
+        }
+      }
+      vals.push(displayStr);
       histBgColors.push(promoYearMap[year] ? getPromotedBgColorCode(promoYearMap[year]) : null);
       histIsChange.push(isChange);
     });
@@ -711,20 +718,19 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
          }
       }
 
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
-
-      // 履歴セルの枠線色 (太枠)
+      // 履歴セルの着色と変更検知
       if (colNumber > 33) {
          const hcOffset = colNumber - 34;
-         const hc = histBorderColors[hcOffset];
+         const hc = histBgColors[hcOffset];
          if (hc) {
-            const hBorder = { style: 'medium', color: { argb: hc } };
-            cell.border = { top: hBorder, bottom: hBorder, left: hBorder, right: hBorder };
+            argb = 'FF' + hc.replace('#', '').toUpperCase();
          }
          if (histIsChange[hcOffset]) {
             cell.font = { ...listDefaultFont, bold: true, italic: true };
          }
       }
+
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
     });
 
     rowIndex++;
