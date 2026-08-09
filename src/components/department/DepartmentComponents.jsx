@@ -219,7 +219,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
-                      <span className="text-[9px] bg-slate-400/60 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-slate-400">
+                      <span className="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-slate-300">
                         今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
                       </span>
                       
