@@ -67,8 +67,15 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const currSummaryStr = generateGradeSummary(employees, false);
   const nextSummaryStr = generateGradeSummary(employees, true);
 
+  const filterName = Object.keys(GRADE_LEVELS).find(key => GRADE_LEVELS[key] === filterLevel);
+  const filterSuffix = filterLevel > 0 && filterName ? `(${filterName}以上)` : '';
+  const cleanFileName = fileName.replace(/\.xlsx$/, '');
+  const displayFileName = filterSuffix && cleanFileName.endsWith(filterSuffix) 
+    ? cleanFileName 
+    : cleanFileName + filterSuffix;
+
   const r1 = ws.getRow(1);
-  r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
+  r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${displayFileName}】`];
   r1.font = { name: 'BIZ UDPGothic', size: 8, bold: true };
   r1.height = 13;
 
