@@ -40,21 +40,20 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
 
     const generateTds = (emp, id, isNext, isHighlight) => { 
       const attributes = (id ? ` data-emp-id="${id}"` : '') + (isHighlight ? ' class="post-cell"' : ''); 
-      let nameStyle = ''; let gradeStyle = '';
+      let promoStyle = '';
       if (emp && isNext && isPromotedGrade(emp.currentGrade, emp.nextGrade)) {
         const colorCode = getPromotedBgColorCode(emp.nextGrade);
         if (colorCode) { 
-          nameStyle = ` style="background-color: ${colorCode};"`; 
-          gradeStyle = ` style="background-color: ${colorCode};"`; 
+          promoStyle = ` style="background-color: ${colorCode};"`; 
         }
       }
       const values = [
-        { val: emp ? (isNext ? emp.nextTitle : emp.currentTitle) : '', attr: attributes }, 
-        { val: emp ? emp.name : '', attr: attributes + nameStyle }, 
-        { val: emp ? (isNext ? emp.nextGrade : emp.currentGrade) : '', attr: attributes + gradeStyle }, 
-        { val: getAgeStr(emp, isNext), attr: attributes }, 
-        { val: getYearsStr(emp, isNext), attr: attributes }, 
-        { val: getNoteStr(emp, isNext), attr: attributes }
+        { val: emp ? (isNext ? emp.nextTitle : emp.currentTitle) : '', attr: attributes + promoStyle }, 
+        { val: emp ? emp.name : '', attr: attributes + promoStyle }, 
+        { val: emp ? (isNext ? emp.nextGrade : emp.currentGrade) : '', attr: attributes + promoStyle }, 
+        { val: getAgeStr(emp, isNext), attr: attributes + promoStyle }, 
+        { val: getYearsStr(emp, isNext), attr: attributes + promoStyle }, 
+        { val: getNoteStr(emp, isNext), attr: attributes + promoStyle }
       ];
       return values.map(v => `<td${v.attr}>${escapeHtml(v.val)}</td>`).join(''); 
     };
