@@ -89,7 +89,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       className={cellClasses} 
       title={isPickingMode && isNext ? "選択中の職員をここに配置します" : ""}
     >
-      <div className={cx("w-14 truncate text-[11px]", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
+      <div className={cx("w-14 truncate text-[11px]", isNext ? "font-bold" : "", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
@@ -98,11 +98,11 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         <span className="truncate">{emp.name}</span>
       </div>
       
-      <div className={cx("w-20 truncate text-[11px] text-center", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
+      <div className={cx("w-20 truncate text-[11px] text-center", isNext ? "font-bold" : "", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
         {isNext ? emp.nextGrade : emp.currentGrade}
       </div>
       
-      <div className={cx("w-10 text-[12px] text-right shrink-0", isNext ? "text-[#02213d] font-bold" : "text-slate-800", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
+      <div className={cx("w-10 text-[12px] text-right shrink-0", isNext ? "font-bold" : "", isConflict ? "text-rose-700" : isNext ? "text-[#02213d]" : "text-slate-900", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
       <div className={cx("w-20 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>
         {yd}
