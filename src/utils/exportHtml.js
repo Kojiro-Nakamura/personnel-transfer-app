@@ -41,7 +41,7 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
       else if (year >= 1989) era = `(H${year - 1988})`;
       else if (year >= 1926) era = `(S${year - 1925})`;
       else if (year >= 1912) era = `(T${year - 1911})`;
-      return era ? `${era}${dateStr}` : dateStr;
+      return era ? `${dateStr}${era}` : dateStr;
     }
     return dateStr;
   };
