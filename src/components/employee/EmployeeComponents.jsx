@@ -104,7 +104,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       
       <div className={cx("w-10 text-[12px] text-right shrink-0 font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
-      <div className={cx("w-20 text-[12px] text-right font-bold truncate shrink-0", ys >= 3 ? "text-rose-900 bg-rose-300 px-1 rounded" : "text-black")} title={yd}>
+      <div className={cx("w-20 text-[12px] text-right font-bold truncate shrink-0 text-black", ys >= 3 ? "bg-rose-300 px-1 rounded" : "")} title={yd}>
         {yd}
       </div>
       
