@@ -169,7 +169,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}
-        {isFirst && <span className={cx("text-[11px] font-bold truncate", applyPostStyle ? "text-sky-900" : "text-black")}>{titleText}</span>}
+        {isFirst && <span className={cx("text-[11px] font-bold truncate", applyPostStyle ? "text-sky-900" : "text-slate-700")}>{titleText}</span>}
       </div>
       
       {isFirst && (onTitleEdit || onTitleDelete || (isPost && (onMoveUp || onMoveDown))) && (
