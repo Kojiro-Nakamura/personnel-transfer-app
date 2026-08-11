@@ -146,7 +146,7 @@ export const AppContent = () => {
               <select 
                 value={filterLevel} 
                 onChange={e => setFilterLevel(Number(e.target.value))} 
-                className={cx("text-xs py-1 px-2 rounded outline-none font-bold cursor-pointer transition-colors border", filterLevel > 0 ? "bg-[#5f8cc5] text-white border-transparent shadow-inner" : "bg-white/20 hover:bg-white/30 text-white border-transparent transition-all")}
+                className={cx("text-xs py-1 px-2 rounded outline-none font-bold cursor-pointer transition-colors border", filterLevel > 0 ? "bg-[#efa09d] text-slate-900 border-transparent shadow-inner" : "bg-white/20 hover:bg-white/30 text-white border-transparent transition-all")}
                 title="表示する職員の条件を切り替える"
               >
                 <option value={0} className="text-slate-800">全件表示</option>
