@@ -58,7 +58,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
     : isFutureUnassigned 
       ? "border-[3px] border-dashed border-orange-400" 
       : isFutureRetired 
-        ? "border-[3px] border-dotted border-slate-800" 
+        ? "border-[3px] border-dotted border-black" 
         : `border-r ${defaultBorder}`;
         
   const bgClass = isConflict 
