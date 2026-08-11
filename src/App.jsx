@@ -97,7 +97,7 @@ export const AppContent = () => {
           <div className="flex items-center gap-3">
             <Building2 className="w-5 h-5 text-white" />
             <div className="flex items-center bg-white/20 border border-white/30 rounded overflow-hidden p-1">
-              <input type="number" value={targetYear} onChange={(e) => setTargetYear(Number(e.target.value))} className="w-16 bg-transparent text-center text-sm font-bold text-white outline-none always-show-spinners" title="対象年度" />
+              <input type="number" value={targetYear} onChange={(e) => setTargetYear(Number(e.target.value))} className="w-20 bg-transparent text-center text-sm font-bold text-white outline-none always-show-spinners" title="対象年度" />
             </div>
             <h1 className="text-base font-bold text-white">年度(R{targetYear - 2018})人事異動案</h1>
           </div>
