@@ -180,7 +180,7 @@ export const AppContent = () => {
                   <div>来年度（新組織）{getEraFormattedYear(targetYear)}</div>
                   <div className="text-[10px] font-normal text-blue-950 mt-0.5">{nextSummary}</div>
                 </div>
-                <div className="w-[40px] border-l border-slate-400 flex items-center justify-center bg-slate-200 text-[10px] text-slate-600">メモ</div>
+                <div className="w-[40px] border-l border-slate-500 flex items-center justify-center bg-slate-200 text-[10px] text-slate-600">メモ</div>
               </div>
               {regDepts.map((d, i) => (
                 <DepartmentBlock 

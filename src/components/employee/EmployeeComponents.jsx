@@ -50,7 +50,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const isFutureUnassigned = !isNext && emp.departmentId === 'unassigned';
   const isFutureRetired = !isNext && emp.departmentId === 'retired';
 
-  const defaultBorder = (isPost && filterLevel === 0) ? "border-sky-400" : "border-slate-400";
+  const defaultBorder = (isPost && filterLevel === 0) ? "border-sky-400" : "border-slate-500";
   const defaultBg = (isPost && filterLevel === 0) ? (isNext ? "bg-sky-200/50" : "bg-sky-100/50") : (isNext ? "bg-blue-50/10" : "bg-white");
 
   const borderClass = isConflict 
@@ -164,8 +164,8 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
   const { filterLevel } = useApp();
   const applyPostStyle = isPost && filterLevel === 0;
   return (
-  <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50/20" : "border-slate-400 hover:bg-slate-50")}>
-    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-200/40 border-l-4 border-l-sky-600" : "border-slate-400 bg-slate-50 border-l-4 border-l-transparent")}>
+  <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50/20" : "border-slate-500 hover:bg-slate-50")}>
+    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-200/40 border-l-4 border-l-sky-600" : "border-slate-500 bg-slate-50 border-l-4 border-l-transparent")}>
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}
@@ -236,7 +236,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
       hasPeer={!!currentEmp} 
     />
     
-      <div className={cx("w-[40px] border-l border-slate-400 flex items-center justify-center shrink-0 bg-white/50 z-20", applyPostStyle ? "border-sky-400" : "border-slate-400")}>
+      <div className={cx("w-[40px] border-l border-slate-500 flex items-center justify-center shrink-0 bg-white/50 z-20", applyPostStyle ? "border-sky-400" : "border-slate-500")}>
       {isFirst && <CommentButton targetId={rowAnchorId} tooltipPos="left" />}
     </div>
     </div>

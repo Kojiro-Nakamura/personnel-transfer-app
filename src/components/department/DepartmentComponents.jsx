@@ -34,7 +34,7 @@ export const AddSlotRow = ({ label, indentClass, onClickNext, anchorId }) => {
       >
         {isPickingMode && selectedEmp?.isSource ? "+ ここに配置" : "+ 職員を選択"}
       </div>
-      <div className="w-[40px] border-l border-slate-400 flex items-center justify-center shrink-0 bg-slate-50/50 z-20">
+      <div className="w-[40px] border-l border-slate-500 flex items-center justify-center shrink-0 bg-slate-50/50 z-20">
         <CommentButton targetId={anchorId} tooltipPos="left" />
       </div>
     </div>
