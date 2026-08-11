@@ -571,7 +571,7 @@ ${summaryHtml}
         let displayStr = hStr;
         if (hStr && hStr !== ' / 課直属' && hStr !== '未配置' && hStr !== '-') {
           if (year === targetYear || prevDept === null || hStr !== prevDept) {
-            histStyleCss += `color: #000; font-weight: bold; `;
+            histStyleCss += `color: #000; font-weight: bold; font-style: italic; `;
           }
           prevDept = hStr;
 
