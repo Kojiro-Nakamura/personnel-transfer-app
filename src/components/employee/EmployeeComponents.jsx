@@ -89,26 +89,26 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       className={cellClasses} 
       title={isPickingMode && isNext ? "選択中の職員をここに配置します" : ""}
     >
-      <div className={cx("w-14 truncate text-[11px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
+      <div className={cx("w-14 truncate text-[11px] font-bold [-webkit-text-stroke:_0.3px_black]", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold [-webkit-text-stroke:_0.3px_black]", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
       
-      <div className={cx("w-20 truncate text-[11px] text-center font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
+      <div className={cx("w-20 truncate text-[11px] text-center font-bold [-webkit-text-stroke:_0.3px_black]", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
         {isNext ? emp.nextGrade : emp.currentGrade}
       </div>
       
-      <div className={cx("w-10 text-[12px] text-right shrink-0 font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
+      <div className={cx("w-10 text-[12px] text-right shrink-0 font-bold [-webkit-text-stroke:_0.3px_black]", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
-      <div className={cx("w-20 text-[12px] text-right font-bold truncate shrink-0 text-black", ys >= 3 ? "bg-rose-300 px-1 rounded" : "")} title={yd}>
+      <div className={cx("w-20 text-[12px] text-right font-bold truncate shrink-0 text-black [-webkit-text-stroke:_0.3px_black]", ys >= 3 ? "bg-rose-300 px-1 rounded" : "")} title={yd}>
         {yd}
       </div>
       
-      <div className="w-24 text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center">
+      <div className="w-24 text-[11px] text-black font-bold [-webkit-text-stroke:_0.3px_black] text-left shrink-0 ml-1 relative group/note flex items-center">
         <span className="truncate w-full block">{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
@@ -169,7 +169,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}
-        {isFirst && <span className={cx("text-[11px] font-bold truncate", applyPostStyle ? "text-sky-900" : "text-slate-600")}>{titleText}</span>}
+        {isFirst && <span className={cx("text-[11px] font-bold truncate [-webkit-text-stroke:_0.3px_black]", applyPostStyle ? "text-sky-900" : "text-black")}>{titleText}</span>}
       </div>
       
       {isFirst && (onTitleEdit || onTitleDelete || (isPost && (onMoveUp || onMoveDown))) && (
