@@ -18,8 +18,8 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   
   if (isEmpty || !emp) {
     const emptyBgClass = isNext 
-      ? cx("bg-checkerboard border-slate-300 shadow-[inset_0_-1px_0_#94a3b8] opacity-90 hover:opacity-100 transition-opacity duration-200", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-slate-400")
-      : "bg-slate-50/20 border-slate-200 cursor-default";
+      ? cx("bg-checkerboard border-slate-300 shadow-[inset_0_-1px_0_#94a3b8]", isPickingMode ? "ring-2 ring-inset ring-amber-400/50 hover:ring-amber-400" : "hover:border-slate-400")
+      : "bg-slate-50 border-slate-200 cursor-default";
 
     return (
       <div 
@@ -73,7 +73,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const promoBg = isPromoted ? getPromotedBgClass(emp.nextGrade) : "";
 
   const cellClasses = cx(
-    "flex-1 flex items-center px-2 py-1 gap-2 transition-all relative group/emp duration-200 cursor-pointer",
+    "flex-1 flex items-center px-2 py-1 gap-2 relative group/emp cursor-pointer",
     borderClass,
     isSelected ? "ring-2 ring-inset ring-[#0F828C] bg-[#0F828C]/10 z-10" : 
     isPickingMode && isNext ? "hover:ring-2 hover:ring-inset hover:ring-amber-500 bg-amber-50 z-10" : 
