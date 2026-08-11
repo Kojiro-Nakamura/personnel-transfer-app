@@ -214,12 +214,12 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             
             return (
               <React.Fragment key={grp.id}>
-                <div className="flex border-b border-slate-300 bg-slate-50 group/grp relative z-10">
-                  <div className="w-full px-2 py-1 text-[14px] font-bold text-slate-700 flex justify-between items-center">
+                <div className="flex border-b border-white bg-[#b2cbe6] group/grp relative z-10">
+                  <div className="w-full px-2 py-1 text-[14px] font-bold text-slate-800 flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
-                      <Layers className="w-3.5 h-3.5 text-slate-500 ml-2" />
+                      <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
-                      <span className="text-[9px] bg-white px-1.5 py-0.5 rounded text-slate-500 ml-1 font-normal select-none pointer-events-none border border-slate-200 shadow-sm">
+                      <span className="text-[9px] bg-white/50 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-white/50 shadow-sm">
                         今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
                       </span>
                       
@@ -227,14 +227,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         <div className="opacity-0 group-hover/grp:opacity-100 flex gap-0.5 ml-2">
                           <button 
                             onClick={gIdx > 0 ? () => mutations.moveGroup(dept.id, grp.id, 'up') : undefined} 
-                            className={cx("p-0.5 rounded text-slate-500", gIdx > 0 ? "hover:bg-slate-400 text-slate-600" : "invisible")} 
+                            className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx > 0 ? "hover:bg-white/50 text-slate-700" : "invisible")} 
                             title={gIdx > 0 ? "班を上に移動" : ""}
                           >
                             <ArrowUp className="w-3.5 h-3.5"/>
                           </button>
                           <button 
                             onClick={gIdx < dept.groups.length - 1 ? () => mutations.moveGroup(dept.id, grp.id, 'down') : undefined} 
-                            className={cx("p-0.5 rounded text-slate-500", gIdx < dept.groups.length - 1 ? "hover:bg-slate-400 text-slate-600" : "invisible")} 
+                            className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx < dept.groups.length - 1 ? "hover:bg-white/50 text-slate-700" : "invisible")} 
                             title={gIdx < dept.groups.length - 1 ? "班を下に移動" : ""}
                           >
                             <ArrowDown className="w-3.5 h-3.5"/>
@@ -247,21 +247,21 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                       <div className="opacity-0 group-hover/grp:opacity-100 flex gap-1 items-center">
                         <button 
                           onClick={() => openModal('groupPost', { deptId: dept.id, groupId: grp.id })} 
-                          className="px-1 bg-slate-50 hover:bg-white rounded text-[10px] border border-slate-400" 
+                          className="px-1.5 py-0.5 bg-white/50 hover:bg-white rounded text-[10px] text-slate-700 transition-colors shadow-sm" 
                           title="この班にポストを追加"
                         >
                           班内ポスト
                         </button>
                         <button 
                           onClick={() => openModal('group', { deptId: dept.id, group: grp })} 
-                          className="p-0.5 hover:bg-slate-400 text-slate-600 rounded" 
+                          className="p-0.5 hover:bg-white/50 text-slate-600 rounded transition-colors" 
                           title="班名を編集"
                         >
                           <Edit2 className="w-3 h-3"/>
                         </button>
                         <button 
                           onClick={() => openModal('delConfirm', { type: 'group', deptId: dept.id, id: grp.id, title: grp.name })} 
-                          className="p-0.5 hover:bg-rose-200" 
+                          className="p-0.5 hover:bg-white/50 text-rose-500 rounded transition-colors" 
                           title="班を削除"
                         >
                           <Trash2 className="w-3 h-3"/>
