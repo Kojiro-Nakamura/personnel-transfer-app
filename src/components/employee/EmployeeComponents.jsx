@@ -108,7 +108,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         {yd}
       </div>
       
-      <div className="w-24 text-[11px] text-slate-700 text-left shrink-0 ml-1 relative group/note flex items-center">
+      <div className="w-24 text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center">
         <span className="truncate w-full block">{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
