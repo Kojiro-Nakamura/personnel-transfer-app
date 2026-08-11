@@ -51,7 +51,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const isFutureRetired = !isNext && emp.departmentId === 'retired';
 
   const defaultBorder = (isPost && filterLevel === 0) ? "border-sky-400" : "border-slate-500";
-  const defaultBg = (isPost && filterLevel === 0) ? (isNext ? "bg-sky-200/50" : "bg-sky-100/50") : (isNext ? "bg-blue-50/10" : "bg-white");
+  const defaultBg = (isPost && filterLevel === 0) ? (isNext ? "bg-sky-100" : "bg-sky-50") : (isNext ? "bg-slate-50" : "bg-white");
 
   const borderClass = isConflict 
     ? "border-2 border-rose-500 z-10 shadow-[0_0_5px_rgba(225,29,72,0.4)]" 
@@ -62,11 +62,11 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         : `border-r ${defaultBorder}`;
         
   const bgClass = isConflict 
-    ? "bg-rose-50/90" 
+    ? "bg-rose-50" 
     : isFutureUnassigned 
-      ? "bg-orange-50/80" 
+      ? "bg-orange-50" 
       : isFutureRetired 
-        ? "bg-slate-100/80" 
+        ? "bg-slate-100" 
         : defaultBg;
 
   const isPromoted = isNext && emp && isPromotedGrade(emp.currentGrade, emp.nextGrade);
@@ -164,8 +164,8 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
   const { filterLevel } = useApp();
   const applyPostStyle = isPost && filterLevel === 0;
   return (
-  <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50/20" : "border-slate-500 hover:bg-slate-50")}>
-    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-200/40 border-l-4 border-l-sky-600" : "border-slate-500 bg-slate-50 border-l-4 border-l-transparent")}>
+  <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50" : "border-slate-500 hover:bg-slate-50")}>
+    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-100 border-l-4 border-l-sky-600" : "border-slate-500 bg-slate-50 border-l-4 border-l-transparent")}>
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}
