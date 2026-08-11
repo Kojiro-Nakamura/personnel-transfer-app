@@ -71,18 +71,18 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   const nCounts = getCounts(deptNextEmps, true);
 
   return (
-    <div className="border-b-4 border-slate-400 relative">
-      {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-100/30 pointer-events-none z-[5]" />}
-      <div className="bg-slate-500 text-white px-2 py-1 flex justify-between items-center relative z-10 group/dept">
+    <div className="border-b-4 border-slate-300 relative">
+      {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-50/50 pointer-events-none z-[5]" />}
+      <div className="bg-slate-200 text-slate-800 border-b border-slate-300 px-2 py-1 flex justify-between items-center relative z-10 group/dept">
         <div className="flex items-center gap-2">
           <div 
-            className="cursor-pointer hover:bg-slate-400 rounded p-0.5" 
+            className="cursor-pointer hover:bg-slate-300 rounded p-0.5 transition-colors" 
             onClick={() => toggleDept(dept.id)} 
             title={isCollapsed ? "展開する" : "折りたたむ"}
           >
-            <ChevronDown className="w-4 h-4 text-slate-100" />
+            <ChevronDown className="w-4 h-4 text-slate-500" />
           </div>
-          <Building2 className="w-4 h-4 text-sky-200" />
+          <Building2 className="w-4 h-4 text-sky-600" />
           <span 
             className="font-bold text-[15px] cursor-pointer select-none" 
             onClick={() => toggleDept(dept.id)} 
@@ -91,7 +91,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
 
             {dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name}
           </span>
-          <span className="text-[10px] bg-slate-400 px-2 py-0.5 rounded text-slate-50 ml-2 shadow-inner pointer-events-none">
+          <span className="text-[10px] bg-white border border-slate-300 px-2 py-0.5 rounded text-slate-600 ml-2 shadow-sm pointer-events-none">
             今年度: {formatCountText(cCounts)} / 来年度: {formatCountText(nCounts)}
           </span>
           
@@ -99,14 +99,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             <div className="opacity-0 group-hover/dept:opacity-100 flex gap-0.5 ml-2">
               <button 
                 onClick={onMoveUp} 
-                className={cx("p-0.5 rounded text-slate-200", onMoveUp ? "hover:bg-slate-400 hover:text-white" : "invisible")} 
+                className={cx("p-1 rounded transition-colors text-slate-500", onMoveUp ? "hover:bg-slate-300 text-slate-600" : "invisible")} 
                 title={onMoveUp ? "部署を上に移動" : ""}
               >
                 <ArrowUp className="w-4 h-4"/>
               </button>
               <button 
                 onClick={onMoveDown} 
-                className={cx("p-0.5 rounded text-slate-200", onMoveDown ? "hover:bg-slate-400 hover:text-white" : "invisible")} 
+                className={cx("p-1 rounded transition-colors text-slate-500", onMoveDown ? "hover:bg-slate-300 text-slate-600" : "invisible")} 
                 title={onMoveDown ? "部署を下に移動" : ""}
               >
                 <ArrowDown className="w-4 h-4"/>
@@ -115,11 +115,18 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
           )}
         </div>
         
-        <div className="flex gap-1 items-center">
+        <div className="flex gap-2 items-center">
           <div className="opacity-0 group-hover/dept:opacity-100 flex gap-1 items-center">
             <button 
+              onClick={() => openModal('dept', dept)} 
+              className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-600 rounded text-xs transition-colors shadow-sm" 
+              title="部署の設定を変更する"
+            >
+              設定
+            </button>
+            <button 
               onClick={() => openModal('post', { deptId: dept.id })} 
-              className="px-1.5 py-0.5 bg-slate-600 rounded text-[10px]" 
+              className="px-2 py-0.5 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-700 rounded text-xs transition-colors shadow-sm" 
               title="この部署にポストを追加"
             >
               <UserPlus className="w-3 h-3 inline mr-1"/>ポスト
@@ -214,12 +221,12 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             
             return (
               <React.Fragment key={grp.id}>
-                <div className="flex border-b border-slate-400 bg-slate-300 group/grp relative z-10">
+                <div className="flex border-b border-slate-300 bg-slate-50 group/grp relative z-10">
                   <div className="w-full px-2 py-1 text-[14px] font-bold text-slate-700 flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
-                      <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
+                      <Layers className="w-3.5 h-3.5 text-slate-500 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
-                      <span className="text-[9px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-slate-300">
+                      <span className="text-[9px] bg-white px-1.5 py-0.5 rounded text-slate-500 ml-1 font-normal select-none pointer-events-none border border-slate-200 shadow-sm">
                         今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
                       </span>
                       
