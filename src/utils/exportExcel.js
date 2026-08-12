@@ -101,7 +101,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   
   const extraCols = [
-    { width: 16.5 },  // 空白列 (Q)
+    { width: 7.40 },  // 空白列 (Q)
     { width: 14 }, // 氏名 (R)
     { width: 8 },  // 年齢 (S)
     { width: 16 }, // フリガナ (T)
