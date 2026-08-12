@@ -521,7 +521,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       
       if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
            const c = getPromotedBgColorCode(extEmp.nextGrade);
-           if (c) curPromoColors[36] = c;
+           if (c) {
+               curPromoColors[18] = c;
+               curPromoColors[19] = c;
+               curPromoColors[36] = c;
+           }
       }
 
       // History
