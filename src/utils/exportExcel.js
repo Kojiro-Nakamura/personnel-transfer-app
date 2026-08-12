@@ -40,9 +40,9 @@ const saveWorkbook = async (workbook, fileName) => {
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel) => {
   const allHistoryYears = new Set();
   employees.forEach(e => {
-    if (e.history) Object.keys(e.history).forEach(y => allHistoryYears.add(parseInt(y)));
+    if (e.history) e.history.forEach(h => allHistoryYears.add(h.year));
   });
-  const historyYears = Array.from(allHistoryYears).sort((a, b) => b - a).filter(y => y < targetYear - 1);
+  const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b).filter(y => y < targetYear - 1);
 
   const getEraSuffixLocal = (yearStr) => {
     if (!yearStr) return '';
@@ -62,13 +62,18 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   };
   
   const formatWithEra = (dateStr) => {
-    if (!dateStr || dateStr.length !== 8) return dateStr;
-    const y = dateStr.substring(0, 4);
-    const m = dateStr.substring(4, 6);
-    const d = dateStr.substring(6, 8);
-    const era = getEraSuffixLocal(y);
-    if (era) return `${y}(${era})/${m}/${d}`;
-    return `${y}/${m}/${d}`;
+    if (!dateStr) return '';
+    const match = dateStr.match(/^(\d{4})[-/]/);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      let era = '';
+      if (year >= 2019) era = `(R${year - 2018})`;
+      else if (year >= 1989) era = `(H${year - 1988})`;
+      else if (year >= 1926) era = `(S${year - 1925})`;
+      else if (year >= 1912) era = `(T${year - 1911})`;
+      return era ? `${dateStr}${era}` : dateStr;
+    }
+    return dateStr;
   };
 
   const getStandardYears = (gradeName) => {
@@ -98,7 +103,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
-    views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false, style: 'pageBreakPreview', zoomScale: 100 }],
+    views: [{ state: 'frozen', xSplit: 0, ySplit: 5, showGridLines: false, style: 'pageBreakPreview', zoomScale: 100 }],
     pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.984, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
@@ -424,7 +429,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           
           if (!isNaN(prevNum) && !isNaN(yNum) && prevNum > 0) {
              const diff = yNum - prevNum;
-             pStr += ` Δ${diff}`;
+             pStr = `${diff}年目> ${pStr}`;
              
              const stdYears = getStandardYears(gradeList[idx]);
              if (stdYears > 0 && diff < stdYears && !prefix) {
@@ -439,9 +444,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       }
       
       // History
-      rowVals.push(extEmp.history && extEmp.history[targetYear] ? extEmp.history[targetYear] : '');
+      const nextHist = (extEmp.history || []).find(h => h.year === targetYear);
+      rowVals.push(nextHist ? nextHist.department : '');
       historyYears.forEach(y => {
-        rowVals.push(extEmp.history && extEmp.history[y] ? extEmp.history[y] : '');
+        const hist = (extEmp.history || []).find(h => h.year === y);
+        rowVals.push(hist ? hist.department : '');
       });
       
       row.values = rowVals;
