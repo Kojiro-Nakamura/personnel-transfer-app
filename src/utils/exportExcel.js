@@ -504,25 +504,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
       }
       
-      // Next year difference
-      let finalDiff = null;
-      if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
-        finalDiff = 1;
-      } else {
-        let prevY = NaN;
-        for (let i = pKeys.length - 1; i >= 0; i--) {
-          const y = pKeys[i] === 'hireDate' ? (extEmp.hireDate ? parseInt(extEmp.hireDate.substring(0,4)) : NaN) : parseInt(extEmp[pKeys[i]] || 'NaN');
-          if (!isNaN(y)) { prevY = y; break; }
-        }
-        finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
-      }
-      rowVals.push(`> ${finalDiff !== null ? (finalDiff >= 0 ? finalDiff : 0) + '年目' : ''}`);
-      
-      if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
-           const c = getPromotedBgColorCode(extEmp.nextGrade);
-           if (c) curPromoColors[25 + pKeys.length] = c;
-      }
-      
+
       // History
       let nDeptName = '';
       if (extEmp) {
