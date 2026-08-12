@@ -213,7 +213,6 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', '', ''];
   r5Vals.push('', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`);
   historyYears.forEach(y => r5Vals.push(getEraFormattedYear(y)));
-  r5Vals.push(`来年度 ${getEraFormattedYear(targetYear)}`);
   r5.values = r5Vals;
   r5.height = 20;
 
@@ -524,9 +523,18 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
            const nGroup = nDept && extEmp.groupId ? (nDept.groups || []).find(g => g.id === extEmp.groupId) : null;
            let d = nDept ? (nDept.nextName || nDept.name) : '';
            let g = nGroup ? (nGroup.nextName || nGroup.name) : '';
+           let pStr = '';
+           if (extEmp.postId && nDept) {
+               const p = (nDept.posts || []).find(x => x.id === extEmp.postId);
+               if (p) pStr = '（' + (p.nextName || p.name) + '）';
+           } else if (extEmp.groupPostId && nGroup) {
+               const gp = (nGroup.posts || []).find(x => x.id === extEmp.groupPostId);
+               if (gp) pStr = '（' + (gp.nextName || gp.name) + '）';
+           }
+           
            if (d === 'システム用外枠') nDeptName = '未配置';
-           else if (d && !g) nDeptName = d;
-           else nDeptName = `${d} ${g}`;
+           else if (d && !g) nDeptName = `${d}${pStr}`;
+           else nDeptName = `${d} ${g}${pStr}`;
         }
       }
 
@@ -575,10 +583,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
          const cell = row.getCell(parseInt(cIdx));
          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + curPromoColors[cIdx].replace('#', '').toUpperCase() } };
       });
-      Object.keys(curFontStyles).forEach(cIdx => {
-         const cell = row.getCell(parseInt(cIdx));
-         cell.font = { name: 'BIZ UDPGothic', size: 10, bold: true, italic: true };
-      });
+
     } else {
       row.values = rowVals;
     }
@@ -596,9 +601,12 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const isPostLevelHighlight = structPostHighlight && filterLevel === 0;
   
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        cell.font = defaultFont;
+        if (curFontStyles && curFontStyles[colNumber] === 'change') {
+            cell.font = { ...defaultFont, bold: true, italic: true };
+        } else {
+            cell.font = defaultFont;
+        }
         cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
-        
         if (colNumber >= 3) {
           cell.alignment = { ...cell.alignment, horizontal: 'center' };
         }
