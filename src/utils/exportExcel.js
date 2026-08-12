@@ -103,7 +103,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
-    views: [{ state: 'frozen', xSplit: 0, ySplit: 5, showGridLines: false, style: 'pageBreakPreview', zoomScale: 100 }],
+    views: [{ state: 'frozen', xSplit: 0, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }],
     pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.984, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
@@ -444,19 +444,68 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       }
       
       // History
-      const nextHist = (extEmp.history || []).find(h => h.year === targetYear);
-      rowVals.push(nextHist ? nextHist.department : '');
-      historyYears.forEach(y => {
+      let nDeptName = '';
+      if (extEmp) {
+        const nextDept = deptMap[extEmp.nextDepartment];
+        const nextGroup = nextDept ? nextDept.groups.find(g => g.id === extEmp.nextGroup) : null;
+        let d = nextDept ? nextDept.name : (extEmp.nextDepartment || '');
+        let g = nextGroup ? nextGroup.name : (extEmp.nextGroup || '');
+        if (d === 'システム用外枠') nDeptName = '未配置';
+        else if (!d && !g) nDeptName = '未配置';
+        else if (d && !g) nDeptName = d;
+        else nDeptName = `${d} ${g}`;
+      }
+
+      let nextYearDisplay = nDeptName;
+      let isNextChange = false;
+      if (nDeptName && nDeptName !== ' / 課直轄' && nDeptName !== '未配置' && nDeptName !== '-') {
+        const nextAge = (extEmp.birthDate && !isNaN(targetYear)) ? calculateAge(extEmp.birthDate, targetYear) : null;
+        if (nextAge !== null && !isNaN(nextAge)) nextYearDisplay = `${nDeptName} (${nextAge}歳)`;
+        
+        const lastHistStr = historyYears.length > 0 ? ((extEmp.history || []).find(h => h.year === historyYears[historyYears.length - 1])?.department || '') : '-';
+        if (nDeptName !== (lastHistStr || '-')) {
+           isNextChange = true;
+        }
+      }
+      rowVals.push(nextYearDisplay);
+      if (isNextChange) curPromoColors[33] = 'change';
+
+      historyYears.forEach((y, i) => {
         const hist = (extEmp.history || []).find(h => h.year === y);
-        rowVals.push(hist ? hist.department : '');
+        let hStr = hist ? hist.department : '';
+        
+        let isChange = false;
+        if (hStr !== '' && hStr !== '-') {
+           const prevHStr = i > 0 ? ((extEmp.history || []).find(h => h.year === historyYears[i-1])?.department || '') : '-';
+           if (hStr !== (prevHStr || '-')) {
+              isChange = true;
+           }
+        }
+        
+        let displayStr = hStr;
+        if (hStr && hStr !== ' / 課直轄' && hStr !== '未配置' && hStr !== '-') {
+          const histAge = (extEmp.birthDate && !isNaN(y)) ? calculateAge(extEmp.birthDate, y) : null;
+          if (histAge !== null && !isNaN(histAge)) {
+            displayStr = `${hStr} (${histAge}歳)`;
+          }
+        }
+        
+        rowVals.push(displayStr);
+        if (isChange) {
+           curPromoColors[34 + i] = 'change'; 
+        }
       });
       
       row.values = rowVals;
       
-      // apply colors for promo
+      // apply colors and styles
       Object.keys(curPromoColors).forEach(cIdx => {
          const cell = row.getCell(parseInt(cIdx));
-         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + curPromoColors[cIdx].replace('#', '').toUpperCase() } };
+         if (curPromoColors[cIdx] === 'change') {
+             cell.font = { name: 'BIZ UDPGothic', size: 10, bold: true, italic: true };
+         } else {
+             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + curPromoColors[cIdx].replace('#', '').toUpperCase() } };
+         }
       });
     } else {
       row.values = rowVals;
@@ -605,7 +654,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('職員一覧', {
-    views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false, style: 'pageBreakPreview', zoomScale: 100 }], // 氏名・年齢まで固定
+    views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }], // 氏名・年齢まで固定
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
