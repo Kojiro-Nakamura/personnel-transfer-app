@@ -683,18 +683,25 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
 
   ws.columns.forEach((col, i) => {
-    if (i >= 15) { // 'P' is col 16 (index 15)
+    if (i >= 17) { // 'R' (フリガナ) 以降
        let maxLength = 0;
        col.eachCell({ includeEmpty: true }, cell => {
-         const str = cell.value ? cell.value.toString() : '';
-         let columnLength = 0;
-         for (let k = 0; k < str.length; k++) {
-           columnLength += str.charCodeAt(k) > 255 ? 2 : 1.2;
+         if (cell.row <= 4) return; // include row 5 headers
+         const v = cell.value ? cell.value.toString() : '';
+         if (v) {
+            const lines = v.split('\n');
+            for (let l of lines) {
+               let lw = 0;
+               for (let c of l) lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+               if (lw > maxLength) maxLength = lw;
+            }
          }
-         if (columnLength > maxLength) maxLength = columnLength;
        });
-       const minW = (i === 15) ? 25 : 10;
-       col.width = maxLength < minW ? minW : maxLength + 1.5;
+       if (maxLength > 40) maxLength = 40; // cap maximum width
+       if (maxLength > 0) {
+          let padding = 1.5;
+          col.width = maxLength + padding;
+       }
     }
   });
 
