@@ -694,6 +694,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   ws.columns.forEach((col, i) => {
     if (i >= 17) { // 'R' (フリガナ) 以降
+       const isHistory = i >= 34;
        let maxLength = 0;
        col.eachCell({ includeEmpty: true }, cell => {
          if (cell.row <= 4) return; // include row 5 headers
@@ -702,14 +703,20 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
             const lines = v.split('\n');
             for (let l of lines) {
                let lw = 0;
-               for (let c of l) lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+               for (let c of l) {
+                   if (isHistory) {
+                       lw += c.charCodeAt(0) > 255 ? 1.3 : 0.7;
+                   } else {
+                       lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+                   }
+               }
                if (lw > maxLength) maxLength = lw;
             }
          }
        });
        if (maxLength > 40) maxLength = 40; // cap maximum width
        if (maxLength > 0) {
-          let padding = 1.5;
+          let padding = isHistory ? 0.5 : 1.5;
           col.width = maxLength + padding;
        }
     }
@@ -1181,6 +1188,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   ws.autoFilter = `A5:${lastColLetter}${rowIndex - 1}`;
 
   ws.columns.forEach((col, i) => {
+    const isHistory = i >= 33;
     let maxLength = 0;
     col.eachCell({ includeEmpty: true }, cell => {
       if (cell.row <= 4) return; 
@@ -1189,7 +1197,13 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
         const lines = v.split('\n');
         for (let l of lines) {
            let lw = 0;
-           for(let c of l) lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+           for(let c of l) {
+               if (isHistory) {
+                   lw += c.charCodeAt(0) > 255 ? 1.3 : 0.7;
+               } else {
+                   lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+               }
+           }
            if (lw > maxLength) maxLength = lw;
         }
       }
@@ -1202,6 +1216,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
        } else if (i === 12 || i === 19) { // 詳細列
            padding = 5.0;
        }
+       if (isHistory) padding = 0.5;
        col.width = maxLength + padding;
     }
   });
