@@ -201,26 +201,35 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   <title>${escapeHtml(fileName.replace(/\.html$/, ''))} - 人事異動案</title>
   <style>
     body { font-family: "BIZ UDPGothic", "BIZ UDPゴシック", "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; font-size: 11px; margin: 0; color: #334155; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
-    table { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 1150px; } 
-    th, td { border: 1px solid #94a3b8; padding: 2px 4px; vertical-align: top; overflow: hidden; word-break: break-word; line-height: 1.25; } 
+    table { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: 100%; min-width: 1150px; border-bottom: 2px solid #000; border-right: 2px solid #000; }
+    th, td { border: none; border-top: 1px solid #94a3b8; border-left: 1px solid #94a3b8; padding: 2px 4px; vertical-align: top; overflow: hidden; word-break: break-word; line-height: 1.25; background-clip: padding-box; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
-    thead th { border: 1px solid #94a3b8 !important; outline: 1px solid #94a3b8; outline-offset: -1px; }
-    th { background-color: #f0f0f0; border-bottom: 1.5px solid #475569; } 
+    
+    thead tr:nth-child(1) th { border-top: 2px solid #000 !important; }
+    th:first-child, td:first-child { border-left: 2px solid #000 !important; }
+    thead tr:nth-child(2) th { border-top: 2px solid #000 !important; }
+    thead tr:nth-child(3) th, thead tr:nth-child(2) th[rowspan="2"] { border-bottom: 2px solid #000 !important; }
+
+    td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #000 !important; } 
+    thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 2px solid #000 !important; }
+    thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 2px solid #000 !important; } 
+
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: 600; color: #0c4a6e; background-color: #e0f2fe; } 
     .table-filtered .post-cell { font-weight: normal; color: inherit; background-color: transparent; }
-    td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 1.5px solid #475569; } 
-    thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 1.5px solid #475569 !important; }
-    thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 1.5px solid #475569 !important; } 
+    
     td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: left; }
     td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
+    
+    tbody tr.highlight:not(.dept-boundary) td { border-top: 1px solid #94a3b8 !important; }
+    tbody tr.highlight td { border-bottom: 1px solid #94a3b8 !important; }
+    tbody tr.highlight + tr.highlight td:nth-child(1):empty,
+    tbody tr.highlight + tr.highlight td:nth-child(2):empty,
+    tbody tr.highlight + tr.highlight td:nth-child(3):empty { border-top: none !important; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
-    tr.border-dept-top td { border-top: 1.5px solid #475569 !important; }
-    tr.border-group-top td { border-top: 1px solid #94a3b8 !important; }
-    td:not(.post-cell):nth-child(1), td:not(.post-cell):nth-child(2), td:not(.post-cell):nth-child(3) { border-top: none !important; border-bottom: none !important; }
 
     /* ========== 印刷用最適化設定 ========== */
     .print-only { display: none; }
@@ -273,12 +282,15 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       const rows = Array.from(tbody.querySelectorAll("tr"));
       
       const updateBorders = () => {
+        const tableElement = document.querySelector('table');
+        const isFiltered = tableElement ? tableElement.classList.contains('table-filtered') : false;
+        
         let lastDept = null;
         let lastGroup = null;
+        let isFirstRow = true;
+        let prevVisibleRow = null;
         
         rows.forEach(row => {
-          row.classList.remove('border-dept-top', 'border-group-top');
-          
           if (row.style.display !== 'none') {
             const currentDept = row.getAttribute('data-dept');
             const currentGroup = row.getAttribute('data-group');
@@ -286,47 +298,54 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const isNewDept = currentDept !== lastDept;
             const isNewGroup = !isNewDept && currentGroup !== lastGroup;
             
+            if (isNewDept) {
+              row.classList.add('dept-boundary');
+            } else {
+              row.classList.remove('dept-boundary');
+            }
+            
             for(let i = 0; i < row.cells.length; i++) {
               const cell = row.cells[i];
-              const isHeaderCell = (i <= 2 && !cell.classList.contains('post-cell'));
+              const isPostCellClass = cell.classList.contains('post-cell');
+              const isHeaderCol = (i <= 2);
+              const isBlank = cell.textContent.trim() === '';
               
-              if (isNewDept) {
-                cell.style.borderTop = '1.5px solid #475569';
-              } else if (isNewGroup) {
-                cell.style.borderTop = '1px solid #94a3b8';
-              } else {
-                if (isHeaderCell) {
-                  cell.style.borderTop = 'none';
-                } else {
-                  cell.style.borderTop = '1px solid #94a3b8';
-                }
+              let isColorDifferent = false;
+              if (isHeaderCol && prevVisibleRow && prevVisibleRow.cells[i]) {
+                const prevIsPostCell = prevVisibleRow.cells[i].classList.contains('post-cell');
+                isColorDifferent = !isFiltered && (isPostCellClass !== prevIsPostCell);
               }
               
-              if (isHeaderCell) {
-                cell.style.borderBottom = 'none';
+              if (isFirstRow) {
+                cell.style.borderTop = 'none';
+              } else if (isNewDept) {
+                cell.style.borderTop = '2px solid #000';
               } else {
-                cell.style.borderBottom = '1px solid #94a3b8';
+                if (isHeaderCol && !isColorDifferent && isBlank) {
+                  cell.style.borderTop = 'none';
+                  if (prevVisibleRow && prevVisibleRow.cells[i]) {
+                    prevVisibleRow.cells[i].style.borderBottom = 'none';
+                  }
+                } else {
+                  cell.style.borderTop = '1px solid #94a3b8';
+                  if (prevVisibleRow && prevVisibleRow.cells[i]) {
+                    prevVisibleRow.cells[i].style.borderBottom = '1px solid #94a3b8';
+                  }
+                }
               }
             }
             
             if (isNewDept) {
-              row.classList.add('border-dept-top');
               lastDept = currentDept;
               lastGroup = currentGroup;
             } else if (isNewGroup) {
-              row.classList.add('border-group-top');
               lastGroup = currentGroup;
             }
+            
+            isFirstRow = false;
+            prevVisibleRow = row;
           }
         });
-        
-        const visibleRows = rows.filter(r => r.style.display !== 'none');
-        if (visibleRows.length > 0) {
-          const lastRow = visibleRows[visibleRows.length - 1];
-          for(let i = 0; i < lastRow.cells.length; i++) {
-            lastRow.cells[i].style.borderBottom = '1.5px solid #475569';
-          }
-        }
       };
       
       updateBorders();
@@ -445,7 +464,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     </colgroup>
     <thead>
       <tr class="print-hide">
-        <th colspan="16" style="background-color: #cbd5e1; border-bottom: 1px solid #94a3b8; text-align: left; padding: 6px 12px;">
+        <th colspan="16" style="background-color: #cbd5e1; text-align: left; padding: 6px 12px;">
           <div class="filter-container">
           </div>
         </th>
@@ -454,17 +473,17 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         <th rowspan="2" style="background-color: #cbd5e1;">部署名</th>
         <th rowspan="2" style="background-color: #cbd5e1;">班・グループ</th>
         <th rowspan="2" style="background-color: #cbd5e1;">ポスト</th>
-        <th colspan="6" style="background-color: #cbd5e1;">今年度（${targetYear - 1}(R${targetYear - 2019})）</th>
+        <th colspan="6" style="background-color: #fef3c7;">今年度（${targetYear - 1}(R${targetYear - 2019})）</th>
         <th colspan="6" style="background-color: #bfdbfe;">来年度（${targetYear}(R${targetYear - 2018})）</th>
         <th rowspan="2" style="background-color: #f0f0f0;">メモ</th>
       </tr>
       <tr>
-        <th style="background-color: #cbd5e1;">職名</th>
-        <th style="background-color: #cbd5e1;">氏名</th>
-        <th style="background-color: #cbd5e1;">級</th>
-        <th style="background-color: #cbd5e1; width: 32px; min-width: 32px;">年齢</th>
-        <th style="background-color: #cbd5e1;">在籍</th>
-        <th style="background-color: #cbd5e1;">備考</th>
+        <th style="background-color: #fef3c7;">職名</th>
+        <th style="background-color: #fef3c7;">氏名</th>
+        <th style="background-color: #fef3c7;">級</th>
+        <th style="background-color: #fef3c7; width: 32px; min-width: 32px;">年齢</th>
+        <th style="background-color: #fef3c7;">在籍</th>
+        <th style="background-color: #fef3c7;">備考</th>
         <th style="background-color: #bfdbfe;">職名</th>
         <th style="background-color: #bfdbfe;">氏名</th>
         <th style="background-color: #bfdbfe;">級</th>
