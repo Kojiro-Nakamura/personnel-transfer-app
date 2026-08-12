@@ -205,7 +205,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     th, td { border: 1px solid #94a3b8; padding: 2px 4px; vertical-align: top; overflow: hidden; word-break: break-word; line-height: 1.25; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
-    thead th { border: 1px solid #94a3b8; outline: 1px solid #94a3b8; outline-offset: -1px; }
+    thead th { border: 1px solid #94a3b8; }
     th { background-color: #f0f0f0; border-bottom: 1px solid #94a3b8; } 
     thead tr:nth-child(2) th { border-top: 2px solid #000 !important; }
     thead tr:nth-child(3) th, thead tr:nth-child(2) th[rowspan="2"] { border-bottom: 2px solid #000 !important; }
@@ -218,6 +218,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #000; } 
     thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 2px solid #000 !important; }
     thead tr:nth-child(3) th:nth-child(1), thead tr:nth-child(3) th:nth-child(7) { border-left: 2px solid #000 !important; } 
+    thead tr:nth-child(3) th:nth-child(12) { border-right: 2px solid #000 !important; }
     td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: left; }
     td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
