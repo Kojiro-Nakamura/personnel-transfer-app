@@ -282,7 +282,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       const rows = Array.from(tbody.querySelectorAll("tr"));
       
       const updateBorders = () => {
-        const tableElement = document.getElementById('empTable');
+        const tableElement = document.querySelector('table');
         const isFiltered = tableElement ? tableElement.classList.contains('table-filtered') : false;
         
         let lastDept = null;
@@ -323,8 +323,14 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
               } else {
                 if (isHeaderCol && !isColorDifferent && isBlank) {
                   cell.style.borderTop = 'none';
+                  if (prevVisibleRow && prevVisibleRow.cells[i]) {
+                    prevVisibleRow.cells[i].style.borderBottom = 'none';
+                  }
                 } else {
                   cell.style.borderTop = '1px solid #94a3b8';
+                  if (prevVisibleRow && prevVisibleRow.cells[i]) {
+                    prevVisibleRow.cells[i].style.borderBottom = '1px solid #94a3b8';
+                  }
                 }
               }
             }
