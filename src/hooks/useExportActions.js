@@ -445,17 +445,17 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         <th rowspan="2" style="background-color: #cbd5e1;">部署名</th>
         <th rowspan="2" style="background-color: #cbd5e1;">班・グループ</th>
         <th rowspan="2" style="background-color: #cbd5e1;">ポスト</th>
-        <th colspan="6" style="background-color: #cbd5e1;">今年度（${targetYear - 1}(R${targetYear - 2019})）</th>
+        <th colspan="6" style="background-color: #fef3c7;">今年度（${targetYear - 1}(R${targetYear - 2019})）</th>
         <th colspan="6" style="background-color: #bfdbfe;">来年度（${targetYear}(R${targetYear - 2018})）</th>
         <th rowspan="2" style="background-color: #f0f0f0;">メモ</th>
       </tr>
       <tr>
-        <th style="background-color: #cbd5e1;">職名</th>
-        <th style="background-color: #cbd5e1;">氏名</th>
-        <th style="background-color: #cbd5e1;">級</th>
-        <th style="background-color: #cbd5e1; width: 32px; min-width: 32px;">年齢</th>
-        <th style="background-color: #cbd5e1;">在籍</th>
-        <th style="background-color: #cbd5e1;">備考</th>
+        <th style="background-color: #fef3c7;">職名</th>
+        <th style="background-color: #fef3c7;">氏名</th>
+        <th style="background-color: #fef3c7;">級</th>
+        <th style="background-color: #fef3c7; width: 32px; min-width: 32px;">年齢</th>
+        <th style="background-color: #fef3c7;">在籍</th>
+        <th style="background-color: #fef3c7;">備考</th>
         <th style="background-color: #bfdbfe;">職名</th>
         <th style="background-color: #bfdbfe;">氏名</th>
         <th style="background-color: #bfdbfe;">級</th>
