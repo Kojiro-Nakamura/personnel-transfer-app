@@ -638,6 +638,15 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           else topBorder = false;
           
           if (structPostHighlight) bottomBorder = true;
+        } else if (colNumber === 17) {
+          topBorder = false;
+          bottomBorder = false;
+        } else if (colNumber >= 18) {
+          if (isNewDept) topBorder = 'thick';
+          else if (extEmp) topBorder = true;
+          else topBorder = false;
+          
+          if (extEmp) bottomBorder = true;
         } else {
           if (isNewDept) topBorder = 'thick';
           else topBorder = true;
