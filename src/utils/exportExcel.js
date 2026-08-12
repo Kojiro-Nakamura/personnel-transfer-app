@@ -267,8 +267,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
-      const topB = rn === 4 ? 'thick' : false;
-      let bottomB = rn === 5 ? 'thick' : false;
+      const topB = rn === 4 && i !== 17 ? 'thick' : false;
+      let bottomB = rn === 5 && i !== 17 ? 'thick' : false;
       if (rn === 4 && i >= 4 && i <= 15) bottomB = true; 
       if (rn === 4 && i >= 18 && i <= 23) bottomB = true;
       if (rn === 4 && i >= 24 && i <= 32) bottomB = true;
@@ -405,7 +405,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       noteStr
     ];
     
-    const extEmp = nextEmp || currEmp;
+    const extEmp = nextEmp;
     if (extEmp) {
       rowVals.push('');
       rowVals.push(extEmp.furigana || '');
@@ -670,7 +670,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   if (rowIndex > 6) {
     const lastRow = ws.getRow(rowIndex - 1);
-    lastRow.eachCell({ includeEmpty: true }, (cell) => {
+    lastRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+       if (colNumber === 17) return;
        if (cell.border) {
          cell.border = { ...cell.border, bottom: thickBorderStyle };
        } else {
