@@ -239,6 +239,9 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const cell = ws.getCell(`${col}${rn}`);
       cell.font = headerFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      if (i >= 35) { // 履歴列
+         cell.alignment = { ...cell.alignment, shrinkToFit: true, wrapText: false };
+      }
       let argb = 'FFCBD5E1'; // slate-300
       if (i >= 4 && i <= 9) argb = 'FFFEF3C7'; // 今年度
       if (i >= 10 && i <= 15) argb = 'FFDBEAFE'; // 来年度
@@ -920,6 +923,9 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = listHeaderFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      if (colNumber >= 34) { // 履歴列
+         cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+      }
       cell.border = getCellBorders(true, true, true, true, true);
       
       if (colNumber <= 9) cell.fill = fillSlate;
