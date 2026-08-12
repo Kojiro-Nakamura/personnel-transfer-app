@@ -168,6 +168,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
   r3.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r3.height = 13;
+  r3.getCell(18).value = '＜参考＞';
+  r3.getCell(18).font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
 
   [1, 2, 3].forEach(rn => {
     ws.getRow(rn).getCell(1).alignment = { vertical: 'middle', wrapText: false };
