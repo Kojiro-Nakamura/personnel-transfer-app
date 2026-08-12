@@ -28,7 +28,7 @@ export const AddSlotRow = ({ label, indentClass, onClickNext, anchorId }) => {
         onClick={onClickNext} 
         className={cx(
           "flex-1 flex items-center justify-center text-[11px] font-bold transition-all border-dashed border border-transparent cursor-pointer", 
-          isPickingMode ? "hover:bg-amber-50 text-slate-800" : "text-slate-400 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300"
+          isPickingMode ? "hover:bg-amber-50 text-black" : "text-slate-400 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300"
         )} 
         title={isPickingMode && selectedEmp?.isSource ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します"}
       >
@@ -215,11 +215,11 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             return (
               <React.Fragment key={grp.id}>
                 <div className="flex border-b border-white bg-[#b2cbe6] group/grp relative z-10">
-                  <div className="w-full px-2 py-1 text-[14px] font-bold text-slate-800 flex justify-between items-center">
+                  <div className="w-full px-2 py-1 text-[14px] font-bold text-black flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
-                      <span className="text-[9px] bg-white/50 px-1.5 py-0.5 rounded text-slate-700 ml-1 font-normal select-none pointer-events-none border border-white/50 shadow-sm">
+                      <span className="text-[9px] bg-white/50 px-1.5 py-0.5 rounded text-slate-900 ml-1 font-normal select-none pointer-events-none border border-white/50 shadow-sm">
                         今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
                       </span>
                       
@@ -227,14 +227,14 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         <div className="opacity-0 group-hover/grp:opacity-100 flex gap-0.5 ml-2">
                           <button 
                             onClick={gIdx > 0 ? () => mutations.moveGroup(dept.id, grp.id, 'up') : undefined} 
-                            className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx > 0 ? "hover:bg-white/50 text-slate-700" : "invisible")} 
+                            className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx > 0 ? "hover:bg-white/50 text-slate-900" : "invisible")} 
                             title={gIdx > 0 ? "班を上に移動" : ""}
                           >
                             <ArrowUp className="w-3.5 h-3.5"/>
                           </button>
                           <button 
                             onClick={gIdx < dept.groups.length - 1 ? () => mutations.moveGroup(dept.id, grp.id, 'down') : undefined} 
-                            className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx < dept.groups.length - 1 ? "hover:bg-white/50 text-slate-700" : "invisible")} 
+                            className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx < dept.groups.length - 1 ? "hover:bg-white/50 text-slate-900" : "invisible")} 
                             title={gIdx < dept.groups.length - 1 ? "班を下に移動" : ""}
                           >
                             <ArrowDown className="w-3.5 h-3.5"/>
@@ -247,7 +247,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                       <div className="opacity-0 group-hover/grp:opacity-100 flex gap-1 items-center">
                         <button 
                           onClick={() => openModal('groupPost', { deptId: dept.id, groupId: grp.id })} 
-                          className="px-1.5 py-0.5 bg-white/50 hover:bg-white rounded text-[10px] text-slate-700 transition-colors shadow-sm" 
+                          className="px-1.5 py-0.5 bg-white/50 hover:bg-white rounded text-[10px] text-slate-900 transition-colors shadow-sm" 
                           title="この班にポストを追加"
                         >
                           班内ポスト

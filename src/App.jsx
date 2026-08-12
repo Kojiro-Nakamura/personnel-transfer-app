@@ -76,7 +76,7 @@ export const AppContent = () => {
 
   return (
     <div 
-      className="min-h-screen bg-slate-200 flex flex-col font-sans text-slate-800 selection-none relative"
+      className="min-h-screen bg-slate-200 flex flex-col font-sans text-black selection-none relative"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -150,9 +150,9 @@ export const AppContent = () => {
                 style={filterLevel > 0 && filterName ? { backgroundColor: getPromotedBgColorCode(filterName) } : {}}
                 title="表示する職員の条件を切り替える"
               >
-                <option value={0} className="text-slate-800">全件表示</option>
+                <option value={0} className="text-black">全件表示</option>
                 {GRADE_OPTIONS.filter(g => g !== "").map(g => (
-                  <option key={g} value={GRADE_LEVELS[g]} className="text-slate-800">{g}以上</option>
+                  <option key={g} value={GRADE_LEVELS[g]} className="text-black">{g}以上</option>
                 ))}
               </select>
             </div>
@@ -252,12 +252,12 @@ export const AppContent = () => {
               </button>
             </div>
             <div className="bg-white text-slate-900 rounded px-3 py-2 flex items-center gap-3 shadow-inner">
-              <div className="w-14 truncate text-[11px] text-slate-800" title={dispTitle}>{dispTitle}</div>
+              <div className="w-14 truncate text-[11px] text-black" title={dispTitle}>{dispTitle}</div>
               <div className="flex-1 truncate text-sm font-bold text-[#065084]" title={selEmp.name}>{selEmp.name}</div>
-              <div className="w-20 truncate text-[11px] text-slate-800 text-center" title={dispGrade}>{dispGrade}</div>
-              <div className="w-10 text-[12px] text-slate-800 text-right" title={`${dispAge}歳`}>{dispAge !== '' ? `${dispAge}歳` : ''}</div>
-              <div className={cx("w-20 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-slate-800")} title={yd}>{yd}</div>
-              <div className="w-24 truncate text-[11px] text-slate-700 text-left shrink-0 ml-1" title={noteText}>{noteText}</div>
+              <div className="w-20 truncate text-[11px] text-black text-center" title={dispGrade}>{dispGrade}</div>
+              <div className="w-10 text-[12px] text-black text-right" title={`${dispAge}歳`}>{dispAge !== '' ? `${dispAge}歳` : ''}</div>
+              <div className={cx("w-20 text-[12px] text-right font-medium truncate shrink-0", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "text-black")} title={yd}>{yd}</div>
+              <div className="w-24 truncate text-[11px] text-slate-900 text-left shrink-0 ml-1" title={noteText}>{noteText}</div>
             </div>
           </div>
         );

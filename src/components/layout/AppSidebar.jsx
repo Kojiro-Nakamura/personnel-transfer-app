@@ -39,7 +39,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
         <span className={cx("font-bold text-[11.5px] truncate shrink-0 max-w-[75%]", isRetired ? "text-slate-900" : "text-[#320A6B]")} title={emp.name}>
           {emp.name}
         </span>
-        <span className="text-[9px] text-slate-800 truncate flex-1 min-w-0" title={emp.currentTitle || '新採'}>
+        <span className="text-[9px] text-black truncate flex-1 min-w-0" title={emp.currentTitle || '新採'}>
           {emp.currentTitle || '新採'}
         </span>
       </div>
@@ -78,7 +78,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
             )}
           </div>
         )}
-        <span className="text-[9.5px] text-slate-800 shrink-0 mr-1" title={currentAge !== '' ? `${currentAge}歳` : ''}>
+        <span className="text-[9.5px] text-black shrink-0 mr-1" title={currentAge !== '' ? `${currentAge}歳` : ''}>
           {currentAge !== '' ? `${currentAge}歳` : ''}
         </span>
         <div onClick={e => e.stopPropagation()}>
@@ -99,7 +99,7 @@ export const AppSidebar = () => {
         title={isPickingMode ? "選択中の職員を「未配置」にします" : ""}
       >
         <div className="bg-slate-100 p-2 border-b border-slate-400 font-bold text-xs flex justify-between items-center shrink-0 group/sideheader">
-          <div className="flex items-center gap-1.5 text-slate-700">
+          <div className="flex items-center gap-1.5 text-slate-900">
             <AlertCircle className="w-4 h-4 text-amber-600" />未配置・保留
           </div>
           <CommentButton targetId="side-unassigned-header" tooltipPos="bottom-right" hoverClass="group-hover/sideheader:opacity-100" />
@@ -125,7 +125,7 @@ export const AppSidebar = () => {
         title={isPickingMode ? "選択中の職員を「退職・転出」にします" : ""}
       >
          <div className="bg-slate-100 p-2 border-b border-slate-400 font-bold text-xs flex justify-between items-center shrink-0 group/sideheader">
-           <div className="flex items-center gap-1.5 text-slate-700">
+           <div className="flex items-center gap-1.5 text-slate-900">
              <UserMinus className="w-4 h-4 text-rose-600" />退職・転出
            </div>
            <CommentButton targetId="side-retired-header" tooltipPos="bottom-right" hoverClass="group-hover/sideheader:opacity-100" />

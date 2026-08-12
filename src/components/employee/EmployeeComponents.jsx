@@ -169,7 +169,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}
-        {isFirst && <span className={cx("text-[11px] font-bold truncate", applyPostStyle ? "text-sky-900" : "text-slate-700")}>{titleText}</span>}
+        {isFirst && <span className={cx("text-[11px] font-bold truncate", applyPostStyle ? "text-sky-900" : "text-slate-900")}>{titleText}</span>}
       </div>
       
       {isFirst && (onTitleEdit || onTitleDelete || (isPost && (onMoveUp || onMoveDown))) && (
@@ -290,11 +290,11 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
   return (
     <div className={cx("p-2 rounded border flex flex-col", isCurrent ? "bg-slate-50 border-slate-200" : "bg-blue-50/50 border-blue-200")}>
       <div className="flex justify-between items-center mb-1.5 border-b pb-1">
-        <h4 className={cx("font-bold text-sm", isCurrent ? "text-slate-700" : "text-[#02213d]")}>{title}</h4>
+        <h4 className={cx("font-bold text-sm", isCurrent ? "text-slate-900" : "text-[#02213d]")}>{title}</h4>
         {isCurrent && setEditCurrent && (
           <label className="flex items-center gap-1 text-xs cursor-pointer" title="今年度のデータを直接編集する">
             <input type="checkbox" checked={editCurrent} onChange={(e) => setEditCurrent(e.target.checked)} className="cursor-pointer"/>
-            <span className={editCurrent ? "text-slate-700 font-bold" : "text-slate-400"}>今年度を編集</span>
+            <span className={editCurrent ? "text-slate-900 font-bold" : "text-slate-400"}>今年度を編集</span>
           </label>
         )}
       </div>
@@ -533,14 +533,14 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mb-3 bg-slate-50/50">
-            <h4 className="font-bold text-sm text-slate-700 mb-2 flex items-center gap-2">
+            <h4 className="font-bold text-sm text-slate-900 mb-2 flex items-center gap-2">
               昇進年度と経過年数
             </h4>
             <div className="grid grid-cols-[110px_1fr_110px_1fr_110px_1fr_110px_1fr_110px_1fr] gap-y-3 items-end justify-items-center">
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
                 <span className="text-[11px] font-bold text-slate-600 mb-1">採用</span>
-                <div className="px-1 py-1 bg-slate-200 text-slate-700 rounded text-xs font-bold shadow-inner border border-slate-300 h-[30px] flex items-center justify-center tracking-tighter overflow-hidden">
+                <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[30px] flex items-center justify-center tracking-tighter overflow-hidden">
                   {fd.hireDate ? (() => {
                     const hYear = parseInt(fd.hireDate.substring(0, 4));
                     const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
@@ -581,7 +581,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
-            <h4 className="font-bold text-sm text-slate-700 mb-2">履歴</h4>
+            <h4 className="font-bold text-sm text-slate-900 mb-2">履歴</h4>
             <div className="grid grid-cols-5 gap-y-2 gap-x-4 pl-4 pr-1">
               {(() => {
                 const baseHistory = [...(fd.history || [])].sort((a, b) => a.year - b.year);
@@ -632,7 +632,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                         {histAge !== null && !isNaN(histAge) && <span className="ml-0.5 text-[9px]">{histAge}歳</span>}
                         {h.isNext && <span className="ml-1 text-[9px] text-[#02213d] font-bold">(予定)</span>}
                       </span>
-                      <span className={cx("text-[11px] text-left truncate w-full", isChange ? "font-bold italic text-slate-900" : "font-normal text-slate-700")}>
+                      <span className={cx("text-[11px] text-left truncate w-full", isChange ? "font-bold italic text-slate-900" : "font-normal text-slate-900")}>
                         {h.department || '-'}
                       </span>
                       {!isLast && !isLastInRow && (
