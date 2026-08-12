@@ -604,6 +604,22 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     });
   }
 
+  ws.columns.forEach((col, i) => {
+    if (i >= 15) { // 'P' is col 16 (index 15)
+       let maxLength = 0;
+       col.eachCell({ includeEmpty: true }, cell => {
+         const str = cell.value ? cell.value.toString() : '';
+         let columnLength = 0;
+         for (let k = 0; k < str.length; k++) {
+           columnLength += str.charCodeAt(k) > 255 ? 2 : 1.2;
+         }
+         if (columnLength > maxLength) maxLength = columnLength;
+       });
+       const minW = (i === 15) ? 25 : 10;
+       col.width = maxLength < minW ? minW : maxLength + 1.5;
+    }
+  });
+
   await saveWorkbook(workbook, fileName);
 };
 
