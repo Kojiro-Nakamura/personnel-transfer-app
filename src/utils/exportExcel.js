@@ -98,7 +98,6 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.984, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
-  ws.pageSetup.printArea = 'A1:P10000';
 
   
   const extraCols = [
@@ -679,6 +678,9 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
        }
     });
   }
+  
+  ws.pageSetup.printArea = `A1:P${rowIndex > 6 ? rowIndex - 1 : 6}`;
+
 
   ws.columns.forEach((col, i) => {
     if (i >= 15) { // 'P' is col 16 (index 15)
