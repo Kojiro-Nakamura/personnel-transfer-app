@@ -39,10 +39,11 @@ const saveWorkbook = async (workbook, fileName) => {
 // --- 人事異動案（Excel）出力 ---
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel) => {
   const allHistoryYears = new Set();
+  allHistoryYears.add(targetYear);
   employees.forEach(e => {
     if (e.history) e.history.forEach(h => allHistoryYears.add(h.year));
   });
-  const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b).filter(y => y < targetYear - 1);
+  const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b);
 
   const getEraSuffixLocal = (yearStr) => {
     if (!yearStr) return '';
@@ -227,12 +228,12 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   ws.mergeCells('R4:R5');
   ws.mergeCells('S4:X4');
   ws.mergeCells('Y4:AH4');
-  const endColCode = ws.getColumn(35 + historyYears.length).letter;
+  const endColCode = ws.getColumn(34 + historyYears.length).letter;
   ws.mergeCells(`AI4:${endColCode}4`);
 
 
   
-  const totalCols = 35 + historyYears.length;
+  const totalCols = 34 + historyYears.length;
   for (let i = 1; i <= totalCols; i++) {
     const col = ws.getColumn(i).letter;
     [4, 5].forEach(rn => {
@@ -531,8 +532,13 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
       let lastValidHStr = '-';
       historyYears.forEach((y, i) => {
-        const hist = (extEmp.history || []).find(h => h.year === y);
-        let hStr = hist ? hist.department : '';
+        let hStr = '';
+        if (y === targetYear) {
+           hStr = nDeptName;
+        } else {
+           const hist = (extEmp.history || []).find(h => h.year === y);
+           hStr = hist ? hist.department : '';
+        }
         
         let isChange = false;
         if (hStr !== '' && hStr !== '-') {
@@ -560,22 +566,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
       });
       
-      let nextYearDisplay = nDeptName;
-      let isNextChange = false;
-      if (nDeptName && nDeptName !== ' / 課直轄' && nDeptName !== '未配置' && nDeptName !== '-') {
-        const nextAge = (extEmp.birthDate && !isNaN(targetYear)) ? calculateAge(extEmp.birthDate, targetYear) : null;
-        if (nextAge !== null && !isNaN(nextAge)) nextYearDisplay = `${nDeptName} (${nextAge}歳)`;
-        
-        if (nDeptName !== lastValidHStr) {
-           isNextChange = true;
-        }
-      }
-      rowVals.push(nextYearDisplay);
-      if (isNextChange) curFontStyles[35 + historyYears.length] = 'change';
-      if (promoYearMap[targetYear]) {
-         const c = getPromotedBgColorCode(promoYearMap[targetYear]);
-         if (c) curPromoColors[35 + historyYears.length] = c;
-      }
+
       
       row.values = rowVals;
       
