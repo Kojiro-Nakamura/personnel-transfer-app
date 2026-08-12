@@ -209,6 +209,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     thead tr:nth-child(1) th { border-top: 2px solid #000 !important; }
     th:first-child, td:first-child { border-left: 2px solid #000 !important; }
     thead tr:nth-child(2) th { border-top: 2px solid #000 !important; }
+    thead tr:nth-child(3) th, thead tr:nth-child(2) th[rowspan="2"] { border-bottom: 2px solid #000 !important; }
 
     td:nth-child(4), td:nth-child(10), td:nth-child(16) { border-left: 2px solid #000 !important; } 
     thead tr:nth-child(2) th:nth-child(4), thead tr:nth-child(2) th:nth-child(5), thead tr:nth-child(2) th:nth-child(6) { border-left: 2px solid #000 !important; }
@@ -278,10 +279,9 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       const updateBorders = () => {
         let lastDept = null;
         let lastGroup = null;
+        let isFirstRow = true;
         
         rows.forEach(row => {
-          row.classList.remove('border-dept-top', 'border-group-top');
-          
           if (row.style.display !== 'none') {
             const currentDept = row.getAttribute('data-dept');
             const currentGroup = row.getAttribute('data-group');
@@ -293,7 +293,9 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
               const cell = row.cells[i];
               const isHeaderCell = (i <= 2 && !cell.classList.contains('post-cell'));
               
-              if (isNewDept) {
+              if (isFirstRow) {
+                cell.style.borderTop = 'none';
+              } else if (isNewDept) {
                 cell.style.borderTop = '2px solid #000';
               } else if (isNewGroup) {
                 cell.style.borderTop = '1px solid #94a3b8';
@@ -312,6 +314,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             } else if (isNewGroup) {
               lastGroup = currentGroup;
             }
+            
+            isFirstRow = false;
           }
         });
       };
