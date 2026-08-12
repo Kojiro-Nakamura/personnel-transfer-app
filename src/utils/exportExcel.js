@@ -121,8 +121,6 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     { width: 14 }  // 来年度 (AG)
   ];
   historyYears.forEach(() => extraCols.push({ width: 14 }));
-  extraCols.push({ width: 14 }); // final Next Year placement
-  
   ws.columns = [
     { width: 18 }, // 部署名
     { width: 18 }, // 班・グループ
@@ -204,8 +202,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   const r4 = ws.getRow(4);
   const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ', ''];
-  r4Vals.push('フリガナ', '基本情報', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', '', '履歴');
-  historyYears.forEach(() => r4Vals.push(''));
+  r4Vals.push('フリガナ', '基本情報', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', '');
+  historyYears.forEach((y, i) => {
+    if (i === 0) r4Vals.push('履歴');
+    else r4Vals.push('');
+  });
   r4.values = r4Vals;
   r4.height = 20;
 
@@ -405,6 +406,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     ];
     
     const extEmp = nextEmp;
+    let curFontStyles = {};
     if (extEmp) {
       rowVals.push('');
       rowVals.push(extEmp.furigana || '');
@@ -428,7 +430,6 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const gradeToPromoKey = { "部長級": "promoYearDeptHead", "次長級": "promoYearDeputyHead", "所属長級": "promoYearDivHead", "課長級": "promoYearSecHead", "補佐級III(補佐兼班長)": "promoYearAssistant3", "補佐級II(班長)": "promoYearAssistant2", "補佐級I(主任)": "promoYearAssistant1", "係長級(主査)": "promoYearChief" };
       
       const curPromoColors = {}; // cell colors for promo
-      const curFontStyles = {}; // font changes for history
       
       const promoYearMap = {};
       if (extEmp) {
