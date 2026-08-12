@@ -191,8 +191,9 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   const r5 = ws.getRow(5);
   const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', ''];
-  r5Vals.push('', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`);
+  r5Vals.push('', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級');
   historyYears.forEach(y => r5Vals.push(getEraFormattedYear(y)));
+  r5Vals.push(`来年度 ${getEraFormattedYear(targetYear)}`);
   r5.values = r5Vals;
   r5.height = 20;
 
@@ -446,40 +447,32 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       // History
       let nDeptName = '';
       if (extEmp) {
-        const nextDept = deptMap[extEmp.nextDepartment];
-        const nextGroup = nextDept ? nextDept.groups.find(g => g.id === extEmp.nextGroup) : null;
-        let d = nextDept ? nextDept.name : (extEmp.nextDepartment || '');
-        let g = nextGroup ? nextGroup.name : (extEmp.nextGroup || '');
-        if (d === 'システム用外枠') nDeptName = '未配置';
-        else if (!d && !g) nDeptName = '未配置';
-        else if (d && !g) nDeptName = d;
-        else nDeptName = `${d} ${g}`;
-      }
-
-      let nextYearDisplay = nDeptName;
-      let isNextChange = false;
-      if (nDeptName && nDeptName !== ' / 課直轄' && nDeptName !== '未配置' && nDeptName !== '-') {
-        const nextAge = (extEmp.birthDate && !isNaN(targetYear)) ? calculateAge(extEmp.birthDate, targetYear) : null;
-        if (nextAge !== null && !isNaN(nextAge)) nextYearDisplay = `${nDeptName} (${nextAge}歳)`;
-        
-        const lastHistStr = historyYears.length > 0 ? ((extEmp.history || []).find(h => h.year === historyYears[historyYears.length - 1])?.department || '') : '-';
-        if (nDeptName !== (lastHistStr || '-')) {
-           isNextChange = true;
+        // Find placement in nextMap which represents the draft state
+        const nextLoc = nextMap[extEmp.id];
+        if (nextLoc) {
+           const nDept = deptMap[nextLoc.deptId];
+           const nGroup = nDept ? nDept.groups.find(g => g.id === nextLoc.groupId) : null;
+           let d = nDept ? nDept.name : '';
+           let g = nGroup ? nGroup.name : '';
+           if (d === 'システム用外枠') nDeptName = '未配置';
+           else if (d && !g) nDeptName = d;
+           else nDeptName = `${d} ${g}`;
+        } else {
+           nDeptName = '未配置';
         }
       }
-      rowVals.push(nextYearDisplay);
-      if (isNextChange) curPromoColors[33] = 'change';
 
+      let lastValidHStr = '-';
       historyYears.forEach((y, i) => {
         const hist = (extEmp.history || []).find(h => h.year === y);
         let hStr = hist ? hist.department : '';
         
         let isChange = false;
         if (hStr !== '' && hStr !== '-') {
-           const prevHStr = i > 0 ? ((extEmp.history || []).find(h => h.year === historyYears[i-1])?.department || '') : '-';
-           if (hStr !== (prevHStr || '-')) {
+           if (hStr !== lastValidHStr) {
               isChange = true;
            }
+           lastValidHStr = hStr;
         }
         
         let displayStr = hStr;
@@ -492,9 +485,22 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         
         rowVals.push(displayStr);
         if (isChange) {
-           curPromoColors[34 + i] = 'change'; 
+           curPromoColors[33 + i] = 'change'; 
         }
       });
+      
+      let nextYearDisplay = nDeptName;
+      let isNextChange = false;
+      if (nDeptName && nDeptName !== ' / 課直轄' && nDeptName !== '未配置' && nDeptName !== '-') {
+        const nextAge = (extEmp.birthDate && !isNaN(targetYear)) ? calculateAge(extEmp.birthDate, targetYear) : null;
+        if (nextAge !== null && !isNaN(nextAge)) nextYearDisplay = `${nDeptName} (${nextAge}歳)`;
+        
+        if (nDeptName !== lastValidHStr) {
+           isNextChange = true;
+        }
+      }
+      rowVals.push(nextYearDisplay);
+      if (isNextChange) curPromoColors[33 + historyYears.length] = 'change';
       
       row.values = rowVals;
       
