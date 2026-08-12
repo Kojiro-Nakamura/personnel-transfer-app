@@ -222,6 +222,12 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     
     td:nth-child(5), td:nth-child(11) { white-space: nowrap; text-overflow: ellipsis; text-align: left; }
     td:nth-child(7), td:nth-child(13) { white-space: nowrap; text-align: center; }
+    
+    tbody tr.highlight:not(.dept-boundary) td { border-top: 1px solid #94a3b8 !important; }
+    tbody tr.highlight td { border-bottom: 1px solid #94a3b8 !important; }
+    tbody tr.highlight + tr.highlight td:nth-child(1):empty,
+    tbody tr.highlight + tr.highlight td:nth-child(2):empty,
+    tbody tr.highlight + tr.highlight td:nth-child(3):empty { border-top: none !important; }
     td:not(.post-cell):nth-child(1), td:not(.post-cell):nth-child(2), td:not(.post-cell):nth-child(3) { border-top: none !important; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
@@ -280,6 +286,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         let lastDept = null;
         let lastGroup = null;
         let isFirstRow = true;
+        let prevVisibleRow = null;
         
         rows.forEach(row => {
           if (row.style.display !== 'none') {
@@ -289,18 +296,30 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const isNewDept = currentDept !== lastDept;
             const isNewGroup = !isNewDept && currentGroup !== lastGroup;
             
+            if (isNewDept) {
+              row.classList.add('dept-boundary');
+            } else {
+              row.classList.remove('dept-boundary');
+            }
+            
             for(let i = 0; i < row.cells.length; i++) {
               const cell = row.cells[i];
-              const isHeaderCell = (i <= 2 && !cell.classList.contains('post-cell'));
+              const isPostCellClass = cell.classList.contains('post-cell');
+              const isHeaderCol = (i <= 2);
+              const isBlank = cell.textContent.trim() === '';
+              
+              let isColorDifferent = false;
+              if (isHeaderCol && prevVisibleRow && prevVisibleRow.cells[i]) {
+                const prevIsPostCell = prevVisibleRow.cells[i].classList.contains('post-cell');
+                isColorDifferent = (isPostCellClass !== prevIsPostCell);
+              }
               
               if (isFirstRow) {
                 cell.style.borderTop = 'none';
               } else if (isNewDept) {
                 cell.style.borderTop = '2px solid #000';
-              } else if (isNewGroup) {
-                cell.style.borderTop = '1px solid #94a3b8';
               } else {
-                if (isHeaderCell) {
+                if (isHeaderCol && !isColorDifferent && isBlank) {
                   cell.style.borderTop = 'none';
                 } else {
                   cell.style.borderTop = '1px solid #94a3b8';
@@ -316,6 +335,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             }
             
             isFirstRow = false;
+            prevVisibleRow = row;
           }
         });
       };

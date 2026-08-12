@@ -311,6 +311,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   let lastDept = null;
   let lastGroup = null;
   let lastPost = null;
+  let prevRowColors = {};
 
   traverseOrgTree(departments, deptMap, currMap, nextMap, filterLevel, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
     const deptName = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
@@ -638,19 +639,16 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
         if (colNumber === 1) {
           if (isNewDept) topBorder = 'thick';
-          else if (structDeptHighlight) topBorder = true;
           else topBorder = false;
           
           if (structDeptHighlight) bottomBorder = true;
         } else if (colNumber === 2) {
           if (isNewDept) topBorder = 'thick';
-          else if (structGroupHighlight) topBorder = true;
           else topBorder = false;
           
           if (structGroupHighlight) bottomBorder = true;
         } else if (colNumber === 3) {
           if (isNewDept) topBorder = 'thick';
-          else if (structPostHighlight) topBorder = true;
           else topBorder = false;
           
           if (structPostHighlight) bottomBorder = true;
@@ -688,6 +686,36 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       if (argb !== 'FFFFFFFF') {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       }
+      
+      if ((colNumber === 1 || colNumber === 2 || colNumber === 3) && argb === prevRowColors[colNumber]) {
+         const cellText = rowVals[colNumber - 1];
+         if (!cellText || cellText === '') {
+            if (cell.border && cell.border.top && cell.border.top.style === 'thin') {
+               cell.border = { ...cell.border, top: undefined };
+            }
+            if (rowIndex > 6) {
+               const prevCell = ws.getRow(rowIndex - 1).getCell(colNumber);
+               if (prevCell.border && prevCell.border.bottom && prevCell.border.bottom.style === 'thin') {
+                  prevCell.border = { ...prevCell.border, bottom: undefined };
+               }
+            }
+         } else {
+            if (!isNewDept && cell.border && !cell.border.top) {
+                cell.border = { ...cell.border, top: { style: 'thin' } };
+            }
+         }
+      } else if (colNumber === 1 || colNumber === 2 || colNumber === 3) {
+         if (!isNewDept) {
+            cell.border = { ...cell.border, top: { style: 'thin' } };
+            if (rowIndex > 6) {
+               const prevCell = ws.getRow(rowIndex - 1).getCell(colNumber);
+               if (prevCell.border && !prevCell.border.bottom) {
+                  prevCell.border = { ...prevCell.border, bottom: { style: 'thin' } };
+               }
+            }
+         }
+      }
+      prevRowColors[colNumber] = argb;
     });
 
     rowIndex++;
