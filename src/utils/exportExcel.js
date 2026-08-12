@@ -405,7 +405,20 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const gradeList = ['', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級'];
       
       const curPromoColors = {}; // cell colors for promo
+      const curFontStyles = {}; // font changes for history
       
+      const promoYearMap = {};
+      if (extEmp) {
+         if (extEmp.promoYearChief) promoYearMap[parseInt(extEmp.promoYearChief)] = "係長級(主査)";
+         if (extEmp.promoYearAssistant1) promoYearMap[parseInt(extEmp.promoYearAssistant1)] = "補佐級I(主任)";
+         if (extEmp.promoYearAssistant2) promoYearMap[parseInt(extEmp.promoYearAssistant2)] = "補佐級II(班長)";
+         if (extEmp.promoYearAssistant3) promoYearMap[parseInt(extEmp.promoYearAssistant3)] = "補佐級III(補佐兼班長)";
+         if (extEmp.promoYearSecHead) promoYearMap[parseInt(extEmp.promoYearSecHead)] = "課長級";
+         if (extEmp.promoYearDivHead) promoYearMap[parseInt(extEmp.promoYearDivHead)] = "所属長級";
+         if (extEmp.promoYearDeputyHead) promoYearMap[parseInt(extEmp.promoYearDeputyHead)] = "次長級";
+         if (extEmp.promoYearDeptHead) promoYearMap[parseInt(extEmp.promoYearDeptHead)] = "部長級";
+      }
+
       for (let idx = 1; idx < pKeys.length; idx++) {
         const key = pKeys[idx];
         let cellVal = extEmp[key] || '';
@@ -431,12 +444,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           if (!isNaN(prevNum) && !isNaN(yNum) && prevNum > 0) {
              const diff = yNum - prevNum;
              pStr = `${diff}年目> ${pStr}`;
-             
-             const stdYears = getStandardYears(gradeList[idx]);
-             if (stdYears > 0 && diff < stdYears && !prefix) {
-                curPromoColors[24 + idx] = getFastBgColorCode();
-             }
           }
+          
+          const c = getPromotedBgColorCode(gradeList[idx]);
+          if (c) curPromoColors[24 + idx] = c;
           
           rowVals.push(prefix ? `${prefix}${pStr}` : pStr);
         } else {
@@ -447,7 +458,6 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       // History
       let nDeptName = '';
       if (extEmp) {
-        // Find placement in nextMap which represents the draft state
         const nextLoc = nextMap[extEmp.id];
         if (nextLoc) {
            const nDept = deptMap[nextLoc.deptId];
@@ -485,7 +495,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         
         rowVals.push(displayStr);
         if (isChange) {
-           curPromoColors[33 + i] = 'change'; 
+           curFontStyles[33 + i] = 'change'; 
+        }
+        if (promoYearMap[y]) {
+           const c = getPromotedBgColorCode(promoYearMap[y]);
+           if (c) curPromoColors[33 + i] = c;
         }
       });
       
@@ -500,18 +514,22 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
       }
       rowVals.push(nextYearDisplay);
-      if (isNextChange) curPromoColors[33 + historyYears.length] = 'change';
+      if (isNextChange) curFontStyles[33 + historyYears.length] = 'change';
+      if (promoYearMap[targetYear]) {
+         const c = getPromotedBgColorCode(promoYearMap[targetYear]);
+         if (c) curPromoColors[33 + historyYears.length] = c;
+      }
       
       row.values = rowVals;
       
       // apply colors and styles
       Object.keys(curPromoColors).forEach(cIdx => {
          const cell = row.getCell(parseInt(cIdx));
-         if (curPromoColors[cIdx] === 'change') {
-             cell.font = { name: 'BIZ UDPGothic', size: 10, bold: true, italic: true };
-         } else {
-             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + curPromoColors[cIdx].replace('#', '').toUpperCase() } };
-         }
+         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + curPromoColors[cIdx].replace('#', '').toUpperCase() } };
+      });
+      Object.keys(curFontStyles).forEach(cIdx => {
+         const cell = row.getCell(parseInt(cIdx));
+         cell.font = { name: 'BIZ UDPGothic', size: 10, bold: true, italic: true };
       });
     } else {
       row.values = rowVals;
