@@ -228,7 +228,6 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     tbody tr.highlight + tr.highlight td:nth-child(1):empty,
     tbody tr.highlight + tr.highlight td:nth-child(2):empty,
     tbody tr.highlight + tr.highlight td:nth-child(3):empty { border-top: none !important; }
-    td:not(.post-cell):nth-child(1), td:not(.post-cell):nth-child(2), td:not(.post-cell):nth-child(3) { border-top: none !important; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
 
