@@ -282,6 +282,9 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
       const rows = Array.from(tbody.querySelectorAll("tr"));
       
       const updateBorders = () => {
+        const tableElement = document.getElementById('empTable');
+        const isFiltered = tableElement ? tableElement.classList.contains('table-filtered') : false;
+        
         let lastDept = null;
         let lastGroup = null;
         let isFirstRow = true;
@@ -310,7 +313,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
               let isColorDifferent = false;
               if (isHeaderCol && prevVisibleRow && prevVisibleRow.cells[i]) {
                 const prevIsPostCell = prevVisibleRow.cells[i].classList.contains('post-cell');
-                isColorDifferent = (isPostCellClass !== prevIsPostCell);
+                isColorDifferent = !isFiltered && (isPostCellClass !== prevIsPostCell);
               }
               
               if (isFirstRow) {
