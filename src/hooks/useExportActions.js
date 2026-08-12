@@ -205,8 +205,12 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     th, td { border: 1px solid #94a3b8; padding: 2px 4px; vertical-align: top; overflow: hidden; word-break: break-word; line-height: 1.25; } 
     th, strong, b { font-weight: 600; }
     thead { position: sticky; top: 0; z-index: 20; background-color: #fff; }
-    thead th { border: 1px solid #94a3b8 !important; outline: 1px solid #94a3b8; outline-offset: -1px; }
-    th { background-color: #f0f0f0; border-bottom: 2px solid #334155; } 
+    thead th { border: 1px solid #94a3b8; outline: 1px solid #94a3b8; outline-offset: -1px; }
+    th { background-color: #f0f0f0; border-bottom: 1px solid #94a3b8; } 
+    thead tr:nth-child(2) th { border-top: 2px solid #334155 !important; }
+    thead tr:nth-child(3) th, thead tr:nth-child(2) th[rowspan="2"] { border-bottom: 2px solid #334155 !important; }
+    thead tr:nth-child(2) th:first-child { border-left: 2px solid #334155 !important; }
+    thead tr:nth-child(2) th:last-child { border-right: 2px solid #334155 !important; }
     .highlight { background-color: #a7f3d0 !important; cursor: pointer; } 
     .selected { background-color: #fef08a !important; } 
     .post-cell { font-weight: 600; color: #0c4a6e; background-color: #e0f2fe; } 
