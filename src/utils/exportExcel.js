@@ -515,17 +515,18 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       // History
       let nDeptName = '';
       if (extEmp) {
-        const nextLoc = nextMap[extEmp.id];
-        if (nextLoc) {
-           const nDept = deptMap[nextLoc.deptId];
-           const nGroup = nDept ? nDept.groups.find(g => g.id === nextLoc.groupId) : null;
-           let d = nDept ? nDept.name : '';
-           let g = nGroup ? nGroup.name : '';
+        if (extEmp.departmentId === 'retired') {
+           nDeptName = '退職';
+        } else if (!extEmp.departmentId || extEmp.departmentId === 'unassigned') {
+           nDeptName = '未配置';
+        } else {
+           const nDept = departments.find(d => d.id === extEmp.departmentId);
+           const nGroup = nDept && extEmp.groupId ? (nDept.groups || []).find(g => g.id === extEmp.groupId) : null;
+           let d = nDept ? (nDept.nextName || nDept.name) : '';
+           let g = nGroup ? (nGroup.nextName || nGroup.name) : '';
            if (d === 'システム用外枠') nDeptName = '未配置';
            else if (d && !g) nDeptName = d;
            else nDeptName = `${d} ${g}`;
-        } else {
-           nDeptName = '未配置';
         }
       }
 
