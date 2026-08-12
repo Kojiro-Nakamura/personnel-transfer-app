@@ -101,7 +101,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   
   const extraCols = [
-    { width: 16 }, // フリガナ (Q)
+    { width: 3 },  // 空白列 (Q)
+    { width: 16 }, // フリガナ (R)
     { width: 12 }, // 職員番号 (R)
     { width: 6 },  // 性別 (S)
     { width: 14 }, // 生年月日 (T)
@@ -174,7 +175,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   
   const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 34 + currYearIndex;
+  const legendEndCol = 35 + currYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -202,14 +203,14 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   }
 
   const r4 = ws.getRow(4);
-  const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ'];
+  const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ', ''];
   r4Vals.push('フリガナ', '基本情報', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', '', '履歴');
   historyYears.forEach(() => r4Vals.push(''));
   r4.values = r4Vals;
   r4.height = 20;
 
   const r5 = ws.getRow(5);
-  const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', ''];
+  const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', '', ''];
   r5Vals.push('', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', `来年度 ${getEraFormattedYear(targetYear)}`);
   historyYears.forEach(y => r5Vals.push(getEraFormattedYear(y)));
   r5Vals.push(`来年度 ${getEraFormattedYear(targetYear)}`);
@@ -223,14 +224,15 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   ws.mergeCells('J4:O4');
   ws.mergeCells('P4:P5');
   ws.mergeCells('Q4:Q5');
-  ws.mergeCells('R4:W4');
-  ws.mergeCells('X4:AG4');
-  const endColCode = ws.getColumn(34 + historyYears.length).letter;
-  ws.mergeCells(`AH4:${endColCode}4`);
+  ws.mergeCells('R4:R5');
+  ws.mergeCells('S4:X4');
+  ws.mergeCells('Y4:AH4');
+  const endColCode = ws.getColumn(35 + historyYears.length).letter;
+  ws.mergeCells(`AI4:${endColCode}4`);
 
 
   
-  const totalCols = 34 + historyYears.length;
+  const totalCols = 35 + historyYears.length;
   for (let i = 1; i <= totalCols; i++) {
     const col = ws.getColumn(i).letter;
     [4, 5].forEach(rn => {
@@ -241,18 +243,19 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       if (i >= 4 && i <= 9) argb = 'FFFEF3C7'; // 今年度
       if (i >= 10 && i <= 15) argb = 'FFDBEAFE'; // 来年度
       if (i === 16) argb = 'FFF1F5F9'; // メモ
-      if (i === 17) argb = 'FFFEF3C7'; // フリガナ (Amber)
-      if (i >= 18 && i <= 23) argb = 'FFBFDBFE'; // 基本情報 (Blue)
-      if (i >= 24 && i <= 33) {
+      if (i === 17) argb = 'FFFFFFFF'; // 空白列
+      if (i === 18) argb = 'FFFEF3C7'; // フリガナ (Amber)
+      if (i >= 19 && i <= 24) argb = 'FFBFDBFE'; // 基本情報 (Blue)
+      if (i >= 25 && i <= 34) {
          const promoColors = {
-            25: getPromotedBgColorCode('係長級(主査)'),
-            26: getPromotedBgColorCode('補佐級I(主任)'),
-            27: getPromotedBgColorCode('補佐級II(班長)'),
-            28: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
-            29: getPromotedBgColorCode('課長級'),
-            30: getPromotedBgColorCode('所属長級'),
-            31: getPromotedBgColorCode('次長級'),
-            32: getPromotedBgColorCode('部長級'),
+            26: getPromotedBgColorCode('係長級(主査)'),
+            27: getPromotedBgColorCode('補佐級I(主任)'),
+            28: getPromotedBgColorCode('補佐級II(班長)'),
+            29: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
+            30: getPromotedBgColorCode('課長級'),
+            31: getPromotedBgColorCode('所属長級'),
+            32: getPromotedBgColorCode('次長級'),
+            33: getPromotedBgColorCode('部長級'),
          };
          if (rn === 5 && promoColors[i]) {
             argb = 'FF' + promoColors[i].replace('#', '').toUpperCase();
@@ -260,7 +263,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
             argb = 'FFF5D0FE'; // Fuchsia
          }
       }
-      if (i >= 34) argb = 'FFA7F3D0'; // Emerald (History)
+      if (i >= 35) argb = 'FFA7F3D0'; // Emerald (History)
       
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
@@ -272,7 +275,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       if (rn === 4 && i >= 33) bottomB = true;
       
       const leftB = (i === 1 || i === 4 || i === 10 || i === 16 || i === 17 || i === 18 || i === 24 || i === 33) ? 'thick' : true;
-      const rightB = (i === 3 || i === 9 || i === 15 || i === 16 || i === 17 || i === 23 || i === 32 || i === totalCols) ? 'thick' : true;
+      const rightB = (i === 3 || i === 9 || i === 15 || i === 16 || i === 17 || i === 18 || i === 24 || i === 34 || i === totalCols) ? 'thick' : true;
       
       const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
       cell.border = { ...(cell.border || {}), ...newBorder };
@@ -404,6 +407,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     
     const extEmp = nextEmp || currEmp;
     if (extEmp) {
+      rowVals.push('');
       rowVals.push(extEmp.furigana || '');
       rowVals.push(extEmp.employeeNumber || '');
       rowVals.push(extEmp.gender || '');
@@ -480,7 +484,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           
           if (isNextPromo) {
              const c = getPromotedBgColorCode(gradeList[idx]);
-             if (c) curPromoColors[24 + idx] = c;
+             if (c) curPromoColors[25 + idx] = c;
           }
           
           rowVals.push(prefix ? `${prefix}${pStr}` : pStr);
@@ -505,7 +509,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       
       if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
            const c = getPromotedBgColorCode(extEmp.nextGrade);
-           if (c) curPromoColors[24 + pKeys.length] = c;
+           if (c) curPromoColors[25 + pKeys.length] = c;
       }
       
       // History
@@ -548,11 +552,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         
         rowVals.push(displayStr);
         if (isChange) {
-           curFontStyles[34 + i] = 'change'; 
+           curFontStyles[35 + i] = 'change'; 
         }
         if (promoYearMap[y]) {
            const c = getPromotedBgColorCode(promoYearMap[y]);
-           if (c) curPromoColors[34 + i] = c;
+           if (c) curPromoColors[35 + i] = c;
         }
       });
       
@@ -567,10 +571,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
       }
       rowVals.push(nextYearDisplay);
-      if (isNextChange) curFontStyles[34 + historyYears.length] = 'change';
+      if (isNextChange) curFontStyles[35 + historyYears.length] = 'change';
       if (promoYearMap[targetYear]) {
          const c = getPromotedBgColorCode(promoYearMap[targetYear]);
-         if (c) curPromoColors[34 + historyYears.length] = c;
+         if (c) curPromoColors[35 + historyYears.length] = c;
       }
       
       row.values = rowVals;
