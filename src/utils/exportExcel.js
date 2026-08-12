@@ -89,17 +89,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   };
   
   const getFastBgColorCode = () => '#fecaca'; // rose-200
-  const getPromotedBgColorCode = (gradeName) => {
-    if (gradeName === '係長級(主査)') return '#fef9c3'; // yellow-100
-    if (gradeName === '補佐級I(主任)') return '#fef08a'; // yellow-200
-    if (gradeName === '補佐級II(班長)') return '#fde047'; // yellow-300
-    if (gradeName === '補佐級III(補佐兼班長)') return '#facc15'; // yellow-400
-    if (gradeName === '課長級') return '#fed7aa'; // orange-200
-    if (gradeName === '所属長級') return '#fdba74'; // orange-300
-    if (gradeName === '次長級') return '#fb923c'; // orange-400
-    if (gradeName === '部長級') return '#f97316'; // orange-500
-    return '#ffffff';
-  };
+
 
   const workbook = new ExcelJS.Workbook();
   const ws = workbook.addWorksheet('人事異動案', {
@@ -182,6 +172,34 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   });
 
   
+  const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
+  const legendEndCol = 33 + currYearIndex;
+  const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
+  const legendStartCol = legendEndCol - 8;
+
+  for (let i = 0; i < legendLabels.length; i++) {
+    const colNumber = legendStartCol + i;
+    if (colNumber > 1) { 
+      const cell = r2.getCell(colNumber);
+      cell.value = legendLabels[i];
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FF000000' } },
+        left: { style: 'thin', color: { argb: 'FF000000' } },
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+        right: { style: 'thin', color: { argb: 'FF000000' } }
+      };
+      if (i === 0) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
+      } else {
+        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: false, color: { argb: 'FF000000' } };
+        const c = getPromotedBgColorCode(legendLabels[i]);
+        if (c) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + c.replace('#', '').toUpperCase() } };
+      }
+    }
+  }
+
   const r4 = ws.getRow(4);
   const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ'];
   r4Vals.push('フリガナ', '基本情報', '', '', '', '', '', '昇進年度', '', '', '', '', '', '', '', '', '履歴');
