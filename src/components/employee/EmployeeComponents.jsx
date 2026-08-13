@@ -3,7 +3,7 @@ import {
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ArrowRight, ChevronDown, ChevronRight, ChevronUp,
-  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
+  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, Wand2
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from '../../utils/helpers.js';
@@ -549,9 +549,10 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           <div className="flex items-center gap-3">
             <button
               onClick={handleAutoFix}
-              className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold py-1.5 px-3 rounded shadow-sm flex items-center gap-1 transition-colors"
+              className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-bold py-2 px-4 rounded shadow-sm flex items-center gap-1.5 transition-colors"
               title="来年度の級と「昇進年数と経過年数」「履歴」があっていない場合、および配置が変わっていない場合の経過年数の間違いを自動修正します"
             >
+              <Wand2 className="w-4 h-4" />
               自動修正
             </button>
             <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1">
