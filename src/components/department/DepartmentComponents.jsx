@@ -190,7 +190,6 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                   nextMove={createMoveProps(nxt, i, nextArr.length, false, mutations)} 
                   currConflict={isCurrConflict} 
                   nextConflict={isNextConflict} 
-                  isIncreased={isPostIncreased}
                 />
               );
             });
@@ -314,7 +313,6 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         nextMove={createMoveProps(nxt, i, nextArr.length, false, mutations)} 
                         currConflict={isCurrConflict} 
                         nextConflict={isNextConflict} 
-                        isIncreased={isGpIncreased}
                       />
                     );
                   });
@@ -341,7 +339,6 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, grp.id, null)} 
                         currentMove={createMoveProps(curr, i, dm.groups[grp.id].direct.current.length, true, mutations)} 
                         nextMove={createMoveProps(nxt, i, dm.groups[grp.id].direct.next.length, false, mutations)} 
-                        isIncreased={isGrpDirectIncreased}
                       />
                     ); 
                   });
@@ -376,7 +373,6 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                   onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, null, null)} 
                   currentMove={createMoveProps(curr, i, dm.direct.current.length, true, mutations)} 
                   nextMove={createMoveProps(nxt, i, dm.direct.next.length, false, mutations)} 
-                  isIncreased={isDeptDirectIncreased}
                 />
               ); 
             });

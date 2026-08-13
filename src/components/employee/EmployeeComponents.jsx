@@ -163,9 +163,11 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   );
 };
 
-export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId, isIncreased }) => {
+export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId }) => {
   const { filterLevel } = useApp();
   const applyPostStyle = isPost && filterLevel === 0;
+  const isNewlyAssigned = !currentEmp && !!nextEmp;
+  
   return (
   <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50" : "border-slate-500 hover:bg-slate-50")}>
     <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-100 border-l-4 border-l-sky-600" : "border-slate-500 bg-slate-50 border-l-4 border-l-transparent")}>
@@ -237,7 +239,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
       moveProps={nextMove} 
       isConflict={nextConflict} 
       hasPeer={!!currentEmp} 
-      isIncreased={isIncreased}
+      isIncreased={isNewlyAssigned}
     />
     
       <div className={cx("w-[40px] border-l border-slate-500 flex items-center justify-center shrink-0 bg-white/50 z-20", applyPostStyle ? "border-sky-400" : "border-slate-500")}>
