@@ -607,10 +607,14 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
                   const dept = h.department || '-';
                   let isChange = false;
-                  const olderH = arr[i + 1];
-                  const olderDept = olderH ? (olderH.department || '-') : '-';
-                  if (dept !== '-' && dept !== olderDept) {
+                  if (i === 0) {
                     isChange = true;
+                  } else {
+                    const olderH = arr[i - 1];
+                    const olderDept = olderH ? (olderH.department || '-') : '-';
+                    if (dept !== '-' && dept !== olderDept) {
+                      isChange = true;
+                    }
                   }
 
                   const histAge = (fd.birthDate && !isNaN(h.year)) ? calculateAge(fd.birthDate, h.year) : null;
