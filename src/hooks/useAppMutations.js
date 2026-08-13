@@ -8,6 +8,7 @@ export function useAppMutations(setEmployees, setDepartments, setNotes, commit) 
   return useMemo(() => ({
     addEmployee: (data) => updateEmps(prev => [...prev, { id: `emp-${Date.now()}`, orderCurrent: Date.now(), orderNext: Date.now(), ...data }]),
     updateEmployee: (id, data) => updateEmps(prev => prev.map(emp => emp.id === id ? { ...emp, ...data } : emp)),
+    updateAllEmployees: (emps) => updateEmps(emps),
     bulkProcessEmployees: (updates, deletes, additions) => updateEmps(prev => {
       let next = [...prev];
       if (deletes?.length) { 
