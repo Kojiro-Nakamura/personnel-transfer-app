@@ -13,6 +13,12 @@
   b, strong, th {
     font-weight: 600;
   }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer utilities {
