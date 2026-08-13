@@ -29,7 +29,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
           (isPost && filterLevel === 0) && !isNext ? "border-r border-sky-400" : "border-r",
           emptyBgClass,
           isNext ? "cursor-pointer" : "",
-          isNext && isIncreased && "border-l-[4px] border-r-[4px] border-blue-500 border-solid"
+          isNext && isIncreased && "border-l-[5px] border-r-[5px] border-blue-600 border-solid"
         )}
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
@@ -81,7 +81,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
     isPickingMode && isNext ? "hover:ring-2 hover:ring-inset hover:ring-amber-500 bg-amber-50 z-10" : 
     emp.id === hoveredEmpId ? "bg-yellow-200 z-20 shadow-md" : 
     bgClass,
-    isNext && isIncreased && "border-l-[4px] border-r-[4px] border-blue-500"
+    isNext && isIncreased && "border-l-[5px] border-r-[5px] border-blue-600"
   );
 
   return (

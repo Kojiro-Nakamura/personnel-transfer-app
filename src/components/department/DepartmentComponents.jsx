@@ -321,28 +321,31 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                 })}
                 
                 {/* 班員（一般） */}
-                {getPairs(
-                  filterDirects(dm.groups[grp.id].direct.current, filterLevel, false), 
-                  filterDirects(dm.groups[grp.id].direct.next, filterLevel, true)
-                ).map(([curr, nxt, i]) => { 
-                  if (!curr && !nxt) return null; 
-                  return (
-                    <EmployeeRow 
-                      key={`direct-${grp.id}-${i}`} 
-                      rowAnchorId={`directRow-${dept.id}-${grp.id}-${i}`} 
-                      isFirst={i === 0} 
-                      isIndent={true} 
-                      titleText="班員" 
-                      currentEmp={curr} 
-                      nextEmp={nxt} 
-                      onCurrentClick={() => handleCellClick(curr?.id, true, dept.id, null, grp.id, null)} 
-                      onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, grp.id, null)} 
-                      currentMove={createMoveProps(curr, i, dm.groups[grp.id].direct.current.length, true, mutations)} 
-                      nextMove={createMoveProps(nxt, i, dm.groups[grp.id].direct.next.length, false, mutations)} 
-                      isIncreased={isGrpIncreased}
-                    />
-                  ); 
-                })}
+                {(() => {
+                  const directCurr = filterDirects(dm.groups[grp.id].direct.current, filterLevel, false);
+                  const directNext = filterDirects(dm.groups[grp.id].direct.next, filterLevel, true);
+                  const isGrpDirectIncreased = dm.groups[grp.id].direct.next.length > dm.groups[grp.id].direct.current.length;
+                  
+                  return getPairs(directCurr, directNext).map(([curr, nxt, i]) => { 
+                    if (!curr && !nxt) return null; 
+                    return (
+                      <EmployeeRow 
+                        key={`direct-${grp.id}-${i}`} 
+                        rowAnchorId={`directRow-${dept.id}-${grp.id}-${i}`} 
+                        isFirst={i === 0} 
+                        isIndent={true} 
+                        titleText="班員" 
+                        currentEmp={curr} 
+                        nextEmp={nxt} 
+                        onCurrentClick={() => handleCellClick(curr?.id, true, dept.id, null, grp.id, null)} 
+                        onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, grp.id, null)} 
+                        currentMove={createMoveProps(curr, i, dm.groups[grp.id].direct.current.length, true, mutations)} 
+                        nextMove={createMoveProps(nxt, i, dm.groups[grp.id].direct.next.length, false, mutations)} 
+                        isIncreased={isGrpDirectIncreased}
+                      />
+                    ); 
+                  });
+                })()}
                 <AddSlotRow 
                   label="追加枠" 
                   indentClass="ml-9" 
@@ -354,26 +357,30 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
           })}
           
           {/* 課直属（一般） */}
-          {getPairs(
-            filterDirects(dm.direct.current, filterLevel, false), 
-            filterDirects(dm.direct.next, filterLevel, true)
-          ).map(([curr, nxt, i]) => { 
-            if (!curr && !nxt) return null; 
-            return (
-              <EmployeeRow 
-                key={`dept-direct-${dept.id}-${i}`} 
-                rowAnchorId={`deptDirectRow-${dept.id}-${i}`} 
-                isFirst={i === 0} 
-                titleText="課直属(一般)" 
-                currentEmp={curr} 
-                nextEmp={nxt} 
-                onCurrentClick={() => handleCellClick(curr?.id, true, dept.id, null, null, null)} 
-                onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, null, null)} 
-                currentMove={createMoveProps(curr, i, dm.direct.current.length, true, mutations)} 
-                nextMove={createMoveProps(nxt, i, dm.direct.next.length, false, mutations)} 
-              />
-            ); 
-          })}
+          {(() => {
+            const isDeptDirectIncreased = dm.direct.next.length > dm.direct.current.length;
+            return getPairs(
+              filterDirects(dm.direct.current, filterLevel, false), 
+              filterDirects(dm.direct.next, filterLevel, true)
+            ).map(([curr, nxt, i]) => { 
+              if (!curr && !nxt) return null; 
+              return (
+                <EmployeeRow 
+                  key={`dept-direct-${dept.id}-${i}`} 
+                  rowAnchorId={`deptDirectRow-${dept.id}-${i}`} 
+                  isFirst={i === 0} 
+                  titleText="課直属(一般)" 
+                  currentEmp={curr} 
+                  nextEmp={nxt} 
+                  onCurrentClick={() => handleCellClick(curr?.id, true, dept.id, null, null, null)} 
+                  onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, null, null)} 
+                  currentMove={createMoveProps(curr, i, dm.direct.current.length, true, mutations)} 
+                  nextMove={createMoveProps(nxt, i, dm.direct.next.length, false, mutations)} 
+                  isIncreased={isDeptDirectIncreased}
+                />
+              ); 
+            });
+          })()}
           <AddSlotRow 
             label="直属追加枠" 
             indentClass="ml-4" 
