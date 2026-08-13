@@ -546,9 +546,18 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               基本情報やスキル、異動案（現行・新）を編集します。
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1">
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleAutoFix}
+              className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold py-1.5 px-3 rounded shadow-sm flex items-center gap-1 transition-colors"
+              title="来年度の級と「昇進年数と経過年数」「履歴」があっていない場合、および配置が変わっていない場合の経過年数の間違いを自動修正します"
+            >
+              自動修正
+            </button>
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         
         <div className="space-y-3 overflow-y-auto flex-1 pr-2 pb-1">
@@ -573,18 +582,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mb-3 bg-slate-50/50">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                昇進年度と経過年数
-              </h4>
-              <button
-                onClick={handleAutoFix}
-                className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold py-1 px-3 rounded shadow-sm flex items-center gap-1 transition-colors"
-                title="来年度の級と「昇進年数と経過年数」「履歴」があっていない場合、および配置が変わっていない場合の経過年数の間違いを自動修正します"
-              >
-                自動修正
-              </button>
-            </div>
+            <h4 className="font-bold text-sm text-slate-900 mb-2 flex items-center gap-2">
+              昇進年度と経過年数
+            </h4>
             <div className="grid grid-cols-[110px_1fr_110px_1fr_110px_1fr_110px_1fr_110px_1fr] gap-y-3 items-end justify-items-center">
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
