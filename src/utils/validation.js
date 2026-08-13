@@ -42,28 +42,23 @@ export const validateEmployees = (employees, targetYear) => {
     }
 
     // 2. 経過年数の矛盾
-    if (isPromoted) {
-      if (Number(emp.nextYears) !== 1) {
-        warnings.push({
-          empId: emp.id,
-          empName: emp.name,
-          type: 'INVALID_NEXT_YEARS_PROMOTED',
-          message: `昇進しているため経過年数は「1年」になるはずですが、現在「${emp.nextYears}年」になっています。`
-        });
-      }
+    const isSameDept = emp.currentDeptId === emp.departmentId;
+    const isSamePlacement = isSameDept && emp.currentPostId === emp.postId && emp.currentGroupId === emp.groupId && emp.currentGroupPostId === emp.groupPostId;
+    
+    let expectedNextYears;
+    if (isSameDept) {
+      expectedNextYears = (Number(emp.currentYears) || 0) + 1;
     } else {
-      const isSamePlacement = emp.currentDeptId === emp.departmentId && emp.currentPostId === emp.postId && emp.currentGroupId === emp.groupId && emp.currentGroupPostId === emp.groupPostId;
-      if (isSamePlacement) {
-        const expectedYears = (Number(emp.currentYears) || 0) + 1;
-        if (Number(emp.nextYears) !== expectedYears && Number(emp.nextYears) === 1) {
-          warnings.push({
-            empId: emp.id,
-            empName: emp.name,
-            type: 'INVALID_NEXT_YEARS_SAME_PLACEMENT',
-            message: `配置と級が変わっていませんが、経過年数が「1年」にリセットされています。本来は「${expectedYears}年」です。`
-          });
-        }
-      }
+      expectedNextYears = 1;
+    }
+
+    if (Number(emp.nextYears) !== expectedNextYears) {
+      warnings.push({
+        empId: emp.id,
+        empName: emp.name,
+        type: 'INVALID_NEXT_YEARS',
+        message: `配置変更ルールに基づくと経過年数は「${expectedNextYears}年」になるはずですが、現在「${emp.nextYears}年」になっています。`
+      });
     }
 
     // 3. 役職と級の不整合（明らかなもの）
