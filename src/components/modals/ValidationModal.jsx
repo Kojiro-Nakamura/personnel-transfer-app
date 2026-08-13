@@ -2,7 +2,7 @@ import React from 'react';
 import { validateEmployees } from '../../utils/validation.js';
 import { AlertCircle, AlertTriangle, CheckCircle, X } from 'lucide-react';
 
-export const ValidationModal = ({ isOpen, onClose, employees, targetYear }) => {
+export const ValidationModal = ({ isOpen, onClose, employees, targetYear, onEmpClick }) => {
   if (!isOpen) return null;
 
   const warnings = validateEmployees(employees, targetYear);
@@ -43,13 +43,18 @@ export const ValidationModal = ({ isOpen, onClose, employees, targetYear }) => {
               </div>
               
               {warnings.map((warn, i) => (
-                <div key={i} className="flex gap-4 p-4 bg-white rounded-lg border-l-4 border-yellow-400 shadow-sm relative overflow-hidden group">
+                <div 
+                  key={i} 
+                  onClick={() => onEmpClick && onEmpClick(warn.empId)}
+                  className="flex gap-4 p-4 bg-white hover:bg-yellow-50/50 rounded-lg border-l-4 border-yellow-400 shadow-sm relative overflow-hidden group cursor-pointer transition-colors"
+                  title="クリックして職員情報を編集"
+                >
                   <div className="shrink-0 pt-0.5">
                     <AlertTriangle className="w-5 h-5 text-yellow-500" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-slate-800 text-lg">{warn.empName}</span>
+                      <span className="font-bold text-slate-800 text-lg group-hover:text-[#0F828C] transition-colors">{warn.empName}</span>
                       <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded border border-slate-200">
                         {warn.type}
                       </span>
