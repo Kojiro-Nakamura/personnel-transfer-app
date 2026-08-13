@@ -9,7 +9,7 @@ import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
-
+import { autoFixEmployees } from '../../utils/validation.js';
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
 export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer }) => {
@@ -439,6 +439,27 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
   
   if (!isOpen) return null;
 
+  const handleAutoFix = () => {
+    const ps = (s) => (s || '').split(',').reduce((a, x) => a.concat(x.split('、')), []).map(x => x.trim()).filter(Boolean); 
+    const tempEmp = {
+      ...fd,
+      currentYears: Number(fd.currentYears),
+      nextYears: Number(fd.nextYears),
+      currentSkills: ps(fd.currentSkillsStr),
+      nextSkills: ps(fd.nextSkillsStr)
+    };
+    
+    const { newEmps } = autoFixEmployees([tempEmp], targetYear);
+    const fixedEmp = newEmps[0];
+    
+    setFd({
+      ...fd,
+      ...fixedEmp,
+      currentSkillsStr: (fixedEmp.currentSkills || []).join('、'),
+      nextSkillsStr: (fixedEmp.nextSkills || []).join('、')
+    });
+  };
+
   const save = () => { 
     const ps = (s) => (s || '').split(',').reduce((a, x) => a.concat(x.split('、')), []).map(x => x.trim()).filter(Boolean); 
     const d = { 
@@ -552,9 +573,18 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mb-3 bg-slate-50/50">
-            <h4 className="font-bold text-sm text-slate-900 mb-2 flex items-center gap-2">
-              昇進年度と経過年数
-            </h4>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                昇進年度と経過年数
+              </h4>
+              <button
+                onClick={handleAutoFix}
+                className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold py-1 px-3 rounded shadow-sm flex items-center gap-1 transition-colors"
+                title="来年度の級と「昇進年数と経過年数」「履歴」があっていない場合、および配置が変わっていない場合の経過年数の間違いを自動修正します"
+              >
+                自動修正
+              </button>
+            </div>
             <div className="grid grid-cols-[110px_1fr_110px_1fr_110px_1fr_110px_1fr_110px_1fr] gap-y-3 items-end justify-items-center">
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
