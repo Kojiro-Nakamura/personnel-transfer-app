@@ -77,7 +77,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
     borderClass,
     isSelected ? "ring-2 ring-inset ring-[#0F828C] bg-[#0F828C]/10 z-10" : 
     isPickingMode && isNext ? "hover:ring-2 hover:ring-inset hover:ring-amber-500 bg-amber-50 z-10" : 
-    emp.id === hoveredEmpId ? "bg-yellow-200 z-20 shadow-md transform -translate-y-0.5" : 
+    emp.id === hoveredEmpId ? "bg-yellow-200 z-20 shadow-md" : 
     bgClass
   );
 
