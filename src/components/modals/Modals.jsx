@@ -200,24 +200,43 @@ export const EmployeeSelectModal = ({ isOpen, onClose, onSelect, targetPlacement
   );
 };
 
-export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension }) => {
+export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension, options }) => {
   const [fileName, setFileName] = useState('');
+  const [selectedFormat, setSelectedFormat] = useState('');
   
   useEffect(() => { 
     if (isOpen) { 
       setFileName(defaultName || ''); 
+      if (options && options.length > 0) {
+         setSelectedFormat(options[0].value); // Default to the first option
+      }
     } 
-  }, [isOpen, defaultName]);
+  }, [isOpen, defaultName, options]);
   
   if (!isOpen) return null;
+  
+  const currentExt = options ? options.find(o => o.value === selectedFormat)?.ext : extension;
   
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl border-t-4 border-[#0F828C]">
         <h3 className="text-lg font-bold text-[#320A6B] mb-4">保存ファイル名の設定</h3>
         <div className="space-y-4">
+          {options && (
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">ファイル形式</label>
+              <div className="flex gap-4 p-2 bg-slate-50 rounded border border-slate-200">
+                 {options.map(o => (
+                   <label key={o.value} className="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                     <input type="radio" name="fileFormat" value={o.value} checked={selectedFormat === o.value} onChange={() => setSelectedFormat(o.value)} className="w-4 h-4 text-[#0F828C]" />
+                     {o.label}
+                   </label>
+                 ))}
+              </div>
+            </div>
+          )}
           <FormInput 
-            label={`ファイル名 (${extension}は自動で付与されます)`} 
+            label={`ファイル名 (${currentExt || ''}は自動で付与されます)`} 
             value={fileName} 
             onChange={setFileName} 
             autoFocus 
@@ -233,12 +252,13 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension 
           </button>
           <button 
             onClick={() => { 
-              const finalName = fileName.endsWith(extension) ? fileName : `${fileName}${extension}`;
-              onSave(finalName); 
+              const extToUse = currentExt || '';
+              const finalName = fileName.endsWith(extToUse) ? fileName : `${fileName}${extToUse}`;
+              onSave(finalName, selectedFormat); 
               onClose(); 
             }} 
             disabled={!fileName.trim()} 
-            className="px-4 py-2 bg-[#0F828C] text-white rounded text-sm font-bold" 
+            className="px-4 py-2 bg-[#0F828C] text-white rounded text-sm font-bold active:scale-95 transition-transform" 
             title="ファイルとして保存する"
           >
             保存
