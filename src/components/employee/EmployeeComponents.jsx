@@ -438,8 +438,15 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       nextSkills: ps(fd.nextSkillsStr)
     };
     
-    const { newEmps } = autoFixEmployees([tempEmp], targetYear);
+    const { newEmps, fixes } = autoFixEmployees([tempEmp], targetYear);
+    
+    if (fixes.length === 0) {
+      alert('自動修正が必要な矛盾箇所は見つかりませんでした。');
+      return;
+    }
+
     const fixedEmp = newEmps[0];
+    const fixDetails = fixes[0].message.split(' / ').join('\n・');
     
     setFd({
       ...fd,
@@ -447,6 +454,8 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       currentSkillsStr: (fixedEmp.currentSkills || []).join('、'),
       nextSkillsStr: (fixedEmp.nextSkills || []).join('、')
     });
+
+    alert(`以下の項目を自動修正しました:\n・${fixDetails}`);
   };
 
   const save = () => { 

@@ -11,6 +11,7 @@ import { useApp, AppProvider } from './contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from './constants/initialData.js';
+import { validateEmployees, autoFixEmployees } from './utils/validation.js';
 
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from './components/ui/CommonUI.jsx';
@@ -113,7 +114,15 @@ export const AppContent = () => {
               <button onClick={undo} disabled={!canUndo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="直前の操作を取り消す(元に戻す)"><Undo className="w-4 h-4"/></button>
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
-            <button onClick={() => openModal('validation')} className="bg-yellow-500/30 hover:bg-yellow-500/50 border border-yellow-300 text-yellow-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="職員データの矛盾（昇進年度や経過年数など）をチェックする"><AlertTriangle className="w-4 h-4 mr-1" />矛盾チェック</button>
+            <button onClick={() => {
+                const { fixes } = autoFixEmployees(employees, targetYear);
+                const warnings = validateEmployees(employees, targetYear);
+                if (fixes.length === 0 && warnings.length === 0) {
+                  alert('矛盾チェックを実行しましたが、自動修正が必要な箇所や警告は見つかりませんでした。\n全てのデータは正常です。');
+                } else {
+                  openModal('validation');
+                }
+            }} className="bg-yellow-500/30 hover:bg-yellow-500/50 border border-yellow-300 text-yellow-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="職員データの矛盾（昇進年度や経過年数など）をチェックする"><AlertTriangle className="w-4 h-4 mr-1" />矛盾チェック</button>
             <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }] })} className="bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
             <button onClick={() => openModal('saveFile', { type: 'list', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_職員一覧' : baseFileName + '_職員一覧', options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }] })} className="bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
