@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { 
-  Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, 
+  Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, AlertTriangle,
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode
@@ -18,6 +18,7 @@ import { EmployeeCell, EmployeeRow, EmployeeFormSection, EmployeeModal } from '.
 import { AddSlotRow, DepartmentBlock } from './components/department/DepartmentComponents.jsx';
 import { SidebarCard, AppSidebar } from './components/layout/AppSidebar.jsx';
 import { NoteEditModal, EmployeeSelectModal, FileSaveModal, NameEditModal, DeleteConfirmModal, TitleChangeConfirmModal, BulkEditModal } from './components/modals/Modals.jsx';
+import { ValidationModal } from './components/modals/ValidationModal.jsx';
 export const AppContent = () => {
   const { 
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
@@ -112,6 +113,7 @@ export const AppContent = () => {
               <button onClick={undo} disabled={!canUndo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="直前の操作を取り消す(元に戻す)"><Undo className="w-4 h-4"/></button>
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
+            <button onClick={() => openModal('validation')} className="bg-yellow-500/30 hover:bg-yellow-500/50 border border-yellow-300 text-yellow-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="職員データの矛盾（昇進年度や経過年数など）をチェックする"><AlertTriangle className="w-4 h-4 mr-1" />矛盾チェック</button>
             <button onClick={() => openModal('saveFile', { type: 'html', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案HTML' + filterSuffix : baseFileName + '_人事異動案HTML' + filterSuffix })} className="bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-300 text-indigo-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をHTMLファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案HTML</button>
             <button onClick={() => openModal('saveFile', { type: 'html_list', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_職員一覧HTML' : baseFileName + '_職員一覧HTML' })} className="bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-300 text-indigo-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をHTMLファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧HTML</button>
             <button onClick={() => openModal('saveFile', { type: 'excel', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案Excel' + filterSuffix : baseFileName + '_人事異動案Excel' + filterSuffix })} className="bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をExcelファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案Excel</button>
@@ -276,6 +278,7 @@ export const AppContent = () => {
       <NameEditModal isOpen={modals.planName.isOpen} title="名前変更" data={{ name: modals.planName.data }} onClose={() => closeModal('planName')} onSave={d => updatePlanName(activePlanId, d.name)} />
       <DeleteConfirmModal isOpen={modals.delConfirm.isOpen} data={modals.delConfirm.data} onClose={() => closeModal('delConfirm')} onConfirm={d => { if (d.type === 'dept') mutations.deleteDepartment(d.id); else if (d.type === 'post') mutations.deletePost(d.deptId, d.id); else if (d.type === 'group') mutations.deleteGroup(d.deptId, d.id); else if (d.type === 'groupPost') mutations.deleteGroupPost(d.deptId, d.groupId, d.id); else if (d.type === 'emp') mutations.deleteEmployee(d.id); }} />
       <FileSaveModal isOpen={modals.saveFile.isOpen} defaultName={modals.saveFile.data?.defaultName} extension={modals.saveFile.data?.type === 'json' ? '.json' : (modals.saveFile.data?.type.startsWith('excel') ? '.xlsx' : '.html')} onClose={() => closeModal('saveFile')} onSave={(fileName) => { if (modals.saveFile.data.type === 'json') exportToJSON(fileName); else if (modals.saveFile.data.type === 'html') exportToHTML(fileName); else if (modals.saveFile.data.type === 'html_list') generateAndDownloadHTML(employees, departments, targetYear, fileName); else if (modals.saveFile.data.type === 'excel') exportToExcel(fileName); else if (modals.saveFile.data.type === 'excel_list') exportListToExcel(fileName, targetYear, employees, departments); }} />
+      <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} targetYear={targetYear} />
       
       {modals.rollOver.isOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">

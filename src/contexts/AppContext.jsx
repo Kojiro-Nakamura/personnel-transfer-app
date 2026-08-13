@@ -58,6 +58,7 @@ export function AppProvider({ children }) {
     delConfirm: { isOpen: false, data: null }, 
     rollOver: { isOpen: false, data: null }, 
     planName: { isOpen: false, data: null }, 
+    validation: { isOpen: false, data: null },
     bulkEdit: { isOpen: false, data: null }, 
     saveFile: { isOpen: false, data: null },
     empSelect: { isOpen: false, data: null },

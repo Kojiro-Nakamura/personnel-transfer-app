@@ -401,9 +401,12 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
   const activePromoKey = isPromoted ? GRADE_TO_PROMO_KEY[fd.nextGrade] : null;
 
   React.useEffect(() => {
-    if (isOpen && isPromoted && activePromoKey) {
-      let shouldUpdate = false;
-      let updates = {};
+    if (!isOpen) return;
+    
+    let shouldUpdate = false;
+    let updates = {};
+
+    if (isPromoted && activePromoKey) {
       if (!fd[activePromoKey]) {
         updates[activePromoKey] = String(targetYear);
         shouldUpdate = true;
@@ -412,11 +415,27 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
         updates.nextYears = 1;
         shouldUpdate = true;
       }
-      if (shouldUpdate) {
-        setFd(prev => ({ ...prev, ...updates }));
+    } else if (!isPromoted) {
+      const pKeys = ['promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+      let clearedPromo = false;
+      pKeys.forEach(k => {
+        if (fd[k] === String(targetYear) || fd[k] === targetYear) {
+          updates[k] = '';
+          shouldUpdate = true;
+          clearedPromo = true;
+        }
+      });
+      if (clearedPromo) {
+        const isSamePlacement = fd.currentDeptId === fd.departmentId && fd.currentPostId === fd.postId && fd.currentGroupId === fd.groupId && fd.currentGroupPostId === fd.groupPostId;
+        const expectedYears = isSamePlacement ? (Number(fd.currentYears) || 0) + 1 : 1;
+        updates.nextYears = expectedYears;
       }
     }
-  }, [isOpen, isPromoted, activePromoKey, targetYear, fd.nextYears, fd[activePromoKey]]);
+
+    if (shouldUpdate) {
+      setFd(prev => ({ ...prev, ...updates }));
+    }
+  }, [isOpen, isPromoted, activePromoKey, targetYear, fd]);
   
   if (!isOpen) return null;
 
