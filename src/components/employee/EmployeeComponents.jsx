@@ -411,25 +411,14 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
         updates[activePromoKey] = String(targetYear);
         shouldUpdate = true;
       }
-      if (fd.nextYears !== 1 && fd.nextYears !== "1") {
-        updates.nextYears = 1;
-        shouldUpdate = true;
-      }
     } else if (!isPromoted) {
       const pKeys = ['promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
-      let clearedPromo = false;
       pKeys.forEach(k => {
         if (fd[k] === String(targetYear) || fd[k] === targetYear) {
           updates[k] = '';
           shouldUpdate = true;
-          clearedPromo = true;
         }
       });
-      if (clearedPromo) {
-        const isSamePlacement = fd.currentDeptId === fd.departmentId && fd.currentPostId === fd.postId && fd.currentGroupId === fd.groupId && fd.currentGroupPostId === fd.groupPostId;
-        const expectedYears = isSamePlacement ? (Number(fd.currentYears) || 0) + 1 : 1;
-        updates.nextYears = expectedYears;
-      }
     }
 
     if (shouldUpdate) {
