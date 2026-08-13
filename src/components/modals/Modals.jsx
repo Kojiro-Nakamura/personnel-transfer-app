@@ -208,7 +208,12 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension,
     if (isOpen) { 
       setFileName(defaultName || ''); 
       if (options && options.length > 0) {
-         setSelectedFormat(options[0].value); // Default to the first option
+         const savedFormat = localStorage.getItem('jinjian_app_last_export_format');
+         if (savedFormat && options.some(o => o.value === savedFormat)) {
+           setSelectedFormat(savedFormat);
+         } else {
+           setSelectedFormat(options[0].value); // Default to the first option
+         }
       }
     } 
   }, [isOpen, defaultName, options]);
@@ -252,6 +257,9 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension,
           </button>
           <button 
             onClick={() => { 
+              if (selectedFormat) {
+                localStorage.setItem('jinjian_app_last_export_format', selectedFormat);
+              }
               const extToUse = currentExt || '';
               const finalName = fileName.endsWith(extToUse) ? fileName : `${fileName}${extToUse}`;
               onSave(finalName, selectedFormat); 
