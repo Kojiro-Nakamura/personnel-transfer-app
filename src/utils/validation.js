@@ -136,8 +136,13 @@ export const autoFixEmployees = (employees, targetYear) => {
     let expectedNextYears = emp.nextYears;
     let expectedNextSkills = [...(emp.nextSkills || [])];
 
-    if (isPromoted) {
+    if (isSameDept) {
+      expectedNextYears = (Number(emp.currentYears) || 0) + 1;
+    } else {
       expectedNextYears = 1;
+    }
+
+    if (isPromoted) {
       if (isSamePost) {
         // Pattern E: same post, promoted -> keep history
         expectedNextSkills = [...(emp.currentSkills || [])];
@@ -151,15 +156,12 @@ export const autoFixEmployees = (employees, targetYear) => {
     } else {
       if (!isSameDept) {
         // Pattern A: different dept
-        expectedNextYears = 1;
         expectedNextSkills = ['1'];
       } else if (!isSamePost) {
         // Pattern B: same dept, different post
-        expectedNextYears = (Number(emp.currentYears) || 0) + 1;
         expectedNextSkills = calcNextSkills(emp.currentSkills, emp.currentYears, false, true);
       } else {
         // Pattern C: same dept, same post
-        expectedNextYears = (Number(emp.currentYears) || 0) + 1;
         expectedNextSkills = calcNextSkills(emp.currentSkills, emp.currentYears, true, true);
       }
     }
