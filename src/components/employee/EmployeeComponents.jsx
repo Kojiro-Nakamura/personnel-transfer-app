@@ -12,7 +12,7 @@ import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialD
 import { autoFixEmployees } from '../../utils/validation.js';
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
-export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer }) => {
+export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer, isIncreased }) => {
   const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
   
@@ -25,9 +25,11 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       <div 
         onClick={isNext ? onClick : undefined} 
         className={cx(
-          "flex-1 flex items-center justify-center px-2 py-0 font-bold text-[11px] border-r transition-all border-dashed overflow-hidden relative",
-          (isPost && filterLevel === 0) && !isNext ? "border-sky-400" : emptyBgClass,
-          isNext ? "cursor-pointer" : ""
+          "flex-1 flex items-center justify-center px-2 py-0 font-bold text-[11px] transition-all border-dashed overflow-hidden relative",
+          (isPost && filterLevel === 0) && !isNext ? "border-r border-sky-400" : "border-r",
+          emptyBgClass,
+          isNext ? "cursor-pointer" : "",
+          isNext && isIncreased && "border-l-[4px] border-r-[4px] border-blue-500 border-solid"
         )}
         title={isNext ? (isPickingMode ? "選択中の職員をここに配置します" : "ここへ配置する職員を選択します") : ""}
       >
@@ -78,7 +80,8 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
     isSelected ? "ring-2 ring-inset ring-[#0F828C] bg-[#0F828C]/10 z-10" : 
     isPickingMode && isNext ? "hover:ring-2 hover:ring-inset hover:ring-amber-500 bg-amber-50 z-10" : 
     emp.id === hoveredEmpId ? "bg-yellow-200 z-20 shadow-md" : 
-    bgClass
+    bgClass,
+    isNext && isIncreased && "border-l-[4px] border-r-[4px] border-blue-500"
   );
 
   return (
@@ -160,7 +163,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   );
 };
 
-export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId }) => {
+export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId, isIncreased }) => {
   const { filterLevel } = useApp();
   const applyPostStyle = isPost && filterLevel === 0;
   return (
@@ -234,6 +237,7 @@ export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitl
       moveProps={nextMove} 
       isConflict={nextConflict} 
       hasPeer={!!currentEmp} 
+      isIncreased={isIncreased}
     />
     
       <div className={cx("w-[40px] border-l border-slate-500 flex items-center justify-center shrink-0 bg-white/50 z-20", applyPostStyle ? "border-sky-400" : "border-slate-500")}>

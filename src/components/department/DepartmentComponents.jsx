@@ -69,10 +69,9 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   
   const cCounts = getCounts(deptCurrEmps, false);
   const nCounts = getCounts(deptNextEmps, true);
-  const isDeptIncreased = nCounts.total > cCounts.total;
 
   return (
-    <div className={cx("border-b-4 border-white relative transition-all duration-300", isDeptIncreased && "border-l-[6px] border-r-[6px] border-blue-500 shadow-sm")}>
+    <div className="border-b-4 border-white relative">
       {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-50/50 pointer-events-none z-[5]" />}
       <div className="bg-[#5f8cc5] text-white border-b-2 border-white px-2 py-1 flex justify-between items-center relative z-10 group/dept">
         <div className="flex items-center gap-2">
@@ -163,10 +162,8 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             const isNextConflict = nextArr.length > 1;
             const isPostIncreased = nextArr.length > currentArr.length;
             
-            return (
-              <div key={post.id} className={cx("transition-all duration-300", isPostIncreased && "border-l-[6px] border-r-[6px] border-blue-500")}>
-                {getPairs(currentArr, nextArr).map(([curr, nxt, i]) => {
-                  if (filterLevel > 0) {
+            return getPairs(currentArr, nextArr).map(([curr, nxt, i]) => {
+              if (filterLevel > 0) {
                 const hasEmp = curr || nxt;
                 const currLvl = curr ? getGradeLevel(curr.currentGrade) : 0;
                 const nextLvl = nxt ? getGradeLevel(nxt.nextGrade) : 0;
@@ -193,11 +190,10 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                   nextMove={createMoveProps(nxt, i, nextArr.length, false, mutations)} 
                   currConflict={isCurrConflict} 
                   nextConflict={isNextConflict} 
+                  isIncreased={isPostIncreased}
                 />
               );
-            })}
-              </div>
-            );
+            });
           })}
           
           {/* グループ一覧 */}
@@ -220,7 +216,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             const isGrpIncreased = gNCounts.total > gCCounts.total;
             
             return (
-              <div key={grp.id} className={cx("transition-all duration-300", isGrpIncreased && "border-l-[6px] border-r-[6px] border-blue-500")}>
+              <React.Fragment key={grp.id}>
                 <div className="flex border-b border-white bg-[#b2cbe6] group/grp relative z-10">
                   <div className="w-full px-2 py-1 text-[14px] font-bold text-black flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
@@ -289,10 +285,8 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                   const isNextConflict = nextArr.length > 1;
                   const isGpIncreased = nextArr.length > currentArr.length;
                   
-                  return (
-                    <div key={gp.id} className={cx("transition-all duration-300", isGpIncreased && "border-l-[6px] border-r-[6px] border-blue-500")}>
-                      {getPairs(currentArr, nextArr).map(([curr, nxt, i]) => {
-                        if (filterLevel > 0) {
+                  return getPairs(currentArr, nextArr).map(([curr, nxt, i]) => {
+                    if (filterLevel > 0) {
                       const hasEmp = curr || nxt;
                       const currLvl = curr ? getGradeLevel(curr.currentGrade) : 0;
                       const nextLvl = nxt ? getGradeLevel(nxt.nextGrade) : 0;
@@ -320,11 +314,10 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                         nextMove={createMoveProps(nxt, i, nextArr.length, false, mutations)} 
                         currConflict={isCurrConflict} 
                         nextConflict={isNextConflict} 
+                        isIncreased={isGpIncreased}
                       />
                     );
-                  })}
-                    </div>
-                  );
+                  });
                 })}
                 
                 {/* 班員（一般） */}
@@ -346,6 +339,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                       onNextClick={() => handleCellClick(nxt?.id, false, dept.id, null, grp.id, null)} 
                       currentMove={createMoveProps(curr, i, dm.groups[grp.id].direct.current.length, true, mutations)} 
                       nextMove={createMoveProps(nxt, i, dm.groups[grp.id].direct.next.length, false, mutations)} 
+                      isIncreased={isGrpIncreased}
                     />
                   ); 
                 })}
@@ -355,7 +349,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                   anchorId={`addSlot-${dept.id}-${grp.id}`} 
                   onClickNext={() => handleCellClick(null, false, dept.id, null, grp.id, null)} 
                 />
-              </div>
+              </React.Fragment>
             );
           })}
           
