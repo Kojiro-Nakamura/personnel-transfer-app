@@ -24,3 +24,14 @@ export const GRADE_LEVELS = {
   "一般": 1,
   "": 0
 };
+
+export const GRADE_TO_PROMO_KEY = {
+  "部長級": "promoYearDeptHead",
+  "次長級": "promoYearDeputyHead",
+  "所属長級": "promoYearDivHead",
+  "課長級": "promoYearSecHead",
+  "補佐級III(補佐兼班長)": "promoYearAssistant3",
+  "補佐級II(班長)": "promoYearAssistant2",
+  "補佐級I(主任)": "promoYearAssistant1",
+  "係長級(主査)": "promoYearChief"
+};
