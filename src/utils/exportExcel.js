@@ -37,7 +37,7 @@ const saveWorkbook = async (workbook, fileName) => {
 };
 
 // --- 人事異動案（Excel）出力 ---
-export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel) => {
+export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const allHistoryYears = new Set();
   allHistoryYears.add(targetYear);
   employees.forEach(e => {
@@ -353,13 +353,17 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         });
         const cCounts = getCounts(deptCurrEmps, false);
         const nCounts = getCounts(deptNextEmps, true);
-        displayDeptStr = `${deptName} （今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）`;
+        if (showCount) {
+          displayDeptStr = `${deptName} （今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）`;
+        } else {
+          displayDeptStr = deptName;
+        }
       } else {
         displayDeptStr = deptName;
       }
     }
 
-    let displayGroupStr = '';
+    let displayGroupStr = groupName;
     if (isNewGroup && groupName !== '') {
       if (dept.id && group && group.id && deptMap[dept.id].groups[group.id]) {
         const gm = deptMap[dept.id].groups[group.id];
@@ -368,7 +372,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         Object.values(gm.posts).forEach(gp => { grpCurrEmps.push(...gp.current); grpNextEmps.push(...gp.next); });
         const gCCounts = getCounts(grpCurrEmps, false);
         const gNCounts = getCounts(grpNextEmps, true);
-        displayGroupStr = `${groupName} （今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）`;
+        if (showCount) {
+          displayGroupStr = `${groupName} （今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）`;
+        } else {
+          displayGroupStr = groupName;
+        }
       } else {
         displayGroupStr = groupName;
       }

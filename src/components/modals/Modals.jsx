@@ -200,13 +200,15 @@ export const EmployeeSelectModal = ({ isOpen, onClose, onSelect, targetPlacement
   );
 };
 
-export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension, options }) => {
+export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension, options, showCountToggle, defaultShowCount }) => {
   const [fileName, setFileName] = useState('');
   const [selectedFormat, setSelectedFormat] = useState('');
+  const [showCount, setShowCount] = useState(defaultShowCount ?? true);
   
   useEffect(() => { 
     if (isOpen) { 
       setFileName(defaultName || ''); 
+      setShowCount(defaultShowCount ?? true);
       if (options && options.length > 0) {
          const savedFormat = localStorage.getItem('jinjian_app_last_export_format');
          if (savedFormat && options.some(o => o.value === savedFormat)) {
@@ -246,6 +248,19 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension,
             onChange={setFileName} 
             autoFocus 
           />
+          {showCountToggle && (
+            <div className="pt-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
+                <input 
+                  type="checkbox" 
+                  checked={showCount} 
+                  onChange={(e) => setShowCount(e.target.checked)} 
+                  className="w-4 h-4 text-[#0F828C] rounded border-slate-300"
+                />
+                （今：〇人／来：〇人）の人数カウントを出力する
+              </label>
+            </div>
+          )}
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <button 
@@ -262,7 +277,7 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension,
               }
               const extToUse = currentExt || '';
               const finalName = fileName.endsWith(extToUse) ? fileName : `${fileName}${extToUse}`;
-              onSave(finalName, selectedFormat); 
+              onSave(finalName, selectedFormat, showCount); 
               onClose(); 
             }} 
             disabled={!fileName.trim()} 

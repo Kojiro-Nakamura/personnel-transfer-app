@@ -14,7 +14,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     setCurrentFileName(fileName);
   }, [targetYear, activePlanId, plans, employees, departments, notes, setCurrentFileName]);
 
-  const exportToHTML = useCallback((fileName) => {
+  const exportToHTML = useCallback((fileName, showCount = true) => {
     const escapeHtml = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     
     const dateObj = new Date();
@@ -100,7 +100,11 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             
             const cCounts = getCounts(deptCurrEmps, false);
             const nCounts = getCounts(deptNextEmps, true);
+          if (showCount) {
             displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）</span>`;
+          } else {
+            displayDeptHtml = escapeHtml(deptName);
+          }
           } else {
             displayDeptHtml = escapeHtml(deptName);
           }
@@ -122,7 +126,11 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             
             const gCCounts = getCounts(grpCurrEmps, false);
             const gNCounts = getCounts(grpNextEmps, true);
-            displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）</span>`;
+            if (showCount) {
+              displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）</span>`;
+            } else {
+              displayGroupHtml = escapeHtml(groupName);
+            }
           } else {
             displayGroupHtml = escapeHtml(groupName);
           }
@@ -506,8 +514,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     downloadFile(htmlContent, 'text/html;charset=utf-8;', fileName);
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
 
-  const exportToExcel = useCallback((fileName) => {
-    exportPlanToExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel);
+  const exportToExcel = useCallback((fileName, showCount = true) => {
+    exportPlanToExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
 
   return { exportToJSON, exportToHTML, exportToExcel };

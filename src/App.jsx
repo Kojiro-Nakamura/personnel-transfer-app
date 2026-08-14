@@ -284,7 +284,26 @@ export const AppContent = () => {
       <NameEditModal isOpen={modals.groupPost.isOpen} title="班内ポスト編集" data={modals.groupPost.data?.post} onClose={() => closeModal('groupPost')} onSave={d => modals.groupPost.data?.post ? mutations.updateGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, modals.groupPost.data.post.id, d) : mutations.addGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, d)} />
       <NameEditModal isOpen={modals.planName.isOpen} title="名前変更" data={{ name: modals.planName.data }} onClose={() => closeModal('planName')} onSave={d => updatePlanName(activePlanId, d.name)} />
       <DeleteConfirmModal isOpen={modals.delConfirm.isOpen} data={modals.delConfirm.data} onClose={() => closeModal('delConfirm')} onConfirm={d => { if (d.type === 'dept') mutations.deleteDepartment(d.id); else if (d.type === 'post') mutations.deletePost(d.deptId, d.id); else if (d.type === 'group') mutations.deleteGroup(d.deptId, d.id); else if (d.type === 'groupPost') mutations.deleteGroupPost(d.deptId, d.groupId, d.id); else if (d.type === 'emp') mutations.deleteEmployee(d.id); }} />
-      <FileSaveModal isOpen={modals.saveFile.isOpen} defaultName={modals.saveFile.data?.defaultName} extension={modals.saveFile.data?.type === 'json' ? '.json' : ''} options={modals.saveFile.data?.options} onClose={() => closeModal('saveFile')} onSave={(fileName, format) => { if (modals.saveFile.data.type === 'json') exportToJSON(fileName); else if (modals.saveFile.data.type === 'org') { if (format === 'excel') exportToExcel(fileName); else exportToHTML(fileName); } else if (modals.saveFile.data.type === 'list') { if (format === 'excel') exportListToExcel(fileName, targetYear, employees, departments); else generateAndDownloadHTML(employees, departments, targetYear, fileName); } }} />
+      <FileSaveModal 
+        isOpen={modals.saveFile.isOpen} 
+        defaultName={modals.saveFile.data?.defaultName} 
+        extension={modals.saveFile.data?.type === 'json' ? '.json' : ''} 
+        options={modals.saveFile.data?.options} 
+        showCountToggle={modals.saveFile.data?.type === 'org'}
+        defaultShowCount={filterLevel === 0}
+        onClose={() => closeModal('saveFile')} 
+        onSave={(fileName, format, showCount) => { 
+          if (modals.saveFile.data.type === 'json') exportToJSON(fileName); 
+          else if (modals.saveFile.data.type === 'org') { 
+            if (format === 'excel') exportToExcel(fileName, showCount); 
+            else exportToHTML(fileName, showCount); 
+          } 
+          else if (modals.saveFile.data.type === 'list') { 
+            if (format === 'excel') exportListToExcel(fileName, targetYear, employees, departments); 
+            else generateAndDownloadHTML(employees, departments, targetYear, fileName); 
+          } 
+        }} 
+      />
       <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} departments={departments} targetYear={targetYear} onEmpClick={(empId) => { const emp = employees.find(e => e.id === empId); if (emp) openModal('emp', emp); }} onAutoFix={(newEmps) => mutations.updateAllEmployees(newEmps)} />
       
       {modals.rollOver.isOpen && (
