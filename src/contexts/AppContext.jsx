@@ -196,8 +196,9 @@ export function AppProvider({ children }) {
       if (targetPostName !== currentTitle) {
         const isCurrentHancho = currentTitle === '班長' || currentTitle === '課長補佐兼班長';
         const isTargetHancho = targetPostName === '班長';
+        const isTargetGL = targetPostName === 'GL';
 
-        if (!(isCurrentHancho && isTargetHancho)) {
+        if (!(isCurrentHancho && isTargetHancho) && !isTargetGL) {
           setTimeout(() => {
              openModal('titleChangeConfirm', {
                empId: empId,
