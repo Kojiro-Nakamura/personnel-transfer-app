@@ -102,7 +102,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
                             {warn.type}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-700 leading-relaxed">{warn.message}</p>
+                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{warn.message}</p>
                       </div>
                     </div>
                   );
@@ -125,7 +125,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
                           修正済み
                         </span>
                       </div>
-                      <p className="text-sm text-slate-700 leading-relaxed">{fix.message}</p>
+                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{fix.message}</p>
                     </div>
                   </div>
                 ))}

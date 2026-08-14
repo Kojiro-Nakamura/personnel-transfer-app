@@ -108,7 +108,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
               empId: nEmp.id,
               type: 'ポスト職名変更',
               targetName: locationStr,
-              message: `同じポスト枠で今年度と来年度の職名が異なります（今年度: ${cTitle} ${cEmp.name} → 来年度: ${nTitle} ${nEmp.name}）。`
+              message: `同じポスト枠で今年度と来年度の職名が異なります。\n（今年度: ${cTitle} ${cEmp.name} → 来年度: ${nTitle} ${nEmp.name}）`
             });
           }
         }
