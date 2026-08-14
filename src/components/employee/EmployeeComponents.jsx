@@ -444,7 +444,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       nextSkills: ps(fd.nextSkillsStr)
     };
     
-    const { newEmps, fixes } = autoFixEmployees([tempEmp], targetYear);
+    const { newEmps, fixes } = autoFixEmployees([tempEmp], targetYear, departments);
     
     if (fixes.length === 0) {
       alert('自動修正が必要な矛盾箇所は見つかりませんでした。');

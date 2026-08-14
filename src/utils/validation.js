@@ -93,7 +93,9 @@ export const validateEmployees = (employees, targetYear, departments) => {
     departments.forEach(d => {
       if (d.type !== 'regular') return;
       
-      const checkSlot = (dId, pId, gId, gpId, locationStr) => {
+      const checkSlot = (dId, pId, gId, gpId, locationStr, postName) => {
+        if (postName === 'GL') return;
+
         const currEmps = employees.filter(e => e.currentDeptId === dId && e.currentPostId === pId && e.currentGroupId === gId && e.currentGroupPostId === gpId);
         const nextEmps = employees.filter(e => e.departmentId === dId && e.postId === pId && e.groupId === gId && e.groupPostId === gpId);
 
@@ -114,9 +116,9 @@ export const validateEmployees = (employees, targetYear, departments) => {
         }
       };
 
-      (d.posts || []).forEach(p => checkSlot(d.id, p.id, null, null, `${d.name} ${p.name}`));
+      (d.posts || []).forEach(p => checkSlot(d.id, p.id, null, null, `${d.name} ${p.name}`, p.name));
       (d.groups || []).forEach(g => {
-        (g.posts || []).forEach(gp => checkSlot(d.id, null, g.id, gp.id, `${d.name} ${g.name} ${gp.name}`));
+        (g.posts || []).forEach(gp => checkSlot(d.id, null, g.id, gp.id, `${d.name} ${g.name} ${gp.name}`, gp.name));
       });
     });
   }
@@ -124,7 +126,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
   return warnings;
 };
 
-export const autoFixEmployees = (employees, targetYear) => {
+export const autoFixEmployees = (employees, targetYear, departments) => {
   const newEmps = JSON.parse(JSON.stringify(employees));
   const fixes = [];
   const PROMO_KEYS = ['promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
@@ -205,6 +207,28 @@ export const autoFixEmployees = (employees, targetYear) => {
       emp.nextSkills = expectedNextSkills;
       fixedThisEmp = true;
       messages.push(`詳細年数を修正`);
+    }
+
+    if (departments && emp.departmentId !== 'unassigned' && emp.departmentId !== 'retired') {
+      const dept = departments.find(d => d.id === emp.departmentId);
+      if (dept) {
+        let postName = '';
+        if (emp.postId) {
+          const post = (dept.posts || []).find(p => p.id === emp.postId);
+          if (post) postName = post.nextName || post.name;
+        } else if (emp.groupId) {
+          const group = (dept.groups || []).find(g => g.id === emp.groupId);
+          if (group && emp.groupPostId) {
+            const gp = (group.posts || []).find(p => p.id === emp.groupPostId);
+            if (gp) postName = gp.nextName || gp.name;
+          }
+        }
+        
+        if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
+          fixedThisEmp = true;
+          messages.push(`ポスト名（${postName}）と来年度の職名（${emp.nextTitle || 'なし'}）が異なります（※手動で修正してください）`);
+        }
+      }
     }
 
     if (fixedThisEmp) {
