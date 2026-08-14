@@ -68,7 +68,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
               
               <div className="space-y-3">
                 {warnings.map((warn, i) => {
-                  const isPostWarning = warn.type === 'POST_TITLE_CHANGED';
+                  const isPostWarning = warn.type === 'ポスト職名変更';
                   return (
                     <div 
                       key={`warn-${i}`} 
