@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { validateEmployees, autoFixEmployees } from '../../utils/validation.js';
 import { AlertCircle, AlertTriangle, CheckCircle, Check, X } from 'lucide-react';
 
-export const ValidationModal = ({ isOpen, onClose, employees, targetYear, onEmpClick, onAutoFix }) => {
+export const ValidationModal = ({ isOpen, onClose, employees, departments, targetYear, onEmpClick, onAutoFix }) => {
   const [fixes, setFixes] = useState([]);
   const [hasAutoFixed, setHasAutoFixed] = useState(false);
 
@@ -22,7 +22,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, targetYear, onEmpC
 
   if (!isOpen) return null;
 
-  const warnings = validateEmployees(employees, targetYear);
+  const warnings = validateEmployees(employees, targetYear, departments);
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200">
@@ -67,27 +67,46 @@ export const ValidationModal = ({ isOpen, onClose, employees, targetYear, onEmpC
               )}
               
               <div className="space-y-3">
-                {warnings.map((warn, i) => (
-                  <div 
-                    key={`warn-${i}`} 
-                    onClick={() => onEmpClick && onEmpClick(warn.empId)}
-                    className="flex gap-4 p-4 bg-white hover:bg-yellow-50/50 rounded-lg border-l-4 border-yellow-400 shadow-sm relative overflow-hidden group cursor-pointer transition-colors"
-                    title="クリックして職員情報を編集"
-                  >
-                    <div className="shrink-0 pt-0.5">
-                      <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-slate-800 text-lg group-hover:text-[#0F828C] transition-colors">{warn.empName}</span>
-                        <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded border border-slate-200">
-                          {warn.type}
-                        </span>
+                {warnings.map((warn, i) => {
+                  const isPostWarning = warn.type === 'POST_TITLE_CHANGED';
+                  return (
+                    <div 
+                      key={`warn-${i}`} 
+                      onClick={() => !isPostWarning && onEmpClick && onEmpClick(warn.empId)}
+                      className={`flex gap-4 p-4 bg-white rounded-lg border-l-4 shadow-sm relative overflow-hidden group transition-colors ${
+                        isPostWarning 
+                          ? 'border-indigo-400 hover:bg-indigo-50/50' 
+                          : 'border-yellow-400 hover:bg-yellow-50/50 cursor-pointer'
+                      }`}
+                      title={isPostWarning ? '' : 'クリックして職員情報を編集'}
+                    >
+                      <div className="shrink-0 pt-0.5">
+                        {isPostWarning ? (
+                          <AlertCircle className="w-5 h-5 text-indigo-500" />
+                        ) : (
+                          <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                        )}
                       </div>
-                      <p className="text-sm text-slate-700 leading-relaxed">{warn.message}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {isPostWarning ? (
+                            <span className="font-bold text-slate-800 text-lg">{warn.targetName}</span>
+                          ) : (
+                            <span className="font-bold text-slate-800 text-lg group-hover:text-[#0F828C] transition-colors">{warn.empName}</span>
+                          )}
+                          <span className={`text-xs px-2 py-0.5 rounded border ${
+                            isPostWarning 
+                              ? 'bg-indigo-100 text-indigo-600 border-indigo-200' 
+                              : 'bg-slate-100 text-slate-500 border-slate-200'
+                          }`}>
+                            {warn.type}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-700 leading-relaxed">{warn.message}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {fixes.map((fix, i) => (
                   <div 

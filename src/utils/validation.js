@@ -1,7 +1,7 @@
 import { isPromotedGrade, calcNextSkills } from './helpers.js';
 import { GRADE_TO_PROMO_KEY } from '../constants/config.js';
 
-export const validateEmployees = (employees, targetYear) => {
+export const validateEmployees = (employees, targetYear, departments) => {
   const warnings = [];
 
   const PROMO_KEYS = ['promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
@@ -87,16 +87,28 @@ export const validateEmployees = (employees, targetYear) => {
         });
       }
     }
-    // 4. 今年度と来年度の職名の相違
-    if ((emp.currentTitle || '') !== (emp.nextTitle || '')) {
-      warnings.push({
-        empId: emp.id,
-        empName: emp.name,
-        type: 'TITLE_CHANGED',
-        message: `職名が変更されています（今年度: ${emp.currentTitle || 'なし'} → 来年度: ${emp.nextTitle || 'なし'}）。`
-      });
-    }
   });
+
+  if (departments) {
+    departments.forEach(d => {
+      if (d.type !== 'regular') return;
+      
+      const checkPost = (post, locationStr) => {
+        if (post.nextName && post.nextName !== post.name) {
+          warnings.push({
+            type: 'POST_TITLE_CHANGED',
+            targetName: locationStr,
+            message: `ポスト枠の職名が変更されています（今年度: ${post.name} → 来年度: ${post.nextName}）。`
+          });
+        }
+      };
+
+      (d.posts || []).forEach(p => checkPost(p, `${d.name}`));
+      (d.groups || []).forEach(g => {
+        (g.posts || []).forEach(gp => checkPost(gp, `${d.name} ${g.name}`));
+      });
+    });
+  }
 
   return warnings;
 };
