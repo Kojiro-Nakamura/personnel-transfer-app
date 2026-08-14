@@ -93,19 +93,30 @@ export const validateEmployees = (employees, targetYear, departments) => {
     departments.forEach(d => {
       if (d.type !== 'regular') return;
       
-      const checkPost = (post, locationStr) => {
-        if (post.nextName && post.nextName !== post.name) {
-          warnings.push({
-            type: 'POST_TITLE_CHANGED',
-            targetName: locationStr,
-            message: `ポスト枠の職名が変更されています（今年度: ${post.name} → 来年度: ${post.nextName}）。`
-          });
+      const checkSlot = (dId, pId, gId, gpId, locationStr) => {
+        const currEmps = employees.filter(e => e.currentDeptId === dId && e.currentPostId === pId && e.currentGroupId === gId && e.currentGroupPostId === gpId);
+        const nextEmps = employees.filter(e => e.departmentId === dId && e.postId === pId && e.groupId === gId && e.groupPostId === gpId);
+
+        if (currEmps.length > 0 && nextEmps.length > 0) {
+          const cEmp = currEmps[0];
+          const nEmp = nextEmps[0];
+          const cTitle = cEmp.currentTitle || 'なし';
+          const nTitle = nEmp.nextTitle || 'なし';
+
+          if (cTitle !== nTitle) {
+            warnings.push({
+              empId: nEmp.id,
+              type: 'POST_TITLE_CHANGED',
+              targetName: locationStr,
+              message: `同じポスト枠で今年度と来年度の職名が異なります（今年度: ${cTitle} → 来年度: ${nTitle}）。`
+            });
+          }
         }
       };
 
-      (d.posts || []).forEach(p => checkPost(p, `${d.name}`));
+      (d.posts || []).forEach(p => checkSlot(d.id, p.id, null, null, `${d.name} ${p.name}`));
       (d.groups || []).forEach(g => {
-        (g.posts || []).forEach(gp => checkPost(gp, `${d.name} ${g.name}`));
+        (g.posts || []).forEach(gp => checkSlot(d.id, null, g.id, gp.id, `${d.name} ${g.name} ${gp.name}`));
       });
     });
   }

@@ -72,13 +72,13 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
                   return (
                     <div 
                       key={`warn-${i}`} 
-                      onClick={() => !isPostWarning && onEmpClick && onEmpClick(warn.empId)}
-                      className={`flex gap-4 p-4 bg-white rounded-lg border-l-4 shadow-sm relative overflow-hidden group transition-colors ${
+                      onClick={() => onEmpClick && onEmpClick(warn.empId)}
+                      className={`flex gap-4 p-4 bg-white rounded-lg border-l-4 shadow-sm relative overflow-hidden group cursor-pointer transition-colors ${
                         isPostWarning 
                           ? 'border-indigo-400 hover:bg-indigo-50/50' 
-                          : 'border-yellow-400 hover:bg-yellow-50/50 cursor-pointer'
+                          : 'border-yellow-400 hover:bg-yellow-50/50'
                       }`}
-                      title={isPostWarning ? '' : 'クリックして職員情報を編集'}
+                      title={isPostWarning ? 'クリックして来年度の担当職員を編集' : 'クリックして職員情報を編集'}
                     >
                       <div className="shrink-0 pt-0.5">
                         {isPostWarning ? (
