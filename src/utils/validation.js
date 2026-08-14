@@ -87,6 +87,15 @@ export const validateEmployees = (employees, targetYear) => {
         });
       }
     }
+    // 4. 今年度と来年度の職名の相違
+    if ((emp.currentTitle || '') !== (emp.nextTitle || '')) {
+      warnings.push({
+        empId: emp.id,
+        empName: emp.name,
+        type: 'TITLE_CHANGED',
+        message: `職名が変更されています（今年度: ${emp.currentTitle || 'なし'} → 来年度: ${emp.nextTitle || 'なし'}）。`
+      });
+    }
   });
 
   return warnings;
