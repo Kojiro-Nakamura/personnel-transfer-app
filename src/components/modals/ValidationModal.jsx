@@ -62,7 +62,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
               )}
               {fixes.length > 0 && (
                 <div className="text-sm text-blue-700 bg-blue-50 p-3 rounded border border-blue-200 shadow-sm flex items-center justify-between">
-                  <span><strong>{fixes.length}</strong> 件の項目を自動修正しました。</span>
+                  <span><strong>{fixes.length}</strong> 件の項目を自動修正・確認しました。</span>
                 </div>
               )}
               
@@ -108,27 +108,34 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
                   );
                 })}
 
-                {fixes.map((fix, i) => (
-                  <div 
-                    key={`fix-${i}`} 
-                    onClick={() => onEmpClick && onEmpClick(fix.empId)}
-                    className="flex gap-4 p-4 bg-white hover:bg-blue-50/50 rounded-lg border-l-4 border-blue-400 shadow-sm relative overflow-hidden group cursor-pointer transition-colors"
-                    title="クリックして職員情報を確認"
-                  >
-                    <div className="shrink-0 pt-0.5">
-                      <Check className="w-5 h-5 text-blue-500" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-slate-800 text-lg group-hover:text-[#0F828C] transition-colors">{fix.empName}</span>
-                        <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded border border-blue-200">
-                          修正済み
-                        </span>
-                      </div>
-                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{fix.message}</p>
+                {fixes.length > 0 && (
+                  <div className="mt-4 border-t pt-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">自動修正・確認結果</h4>
+                    <div className="space-y-2">
+                      {fixes.map((fix, i) => (
+                        <div 
+                          key={`fix-${i}`} 
+                          onClick={() => onEmpClick && onEmpClick(fix.empId)}
+                          className="flex gap-4 p-4 bg-white hover:bg-blue-50/50 rounded-lg border-l-4 border-blue-400 shadow-sm relative overflow-hidden group cursor-pointer transition-colors"
+                          title="クリックして職員情報を確認"
+                        >
+                          <div className="shrink-0 pt-0.5">
+                            <Check className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-bold text-slate-800 text-lg group-hover:text-[#0F828C] transition-colors">{fix.empName}</span>
+                              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded border border-blue-200">
+                                修正済み / 確認
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{fix.message}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}

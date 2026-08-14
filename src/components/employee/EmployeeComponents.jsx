@@ -452,7 +452,17 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     }
 
     const fixedEmp = newEmps[0];
-    const fixDetails = fixes[0].message.split(' / ').join('\n・');
+    const fixList = fixes[0].message.split(' / ');
+    const actualFixes = fixList.filter(msg => !msg.includes('手動で修正してください'));
+    const manualChecks = fixList.filter(msg => msg.includes('手動で修正してください'));
+
+    let alertMsg = '';
+    if (actualFixes.length > 0) {
+      alertMsg += `以下の項目を自動修正しました:\n・${actualFixes.join('\n・')}\n\n`;
+    }
+    if (manualChecks.length > 0) {
+      alertMsg += `【要確認事項】\n・${manualChecks.join('\n・')}`;
+    }
     
     setFd({
       ...fd,
@@ -461,7 +471,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       nextSkillsStr: (fixedEmp.nextSkills || []).join('、')
     });
 
-    alert(`以下の項目を自動修正しました:\n・${fixDetails}`);
+    alert(alertMsg.trim());
   };
 
   const save = () => { 
