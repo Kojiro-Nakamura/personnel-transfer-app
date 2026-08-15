@@ -644,7 +644,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible" style={{fontFamily: "'BIZ UDPMincho', serif"}}>
+    <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
       {/* Header */}
       <header className="bg-white border-b border-gray-300 shadow-sm shrink-0 no-print">
         <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between">
