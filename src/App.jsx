@@ -3,7 +3,7 @@ import {
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, AlertTriangle,
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
-  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode
+  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { exportListToExcel } from './utils/exportExcel.js';
