@@ -20,6 +20,7 @@ import { AddSlotRow, DepartmentBlock } from './components/department/DepartmentC
 import { SidebarCard, AppSidebar } from './components/layout/AppSidebar.jsx';
 import { NoteEditModal, EmployeeSelectModal, FileSaveModal, NameEditModal, DeleteConfirmModal, TitleChangeConfirmModal, BulkEditModal } from './components/modals/Modals.jsx';
 import { ValidationModal } from './components/modals/ValidationModal.jsx';
+import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
 export const AppContent = () => {
   const { 
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
@@ -114,6 +115,7 @@ export const AppContent = () => {
               <button onClick={undo} disabled={!canUndo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="直前の操作を取り消す(元に戻す)"><Undo className="w-4 h-4"/></button>
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
+            <button onClick={() => openModal('chainTransfer')} className="bg-fuchsia-500/30 hover:bg-fuchsia-500/50 border border-fuchsia-300 text-fuchsia-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="玉突き異動表（つなぎ表）を表示する"><GitMerge className="w-4 h-4 mr-1" />つなぎ表</button>
             <button onClick={() => {
                 const { fixes } = autoFixEmployees(employees, targetYear);
                 const warnings = validateEmployees(employees, targetYear);
@@ -305,6 +307,7 @@ export const AppContent = () => {
         }} 
       />
       <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} departments={departments} targetYear={targetYear} onEmpClick={(empId) => { const emp = employees.find(e => e.id === empId); if (emp) openModal('emp', emp); }} onAutoFix={(newEmps) => mutations.updateAllEmployees(newEmps)} />
+      <ChainTransferModal isOpen={modals.chainTransfer.isOpen} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} />
       
       {modals.rollOver.isOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">

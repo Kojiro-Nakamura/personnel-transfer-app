@@ -63,7 +63,8 @@ export function AppProvider({ children }) {
     saveFile: { isOpen: false, data: null },
     empSelect: { isOpen: false, data: null },
     titleChangeConfirm: { isOpen: false, data: null },
-    note: { isOpen: false, data: null } 
+    note: { isOpen: false, data: null },
+    chainTransfer: { isOpen: false, data: null }
   });
 
   const openModal = useCallback((type, data = null) => {
