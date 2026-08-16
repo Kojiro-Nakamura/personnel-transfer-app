@@ -649,7 +649,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
       {/* Header */}
       <header className="bg-white border-b border-gray-300 shadow-sm shrink-0 print:border-none print:shadow-none">
-        <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between print:h-auto print:py-2">
+        <div className="w-full px-4 sm:px-8 h-14 flex items-center justify-between print:h-auto print:py-2 print:px-0">
           <div className="flex items-center gap-2">
             <GitMerge className="w-5 h-5 text-gray-700 print:hidden" />
             <h1 className="text-lg font-bold text-gray-800 print:text-xl">
@@ -668,7 +668,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       </header>
 
       {/* Content */}
-      <main className="flex-1 overflow-auto p-4 sm:p-8 mx-auto w-full max-w-[1400px] print:p-0 print:max-w-none print:overflow-visible">
+      <main className="flex-1 overflow-auto p-4 sm:p-8 w-full print:p-0 print:overflow-visible">
         {/* Tabs */}
         <div className="flex justify-between items-end border-b-2 border-gray-300 mb-4 no-print">
           <div className="flex gap-1.5">
