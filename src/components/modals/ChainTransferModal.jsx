@@ -646,15 +646,15 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
       {/* Header */}
-      <header className="bg-white border-b border-gray-300 shadow-sm shrink-0 no-print">
-        <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-300 shadow-sm shrink-0 print:border-none print:shadow-none">
+        <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between print:h-auto print:py-2">
           <div className="flex items-center gap-2">
-            <GitMerge className="w-5 h-5 text-gray-700" />
-            <h1 className="text-lg font-bold text-gray-800">
+            <GitMerge className="w-5 h-5 text-gray-700 print:hidden" />
+            <h1 className="text-lg font-bold text-gray-800 print:text-xl">
               {targetYear}年度(R{toReiwa(targetYear)})人事異動案{currentFileName ? `（${currentFileName}）` : ''}
             </h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 print:hidden">
             <button onClick={handlePrint} className="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm transition-colors">
               <Printer className="w-4 h-4" />印刷 / PDF化
             </button>
