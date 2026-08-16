@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, GitMerge, List, Award, RotateCcw, FileSpreadsheet, Printer } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
-import ExcelJS from 'exceljs';
+import { GRADE_TO_PROMO_KEY } from '../../constants/config.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -67,7 +67,15 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   const [chainSortOrder, setChainSortOrder] = useState(null);
   const [designatedSortKey, setDesignatedSortKey] = useState(null);
   const [designatedSortOrder, setDesignatedSortOrder] = useState('asc');
-  const [gradeYearsMap, setGradeYearsMap] = useState({});
+
+  const calculateGradeYears = (emp, targetYear) => {
+    if (!emp || !emp.currentGrade) return '';
+    const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
+    if (!promoKey) return '';
+    const promoYear = Number(emp[promoKey]);
+    if (!promoYear || isNaN(promoYear)) return '';
+    return Math.max(0, targetYear - promoYear);
+  };
 
   const data = useMemo(() => {
     if (!isOpen) return null;
@@ -78,56 +86,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
 
   const { chains, movesByToPost, movesByFromPost, moves, retentions } = data;
 
-  const handleExcelUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const workbook = new ExcelJS.Workbook();
-      
-      if (file.name.endsWith('.csv')) {
-        await workbook.csv.read(file); // note: might not work well with all encodings, but good enough for now
-      } else {
-        await workbook.xlsx.load(buffer);
-      }
-      
-      const worksheet = workbook.worksheets[0];
-      if (!worksheet) return;
-
-      let empNoCol = -1;
-      let gradeYearsCol = -1;
-
-      const headerRow = worksheet.getRow(1);
-      headerRow.eachCell((cell, colNumber) => {
-        const val = String(cell.value || '');
-        if (val.includes('職員番号') || val.includes('職員No') || val.includes('コード')) empNoCol = colNumber;
-        if (val.includes('格付年数') || val.includes('級年数')) gradeYearsCol = colNumber;
-      });
-
-      if (empNoCol !== -1 && gradeYearsCol !== -1) {
-        const newMap = { ...gradeYearsMap };
-        let count = 0;
-        worksheet.eachRow((row, rowNumber) => {
-          if (rowNumber === 1) return; 
-          const empNo = row.getCell(empNoCol).value;
-          const years = row.getCell(gradeYearsCol).value;
-          if (empNo != null && years != null) {
-            newMap[String(empNo).trim()] = years;
-            count++;
-          }
-        });
-        setGradeYearsMap(newMap);
-        alert(`Excelから ${count}件 の現格付年数を読み込みました。`);
-      } else {
-         alert("「職員番号」と「格付年数」の列が見つかりませんでした。");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("ファイルの読み込みに失敗しました。");
-    }
-    e.target.value = '';
-  };
 
   const handlePrint = (e) => {
     // Print the window where the event occurred (useful if rendered in a Portal/new window)
@@ -540,7 +498,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
          if (row.successor && succPost.type === 'unassigned') displaySuccName = '新採 ' + displaySuccName;
          displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
          displaySuccCurrentYears = row.successor ? '1' : ''; 
-         displaySuccGradeYears = succEmpNo ? (gradeYearsMap[succEmpNo] || '') : '';
+         displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
          displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
       }
 
@@ -550,7 +508,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         predName: pred.name || '',
         predAge: pred.ageNextYear ?? pred.age ?? '',
         predCurrentYears: pred.currentYears || pred.yearsInCurrentPost || '',
-        predGradeYears: predEmpNo ? (gradeYearsMap[predEmpNo] || '') : '',
+        predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
         predReason: predReason,
         succName: displaySuccName,
         succAge: displaySuccAge,
@@ -597,10 +555,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       <div className="bg-white">
         <div className="mb-2 flex justify-between items-center no-print">
           <div className="text-lg font-bold tracking-widest">指定職人事異動様式</div>
-          <label className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1 shadow-sm font-sans no-print">
-            <FileSpreadsheet className="w-4 h-4" />現格付年数データ読込(Excel/CSV)
-            <input type="file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleExcelUpload} />
-          </label>
         </div>
         
         <div className="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
