@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, GitMerge, List, Award, RotateCcw, FileSpreadsheet, Printer } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
-import { GRADE_TO_PROMO_KEY } from '../../constants/config.js';
+import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -488,8 +488,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
            succRemark = '昇格';
         }
       }
-      const noteStr = succ.note || pred.note || '';
-      if (noteStr) succRemark += (succRemark ? ' / ' : '') + noteStr;
+      // Removed noteStr from succRemark as requested
 
       let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
 
@@ -517,6 +516,18 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         succPostLabel: displaySuccPostLabel,
         succRemark: succRemark
       };
+    });
+
+    // Apply default sorting
+    desigRows.sort((a, b) => {
+      const levelA = GRADE_LEVELS[a.gradeLabel] || 0;
+      const levelB = GRADE_LEVELS[b.gradeLabel] || 0;
+      if (levelA !== levelB) {
+        return levelB - levelA; // Descending (higher grade first)
+      }
+      const gyA = Number(a.predGradeYears) || 0;
+      const gyB = Number(b.predGradeYears) || 0;
+      return gyB - gyA; // Descending (longer years first)
     });
 
     desigRows = sortData(desigRows, designatedSortKey, designatedSortOrder);
