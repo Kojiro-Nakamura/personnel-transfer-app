@@ -95,7 +95,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
 
   const isDesignated = (grade, title) => {
     const g = String(grade || ''), t = String(title || '');
-    const isHosa1 = g.includes('補佐級I') || g.includes('補佐級Ⅰ') || g.includes('主任');
+    const isHosa1 = g.includes('補佐級I(') || g.includes('補佐級Ⅰ') || g.includes('主任');
     if (g.includes('補佐級') && !isHosa1) return true;
     if (g.includes('課長級') || g.includes('所属長級') || g.includes('次長級') || g.includes('部長級') || g.includes('指定職')) return true;
     if (['局長', '次長', '課長', '参事', '部長', '場長', '班長', '専門技術員', '企画員', '主幹'].some(k => t.includes(k))) return true;
@@ -402,7 +402,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     
     const getDisplayGrade = (gradeStr) => {
       const g = String(gradeStr || '');
-      if (g.includes('補佐級I') || g.includes('補佐級Ⅰ') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
+      if (g.includes('補佐級I(') || g.includes('補佐級Ⅰ') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
       return g;
     };
     
