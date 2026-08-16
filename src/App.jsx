@@ -21,6 +21,7 @@ import { SidebarCard, AppSidebar } from './components/layout/AppSidebar.jsx';
 import { NoteEditModal, EmployeeSelectModal, FileSaveModal, NameEditModal, DeleteConfirmModal, TitleChangeConfirmModal, BulkEditModal } from './components/modals/Modals.jsx';
 import { ValidationModal } from './components/modals/ValidationModal.jsx';
 import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
+import { NewWindowPortal } from './components/common/NewWindowPortal.jsx';
 export const AppContent = () => {
   const { 
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
@@ -95,7 +96,7 @@ export const AppContent = () => {
       )}
 
       {/* 画面上部ヘッダー（操作パネル） */}
-      <header className={cx("bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]", modals.chainTransfer.isOpen && "print:hidden")}>
+      <header className="bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]">
         <div className="flex justify-between items-center p-2 border-b border-[#4d86c2]">
           <div className="flex items-center gap-3">
             <Building2 className="w-5 h-5 text-white" />
@@ -176,7 +177,7 @@ export const AppContent = () => {
       </header>
 
       {/* メイン画面（表エリア） */}
-      <div className={cx("flex-1 overflow-hidden relative w-full", modals.chainTransfer.isOpen && "print:hidden")}>
+      <div className="flex-1 overflow-hidden relative w-full">
         <main className="absolute top-0 left-0 p-2 flex" style={{ transform: actZoom !== 1 ? `scale(${actZoom})` : 'none', transformOrigin: 'top left', width: `${100/actZoom}%`, height: `${100/actZoom}%` }}>
           <div className="flex flex-col md:flex-row gap-2 w-full h-full">
             <div className="flex-1 w-full bg-white rounded shadow-sm border border-slate-400 flex flex-col h-full overflow-hidden">
@@ -307,8 +308,13 @@ export const AppContent = () => {
         }} 
       />
       <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} departments={departments} targetYear={targetYear} onEmpClick={(empId) => { const emp = employees.find(e => e.id === empId); if (emp) openModal('emp', emp); }} onAutoFix={(newEmps) => mutations.updateAllEmployees(newEmps)} />
-      <ChainTransferModal isOpen={modals.chainTransfer.isOpen} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} currentFileName={currentFileName} />
       
+      {modals.chainTransfer.isOpen && (
+        <NewWindowPortal title="玉突き異動表（つなぎ表）" onClose={() => closeModal('chainTransfer')}>
+          <ChainTransferModal isOpen={true} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} currentFileName={currentFileName} />
+        </NewWindowPortal>
+      )}
+
       {modals.rollOver.isOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full border-t-4 border-orange-500">

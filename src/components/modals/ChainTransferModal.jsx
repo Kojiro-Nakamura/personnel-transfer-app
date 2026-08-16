@@ -129,8 +129,10 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     e.target.value = '';
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = (e) => {
+    // Print the window where the event occurred (useful if rendered in a Portal/new window)
+    const targetWindow = e?.currentTarget?.ownerDocument?.defaultView || window;
+    targetWindow.print();
   };
 
   const isDesignated = (grade, title) => {
