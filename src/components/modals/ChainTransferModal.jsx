@@ -77,6 +77,16 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     return Math.max(0, targetYear - promoYear);
   };
 
+  const calculateHosa2Years = (emp, targetYear) => {
+    if (!emp || !emp.currentGrade || !emp.currentGrade.includes('補佐級III')) return '';
+    const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
+    const hosa2PromoYear = Number(emp[hosa2PromoKey]);
+    if (hosa2PromoYear && !isNaN(hosa2PromoYear)) {
+      return Math.max(0, targetYear - hosa2PromoYear);
+    }
+    return '';
+  };
+
   const data = useMemo(() => {
     if (!isOpen) return null;
     return analyzeChainTransfers(employees, departments, targetYear);
@@ -508,11 +518,13 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         predAge: pred.ageNextYear ?? pred.age ?? '',
         predCurrentYears: pred.currentYears || pred.yearsInCurrentPost || '',
         predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
+        predHosa2Years: pred ? calculateHosa2Years(pred, targetYear) : '',
         predReason: predReason,
         succName: displaySuccName,
         succAge: displaySuccAge,
         succCurrentYears: displaySuccCurrentYears,
         succGradeYears: displaySuccGradeYears,
+        succHosa2Years: succ ? calculateHosa2Years(succ, targetYear) : '',
         succPostLabel: displaySuccPostLabel,
         succRemark: succRemark
       };
@@ -592,12 +604,18 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predCurrentYears}</td>
-                    <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>{r.predGradeYears}</td>
+                    <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
+                      {r.predGradeYears}
+                      {r.predHosa2Years !== '' && <span className="ml-1 font-normal text-xs">({r.predHosa2Years})</span>}
+                    </td>
                     <td className={`border-r border-black p-1.5 text-center font-bold bg-blue-50/50 ${reasonColor}`}>{r.predReason}</td>
                     <td className={`border-r border-black p-1.5 whitespace-nowrap ${succNameClass}`}>{r.succName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succCurrentYears}</td>
-                    <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>{r.succGradeYears}</td>
+                    <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
+                      {r.succGradeYears}
+                      {r.succHosa2Years !== '' && <span className="ml-1 font-normal text-xs">({r.succHosa2Years})</span>}
+                    </td>
                     <td className="border-r border-black p-1.5 break-words">{r.succPostLabel}</td>
                     <td className={`p-1.5 break-words ${COLORS.RETIRING} font-bold`}>{r.succRemark}</td>
                   </tr>
