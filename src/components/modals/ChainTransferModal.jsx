@@ -60,7 +60,7 @@ const sortData = (rows, sortKey, sortOrder) => {
   });
 };
 
-export const ChainTransferModal = ({ isOpen, onClose, employees, departments, targetYear }) => {
+export const ChainTransferModal = ({ isOpen, onClose, employees, departments, targetYear, currentFileName }) => {
   const [currentTab, setCurrentTab] = useState('chain');
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -650,7 +650,9 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <GitMerge className="w-5 h-5 text-gray-700" />
-            <h1 className="text-lg font-bold text-gray-800">玉突き異動表（つなぎ表）</h1>
+            <h1 className="text-lg font-bold text-gray-800">
+              {targetYear}年度(R{toReiwa(targetYear)})人事異動案{currentFileName ? `（${currentFileName}）` : ''}
+            </h1>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={handlePrint} className="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm transition-colors">

@@ -95,7 +95,7 @@ export const AppContent = () => {
       )}
 
       {/* 画面上部ヘッダー（操作パネル） */}
-      <header className="bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]">
+      <header className={cx("bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]", modals.chainTransfer.isOpen && "print:hidden")}>
         <div className="flex justify-between items-center p-2 border-b border-[#4d86c2]">
           <div className="flex items-center gap-3">
             <Building2 className="w-5 h-5 text-white" />
@@ -176,7 +176,7 @@ export const AppContent = () => {
       </header>
 
       {/* メイン画面（表エリア） */}
-      <div className="flex-1 overflow-hidden relative w-full">
+      <div className={cx("flex-1 overflow-hidden relative w-full", modals.chainTransfer.isOpen && "print:hidden")}>
         <main className="absolute top-0 left-0 p-2 flex" style={{ transform: actZoom !== 1 ? `scale(${actZoom})` : 'none', transformOrigin: 'top left', width: `${100/actZoom}%`, height: `${100/actZoom}%` }}>
           <div className="flex flex-col md:flex-row gap-2 w-full h-full">
             <div className="flex-1 w-full bg-white rounded shadow-sm border border-slate-400 flex flex-col h-full overflow-hidden">
@@ -307,7 +307,7 @@ export const AppContent = () => {
         }} 
       />
       <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} departments={departments} targetYear={targetYear} onEmpClick={(empId) => { const emp = employees.find(e => e.id === empId); if (emp) openModal('emp', emp); }} onAutoFix={(newEmps) => mutations.updateAllEmployees(newEmps)} />
-      <ChainTransferModal isOpen={modals.chainTransfer.isOpen} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} />
+      <ChainTransferModal isOpen={modals.chainTransfer.isOpen} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} currentFileName={currentFileName} />
       
       {modals.rollOver.isOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
