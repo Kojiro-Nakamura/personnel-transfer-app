@@ -72,7 +72,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
 
         const isNewDept = deptName !== lastDept;
         const isNewGroup = isNewDept || groupName !== lastGroup;
-        const displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
+        let displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
+        if (displayPost === '班員') displayPost = '';
         
         lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
 
