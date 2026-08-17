@@ -729,6 +729,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           <button onClick={onClose} className="px-5 py-2 border rounded" title="変更を破棄して閉じる">キャンセル</button>
           <button onClick={save} className="px-6 py-2 bg-[#065084] text-white rounded font-bold" title="職員情報を保存する">保存</button>
         </div>
+        </ErrorBoundary>
       </div>
     </div>
   );
