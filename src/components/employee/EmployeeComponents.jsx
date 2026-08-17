@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 import { autoFixEmployees } from '../../utils/validation.js';
@@ -339,8 +339,14 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
   
   const getYearPart = (val) => {
     if (!val) return '';
-    const y = String(val).split('-')[0];
-    return y ? getEraSuffix(y) : '';
+    const str = String(val);
+    const parts = str.split('-');
+    const y = parts[0];
+    const era = getEraSuffix(y);
+    if (parts.length >= 3 && !(parts[1] === '04' && parts[2] === '01')) {
+       return `(${era})`;
+    }
+    return `(${era})`;
   };
   
   const handleBlur = (e) => {
@@ -356,7 +362,7 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
   return (
     <div className="flex flex-col w-full">
       <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
-      <div className={cx("flex flex-col w-full px-1.5 py-0.5 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
+      <div className={cx("flex flex-col justify-center h-[36px] w-full px-1.5 py-0.5 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
         <input 
           type="text" 
           placeholder="YYYY-MM-DD"
@@ -365,16 +371,20 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
           onBlur={handleBlur}
           className="w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight" 
         />
-        {(value || serviceYears !== null) && (
-          <div className="flex items-center justify-between mt-[-2px] pb-[2px]">
-            <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none">
-              {value ? getYearPart(value) : ''}
-            </span>
-            <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none whitespace-nowrap">
-              {serviceYears !== null ? `${serviceYears}年目` : ''}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center justify-between mt-[-2px] min-h-[14px]">
+          {(value || serviceYears !== null) ? (
+            <>
+              <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none">
+                {value ? getYearPart(value) : ''}
+              </span>
+              <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none whitespace-nowrap">
+                {formatServiceYearsText(serviceYears)}
+              </span>
+            </>
+          ) : (
+            <span className="text-[9px] min-h-[14px]"></span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -619,17 +629,23 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
                 <span className="text-[11px] font-bold text-slate-600 mb-1">採用</span>
-                <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[30px] flex items-center justify-center tracking-tighter overflow-hidden">
+                <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[36px] flex flex-col justify-center leading-tight tracking-tighter overflow-hidden">
                   {fd.hireDate ? (() => {
                     const hYear = parseInt(String(fd.hireDate).substring(0, 4));
+                    const isAprilFirst = String(fd.hireDate).endsWith('-04-01') || !String(fd.hireDate).includes('-');
+                    const displayStr = isAprilFirst ? `${hYear}` : String(fd.hireDate);
                     const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
                     return (
-                      <div className="flex items-baseline">
-                        <span>{hYear}</span>
-                        <span className="ml-1 text-[10px] text-slate-500 font-bold">{getEraSuffix(hYear)}</span>
-                        {hAge !== null && !isNaN(hAge) && (
-                          <span className="ml-1 text-[10px] text-slate-500 font-bold">{hAge}歳</span>
-                        )}
+                      <div className="flex flex-col items-center justify-center w-full">
+                        <div className="flex items-baseline justify-center w-full truncate">
+                          <span>{displayStr}</span>
+                        </div>
+                        <div className="flex items-baseline justify-center mt-[-1px] w-full truncate">
+                          <span className="text-[10px] text-slate-500 font-bold">({getEraSuffix(hYear)})</span>
+                          {hAge !== null && !isNaN(hAge) && (
+                            <span className="ml-1 text-[10px] text-slate-500 font-bold">{hAge}歳</span>
+                          )}
+                        </div>
                       </div>
                     );
                   })() : '----'}

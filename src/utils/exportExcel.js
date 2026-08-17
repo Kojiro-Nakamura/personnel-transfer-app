@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay } from './helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
@@ -478,8 +478,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           
           if (prevDate) {
              const diffStr = calculateServiceYears(prevDate, cellVal);
-             if (diffStr) {
-               pStr = `${diffStr}年目> ${pStr}`;
+             if (diffStr !== '') {
+               pStr = `${formatServiceYearsText(diffStr)}> ${pStr}`;
              } else {
                pStr = `> ${pStr}`;
              }
@@ -509,7 +509,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
         finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
       }
-      rowVals.push(`> ${finalDiff !== null ? (finalDiff >= 0 ? finalDiff : 0) + '年目' : ''}`);
+      rowVals.push(`> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`);
       
       if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
            const c = getPromotedBgColorCode(extEmp.nextGrade);
@@ -780,6 +780,21 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     return match ? `${match[1]}${match[2]}` : String(y).substring(2);
   };
   
+  const formatDateForDisplayLocal = (dateStr) => {
+    if (!dateStr) return '';
+    const str = String(dateStr);
+    const parts = str.split('-');
+    const y = parts[0];
+    const era = getEraSuffixLocal(y);
+    if (parts.length >= 3) {
+      if (parts[1] === '04' && parts[2] === '01') {
+        return `${y}(${era})`;
+      }
+      return `${str}(${era})`;
+    }
+    return `${y}(${era})`;
+  };
+  
   const formatWithEra = (dateStr) => {
     if (!dateStr) return '';
     const match = String(dateStr).match(/^(\d{4})[-/]/);
@@ -1026,7 +1041,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     
     const isNextRetired = emp.departmentId === 'retired';
     const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
-    const valYears = getEmpCurrentYears(emp, targetYear, true);
+    const valYears = formatServiceYearsText(getEmpCurrentYears(emp, targetYear, true));
 
     const vals = [
       emp.name || '',
@@ -1061,9 +1076,8 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     // 昇級年度の計算 (hireDate, then keys)
     const hireYear = emp.hireDate ? String(emp.hireDate).substring(0,4) : '';
     let hireStr = hireYear;
-    if (hireYear) {
-      const suffix = getEraSuffixLocal(hireYear);
-      if (suffix) hireStr += `(${suffix})`;
+    if (emp.hireDate) {
+      hireStr = formatDateForDisplay(emp.hireDate);
     }
     vals.push(hireStr);
 
@@ -1091,13 +1105,11 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
       
       let cellStr = '';
-      if (diff !== null) cellStr += `${diff}年目> `;
+      if (diff !== null) cellStr += `${formatServiceYearsText(diff)}> `;
       else cellStr += `> `;
       
-      cellStr += cellVal;
       if (cellVal) {
-        const suffix = getEraSuffixForDate(cellVal);
-        if (suffix) cellStr += `(${suffix})`;
+        cellStr += formatDateForDisplayLocal(cellVal);
       }
       vals.push(cellStr);
     }
@@ -1114,7 +1126,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       }
       finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
     }
-    vals.push(`> ${finalDiff !== null ? finalDiff + '年目' : ''}`);
+    vals.push(`> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`);
 
     // 履歴
     const promoYearMap = {};

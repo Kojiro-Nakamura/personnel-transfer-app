@@ -609,6 +609,28 @@ export const getEraSuffixForDate = (dateStr) => {
   return fYear ? getEraSuffix(fYear) : '';
 };
 
+export const formatServiceYearsText = (yearsStr) => {
+  if (yearsStr === null || yearsStr === undefined || yearsStr === '') return '';
+  if (String(yearsStr).includes('.')) return `${yearsStr}年`;
+  return `${yearsStr}年目`;
+};
+
+export const formatDateForDisplay = (dateStr) => {
+  if (!dateStr) return '';
+  const str = String(dateStr);
+  const parts = str.split('-');
+  const y = parts[0];
+  const era = getEraSuffix(y);
+  
+  if (parts.length >= 3) {
+    if (parts[1] === '04' && parts[2] === '01') {
+      return `${y}(${era})`;
+    }
+    return `${str}(${era})`;
+  }
+  return `${y}(${era})`;
+};
+
 export const formatPromoDateWithEra = (promoDateStr, targetYear) => {
   if (!promoDateStr) return '';
   let normalizedStr = String(promoDateStr).trim();
@@ -618,17 +640,12 @@ export const formatPromoDateWithEra = (promoDateStr, targetYear) => {
   const date = new Date(normalizedStr);
   if (isNaN(date.getTime())) return normalizedStr;
   
-  const y = date.getFullYear();
-  const mStr = String(date.getMonth() + 1).padStart(2, '0');
-  const dStr = String(date.getDate()).padStart(2, '0');
-  
-  const era = getEraSuffixForDate(normalizedStr);
-  const dateStr = `${y}-${mStr}-${dStr}${era ? `(${era})` : ''}`;
+  const dateStr = formatDateForDisplay(normalizedStr);
   
   if (targetYear) {
     const serviceYears = calculateServiceYears(promoDateStr, targetYear);
     if (serviceYears) {
-      return `${serviceYears}年目>${dateStr}`;
+      return `${formatServiceYearsText(serviceYears)}> ${dateStr}`;
     }
   }
   return dateStr;

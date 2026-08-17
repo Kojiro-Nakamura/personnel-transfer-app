@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, getEraSuffixForDate, formatPromoDateWithEra } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, getEraSuffixForDate, formatPromoDateWithEra, formatServiceYearsText, formatDateForDisplay } from './helpers.js';
 
 const getBorderHexColor = (grade) => {
   switch (grade) {
@@ -480,16 +480,15 @@ ${summaryHtml}
           }
         }
         
-        const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
-        
         let cellHtml = '';
-        if (diff !== null) {
-          cellHtml += `<span class="diff-span diff-emerald">${diff}年目&gt;</span>`;
-        } else {
-          cellHtml += `<span class="arrow">&gt;</span>`;
-        }
-        cellHtml += cellVal;
         if (cellVal) {
+          const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
+          if (diff !== null) {
+            cellHtml += `<span style="font-size: 10px; color: #1e293b; font-weight: bold; margin-right: 2px;">${formatServiceYearsText(diff)}></span>`;
+          } else {
+            cellHtml += `<span class="arrow">&gt;</span>`;
+          }
+          cellHtml += `<span style="font-size: 11px; font-weight: bold; color: #0f172a;">${formatDateForDisplay(cellVal)}</span>`;
           const suffix = getEraSuffixForDate(cellVal);
           if (suffix) {
              cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
@@ -524,7 +523,7 @@ ${summaryHtml}
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff}年目</span>`;
+          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${formatServiceYearsText(diff)}</span>`;
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
@@ -614,7 +613,7 @@ ${summaryHtml}
       <td class="bg-amber" data-val="${cDeptName}">${cDeptName}</td>
       <td class="bg-amber" data-val="${emp.currentTitle||''}">${emp.currentTitle||''}</td>
       <td class="bg-amber" data-val="${emp.currentGrade||''}">${emp.currentGrade||''}</td>
-      <td class="bg-amber" data-val="${getEmpCurrentYears(emp, targetYear - 1, false)}">${getEmpCurrentYears(emp, targetYear - 1, false)}</td>
+      <td class="bg-amber" data-val="${getEmpCurrentYears(emp, targetYear - 1, false)}">${formatServiceYearsText(getEmpCurrentYears(emp, targetYear - 1, false))}</td>
       <td class="bg-amber" data-val="${(emp.currentSkills || []).join('、')||''}">${(emp.currentSkills || []).join('、')||''}</td>
       <td class="bg-amber" data-val="${emp.currentEmploymentType||''}">${emp.currentEmploymentType||''}</td>
       <td class="bg-amber" data-val="${emp.currentExclude||''}">${emp.currentExclude||''}</td>
@@ -625,26 +624,18 @@ ${summaryHtml}
       ${(() => {
         if (isNextRetired) return `<td class="bg-blue" data-val=""${nStyle}></td>`;
         const valYears = getEmpCurrentYears(emp, targetYear, true);
-        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${valYears}</td>`;
+        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${formatServiceYearsText(valYears)}</td>`;
       })()}
       <td class="bg-blue" data-val="${nSkills}"${nStyle}>${nSkills}</td>
       <td class="bg-blue" data-val="${nEmpType}"${nStyle}>${nEmpType}</td>
       <td class="bg-blue" data-val="${nExclude}"${nStyle}>${nExclude}</td>
       
       ${(() => {
-        const hireYear = emp.hireDate ? String(emp.hireDate).substring(0,4) : '';
-        let cellHtml = hireYear;
-        if (hireYear) {
-          const suffix = getEraSuffix(hireYear);
-          if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
-          if (emp.birthDate) {
-             const hAge = calculateAge(emp.birthDate, parseInt(hireYear));
-             if (hAge !== null && !isNaN(hAge)) {
-                cellHtml += `<span style="font-size: 10px; color: #334155; margin-left: 2px;">${hAge}歳</span>`;
-             }
-          }
+        let cellHtml = '';
+        if (emp.hireDate) {
+          cellHtml = formatDateForDisplay(emp.hireDate);
         }
-        return `<td class="bg-fuchsia" data-val="${hireYear}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
+        return `<td class="bg-fuchsia" data-val="${cellHtml}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       })()}
       ${renderPromo('promoYearChief')}
       ${renderPromo('promoYearAssistant1')}
