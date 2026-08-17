@@ -525,27 +525,36 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
 
     if (currentIdx <= lastFilledIdx) {
       // Normal arrow between filled
-      const currentY = pKeys[currentIdx] === 'hire' ? (fd.hireDate ? parseInt(fd.hireDate.substring(0,4)) : NaN) : parseInt(fd[pKeys[currentIdx]]);
-      let prevY = NaN;
+      const currentY = pKeys[currentIdx] === 'hire' ? fd.hireDate : fd[pKeys[currentIdx]];
+      let prevY = '';
       for (let i = currentIdx - 1; i >= 0; i--) {
-        const y = pKeys[i] === 'hire' ? (fd.hireDate ? parseInt(fd.hireDate.substring(0,4)) : NaN) : parseInt(fd[pKeys[i]]);
-        if (!isNaN(y)) { prevY = y; break; }
+        const y = pKeys[i] === 'hire' ? fd.hireDate : fd[pKeys[i]];
+        if (y) { prevY = y; break; }
       }
-      const diff = (!isNaN(currentY) && !isNaN(prevY)) ? currentY - prevY : null;
+      
+      let diffStr = null;
+      if (currentY && prevY) {
+        diffStr = calculateServiceYears(prevY, currentY);
+      }
+
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
-          <span className={cx("text-[10px] font-bold text-emerald-600 px-1 rounded mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-emerald-50")}>{diff !== null && diff >= 0 ? diff + 1 : 1}年目</span>
+          <span className={cx("text-[10px] font-bold text-emerald-600 px-1 rounded mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-emerald-50")}>{diffStr ? diffStr : 1}年目</span>
           <ChevronRight className="w-4 h-4 text-emerald-500" />
         </div>
       );
     } else if (currentIdx === lastFilledIdx + 1) {
       // Final "来年度まで" arrow
-      const lastY = pKeys[lastFilledIdx] === 'hire' ? (fd.hireDate ? parseInt(fd.hireDate.substring(0,4)) : NaN) : parseInt(fd[pKeys[lastFilledIdx]]);
-      const diff = !isNaN(lastY) ? (targetYear - lastY + 1) : null;
+      const lastY = pKeys[lastFilledIdx] === 'hire' ? fd.hireDate : fd[pKeys[lastFilledIdx]];
+      let diffStr = null;
+      if (lastY) {
+        diffStr = calculateServiceYears(lastY, targetYear);
+      }
+
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
           <span className="text-[9px] font-bold text-blue-600 leading-tight whitespace-nowrap">来年度</span>
-          <span className={cx("text-[10px] font-bold text-blue-700 px-1 rounded border border-blue-200 mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-blue-100")}>{diff !== null && diff >= 0 ? diff : 0}年目</span>
+          <span className={cx("text-[10px] font-bold text-blue-700 px-1 rounded border border-blue-200 mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-blue-100")}>{diffStr ? diffStr : 0}年目</span>
           <ChevronRight className="w-4 h-4 text-blue-500" />
         </div>
       );

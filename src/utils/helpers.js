@@ -66,6 +66,8 @@ export const calculateAge = (birthDate, targetYear) => {
 export const parseJapaneseDate = (str) => {
   if (!str) return '';
   str = String(str).trim();
+  // Remove any trailing text after a space (e.g. " R6 56歳")
+  str = str.split(/[\s　]/)[0];
   // 全角英数字・記号を半角に変換
   str = str.replace(/[！-～]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
 
@@ -106,6 +108,7 @@ export const parseJapaneseDate = (str) => {
 export const parsePromoDate = (str) => {
   if (!str) return '';
   str = String(str).trim();
+  str = str.split(/[\s　]/)[0];
   // 全角英数字・記号を半角に変換
   str = str.replace(/[！-～]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
   
@@ -563,7 +566,8 @@ export const getEraSuffix = (year) => {
 
 export const calculateServiceYears = (promoDateStr, targetYearOrDate) => {
   if (!promoDateStr || !targetYearOrDate) return '';
-  const promoDate = new Date(promoDateStr);
+  const cleanPromoStr = String(promoDateStr).split(' ')[0];
+  const promoDate = new Date(cleanPromoStr);
   if (isNaN(promoDate.getTime())) return '';
   
   let targetDate;
