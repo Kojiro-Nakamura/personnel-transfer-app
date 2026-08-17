@@ -50,7 +50,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   };
   
   const formatWithEra = (dateStr) => {
-    return formatPromoDateWithEra(dateStr);
+    return formatPromoDateWithEra(String(dateStr));
   };
 
   const getStandardYears = (gradeName) => {
@@ -782,7 +782,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   
   const formatWithEra = (dateStr) => {
     if (!dateStr) return '';
-    const match = dateStr.match(/^(\d{4})[-/]/);
+    const match = String(dateStr).match(/^(\d{4})[-/]/);
     if (match) {
       const year = parseInt(match[1], 10);
       let era = '';
@@ -790,9 +790,9 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       else if (year >= 1989) era = `(H${year - 1988})`;
       else if (year >= 1926) era = `(S${year - 1925})`;
       else if (year >= 1912) era = `(T${year - 1911})`;
-      return era ? `${dateStr}${era}` : dateStr;
+      return era ? `${dateStr}${era}` : String(dateStr);
     }
-    return dateStr;
+    return String(dateStr);
   };
 
   const gradeToPromoKey = { "部長級": "promoYearDeptHead", "次長級": "promoYearDeputyHead", "所属長級": "promoYearDivHead", "課長級": "promoYearSecHead", "補佐級III(補佐兼班長)": "promoYearAssistant3", "補佐級II(班長)": "promoYearAssistant2", "補佐級I(主任)": "promoYearAssistant1", "係長級(主査)": "promoYearChief" };
@@ -1118,14 +1118,14 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
 
     // 履歴
     const promoYearMap = {};
-    if (emp.promoYearChief) promoYearMap[parseInt(emp.promoYearChief.split('-')[0])] = "係長級(主査)";
-    if (emp.promoYearAssistant1) promoYearMap[parseInt(emp.promoYearAssistant1.split('-')[0])] = "補佐級I(主任)";
-    if (emp.promoYearAssistant2) promoYearMap[parseInt(emp.promoYearAssistant2.split('-')[0])] = "補佐級II(班長)";
-    if (emp.promoYearAssistant3) promoYearMap[parseInt(emp.promoYearAssistant3.split('-')[0])] = "補佐級III(補佐兼班長)";
-    if (emp.promoYearSecHead) promoYearMap[parseInt(emp.promoYearSecHead.split('-')[0])] = "課長級";
-    if (emp.promoYearDivHead) promoYearMap[parseInt(emp.promoYearDivHead.split('-')[0])] = "所属長級";
-    if (emp.promoYearDeputyHead) promoYearMap[parseInt(emp.promoYearDeputyHead.split('-')[0])] = "次長級";
-    if (emp.promoYearDeptHead) promoYearMap[parseInt(emp.promoYearDeptHead.split('-')[0])] = "部長級";
+    if (emp.promoYearChief) promoYearMap[parseInt(String(emp.promoYearChief).split('-')[0])] = "係長級(主査)";
+    if (emp.promoYearAssistant1) promoYearMap[parseInt(String(emp.promoYearAssistant1).split('-')[0])] = "補佐級I(主任)";
+    if (emp.promoYearAssistant2) promoYearMap[parseInt(String(emp.promoYearAssistant2).split('-')[0])] = "補佐級II(班長)";
+    if (emp.promoYearAssistant3) promoYearMap[parseInt(String(emp.promoYearAssistant3).split('-')[0])] = "補佐級III(補佐兼班長)";
+    if (emp.promoYearSecHead) promoYearMap[parseInt(String(emp.promoYearSecHead).split('-')[0])] = "課長級";
+    if (emp.promoYearDivHead) promoYearMap[parseInt(String(emp.promoYearDivHead).split('-')[0])] = "所属長級";
+    if (emp.promoYearDeputyHead) promoYearMap[parseInt(String(emp.promoYearDeputyHead).split('-')[0])] = "次長級";
+    if (emp.promoYearDeptHead) promoYearMap[parseInt(String(emp.promoYearDeptHead).split('-')[0])] = "部長級";
 
     const histBgColors = [];
     const histIsChange = [];

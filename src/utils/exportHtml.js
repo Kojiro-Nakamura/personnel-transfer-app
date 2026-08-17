@@ -494,7 +494,7 @@ ${summaryHtml}
           if (suffix) {
              cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
           }
-          const y = parseInt(cellVal.split('-')[0], 10);
+          const y = parseInt(String(cellVal).split('-')[0], 10);
           if (emp.birthDate && !isNaN(y)) {
              const promoAge = calculateAge(emp.birthDate, y);
              if (promoAge !== null && !isNaN(promoAge)) {
@@ -532,14 +532,14 @@ ${summaryHtml}
       };
 
       const promoYearMap = {};
-      if (emp.promoYearChief) promoYearMap[parseInt(emp.promoYearChief.split('-')[0])] = "係長級(主査)";
-      if (emp.promoYearAssistant1) promoYearMap[parseInt(emp.promoYearAssistant1.split('-')[0])] = "補佐級I(主任)";
-      if (emp.promoYearAssistant2) promoYearMap[parseInt(emp.promoYearAssistant2.split('-')[0])] = "補佐級II(班長)";
-      if (emp.promoYearAssistant3) promoYearMap[parseInt(emp.promoYearAssistant3.split('-')[0])] = "補佐級III(補佐兼班長)";
-      if (emp.promoYearSecHead) promoYearMap[parseInt(emp.promoYearSecHead.split('-')[0])] = "課長級";
-      if (emp.promoYearDivHead) promoYearMap[parseInt(emp.promoYearDivHead.split('-')[0])] = "所属長級";
-      if (emp.promoYearDeputyHead) promoYearMap[parseInt(emp.promoYearDeputyHead.split('-')[0])] = "次長級";
-      if (emp.promoYearDeptHead) promoYearMap[parseInt(emp.promoYearDeptHead.split('-')[0])] = "部長級";
+      if (emp.promoYearChief) promoYearMap[parseInt(String(emp.promoYearChief).split('-')[0])] = "係長級(主査)";
+      if (emp.promoYearAssistant1) promoYearMap[parseInt(String(emp.promoYearAssistant1).split('-')[0])] = "補佐級I(主任)";
+      if (emp.promoYearAssistant2) promoYearMap[parseInt(String(emp.promoYearAssistant2).split('-')[0])] = "補佐級II(班長)";
+      if (emp.promoYearAssistant3) promoYearMap[parseInt(String(emp.promoYearAssistant3).split('-')[0])] = "補佐級III(補佐兼班長)";
+      if (emp.promoYearSecHead) promoYearMap[parseInt(String(emp.promoYearSecHead).split('-')[0])] = "課長級";
+      if (emp.promoYearDivHead) promoYearMap[parseInt(String(emp.promoYearDivHead).split('-')[0])] = "所属長級";
+      if (emp.promoYearDeputyHead) promoYearMap[parseInt(String(emp.promoYearDeputyHead).split('-')[0])] = "次長級";
+      if (emp.promoYearDeptHead) promoYearMap[parseInt(String(emp.promoYearDeptHead).split('-')[0])] = "部長級";
 
       let histHtml = '';
       let prevDept = null;
