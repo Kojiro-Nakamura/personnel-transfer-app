@@ -381,10 +381,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
               {listRows.map((r, i) => {
                 const reasonColor = getReasonColorClass(r.reason);
                 const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
+                const showGroup = i === 0 || r.predGroup !== listRows[i - 1].predGroup || r.predDeptTitle !== listRows[i - 1].predDeptTitle || !!sortKey;
                 return (
                   <tr key={i} className="border-b border-gray-400 text-[11px] hover:bg-gray-50 print-break-inside-avoid">
                     <td className="border-r border-black p-1.5 max-w-[120px] break-words">{r.predDeptTitle}</td>
-                    <td className="border-r border-black p-1.5 max-w-[100px] break-words">{r.predGroup}</td>
+                    <td className="border-r border-black p-1.5 max-w-[100px] break-words">{showGroup ? r.predGroup : ''}</td>
                     <td className="border-r border-black p-1.5 text-center min-w-[5rem] w-20">{r.predEmpNo}</td>
                     <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
