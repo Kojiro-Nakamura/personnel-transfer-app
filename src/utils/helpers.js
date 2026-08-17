@@ -66,6 +66,8 @@ export const calculateAge = (birthDate, targetYear) => {
 export const parseJapaneseDate = (str) => {
   if (!str) return '';
   str = String(str).trim();
+  // 全角英数字・記号を半角に変換
+  str = str.replace(/[！-～]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
 
   // Try standard YYYY-MM-DD or YYYY/MM/DD or YYYY年MM月DD日
   const adMatch = str.match(/^(\d{4})[-\/\.年](\d{1,2})[-\/\.月](\d{1,2})日?$/);
@@ -104,6 +106,9 @@ export const parseJapaneseDate = (str) => {
 export const parsePromoDate = (str) => {
   if (!str) return '';
   str = String(str).trim();
+  // 全角英数字・記号を半角に変換
+  str = str.replace(/[！-～]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
+  
   if (/^\d{4}$/.test(str) || /^\d{4}年$/.test(str)) {
     const y = parseInt(str, 10);
     return `${y}-04-01`;
