@@ -623,12 +623,9 @@ export const formatDateForDisplay = (dateStr) => {
   const era = getEraSuffix(y);
   
   if (parts.length >= 3) {
-    if (parts[1] === '04' && parts[2] === '01') {
-      return `${y}(${era})`;
-    }
     return `${str}(${era})`;
   }
-  return `${y}(${era})`;
+  return `${str}(${era})`;
 };
 
 export const formatPromoDateWithEra = (promoDateStr, targetYear) => {

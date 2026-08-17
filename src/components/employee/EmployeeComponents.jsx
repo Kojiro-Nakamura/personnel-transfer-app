@@ -632,8 +632,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[36px] flex flex-col justify-center leading-tight tracking-tighter overflow-hidden">
                   {fd.hireDate ? (() => {
                     const hYear = parseInt(String(fd.hireDate).substring(0, 4));
-                    const isAprilFirst = String(fd.hireDate).endsWith('-04-01') || !String(fd.hireDate).includes('-');
-                    const displayStr = isAprilFirst ? `${hYear}` : String(fd.hireDate);
+                    const displayStr = String(fd.hireDate);
                     const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
                     return (
                       <div className="flex flex-col items-center justify-center w-full">

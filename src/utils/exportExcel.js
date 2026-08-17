@@ -787,12 +787,9 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     const y = parts[0];
     const era = getEraSuffixLocal(y);
     if (parts.length >= 3) {
-      if (parts[1] === '04' && parts[2] === '01') {
-        return `${y}(${era})`;
-      }
       return `${str}(${era})`;
     }
-    return `${y}(${era})`;
+    return `${str}(${era})`;
   };
   
   const formatWithEra = (dateStr) => {
