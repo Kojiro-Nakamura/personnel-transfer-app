@@ -323,12 +323,6 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       formattedPostName = `${post.name} / ${post.nextName}`;
     }
 
-    const isNewDept = deptName !== lastDept;
-    const isNewGroup = isNewDept || groupName !== lastGroup;
-    const displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
-    
-    lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
-
     if (filterLevel > 0) {
       const currLvl = currEmp ? getGradeLevel(currEmp.currentGrade) : 0;
       const nextLvl = nextEmp ? getGradeLevel(nextEmp.nextGrade) : 0;
@@ -339,6 +333,12 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         if (currLvl < filterLevel && nextLvl < filterLevel) return; 
       }
     }
+
+    const isNewDept = deptName !== lastDept;
+    const isNewGroup = isNewDept || groupName !== lastGroup;
+    const displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
+    
+    lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
 
     let displayDeptStr = '';
     if (isNewDept) {
@@ -363,7 +363,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       }
     }
 
-    let displayGroupStr = groupName;
+    let displayGroupStr = '';
     if (isNewGroup && groupName !== '') {
       if (dept.id && group && group.id && deptMap[dept.id].groups[group.id]) {
         const gm = deptMap[dept.id].groups[group.id];
