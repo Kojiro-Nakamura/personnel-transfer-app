@@ -78,7 +78,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   const calculateHosa2Years = (emp, targetYear) => {
-    if (!emp || !emp.currentGrade || !emp.currentGrade.includes('補佐級III')) return '';
+    if (!emp || !emp.currentGrade || !String(emp.currentGrade).includes('補佐級III')) return '';
     const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
     const hosa2PromoYear = Number(emp[hosa2PromoKey]);
     if (hosa2PromoYear && !isNaN(hosa2PromoYear)) {
@@ -381,7 +381,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
               {listRows.map((r, i) => {
                 const reasonColor = getReasonColorClass(r.reason);
                 const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
-                const showGroup = i === 0 || r.predGroup !== listRows[i - 1].predGroup || r.predDeptTitle !== listRows[i - 1].predDeptTitle || !!sortKey;
+                const showGroup = i === 0 || !listRows[i - 1] || r.predGroup !== listRows[i - 1].predGroup || r.predDeptTitle !== listRows[i - 1].predDeptTitle || !!sortKey;
                 return (
                   <tr key={i} className="border-b border-gray-400 text-[11px] hover:bg-gray-50 print-break-inside-avoid">
                     <td className="border-r border-black p-1.5 max-w-[120px] break-words">{r.predDeptTitle}</td>
