@@ -369,13 +369,13 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
           value={value || ''} 
           onChange={handleDateChange} 
           onBlur={handleBlur}
-          className={`w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight ${value && String(value).length >= 10 && !String(value).endsWith('-04-01') ? 'text-rose-600' : 'text-slate-900'}`} 
+          className={`w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight ${value && String(value).length >= 10 && !String(value).endsWith('-04-01') ? 'text-rose-600 text-outline-white' : 'text-slate-900'}`} 
         />
         <div className="flex items-center justify-between mt-[-2px] min-h-[14px]">
           {(value || serviceYears !== null) ? (
             (() => {
               const isNonAprilFirst = value && String(value).length >= 10 && !String(value).endsWith('-04-01');
-              const subColor = isNonAprilFirst ? 'text-rose-600' : 'text-slate-500';
+              const subColor = isNonAprilFirst ? 'text-rose-600 text-outline-white' : 'text-slate-500';
               return (
                 <>
                   <span className={`text-[9px] ${subColor} font-bold tracking-tighter pointer-events-none select-none`}>
@@ -639,7 +639,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   {fd.hireDate ? (() => {
                     const hYear = parseInt(String(fd.hireDate).substring(0, 4));
                     const isNonAprilFirst = String(fd.hireDate).length >= 10 && !String(fd.hireDate).endsWith('-04-01');
-                    const textClass = isNonAprilFirst ? 'text-rose-600' : '';
+                    const textClass = isNonAprilFirst ? 'text-rose-600 text-outline-white' : '';
                     const displayStr = String(fd.hireDate);
                     const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
                     return (
@@ -648,9 +648,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                           <span>{displayStr}</span>
                         </div>
                         <div className="flex items-baseline justify-center mt-[-1px] w-full truncate">
-                          <span className={`text-[10px] font-bold ${isNonAprilFirst ? 'text-rose-600' : 'text-slate-500'}`}>({getEraSuffix(hYear)})</span>
+                          <span className={`text-[10px] font-bold ${isNonAprilFirst ? 'text-rose-600 text-outline-white' : 'text-slate-500'}`}>({getEraSuffix(hYear)})</span>
                           {hAge !== null && !isNaN(hAge) && (
-                            <span className={`ml-1 text-[10px] font-bold ${isNonAprilFirst ? 'text-rose-600' : 'text-slate-500'}`}>{hAge}歳</span>
+                            <span className={`ml-1 text-[10px] font-bold ${isNonAprilFirst ? 'text-rose-600 text-outline-white' : 'text-slate-500'}`}>{hAge}歳</span>
                           )}
                         </div>
                       </div>

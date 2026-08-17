@@ -44,4 +44,15 @@
     );
     background-size: 16px 16px;
   }
+  .text-outline-white {
+    text-shadow: 
+      -1px -1px 0 #ffffff,  
+       1px -1px 0 #ffffff,
+      -1px  1px 0 #ffffff,
+       1px  1px 0 #ffffff,
+       0px -1px 0 #ffffff,
+       0px  1px 0 #ffffff,
+      -1px  0px 0 #ffffff,
+       1px  0px 0 #ffffff;
+  }
 }

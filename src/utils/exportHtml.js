@@ -490,7 +490,8 @@ ${summaryHtml}
           }
           const isNonAprilFirst = String(cellVal).length >= 10 && !String(cellVal).endsWith('-04-01');
           const dateColor = isNonAprilFirst ? '#e11d48' : '#0f172a';
-          cellHtml += `<span style="font-size: 11px; font-weight: bold; color: ${dateColor};">${formatDateForDisplay(cellVal)}</span>`;
+          const textShadow = isNonAprilFirst ? 'text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -1px 0 0 #fff, 1px 0 0 #fff;' : '';
+          cellHtml += `<span style="font-size: 11px; font-weight: bold; color: ${dateColor}; ${textShadow}">${formatDateForDisplay(cellVal)}</span>`;
           const suffix = getEraSuffixForDate(cellVal);
           if (suffix) {
              cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
@@ -637,8 +638,9 @@ ${summaryHtml}
         if (emp.hireDate) {
           const isNonAprilFirst = String(emp.hireDate).length >= 10 && !String(emp.hireDate).endsWith('-04-01');
           const dateColor = isNonAprilFirst ? '#e11d48' : '#0f172a';
+          const textShadow = isNonAprilFirst ? 'text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -1px 0 0 #fff, 1px 0 0 #fff;' : '';
           const displayDate = formatDateForDisplay(emp.hireDate);
-          cellHtml = `<span style="font-size: 11px; font-weight: bold; color: ${dateColor};">${displayDate}</span>`;
+          cellHtml = `<span style="font-size: 11px; font-weight: bold; color: ${dateColor}; ${textShadow}">${displayDate}</span>`;
         }
         return `<td class="bg-fuchsia" data-val="${cellHtml}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       })()}
