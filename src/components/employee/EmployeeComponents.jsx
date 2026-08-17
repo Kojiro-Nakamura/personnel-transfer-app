@@ -6,6 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, Wand2
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
+import { ErrorBoundary } from '../ErrorBoundary';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
@@ -560,13 +561,11 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           <ChevronRight className="w-4 h-4 text-slate-300 mb-1" />
         </div>
       );
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
       <div className="bg-white rounded-lg p-5 max-w-4xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <ErrorBoundary>
+          <div className="flex justify-between items-center mb-4 border-b pb-2">
           <div>
             <h3 className="text-xl font-bold text-[#065084]">職員情報編集</h3>
             <p className="text-sm text-slate-500 mt-1">
