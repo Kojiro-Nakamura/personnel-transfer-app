@@ -561,6 +561,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           <ChevronRight className="w-4 h-4 text-slate-300 mb-1" />
         </div>
       );
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
       <div className="bg-white rounded-lg p-5 max-w-4xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
