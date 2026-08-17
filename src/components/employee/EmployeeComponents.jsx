@@ -329,8 +329,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
     </div>
   );
 };
-const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear }) => {
-  const serviceYears = (value && targetYear) ? calculateServiceYears(value, targetYear) : null;
+const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear, birthDate }) => {
   const activeBorder = (value && borderClass) ? `border-2 ${borderClass}` : "border border-slate-300";
   
   const handleDateChange = (e) => {
@@ -372,17 +371,19 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
           className={`w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight ${value && String(value).length >= 10 && !String(value).endsWith('-04-01') ? 'text-rose-600 text-outline-white' : 'text-slate-900'}`} 
         />
         <div className="flex items-center justify-between mt-[-2px] min-h-[14px]">
-          {(value || serviceYears !== null) ? (
+          {value ? (
             (() => {
               const isNonAprilFirst = value && String(value).length >= 10 && !String(value).endsWith('-04-01');
               const subColor = isNonAprilFirst ? 'text-rose-600 text-outline-white' : 'text-slate-500';
+              const vYear = parseInt(String(value).substring(0, 4));
+              const age = (birthDate && !isNaN(vYear)) ? calculateAge(birthDate, vYear) : null;
               return (
                 <>
                   <span className={`text-[9px] ${subColor} font-bold tracking-tighter pointer-events-none select-none`}>
-                    {value ? getYearPart(value) : ''}
+                    {getYearPart(value)}
                   </span>
                   <span className={`text-[9px] ${subColor} font-bold tracking-tighter pointer-events-none select-none whitespace-nowrap`}>
-                    {formatServiceYearsText(serviceYears)}
+                    {age !== null && !isNaN(age) ? `${age}歳` : ''}
                   </span>
                 </>
               );
@@ -659,25 +660,25 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 </div>
               </div>
               <ArrowDiff currentKey="promoYearChief" />
-              <DateInput targetYear={targetYear} label="係長級(主査)" value={fd.promoYearChief} onChange={v => setFd({...fd, promoYearChief: v})} bgClass={activePromoKey === "promoYearChief" ? promoBg : ""} borderClass={getPromotedBorderClass("係長級(主査)")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="係長級(主査)" value={fd.promoYearChief} onChange={v => setFd({...fd, promoYearChief: v})} bgClass={activePromoKey === "promoYearChief" ? promoBg : ""} borderClass={getPromotedBorderClass("係長級(主査)")} />
               <ArrowDiff currentKey="promoYearAssistant1" />
-              <DateInput targetYear={targetYear} label="補佐級I(主任)" value={fd.promoYearAssistant1} onChange={v => setFd({...fd, promoYearAssistant1: v})} bgClass={activePromoKey === "promoYearAssistant1" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級I(主任)")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="補佐級I(主任)" value={fd.promoYearAssistant1} onChange={v => setFd({...fd, promoYearAssistant1: v})} bgClass={activePromoKey === "promoYearAssistant1" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級I(主任)")} />
               <ArrowDiff currentKey="promoYearAssistant2" />
-              <DateInput targetYear={targetYear} label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} bgClass={activePromoKey === "promoYearAssistant2" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級II(班長)")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} bgClass={activePromoKey === "promoYearAssistant2" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級II(班長)")} />
               <ArrowDiff currentKey="promoYearAssistant3" />
-              <DateInput targetYear={targetYear} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} bgClass={activePromoKey === "promoYearAssistant3" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級III(補佐兼班長)")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} bgClass={activePromoKey === "promoYearAssistant3" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級III(補佐兼班長)")} />
               <div className="w-full opacity-0 pointer-events-none"></div>
 
               {/* Bottom Row */}
               <div className="w-full opacity-0 pointer-events-none"></div>
               <ArrowDiff currentKey="promoYearSecHead" />
-              <DateInput targetYear={targetYear} label="課長級" value={fd.promoYearSecHead} onChange={v => setFd({...fd, promoYearSecHead: v})} bgClass={activePromoKey === "promoYearSecHead" ? promoBg : ""} borderClass={getPromotedBorderClass("課長級")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="課長級" value={fd.promoYearSecHead} onChange={v => setFd({...fd, promoYearSecHead: v})} bgClass={activePromoKey === "promoYearSecHead" ? promoBg : ""} borderClass={getPromotedBorderClass("課長級")} />
               <ArrowDiff currentKey="promoYearDivHead" />
-              <DateInput targetYear={targetYear} label="所属長級" value={fd.promoYearDivHead} onChange={v => setFd({...fd, promoYearDivHead: v})} bgClass={activePromoKey === "promoYearDivHead" ? promoBg : ""} borderClass={getPromotedBorderClass("所属長級")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="所属長級" value={fd.promoYearDivHead} onChange={v => setFd({...fd, promoYearDivHead: v})} bgClass={activePromoKey === "promoYearDivHead" ? promoBg : ""} borderClass={getPromotedBorderClass("所属長級")} />
               <ArrowDiff currentKey="promoYearDeputyHead" />
-              <DateInput targetYear={targetYear} label="次長級" value={fd.promoYearDeputyHead} onChange={v => setFd({...fd, promoYearDeputyHead: v})} bgClass={activePromoKey === "promoYearDeputyHead" ? promoBg : ""} borderClass={getPromotedBorderClass("次長級")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="次長級" value={fd.promoYearDeputyHead} onChange={v => setFd({...fd, promoYearDeputyHead: v})} bgClass={activePromoKey === "promoYearDeputyHead" ? promoBg : ""} borderClass={getPromotedBorderClass("次長級")} />
               <ArrowDiff currentKey="promoYearDeptHead" />
-              <DateInput targetYear={targetYear} label="部長級" value={fd.promoYearDeptHead} onChange={v => setFd({...fd, promoYearDeptHead: v})} bgClass={activePromoKey === "promoYearDeptHead" ? promoBg : ""} borderClass={getPromotedBorderClass("部長級")} />
+              <DateInput birthDate={fd.birthDate} targetYear={targetYear} label="部長級" value={fd.promoYearDeptHead} onChange={v => setFd({...fd, promoYearDeptHead: v})} bgClass={activePromoKey === "promoYearDeptHead" ? promoBg : ""} borderClass={getPromotedBorderClass("部長級")} />
               <ArrowDiff currentKey="finalArrow" />
             </div>
           </div>
