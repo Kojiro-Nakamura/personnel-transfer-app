@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玉突き異動表生成</title>
+
+  <!-- Google Fonts: BIZ UDPMincho (UD明朝) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPMincho&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- SheetJS (Excel読み込み用) -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+  <!-- JSZip (ZIP作成用) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- 保存用データ埋め込み領域 -->
+  <script id="saved-state" type="application/json"></script>
+
+  <style>
+    body { font-family: 'BIZ UDPMincho', serif; }
+    @media print {
+      @page { size: landscape; margin: 10mm; }
+      body { background-color: white; }
+      .no-print { display: none !important; }
+      .print-break-inside-avoid { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-black selection:bg-gray-300">
+  
+  <div id="app"></div>
+
+  <script>
+    window.addEventListener('dragover', (e) => e.preventDefault(), false);
+    window.addEventListener('drop', (e) => e.preventDefault(), false);
+
+    // ==========================================
+    // 0. Utilities
+    // ==========================================
+    const Utils = {
+      calculateAge(birthDateString, targetDateString) {
+        if (!birthDateString) return null;
+        let normalizedStr = birthDateString.toString().trim();
+        if (normalizedStr.length === 8 && !normalizedStr.includes('-') && !normalizedStr.includes('/')) {
+            normalizedStr = `${normalizedStr.substring(0, 4)}-${normalizedStr.substring(4, 6)}-${normalizedStr.substring(6, 8)}`;
+        } else {
+            normalizedStr = normalizedStr.replace(/\//g, '-');
+        }
+        const birthDate = new Date(normalizedStr);
+        if (isNaN(birthDate.getTime())) return null;
+        
+        const targetDate = new Date(targetDateString);
+        let age = targetDate.getFullYear() - birthDate.getFullYear();
+        const m = targetDate.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && targetDate.getDate() < birthDate.getDate())) age--;
+        return age;
+      },
+      chunkArray(array, size) {
+        return Array.from({ length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size));
+      },
+      toReiwa(year) {
+        return year - 2018; // 2019年=令和1年
+      }
+    };
+
+    // ==========================================
+    // 1. State Management
+    // ==========================================
+    const AppState = {
+      data: {
+        chains: [], movesByToPost: {}, movesByFromPost: {}, moves: [], retentions: [],
+        error: null, fileName: null, isReadOnly: false, currentTab: 'chain',
+        targetYear: 2027, sortKey: null, sortOrder: 'asc', chainSortOrder: null,
+        designatedSortKey: null, designatedSortOrder: 'asc', gradeYearsMap: {}
+      },
+      get() { return this.data; },
+      update(newState) { 
+        this.data = { ...this.data, ...newState }; 
+        AppRenderer.render(); 
+      },
+      setTab(tab) { this.update({ currentTab: tab }); },
+      restoreFromSavedState() {
+        try {
+          const stateEl = document.getElementById('saved-state');
+          if (stateEl && stateEl.textContent.trim() !== '') {
+            const saved = JSON.parse(stateEl.textContent);
+            if (saved && typeof saved === 'object') this.data = { ...this.data, ...saved };
+          }
+        } catch(e) {
+          console.error("保存された状態の復元に失敗", e);
+        }
+      }
+    };
+    
+    // イベントから正しく参照できるよう、Windowオブジェクトに登録
+    window.AppState = AppState;
+
+    // ==========================================
+    // 2. Data Parser
+    // ==========================================
+    const DataParser = {
+      analyze(data, targetYear = 2027) {
+        if (!data?.plans?.[0]) return { chains: [], movesByToPost: {}, movesByFromPost: {}, moves: [], retentions: [] };
+        
+        const plan = data.plans[0];
+        const { deptMap, groupMap } = this._createMaps(plan.departments || []);
+        
+        const allEmpMoves = this._createAllMoves(plan.employees || [], deptMap, groupMap, targetYear);
+        const moves = allEmpMoves.filter(m => m.fromPostId !== m.toPostId);
+        const retentions = allEmpMoves.filter(m => m.fromPostId === m.toPostId && m.fromPost.type !== 'unassigned' && m.fromPost.type !== 'retired');
+
+        const { movesByToPost, movesByFromPost } = this._groupMoves(moves);
+        const chains = this._buildChains(moves, movesByToPost, movesByFromPost);
+
+        return { chains, movesByToPost, movesByFromPost, moves, retentions };
+      },
+
+      _createMaps(departments) {
+        const deptMap = {}, groupMap = {};
+        departments.forEach(d => {
+          deptMap[d.id] = d.name;
+          (d.groups || []).forEach(g => { groupMap[g.id] = g.name; });
+        });
+        return { deptMap, groupMap };
+      },
+
+      _getPostId(emp, isNext) {
+        const deptId = isNext ? emp.departmentId : emp.currentDeptId;
+        const groupId = isNext ? emp.groupId : emp.currentGroupId;
+        const postId = isNext ? emp.postId : emp.currentPostId;
+        const groupPostId = isNext ? emp.groupPostId : emp.currentGroupPostId;
+        const title = isNext ? emp.nextTitle : emp.currentTitle;
+
+        if (deptId === 'unassigned') return `unassigned_${emp.id}`;
+        if (deptId === 'retired') return `retired_${emp.id}`;
+        if (postId || groupPostId) return `POST|${postId || ''}|${groupPostId || ''}`;
+        return `TITLE|${deptId || ''}|${groupId || ''}|${title || ''}`;
+      },
+
+      _getPostDetails(deptId, groupId, title, maps) {
+        if (deptId === 'unassigned') return { type: 'unassigned', dept: '', group: '', title: '新規採用', label: '新規採用' };
+        if (deptId === 'retired') return { type: 'retired', dept: '', group: '', title: '退職 / 転出', label: '退職 / 転出' };
+        
+        const dept = maps.deptMap[deptId] || '';
+        const group = maps.groupMap[groupId] || '';
+        const fullDept = [dept, group].filter(Boolean).join('');
+        const postName = [fullDept, title].filter(Boolean).join(' ');
+        
+        return { type: 'regular', dept, group, fullDept, title: title || '', label: postName || '(役職なし)' };
+      },
+
+      _getPromotedSuffix(currentGrade, nextGrade) {
+        if (!nextGrade) return "";
+        const levels = ['係長級', '補佐級', '課長級', '所属長級', '次長級', '部長級'];
+        const currentVal = levels.findIndex(lvl => currentGrade?.includes(lvl)) + 1;
+        const nextVal = levels.findIndex(lvl => nextGrade?.includes(lvl)) + 1;
+
+        if (nextVal > currentVal && nextVal >= 2) {
+          if (nextGrade.includes('次長級')) return '(次)';
+          if (nextGrade.includes('所属長級')) return '(所)';
+          if (nextGrade.includes('課長級')) return '(課)';
+          if (nextGrade.includes('補佐級')) return '(補)';
+        }
+        return "";
+      },
+
+      _createAllMoves(employees, deptMap, groupMap, targetYear) {
+        const maps = { deptMap, groupMap };
+        const thisYearDate = `${targetYear - 1}-04-01`;
+        const nextYearDate = `${targetYear}-04-01`;
+
+        return employees.map(emp => {
+          const hasCurrentTitle = (emp.currentTitle || '').trim() !== '';
+          const hasValidHistory = hasCurrentTitle && emp.currentDeptId !== 'unassigned';
+          const suffix = hasValidHistory ? this._getPromotedSuffix(emp.currentGrade, emp.nextGrade) : "";
+          const isToShocho = hasValidHistory && (emp.currentGrade || '').includes('課長級') && (emp.nextGrade || '').includes('所属長級');
+
+          const birthDateStr = emp.birthDate || emp.birthday || emp['生年月日'];
+          emp.ageThisYear = Utils.calculateAge(birthDateStr, thisYearDate) ?? emp.age;
+          emp.ageNextYear = Utils.calculateAge(birthDateStr, nextYearDate) ?? emp.age;
+
+          return {
+            emp,
+            fromPostId: this._getPostId(emp, false),
+            toPostId: this._getPostId(emp, true),
+            fromPost: this._getPostDetails(emp.currentDeptId, emp.currentGroupId, emp.currentTitle, maps),
+            toPost: this._getPostDetails(emp.departmentId, emp.groupId, emp.nextTitle, maps),
+            isTitleChanged: hasCurrentTitle && emp.currentTitle !== emp.nextTitle, 
+            isPromoted: suffix !== "", 
+            promotedSuffix: suffix, 
+            isPromotedToFukuShunin: hasValidHistory && emp.currentTitle !== '副主任' && emp.nextTitle === '副主任',
+            isPromotedToShocho: isToShocho 
+          };
+        });
+      },
+
+      _groupMoves(moves) {
+        const movesByToPost = {};
+        const movesByFromPost = {};
+        moves.forEach(m => {
+          (movesByToPost[m.toPostId] ??= []).push(m);
+          (movesByFromPost[m.fromPostId] ??= []).push(m);
+        });
+        return { movesByToPost, movesByFromPost };
+      },
+
+      _buildChains(moves, movesByToPost, movesByFromPost) {
+        const visited = new Set();
+        const chains = [];
+
+        const startMoves = moves.filter(m => m.emp.departmentId === 'retired' || !(movesByFromPost[m.toPostId]?.length));
+
+        const buildChain = (startMove) => {
+          const chain = [];
+          let curr = startMove;
+          while (curr && !visited.has(curr)) {
+            chain.push(curr);
+            visited.add(curr);
+            const unvisitedNext = (movesByToPost[curr.fromPostId] || []).filter(nm => !visited.has(nm));
+            curr = unvisitedNext[0] || null;
+          }
+          return chain;
+        };
+
+        startMoves.forEach(sm => { if (!visited.has(sm)) chains.push(buildChain(sm)); });
+        moves.forEach(m => { if (!visited.has(m)) chains.push(buildChain(m)); });
+
+        return chains.sort((a, b) => b.length - a.length);
+      },
+
+      getReason(chain, movesByFromPost) {
+        if (!chain?.length) return '';
+        const first = chain[0];
+        const last = chain[chain.length - 1];
+        
+        const isRetired = first.toPost.type === 'retired';
+        const isNewPost = !isRetired && !(movesByFromPost[first.toPostId]?.length);
+        const isNewHire = last.fromPost.type === 'unassigned';
+
+        if (isRetired) return chain.length === 1 ? '退職廃止' : (isNewHire ? '退職新採' : '退職後任');
+        if (isNewPost) return isNewHire ? '新設新採' : '新設';
+        return isNewHire ? '新採' : '内部昇格/異動';
+      }
+    };
+
+    // ==========================================
+    // 3. UI Components (HTML Generators)
+    // ==========================================
+    const UIComponents = {
+      COLORS: {
+        RETIRING: 'text-[#FF4B00]', // CUD 赤
+        RETAINING: 'text-[#03AF7A]', // CUD 緑（青緑）
+        NEW: 'text-[#F6AA00]',      // CUD 黄（オレンジ系）
+        NEW_HIRE: 'text-[#990099]', // CUD 紫
+        TRANSFER: 'text-[#005AFF]'  // CUD 青
+      },
+
+      _getReasonColorClass(reason) {
+        if (!reason) return '';
+        if (reason.includes('退職')) return this.COLORS.RETIRING;
+        if (reason.includes('留任')) return this.COLORS.RETAINING;
+        if (reason.includes('新設')) return this.COLORS.NEW;
+        if (reason.includes('新採')) return this.COLORS.NEW_HIRE;
+        if (reason.includes('転任') || reason.includes('異動')) return this.COLORS.TRANSFER;
+        return 'text-gray-800';
+      },
+
+      _formatPostInfo(post) {
+        if (['retired', 'unassigned'].includes(post.type)) return `<span>${post.label}</span>`;
+        return `<span class="text-gray-700">${post.dept}</span><span>${post.title}</span>`;
+      },
+
+      _getDisplayName(move) {
+        let prefix = move.isPromotedToFukuShunin ? "E! " : 
+                     move.isPromotedToShocho ? "! " : 
+                     move.isPromoted ? "*! " : 
+                     move.isTitleChanged ? "! " : "";
+        return prefix + move.emp.name + (move.promotedSuffix || "");
+      },
+
+      // --- Common UI Parts ---
+      Header(state) {
+        const titleArea = `
+          <div class="flex items-center gap-2">
+            <i data-lucide="file-json" class="w-5 h-5 text-gray-700"></i>
+            <h1 class="text-lg font-bold text-gray-800">玉突き異動表（つなぎ表）生成</h1>
+          </div>
+        `;
+        const fileNameArea = state.fileName ? `<span class="text-sm text-gray-500">${state.fileName}</span>` : '';
+        const saveHtmlBtn = (!state.isReadOnly && state.chains.length > 0) 
+          ? `<button onclick="window.AppEvents.saveHtml()" class="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm transition-colors"><i data-lucide="folder-down" class="w-4 h-4"></i>HTMLを一括保存(ZIP)</button>` : '';
+
+        const actionBtn = !state.isReadOnly ? `
+          <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-sm border border-gray-300 transition-colors flex items-center gap-1 shadow-sm">
+            <i data-lucide="upload" class="w-4 h-4"></i>${state.chains.length > 0 ? '再読込' : 'ファイル選択'}
+            <input type="file" class="hidden" accept=".json" onchange="window.AppEvents.fileUpload(event)" />
+          </label>
+        ` : `
+          <button onclick="window.print()" class="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm transition-colors"><i data-lucide="printer" class="w-4 h-4"></i>印刷 / PDF化</button>
+        `;
+
+        return `
+          <header class="bg-white border-b border-gray-300 shadow-sm sticky top-0 z-10 no-print">
+            <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between font-sans">
+              ${titleArea}
+              <div class="flex items-center gap-3">${fileNameArea}${saveHtmlBtn}${actionBtn}</div>
+            </div>
+          </header>
+        `;
+      },
+
+      Tabs(state) {
+        const tabs = [
+          { id: 'chain', icon: 'git-merge', label: 'つなぎ表' },
+          { id: 'list', icon: 'list', label: '異動案リスト' },
+          { id: 'designated', icon: 'award', label: '指定職人事異動' }
+        ];
+
+        const activeClass = 'bg-gray-800 text-white';
+        const inactiveClass = 'bg-gray-200 text-gray-600 hover:bg-gray-300';
+        const hasSort = (state.currentTab === 'chain' && !!state.chainSortOrder) || 
+                        (state.currentTab === 'list' && !!state.sortKey) || 
+                        (state.currentTab === 'designated' && !!state.designatedSortKey);
+        
+        const resetBtnClass = hasSort 
+          ? 'text-gray-700 hover:text-black bg-white hover:bg-gray-100 border-gray-300 cursor-pointer shadow-sm' 
+          : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed opacity-70';
+
+        let tabButtons = '';
+        if (state.isReadOnly) {
+            // 保存されたHTML（読取専用）では、現在のタブのみを表示する
+            const t = tabs.find(t => t.id === state.currentTab);
+            tabButtons = `
+              <div class="px-5 py-2.5 text-sm font-bold rounded-t-lg transition-colors ${activeClass} cursor-default">
+                <div class="flex items-center gap-1.5"><i data-lucide="${t.icon}" class="w-4 h-4"></i>${t.label}</div>
+              </div>
+            `;
+        } else {
+            tabButtons = tabs.map(t => `
+              <button onclick="window.AppState.setTab('${t.id}')" class="px-5 py-2.5 text-sm font-bold rounded-t-lg transition-colors ${state.currentTab === t.id ? activeClass : inactiveClass}">
+                <div class="flex items-center gap-1.5"><i data-lucide="${t.icon}" class="w-4 h-4"></i>${t.label}</div>
+              </button>
+            `).join('');
+        }
+
+        const resetBtnHtml = state.isReadOnly ? '' : `
+            <button onclick="window.AppEvents.resetSort()" ${!hasSort ? 'disabled' : ''} class="flex items-center gap-1.5 text-xs transition-colors px-2.5 py-1.5 rounded border mb-1.5 mr-1 ${resetBtnClass}">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>並べ替えリセット
+            </button>
+        `;
+
+        return `
+          <div class="flex justify-between items-end border-b-2 border-gray-300 mb-4 no-print font-sans">
+            <div class="flex gap-1.5">${tabButtons}</div>
+            ${resetBtnHtml}
+          </div>
+        `;
+      },
+
+      DropZone() {
+        return `
+          <div class="max-w-2xl mx-auto mt-12 no-print font-sans">
+            <label class="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-xl cursor-pointer transition-colors border-gray-300 bg-white hover:bg-gray-50"
+              ondragover="window.AppEvents.dragOver(event)" ondragleave="window.AppEvents.dragLeave(event)" ondrop="window.AppEvents.drop(event)">
+              <div class="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
+                <i data-lucide="upload" class="w-10 h-10 text-gray-400 mb-4"></i>
+                <p class="mb-2 text-sm text-gray-600 font-medium">人事案の JSON ファイルをドラッグ＆ドロップ</p>
+                <p class="text-xs text-gray-500">またはクリックしてファイルを選択</p>
+              </div>
+              <input type="file" class="hidden" accept=".json" onchange="window.AppEvents.fileUpload(event)" />
+            </label>
+          </div>
+        `;
+      },
+
+      ErrorAlert(errorMsg) {
+        return `
+          <div class="max-w-2xl mx-auto mt-8 border border-black bg-white p-4 flex items-start gap-3 font-sans no-print">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-black mt-0.5"></i>
+            <div><h3 class="font-bold text-black">エラー</h3><p class="text-sm mt-1 text-gray-800">${errorMsg}</p></div>
+          </div>
+        `;
+      },
+
+      _th(label, key, state, sortHandler, isDesig = false, extraClass = '', rowspan = '') {
+        const sortKey = isDesig ? state.designatedSortKey : state.sortKey;
+        const sortOrder = isDesig ? state.designatedSortOrder : state.sortOrder;
+        
+        const isSorted = sortKey === key;
+        const plainTextLabel = label.replace(/<[^>]*>?/gm, '');
+        
+        let iconHtml = `<i data-lucide="arrow-up-down" class="w-3 h-3 text-gray-300 transition-colors group-hover:text-gray-500"></i>`;
+        if (isSorted) {
+          iconHtml = sortOrder === 'asc' 
+            ? `<i data-lucide="arrow-up" class="w-3 h-3 text-blue-600"></i>`
+            : `<i data-lucide="arrow-down" class="w-3 h-3 text-blue-600"></i>`;
+        }
+
+        let bgClass = extraClass;
+        if (isSorted) {
+           bgClass = extraClass.replace(/bg-[a-zA-Z0-9/-]+/g, '').trim() + ' bg-blue-50';
+        } else if (!bgClass.includes('bg-')) {
+           bgClass += ' bg-white';
+        }
+
+        const rowspanAttr = rowspan ? `rowspan="${rowspan}"` : '';
+        const paddingClass = isDesig ? 'px-1.5 py-1.5' : 'px-1.5 py-2';
+        const borderClass = isDesig ? 'border-r border-b border-black' : 'border-r border-black';
+        
+        return `
+          <th ${rowspanAttr}
+            class="${borderClass} ${paddingClass} font-normal cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors select-none group ${bgClass}" 
+            onclick="window.AppEvents.${sortHandler}('${key}')"
+            title="${plainTextLabel}で並べ替え"
+          >
+            <div class="flex items-center justify-between gap-1">
+              <span>${label}</span>
+              <span class="inline-flex">${iconHtml}</span>
+            </div>
+          </th>`;
+      },
+
+      _sortData(rows, sortKey, sortOrder) {
+        if (!sortKey) return rows;
+        return [...rows].sort((a, b) => {
+          let valA = a[sortKey];
+          let valB = b[sortKey];
+
+          const isEmptyA = (valA === '' || valA == null);
+          const isEmptyB = (valB === '' || valB == null);
+          if (isEmptyA && !isEmptyB) return 1;
+          if (!isEmptyA && isEmptyB) return -1;
+          if (isEmptyA && isEmptyB) return 0;
+
+          const numA = Number(valA);
+          const numB = Number(valB);
+
+          let cmp = 0;
+          if (!isNaN(numA) && !isNaN(numB) && valA !== '' && valB !== '') {
+            cmp = numA - numB;
+          } else {
+            cmp = String(valA).localeCompare(String(valB), 'ja');
+          }
+
+          return sortOrder === 'asc' ? cmp : -cmp;
+        });
+      },
+
+      // --- Tab 1: Table View (つなぎ表) ---
+      Table(state) {
+        let displayChains = [...state.chains];
+        if (state.chainSortOrder) {
+          displayChains.sort((a, b) => {
+            const reasonA = DataParser.getReason(a, state.movesByFromPost) || '';
+            const reasonB = DataParser.getReason(b, state.movesByFromPost) || '';
+            const nameA = a[0]?.emp?.name || '';
+            const nameB = b[0]?.emp?.name || '';
+            
+            let cmp = reasonA.localeCompare(reasonB, 'ja');
+            if (cmp === 0) cmp = nameA.localeCompare(nameB, 'ja');
+            return state.chainSortOrder === 'asc' ? cmp : -cmp;
+          });
+        }
+
+        const MAX_COLS = 4;
+        const theadHtml = Array.from({ length: MAX_COLS }).map(() => 
+          `<th class="border-r border-black px-2 py-1.5 text-center font-normal w-40 min-w-[10rem] text-[13px] bg-white bg-clip-padding"></th>`
+        ).join('');
+        const tbodyHtml = displayChains.map(chain => this.TableRow(chain, MAX_COLS, state)).join('');
+
+        let iconHtml = `<i data-lucide="arrow-up-down" class="w-3 h-3 text-gray-300 transition-colors group-hover:text-gray-500"></i>`;
+        if (state.chainSortOrder) {
+          iconHtml = state.chainSortOrder === 'asc' 
+            ? `<i data-lucide="arrow-up" class="w-3 h-3 text-blue-600"></i>`
+            : `<i data-lucide="arrow-down" class="w-3 h-3 text-blue-600"></i>`;
+        }
+        const bgClass = state.chainSortOrder ? 'bg-blue-50' : 'bg-white';
+
+        return `
+          <div class="bg-white">
+            <div class="mb-2"><div class="text-lg font-bold tracking-widest">つなぎ表</div></div>
+            <div class="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
+              <table class="border-collapse w-full min-w-max bg-white text-black relative">
+                <thead class="sticky top-0 z-10 shadow-[0_2px_0_0_black] print:static print:shadow-none print:border-b-2 print:border-black">
+                  <tr>
+                    <th class="border-r border-black px-2 py-1.5 text-center font-normal w-24 text-[13px] bg-clip-padding cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors select-none group ${bgClass}"
+                        onclick="window.AppEvents.handleChainSort()" title="事由・氏名で並べ替え">
+                      <div class="flex items-center justify-between gap-1">
+                        <span>事由・氏名</span><span class="inline-flex">${iconHtml}</span>
+                      </div>
+                    </th>
+                    ${theadHtml}
+                  </tr>
+                </thead>
+                <tbody>${tbodyHtml}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      },
+
+      TableRow(chain, maxCols, state) {
+        const firstMove = chain[0];
+        const lastMove = chain[chain.length - 1];
+        const isLastEmpty = !(state.movesByToPost[lastMove.fromPostId]?.length) && lastMove.fromPost.type !== 'unassigned';
+        const isRetired = firstMove.toPost.type === 'retired';
+        
+        const cells = [];
+        chain.forEach((move, i) => {
+          if (isRetired && i === 0) return;
+          cells.push({ type: 'move', move, showArrow: isRetired ? true : i > 0 });
+        });
+        if (isLastEmpty) cells.push({ type: 'empty', move: lastMove });
+        if (cells.length === 0) cells.push({ type: 'placeholder' });
+
+        const chunks = Utils.chunkArray(cells, maxCols);
+        const reason = DataParser.getReason(chain, state.movesByFromPost);
+
+        return chunks.map((chunk, idx) => {
+          const isFirst = idx === 0;
+          const isLast = idx === chunks.length - 1;
+          let html = isFirst ? this._buildFirstCellHtml(firstMove, reason, chunks.length, isRetired) : '';
+          
+          html += chunk.map(cell => {
+            if (cell.type === 'move') return this.MoveCell(cell.move, cell.showArrow);
+            if (cell.type === 'empty') return this.EmptyPostCell(cell.move);
+            return ''; 
+          }).join('');
+
+          const emptyCols = Array.from({ length: maxCols - chunk.filter(c => c.type !== 'placeholder').length })
+                                 .map(() => `<td class="border-r border-black px-2 py-2"></td>`).join('');
+          
+          return `<tr class="border-black print-break-inside-avoid ${isLast ? 'border-b-2' : 'border-b'}">${html}${emptyCols}</tr>`;
+        }).join('');
+      },
+
+      _buildFirstCellHtml(firstMove, reason, rowspan, isRetired) {
+        const targetPost = isRetired ? firstMove.fromPost : firstMove.toPost;
+        const displayNameHtml = isRetired ? `
+            <div class="text-[12px] tracking-wider font-bold mt-2 pt-2 border-t border-gray-300 border-dashed">
+              ${this._getDisplayName(firstMove)}
+            </div>` : '';
+        const reasonColor = this._getReasonColorClass(reason);
+
+        return `
+          <td class="border-r border-black px-1 py-3 text-center align-top relative bg-gray-50/40 min-w-[7rem]" rowspan="${rowspan}">
+            <div class="text-[12px] font-bold mb-3 pb-1 border-b border-gray-400 border-dashed inline-block px-1 ${reasonColor}">${reason}</div>
+            <div class="text-[11px] leading-snug flex flex-col justify-start">
+              <span class="text-gray-600">${targetPost.dept || ''}</span>
+              <span class="text-gray-800 font-medium">${targetPost.title || ''}</span>
+            </div>
+            ${displayNameHtml}
+          </td>
+        `;
+      },
+
+      MoveCell(move, showArrow) {
+        const arrowHtml = showArrow ? `<div class="absolute top-1/2 left-1 -translate-y-1/2 z-10 text-[15px] font-sans">←</div>` : '';
+        return `
+          <td class="border-r border-black px-2 py-2 text-center align-top relative">
+            ${arrowHtml}
+            <div class="text-[11px] leading-snug mb-3 min-h-[2.5em] flex flex-col justify-end">${this._formatPostInfo(move.toPost)}</div>
+            <div class="text-[14px] tracking-widest font-bold my-1 border-t border-b border-dashed border-gray-300 py-1">${this._getDisplayName(move)}</div>
+            <div class="text-[11px] leading-snug mt-3 min-h-[2.5em] flex flex-col justify-start">${this._formatPostInfo(move.fromPost)}</div>
+          </td>
+        `;
+      },
+
+      EmptyPostCell(lastMove) {
+        return `
+          <td class="border-r border-black px-2 py-2 text-center align-middle relative bg-gray-50/50">
+            <div class="absolute top-1/2 left-1 -translate-y-1/2 z-10 text-[15px] font-sans text-gray-500">←</div>
+            <div class="text-[12px] ${this.COLORS.RETIRING} mb-2 tracking-widest font-bold">廃止</div>
+            <div class="text-[11px] leading-snug">
+              <div class="text-gray-500">${lastMove.fromPost.fullDept || lastMove.fromPost.dept}</div>
+              <div class="text-gray-700">${lastMove.fromPost.title}</div>
+            </div>
+          </td>
+        `;
+      },
+
+      // --- Tab 2: List View (異動案リスト) ---
+      ListTable(state) {
+        let rows = this._formatListRows(state);
+        rows = this._sortData(rows, state.sortKey, state.sortOrder);
+
+        const targetYearR = Utils.toReiwa(state.targetYear);
+        const prevYearR = targetYearR - 1;
+
+        const theadHtml = [
+          { label: '所属・職名', key: 'predDeptTitle', cls: 'text-left' },
+          { label: '班係', key: 'predGroup', cls: 'text-left' },
+          { label: '職員番号', key: 'predEmpNo', cls: 'text-center min-w-[5rem] w-20 leading-tight' },
+          { label: '氏名', key: 'predName', cls: 'text-left' },
+          { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center leading-tight' },
+          { label: '事由', key: 'reason', cls: 'text-left' },
+          { label: '現所属<br>年数', key: 'currentYears', cls: 'text-center leading-tight' },
+          { label: '後任者<br>職員番号', key: 'succEmpNo', cls: 'text-center min-w-[5rem] w-20 leading-tight' },
+          { label: '後任者 氏名', key: 'succName', cls: 'text-left leading-tight' },
+          { label: '昇任<br>昇格', key: 'isPromoted', cls: 'text-center leading-tight' },
+          { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center leading-tight' },
+          { label: `R${prevYearR}年度所属・職名`, key: 'succPostLabel', cls: 'text-left leading-tight' },
+          { label: '特記事項', key: 'noteStr', cls: 'text-left' }
+        ].map(col => this._th(col.label, col.key, state, 'handleSort', false, col.cls)).join('');
+
+        const tbodyHtml = rows.map(r => {
+          const reasonColor = this._getReasonColorClass(r.reason);
+          const succNameClass = r.succName === '【 廃 止 】' ? `${this.COLORS.RETIRING} font-bold` : '';
+          return `
+            <tr class="border-b border-gray-400 text-[11px] hover:bg-gray-50 print-break-inside-avoid">
+              <td class="border-r border-black p-1.5 max-w-[120px] break-words">${r.predDeptTitle}</td>
+              <td class="border-r border-black p-1.5 max-w-[100px] break-words">${r.predGroup}</td>
+              <td class="border-r border-black p-1.5 text-center min-w-[5rem] w-20">${r.predEmpNo}</td>
+              <td class="border-r border-black p-1.5 whitespace-nowrap">${r.predName}</td>
+              <td class="border-r border-black p-1.5 text-center">${r.predAge}</td>
+              <td class="border-r border-black p-1.5 max-w-[120px] break-words font-bold ${reasonColor}">${r.reason}</td>
+              <td class="border-r border-black p-1.5 text-center whitespace-nowrap">${r.currentYears ? r.currentYears + '年' : ''}</td>
+              <td class="border-r border-black p-1.5 text-center min-w-[5rem] w-20">${r.succEmpNo}</td>
+              <td class="border-r border-black p-1.5 whitespace-nowrap ${succNameClass}">${r.succName}</td>
+              <td class="border-r border-black p-1.5 text-center ${this.COLORS.RETIRING} font-bold">${r.isPromoted}</td>
+              <td class="border-r border-black p-1.5 text-center">${r.succAge}</td>
+              <td class="border-r border-black p-1.5 max-w-[140px] break-words">${r.succPostLabel}</td>
+              <td class="p-1.5 max-w-[140px] break-words">${r.noteStr}</td>
+            </tr>`;
+        }).join('');
+
+        return `
+          <div class="bg-white">
+            <div class="mb-2"><div class="text-lg font-bold tracking-widest">異動案リスト</div></div>
+            <div class="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
+              <table class="border-collapse w-full min-w-max bg-white text-black border-b-2 border-black text-[12px]">
+                <thead class="sticky top-0 z-10 shadow-[0_2px_0_0_black] print:static print:shadow-none print:border-b-2 print:border-black bg-white">
+                  <tr>${theadHtml}</tr>
+                </thead>
+                <tbody>${tbodyHtml}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      },
+
+      _formatListRows(state) {
+        const listRows = [];
+        const usedToMoves = new Set();
+        const allMoves = state.moves || [];
+        
+        allMoves.forEach(move => {
+          if (move.fromPost.type === 'unassigned') return;
+          const incomingMoves = (state.movesByToPost[move.fromPostId] || []).filter(m => !usedToMoves.has(m));
+          let successor = null;
+          if (incomingMoves.length > 0) {
+            successor = incomingMoves[0];
+            usedToMoves.add(successor);
+          }
+          const reason = move.toPost.type === 'retired' ? '退職' : `異動<br>(${move.toPost.label})`;
+          listRows.push({ predecessor: move, successor, reason });
+        });
+
+        allMoves.forEach(move => {
+          if (!usedToMoves.has(move)) {
+            listRows.push({
+              predecessor: null, successor: move,
+              reason: move.fromPost.type === 'unassigned' ? '新採' : '新設'
+            });
+          }
+        });
+
+        return listRows.map(row => {
+          const pred = row.predecessor?.emp || {};
+          const succ = row.successor?.emp || {};
+          const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
+          const succPost = row.successor?.fromPost || {};
+          
+          let succName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+          if (row.successor && succPost.type === 'unassigned') succName = '新採 ' + succName;
+          
+          const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
+          const getEmpNo = (emp) => {
+            const no = emp.employeeNumber || emp.employeeId || emp['職員番号'] || emp.id || '';
+            const str = String(no).trim();
+            return /[a-zA-Z_\-]/.test(str) ? '' : str;
+          };
+
+          return {
+            predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
+            predGroup: predPost.group || '',
+            predEmpNo: getEmpNo(pred),
+            predName: pred.name || '',
+            predAge: pred.ageNextYear ?? pred.age ?? '',
+            reason: row.reason,
+            currentYears: pred.currentYears || pred.yearsInCurrentPost || '',
+            succEmpNo: getEmpNo(succ),
+            succName,
+            isPromoted,
+            succAge: succ.ageNextYear ?? succ.age ?? '',
+            succPostLabel: succPost.label || '',
+            noteStr: succ.note || pred.note || ''
+          };
+        });
+      },
+
+      // --- Tab 3: Designated View (指定職人事異動) ---
+      _isDesignated(grade, title) {
+        const g = String(grade || ''), t = String(title || '');
+        const isHosa1 = g.includes('補佐級I') || g.includes('補佐級Ⅰ') || g.includes('主任');
+        if (g.includes('補佐級') && !isHosa1) return true;
+        if (g.includes('課長級') || g.includes('所属長級') || g.includes('次長級') || g.includes('部長級') || g.includes('指定職')) return true;
+        if (['局長', '次長', '課長', '参事', '部長', '場長', '班長', '専門技術員', '企画員', '主幹'].some(k => t.includes(k))) return true;
+        return false;
+      },
+
+      _formatDesignatedRows(state) {
+        const rows = [];
+        const usedToMoves = new Set();
+        const allMoves = state.moves || [];
+        const retentions = state.retentions || [];
+        
+        const getDisplayGrade = (gradeStr) => {
+          const g = String(gradeStr || '');
+          if (g.includes('補佐級I') || g.includes('補佐級Ⅰ') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
+          return g;
+        };
+        
+        allMoves.forEach(move => {
+          if (move.fromPost.type === 'unassigned' || move.fromPost.type === 'retired') return;
+          const isFromDesig = this._isDesignated(move.emp.currentGrade, move.fromPost.title);
+          
+          const incomingMoves = (state.movesByToPost[move.fromPostId] || []).filter(m => !usedToMoves.has(m));
+          let successor = null;
+          if (incomingMoves.length > 0) {
+            successor = incomingMoves[0];
+            usedToMoves.add(successor);
+          }
+          const isToDesig = successor ? this._isDesignated(successor.emp.nextGrade, successor.toPost.title) : false;
+
+          if (isFromDesig || isToDesig) {
+             rows.push({
+               postLabel: (move.fromPost.fullDept || move.fromPost.dept) + ' ' + (move.fromPost.title || ''),
+               gradeLabel: getDisplayGrade(move.emp.currentGrade),
+               predecessor: move, successor
+             });
+          }
+        });
+
+        allMoves.forEach(move => {
+          if (!usedToMoves.has(move)) {
+            if (move.toPost.type === 'retired' || move.toPost.type === 'unassigned') return;
+            if (this._isDesignated(move.emp.nextGrade, move.toPost.title)) {
+              rows.push({
+                postLabel: (move.toPost.fullDept || move.toPost.dept) + ' ' + (move.toPost.title || ''),
+                gradeLabel: getDisplayGrade(move.emp.nextGrade),
+                predecessor: null, successor: move
+              });
+            }
+          }
+        });
+
+        retentions.forEach(move => {
+          if (this._isDesignated(move.emp.currentGrade, move.fromPost.title) || this._isDesignated(move.emp.nextGrade, move.toPost.title)) {
+             rows.push({
+               postLabel: (move.fromPost.fullDept || move.fromPost.dept) + ' ' + (move.fromPost.title || ''),
+               gradeLabel: getDisplayGrade(move.emp.currentGrade),
+               predecessor: move, successor: move, isRetention: true
+             });
+          }
+        });
+
+        return rows.map(row => {
+          const isRetention = row.isRetention;
+          const pred = row.predecessor?.emp || {};
+          const succ = row.successor?.emp || {};
+          const succPost = row.successor?.fromPost || {};
+          
+          const getEmpNo = (emp) => {
+            const no = emp.employeeNumber || emp.employeeId || emp['職員番号'] || emp.id || '';
+            const str = String(no).trim();
+            return /[a-zA-Z_\-]/.test(str) ? '' : str;
+          };
+
+          const predEmpNo = getEmpNo(pred);
+          const succEmpNo = getEmpNo(succ);
+          
+          let predReason = isRetention ? '留任' : (row.predecessor ? (row.predecessor.toPost.type === 'retired' ? '退職' : '転任') : '新設');
+          
+          let succRemark = '';
+          if (row.successor) {
+            const cGrade = row.successor.emp.currentGrade || '';
+            const nGrade = row.successor.emp.nextGrade || '';
+            const getBaseGrade = (gradeStr) => {
+              if (gradeStr.includes('部長級')) return '部長級';
+              if (gradeStr.includes('次長級')) return '次長級';
+              if (gradeStr.includes('所属長級') || gradeStr.includes('課長級')) return '課長級';
+              if (gradeStr.includes('補佐級')) return '補佐級';
+              return gradeStr; 
+            };
+            const gradeLevels = { '補佐級': 1, '課長級': 2, '次長級': 3, '部長級': 4 };
+            const cBase = getBaseGrade(cGrade), nBase = getBaseGrade(nGrade);
+            const cLevel = gradeLevels[cBase] || 0, nLevel = gradeLevels[nBase] || 0;
+
+            if (cGrade !== nGrade && nGrade !== '') {
+               succRemark = (nLevel > cLevel && ['部長級', '次長級', '課長級', '補佐級'].includes(nBase)) ? '昇任' : '昇格';
+            } else if (row.successor.isTitleChanged) {
+               succRemark = '昇格';
+            }
+          }
+          const noteStr = succ.note || pred.note || '';
+          if (noteStr) succRemark += (succRemark ? ' / ' : '') + noteStr;
+          
+          const gradeMap = state.gradeYearsMap || {};
+
+          let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
+
+          if (!isRetention) {
+             displaySuccName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+             if (row.successor && succPost.type === 'unassigned') displaySuccName = '新採 ' + displaySuccName;
+             displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
+             displaySuccCurrentYears = row.successor ? '1' : ''; 
+             displaySuccGradeYears = succEmpNo ? (gradeMap[succEmpNo] || '') : '';
+             displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
+          }
+
+          return {
+            postLabel: row.postLabel,
+            gradeLabel: row.gradeLabel,
+            predName: pred.name || '',
+            predAge: pred.ageNextYear ?? pred.age ?? '',
+            predCurrentYears: pred.currentYears || pred.yearsInCurrentPost || '',
+            predGradeYears: predEmpNo ? (gradeMap[predEmpNo] || '') : '',
+            predReason: predReason,
+            succName: displaySuccName,
+            succAge: displaySuccAge,
+            succCurrentYears: displaySuccCurrentYears,
+            succGradeYears: displaySuccGradeYears,
+            succPostLabel: displaySuccPostLabel,
+            succRemark: succRemark
+          };
+        });
+      },
+
+      DesignatedTable(state) {
+        let rows = this._formatDesignatedRows(state);
+        rows = this._sortData(rows, state.designatedSortKey, state.designatedSortOrder);
+
+        const targetYearR = Utils.toReiwa(state.targetYear);
+        const prevYearR = targetYearR - 1;
+
+        const today = new Date();
+        const currentConfigTitle = `令和${prevYearR}年度配置（R${Utils.toReiwa(today.getFullYear())}.${today.getMonth() + 1}.${today.getDate()}現在）`;
+
+        const tbodyHtml = rows.map(r => {
+          const reasonColor = this._getReasonColorClass(r.predReason);
+          const succNameClass = r.succName === '【 廃 止 】' ? `${this.COLORS.RETIRING} font-bold` : '';
+          return `
+          <tr class="border-b border-gray-400 hover:bg-gray-50 print-break-inside-avoid">
+            <td class="border-r border-black p-1.5 break-words font-bold">${r.postLabel}</td>
+            <td class="border-r border-black p-1.5 text-center whitespace-nowrap">${r.gradeLabel}</td>
+            <td class="border-r border-black p-1.5 whitespace-nowrap">${r.predName}</td>
+            <td class="border-r border-black p-1.5 text-center">${r.predAge}</td>
+            <td class="border-r border-black p-1.5 text-center">${r.predCurrentYears}</td>
+            <td class="border-r border-black p-1.5 text-center font-bold ${this.COLORS.RETAINING} bg-[#03AF7A]/10">${r.predGradeYears}</td>
+            <td class="border-r border-black p-1.5 text-center font-bold bg-blue-50/50 ${reasonColor}">${r.predReason}</td>
+            <td class="border-r border-black p-1.5 whitespace-nowrap ${succNameClass}">${r.succName}</td>
+            <td class="border-r border-black p-1.5 text-center">${r.succAge}</td>
+            <td class="border-r border-black p-1.5 text-center">${r.succCurrentYears}</td>
+            <td class="border-r border-black p-1.5 text-center font-bold ${this.COLORS.RETAINING} bg-[#03AF7A]/10">${r.succGradeYears}</td>
+            <td class="border-r border-black p-1.5 break-words">${r.succPostLabel}</td>
+            <td class="p-1.5 break-words ${this.COLORS.RETIRING} font-bold">${r.succRemark}</td>
+          </tr>`;
+        }).join('');
+
+        const headerColsTop = [
+          { label: '所属・職名', key: 'postLabel', cls: 'text-left min-w-[120px]', rowspan: '2' }
+        ];
+
+        const headerColsBottom = [
+          { label: `R${prevYearR}年度<br>格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight' },
+          { label: '氏名', key: 'predName', cls: 'text-center bg-gray-50' },
+          { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center bg-gray-50' },
+          { label: `現職年数<br>R${targetYearR}.3.31`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
+          { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${this.COLORS.RETAINING} font-bold` },
+          { label: '氏名', key: 'succName', cls: 'text-center bg-gray-50' },
+          { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center bg-gray-50' },
+          { label: `現職年数<br>R${targetYearR}.3.31`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
+          { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'succGradeYears', cls: `text-center bg-[#03AF7A]/10 ${this.COLORS.RETAINING} font-bold` },
+          { label: `R${prevYearR}年度<br>現所属`, key: 'succPostLabel', cls: 'text-left min-w-[120px]' },
+          { label: '備考', key: 'succRemark', cls: 'text-left min-w-[80px]' }
+        ];
+
+        const excelUploadBtn = `
+          <label class="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1 shadow-sm font-sans no-print">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>現格付年数データ読込(Excel/CSV)
+            <input type="file" class="hidden" accept=".xlsx, .xls, .csv" onchange="window.AppEvents.excelUpload(event)" />
+          </label>
+        `;
+
+        return `
+          <div class="bg-white">
+            <div class="mb-2 flex justify-between items-center no-print">
+              <div class="text-lg font-bold tracking-widest">指定職人事異動様式</div>
+              ${excelUploadBtn}
+            </div>
+            
+            <div class="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
+              <table class="border-collapse w-full min-w-max bg-white text-black border-b-2 border-black text-[11px]">
+                <thead class="sticky top-0 z-10 bg-white">
+                  <tr>
+                    ${headerColsTop.map(c => this._th(c.label, c.key, state, 'handleDesignatedSort', true, c.cls, c.rowspan)).join('')}
+                    <th colspan="5" class="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">${currentConfigTitle}</th>
+                    ${this._th(`R${targetYearR}<br>異動案`, 'predReason', state, 'handleDesignatedSort', true, 'text-center bg-blue-100/50', '2')}
+                    <th colspan="6" class="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">令和${targetYearR}年度配置（案）</th>
+                  </tr>
+                  <tr>
+                    ${headerColsBottom.map(c => this._th(c.label, c.key, state, 'handleDesignatedSort', true, c.cls)).join('')}
+                  </tr>
+                </thead>
+                <tbody>${tbodyHtml}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    // ==========================================
+    // 4. Renderer
+    // ==========================================
+    const AppRenderer = {
+      render() {
+        const state = AppState.get();
+        const app = document.getElementById('app');
+        
+        let html = UIComponents.Header(state);
+        html += `<main class="p-4 sm:p-8 mx-auto w-full max-w-full">`;
+
+        if (state.chains.length === 0 && !state.error) html += UIComponents.DropZone();
+        if (state.error) html += UIComponents.ErrorAlert(state.error);
+        if (state.chains.length > 0) {
+          html += UIComponents.Tabs(state);
+          if (state.currentTab === 'chain') html += UIComponents.Table(state);
+          else if (state.currentTab === 'list') html += UIComponents.ListTable(state);
+          else if (state.currentTab === 'designated') html += UIComponents.DesignatedTable(state);
+        }
+
+        html += `</main>`;
+        app.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+      }
+    };
+
+    // ==========================================
+    // 5. Event Handlers
+    // ==========================================
+    window.AppEvents = {
+      processFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const fileContent = event.target.result;
+            const lines = fileContent.split(/\r?\n/);
+            let extractedYear = null;
+            if (lines.length > 1) {
+              const match = lines[1].match(/\b(20\d{2})\b/);
+              if (match) extractedYear = parseInt(match[1], 10);
+            }
+
+            const json = JSON.parse(fileContent);
+            const currentState = AppState.get();
+            const targetYear = extractedYear || json.targetYear || json.year || currentState.targetYear;
+
+            const result = DataParser.analyze(json, targetYear);
+            window.AppState.update({
+              fileName: file.name,
+              chains: result.chains, movesByToPost: result.movesByToPost,
+              movesByFromPost: result.movesByFromPost, moves: result.moves,
+              retentions: result.retentions, error: null, targetYear
+            });
+          } catch (err) {
+            console.error(err);
+            window.AppState.update({ error: "JSONファイルの読み込みに失敗しました。ファイル形式を確認してください。" });
+          }
+        };
+        reader.readAsText(file);
+      },
+
+      fileUpload(e) { this.processFile(e.target.files[0]); },
+
+      excelUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = new Uint8Array(event.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet);
+            
+            const gradeMap = window.AppState.get().gradeYearsMap || {};
+            let count = 0;
+
+            json.forEach(row => {
+               const keys = Object.keys(row);
+               const empNoKey = keys.find(k => String(k).includes('職員番号') || String(k).includes('職員No') || String(k).includes('コード'));
+               const gradeYearsKey = keys.find(k => String(k).includes('格付年数') || String(k).includes('級年数'));
+               
+               if (empNoKey && gradeYearsKey) {
+                 const empNo = row[empNoKey];
+                 const gradeYears = row[gradeYearsKey];
+                 if (empNo != null && gradeYears != null) {
+                   gradeMap[String(empNo).trim()] = gradeYears;
+                   count++;
+                 }
+               }
+            });
+
+            window.AppState.update({ gradeYearsMap: gradeMap });
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-3 rounded shadow-lg z-50 transition-opacity font-bold font-sans flex items-center gap-2';
+            toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i>Excelから ${count}件 の現格付年数を読み込みました。`;
+            document.body.appendChild(toast);
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+
+          } catch(err) {
+            console.error(err);
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-3 rounded shadow-lg z-50 transition-opacity font-bold font-sans flex items-center gap-2';
+            toast.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>Excelファイルの読み込みに失敗しました。`;
+            document.body.appendChild(toast);
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+          }
+          e.target.value = ''; // Reset input
+        };
+        reader.readAsArrayBuffer(file);
+      },
+
+      handleSort(key) {
+        const state = window.AppState.get();
+        let newOrder = 'asc';
+        if (state.sortKey === key) newOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+        window.AppState.update({ sortKey: key, sortOrder: newOrder });
+      },
+
+      handleChainSort() {
+        const state = window.AppState.get();
+        let newOrder = 'asc';
+        if (state.chainSortOrder === 'asc') newOrder = 'desc';
+        window.AppState.update({ chainSortOrder: newOrder });
+      },
+
+      handleDesignatedSort(key) {
+        const state = window.AppState.get();
+        let newOrder = 'asc';
+        if (state.designatedSortKey === key) newOrder = state.designatedSortOrder === 'asc' ? 'desc' : 'asc';
+        window.AppState.update({ designatedSortKey: key, designatedSortOrder: newOrder });
+      },
+
+      resetSort() {
+        const state = window.AppState.get();
+        if (state.currentTab === 'chain') {
+          window.AppState.update({ chainSortOrder: null });
+        } else if (state.currentTab === 'designated') {
+          window.AppState.update({ designatedSortKey: null, designatedSortOrder: 'asc' });
+        } else {
+          window.AppState.update({ sortKey: null, sortOrder: 'asc' });
+        }
+      },
+
+      dragOver(e) {
+        e.preventDefault(); e.stopPropagation();
+        e.currentTarget.classList.replace('border-gray-300', 'border-gray-500');
+        e.currentTarget.classList.replace('bg-white', 'bg-gray-100');
+      },
+
+      dragLeave(e) {
+        e.preventDefault(); e.stopPropagation();
+        e.currentTarget.classList.replace('border-gray-500', 'border-gray-300');
+        e.currentTarget.classList.replace('bg-gray-100', 'bg-white');
+      },
+
+      drop(e) {
+        e.preventDefault(); e.stopPropagation();
+        this.dragLeave(e);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          const file = e.dataTransfer.files[0];
+          if (file.name.endsWith('.json')) {
+            this.processFile(file);
+          } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.csv') || file.name.endsWith('.xls')) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            this.excelUpload({ target: { files: dataTransfer.files } });
+          } else {
+             const toast = document.createElement('div');
+             toast.className = 'fixed top-4 right-4 bg-orange-600 text-white px-4 py-3 rounded shadow-lg z-50 transition-opacity font-bold font-sans flex items-center gap-2';
+             toast.innerHTML = `<i data-lucide="alert-triangle" class="w-5 h-5"></i>対応していないファイルです。JSONまたはExcelファイルをドロップしてください。`;
+             document.body.appendChild(toast);
+             if (window.lucide) lucide.createIcons();
+             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+          }
+        }
+      },
+
+      async saveHtml() {
+        if (typeof JSZip === 'undefined') {
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-3 rounded shadow-lg z-50 transition-opacity font-bold font-sans flex items-center gap-2';
+          toast.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>ZIP作成ライブラリの読み込みに失敗しました。`;
+          document.body.appendChild(toast);
+          if (window.lucide) lucide.createIcons();
+          setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+          return;
+        }
+
+        const zip = new JSZip();
+        const baseState = { ...window.AppState.get(), isReadOnly: true };
+        const dlName = baseState.fileName ? baseState.fileName.replace('.json', '') : '玉突き異動表';
+
+        const tabs = [
+          { id: 'chain', name: 'つなぎ表' },
+          { id: 'list', name: '異動案リスト' },
+          { id: 'designated', name: '指定職人事異動' }
+        ];
+
+        for (const tab of tabs) {
+          const cloneDoc = document.cloneNode(true);
+          const stateScript = cloneDoc.getElementById('saved-state');
+          if (stateScript) {
+            stateScript.textContent = JSON.stringify({ ...baseState, currentTab: tab.id });
+          }
+          
+          const appDiv = cloneDoc.getElementById('app');
+          if (appDiv) appDiv.innerHTML = '';
+          
+          const htmlContent = "<!DOCTYPE html>\n" + cloneDoc.documentElement.outerHTML;
+          zip.file(`${dlName}_${tab.name}.html`, htmlContent);
+        }
+
+        try {
+          const content = await zip.generateAsync({ type: 'blob' });
+          const url = URL.createObjectURL(content);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${dlName}_HTML一式.zip`;
+          
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-3 rounded shadow-lg z-50 transition-opacity font-bold font-sans flex items-center gap-2';
+          toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i>ZIPファイルとしてダウンロードしました。`;
+          document.body.appendChild(toast);
+          if (window.lucide) lucide.createIcons();
+          setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+
+        } catch (error) {
+          console.error(error);
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-3 rounded shadow-lg z-50 transition-opacity font-bold font-sans flex items-center gap-2';
+          toast.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>ZIPファイルの作成中にエラーが発生しました。`;
+          document.body.appendChild(toast);
+          if (window.lucide) lucide.createIcons();
+          setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+      }
+    };
+
+    // ==========================================
+    // App Initialization
+    // ==========================================
+    window.AppState.restoreFromSavedState();
+    AppRenderer.render();
+
+  </script>
+</body>
+</html>

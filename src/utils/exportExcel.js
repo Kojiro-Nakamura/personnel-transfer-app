@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate } from './helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
@@ -452,34 +452,37 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         
         if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade) && gradeToPromoKey[extEmp.nextGrade] === key) {
            isNextPromo = true;
-           cellVal = String(targetYear);
+           cellVal = `${targetYear}-04-01`;
         }
         
         if (cellVal) {
-          const yNum = parseInt(cellVal);
           let prefix = '';
           if (cellVal.includes && cellVal.includes('(追及)')) prefix = '追及:';
           else if (cellVal.includes && cellVal.includes('(免除)')) prefix = '免除:';
           
-          let pStr = `${yNum}`;
-          const suffix = getEraSuffixLocal(yNum.toString());
+          let pStr = cellVal;
+          const suffix = getEraSuffixForDate(cellVal);
           if (suffix) pStr += `(${suffix})`;
           
-          let prevNum = NaN;
+          let prevDate = '';
           for (let j = idx - 1; j >= 0; j--) {
              let prevVal = extEmp[pKeys[j]] || '';
              if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade) && gradeToPromoKey[extEmp.nextGrade] === pKeys[j]) {
-                 prevVal = String(targetYear);
+                 prevVal = `${targetYear}-04-01`;
              }
              if (prevVal) {
-               prevNum = parseInt(prevVal);
-               if (!isNaN(prevNum)) break;
+               prevDate = prevVal;
+               break;
              }
           }
           
-          if (!isNaN(prevNum) && !isNaN(yNum) && prevNum > 0 && yNum >= prevNum) {
-             const diff = yNum - prevNum;
-             pStr = `${diff + 1}年目> ${pStr}`;
+          if (prevDate) {
+             const diffStr = calculateServiceYears(prevDate, cellVal);
+             if (diffStr) {
+               pStr = `${diffStr}年目> ${pStr}`;
+             } else {
+               pStr = `> ${pStr}`;
+             }
           } else {
              pStr = `> ${pStr}`;
           }
@@ -1093,7 +1096,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       
       cellStr += cellVal;
       if (cellVal) {
-        const suffix = getEraSuffix(cellVal.split('-')[0]);
+        const suffix = getEraSuffixForDate(cellVal);
         if (suffix) cellStr += `(${suffix})`;
       }
       vals.push(cellStr);

@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, Wand2
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 import { autoFixEmployees } from '../../utils/validation.js';
@@ -350,14 +350,26 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
     return y ? getEraSuffix(y) : '';
   };
   
+  const handleBlur = (e) => {
+    const val = e.target.value;
+    if (val) {
+       const parsed = parsePromoDate(val);
+       if (parsed) {
+         onChange(parsed);
+       }
+    }
+  };
+  
   return (
     <div className="flex flex-col w-full">
       <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
       <div className={cx("flex items-center w-full px-1.5 py-1 text-sm rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
         <input 
-          type="date" 
+          type="text" 
+          placeholder="YYYY-MM-DD"
           value={value || ''} 
           onChange={handleDateChange} 
+          onBlur={handleBlur}
           className="w-full outline-none bg-transparent placeholder-slate-300" 
         />
         {value && (
@@ -582,11 +594,11 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               <FormInput label="氏名" value={fd.name} onChange={v => setFd({...fd, name: v})} className="w-[100px] flex-1 min-w-0" />
               <FormInput label="フリガナ" value={fd.furigana} onChange={v => setFd({...fd, furigana: v})} className="w-[100px] flex-1 min-w-0" />
               <FormSelect label="性別" options={['', '男', '女']} value={fd.gender || ''} onChange={v => setFd({...fd, gender: v})} className="w-[50px] shrink-0" />
-              <FormInput label={`生年月日${getEraStr(fd.birthDate)}${fd.birthDate ? ` (R${targetYear - 2018 - 1}年齢:${calculateAge(fd.birthDate, targetYear - 1)}歳)` : ''}`} type="date" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} className="w-[200px] shrink-0" />
+              <FormInput label={`生年月日${getEraStr(fd.birthDate)}${fd.birthDate ? ` (R${targetYear - 2018 - 1}年齢:${calculateAge(fd.birthDate, targetYear - 1)}歳)` : ''}`} type="text" placeholder="YYYY-MM-DD" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) setFd({...fd, birthDate: p}); }} className="w-[200px] shrink-0" />
               <FormInput label="学歴" value={fd.education} onChange={v => setFd({...fd, education: v})} className="w-[80px] shrink-0" />
             </div>
             <div className="flex gap-2 w-full">
-              <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="date" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} className="w-[130px] shrink-0" />
+              <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="text" placeholder="YYYY-MM-DD" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) setFd({...fd, hireDate: p}); }} className="w-[130px] shrink-0" />
               <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="flex-1 min-w-0" />
             </div>
           </div>

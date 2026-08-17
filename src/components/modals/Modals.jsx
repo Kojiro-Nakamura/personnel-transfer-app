@@ -1325,7 +1325,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                             {diff + 1}年目<ChevronRight className="w-2.5 h-2.5 text-emerald-500" />
                           </div>
                         )}
-                        <input type="date" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center !px-0.5 !w-[105px] shrink-0')} />
+                        <input type="text" placeholder="YYYY-MM-DD" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) handleChange(emp.id, key, p); }} className={cx(inputCls, 'text-center !px-0.5 !w-[105px] shrink-0')} />
                         {emp[key] && <span className="text-[9px] text-slate-500 font-bold tracking-tighter shrink-0 select-none">({getEraSuffix(emp[key].split('-')[0])})</span>}
                       </div>
                     </td>
@@ -1381,9 +1381,9 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                         <option value="女">女</option>
                       </select>
                     </td>
-                    <td><input type="date" value={emp.birthDate||''} onChange={e => handleChange(emp.id,'birthDate',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td><input type="text" placeholder="YYYY-MM-DD" value={emp.birthDate||''} onChange={e => handleChange(emp.id,'birthDate',e.target.value)} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) handleChange(emp.id, 'birthDate', p); }} className={cx(inputCls, 'text-center px-1')} /></td>
                     <td><input type="text" value={emp.education||''} onChange={e => handleChange(emp.id,'education',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
-                    <td><input type="date" value={emp.hireDate||''} onChange={e => handleChange(emp.id,'hireDate',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td><input type="text" placeholder="YYYY-MM-DD" value={emp.hireDate||''} onChange={e => handleChange(emp.id,'hireDate',e.target.value)} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) handleChange(emp.id, 'hireDate', p); }} className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="border-r relative group/input">
                       <input type="text" value={emp.note||''} onChange={e => handleChange(emp.id,'note',e.target.value)} className={cx(inputCls, 'text-center px-1')} />
                       {emp.note && (

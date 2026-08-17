@@ -579,6 +579,25 @@ export const calculateServiceYears = (promoDateStr, targetYearOrDate) => {
   return (yearsPassed + 1).toFixed(2);
 };
 
+export const getFiscalYear = (dateStr) => {
+  if (!dateStr) return null;
+  const parts = String(dateStr).split('-');
+  if (parts.length < 2) {
+    const y = parseInt(parts[0], 10);
+    return isNaN(y) ? null : y;
+  }
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  if (isNaN(y) || isNaN(m)) return null;
+  if (m <= 3) return y - 1;
+  return y;
+};
+
+export const getEraSuffixForDate = (dateStr) => {
+  const fYear = getFiscalYear(dateStr);
+  return fYear ? getEraSuffix(fYear) : '';
+};
+
 export const formatPromoDateWithEra = (promoDateStr, targetYear) => {
   if (!promoDateStr) return '';
   let normalizedStr = String(promoDateStr).trim();
@@ -589,11 +608,11 @@ export const formatPromoDateWithEra = (promoDateStr, targetYear) => {
   if (isNaN(date.getTime())) return normalizedStr;
   
   const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
+  const mStr = String(date.getMonth() + 1).padStart(2, '0');
+  const dStr = String(date.getDate()).padStart(2, '0');
   
-  const era = getEraSuffix(y);
-  const dateStr = `${y}-${m}-${d}${era ? `(${era})` : ''}`;
+  const era = getEraSuffixForDate(normalizedStr);
+  const dateStr = `${y}-${mStr}-${dStr}${era ? `(${era})` : ''}`;
   
   if (targetYear) {
     const serviceYears = calculateServiceYears(promoDateStr, targetYear);

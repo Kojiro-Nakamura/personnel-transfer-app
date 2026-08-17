@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, formatPromoDateWithEra } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, getEraSuffixForDate, formatPromoDateWithEra } from './helpers.js';
 
 const getBorderHexColor = (grade) => {
   switch (grade) {
@@ -490,9 +490,11 @@ ${summaryHtml}
         }
         cellHtml += cellVal;
         if (cellVal) {
-          const y = parseInt(cellVal.split('-')[0]);
-          const suffix = getEraSuffix(y);
-          if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
+          const suffix = getEraSuffixForDate(cellVal);
+          if (suffix) {
+             cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
+          }
+          const y = parseInt(cellVal.split('-')[0], 10);
           if (emp.birthDate && !isNaN(y)) {
              const promoAge = calculateAge(emp.birthDate, y);
              if (promoAge !== null && !isNaN(promoAge)) {
