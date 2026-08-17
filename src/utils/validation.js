@@ -15,14 +15,14 @@ export const validateEmployees = (employees, targetYear, departments) => {
 
     let hasTargetYearPromo = false;
     PROMO_KEYS.forEach(k => {
-      if (emp[k] === String(targetYear) || emp[k] === targetYear) {
+      if (emp[k] && String(emp[k]).startsWith(String(targetYear))) {
         hasTargetYearPromo = true;
       }
     });
 
     // 1. 昇進年度の未設定・消し忘れ
     if (isPromoted) {
-      if (activePromoKey && emp[activePromoKey] !== String(targetYear) && emp[activePromoKey] !== targetYear) {
+      if (activePromoKey && !(emp[activePromoKey] && String(emp[activePromoKey]).startsWith(String(targetYear)))) {
         warnings.push({
           empId: emp.id,
           empName: emp.name,
@@ -143,10 +143,24 @@ export const autoFixEmployees = (employees, targetYear, departments) => {
     const isSameDept = emp.currentDeptId === emp.departmentId;
     const isSamePost = isSameDept && emp.currentPostId === emp.postId && emp.currentGroupId === emp.groupId && emp.currentGroupPostId === emp.groupPostId;
 
+    // 0. Normalize Date Formats
+    ['hireDate', ...PROMO_KEYS].forEach(k => {
+      if (emp[k]) {
+        const val = String(emp[k]).trim();
+        // Match exactly 4 digits, or 4 digits followed by "年度" or "年"
+        if (/^\d{4}$/.test(val) || /^\d{4}年度?$/.test(val)) {
+          const year = val.replace(/\D/g, '');
+          emp[k] = `${year}-04-01`;
+          fixedThisEmp = true;
+          messages.push(`日付フォーマットを修正(${k})`);
+        }
+      }
+    });
+
     // 1. Promo Year Fixes
     if (isPromoted) {
-      if (activePromoKey && (emp[activePromoKey] !== String(targetYear) && emp[activePromoKey] !== targetYear)) {
-        emp[activePromoKey] = targetYear;
+      if (activePromoKey && !(emp[activePromoKey] && String(emp[activePromoKey]).startsWith(String(targetYear)))) {
+        emp[activePromoKey] = `${targetYear}-04-01`;
         fixedThisEmp = true;
         messages.push(`昇進年度を${targetYear}年度に修正`);
       }
@@ -154,7 +168,7 @@ export const autoFixEmployees = (employees, targetYear, departments) => {
     
     // Check and clear stale promo years regardless of isPromoted, but if promoted we don't clear the active one
     PROMO_KEYS.forEach(k => {
-      if (k !== activePromoKey && (emp[k] === String(targetYear) || emp[k] === targetYear)) {
+      if (k !== activePromoKey && (emp[k] && String(emp[k]).startsWith(String(targetYear)))) {
         emp[k] = '';
         fixedThisEmp = true;
         messages.push(`誤った昇進年度をクリア`);

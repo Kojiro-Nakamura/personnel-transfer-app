@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix } from './helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
@@ -46,35 +46,11 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b);
 
   const getEraSuffixLocal = (yearStr) => {
-    if (!yearStr) return '';
-    const y = parseInt(yearStr);
-    if (isNaN(y)) return '';
-    if (y >= 2019) {
-      const r = y - 2018;
-      return r === 1 ? 'R元' : 'R' + r;
-    } else if (y >= 1989) {
-      const h = y - 1988;
-      return h === 1 ? 'H元' : 'H' + h;
-    } else if (y >= 1926) {
-      const s = y - 1925;
-      return s === 1 ? 'S元' : 'S' + s;
-    }
-    return '';
+    return getEraSuffix(yearStr);
   };
   
   const formatWithEra = (dateStr) => {
-    if (!dateStr) return '';
-    const match = dateStr.match(/^(\d{4})[-/]/);
-    if (match) {
-      const year = parseInt(match[1], 10);
-      let era = '';
-      if (year >= 2019) era = `(R${year - 2018})`;
-      else if (year >= 1989) era = `(H${year - 1988})`;
-      else if (year >= 1926) era = `(S${year - 1925})`;
-      else if (year >= 1912) era = `(T${year - 1911})`;
-      return era ? `${dateStr}${era}` : dateStr;
-    }
-    return dateStr;
+    return formatPromoDateWithEra(dateStr);
   };
 
   const getStandardYears = (gradeName) => {
@@ -298,7 +274,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
   const getYearsStr = (emp, isNext) => { 
     if (!emp) return ''; 
-    const years = isNext ? emp.nextYears : emp.currentYears;
+    const years = getEmpCurrentYears(emp, isNext ? targetYear : targetYear - 1, isNext);
     const skills = isNext ? emp.nextSkills : emp.currentSkills; 
     return skills?.length ? `${years}年(${skills.join('、')})` : `${years}年`; 
   };
@@ -361,7 +337,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           displayDeptStr = deptName;
         }
       } else {
-        displayDeptStr = deptName;
+        displayDeptStr = '';
       }
     }
 
@@ -380,7 +356,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           displayGroupStr = groupName;
         }
       } else {
-        displayGroupStr = groupName;
+        displayGroupStr = '';
       }
     }
 
@@ -1047,7 +1023,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     
     const isNextRetired = emp.departmentId === 'retired';
     const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
-    const valYears = isNextPromoted ? 1 : (emp.nextYears || '');
+    const valYears = getEmpCurrentYears(emp, targetYear, true);
 
     const vals = [
       emp.name || '',
@@ -1066,7 +1042,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       cDeptName,
       emp.currentTitle || '',
       emp.currentGrade || '',
-      emp.currentYears || '',
+      getEmpCurrentYears(emp, targetYear - 1, false),
       (emp.currentSkills || []).join('、'),
       emp.currentEmploymentType || '',
       emp.currentExclude || '',
@@ -1097,29 +1073,27 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       let isNextPromo = false;
       if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
          isNextPromo = true;
-         cellVal = String(targetYear);
+         cellVal = `${targetYear}-04-01`;
       }
       
-      let prevY = NaN;
+      let prevDate = '';
       for (let i = idx - 1; i >= 0; i--) {
-        let pVal = pKeys[i] === 'hireDate' ? (emp.hireDate ? emp.hireDate.substring(0,4) : '') : (emp[pKeys[i]] || '');
+        let pVal = pKeys[i] === 'hireDate' ? emp.hireDate : (emp[pKeys[i]] || '');
         if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === pKeys[i]) {
-            pVal = String(targetYear);
+            pVal = `${targetYear}-04-01`;
         }
-        const y = parseInt(pVal || 'NaN');
-        if (!isNaN(y)) { prevY = y; break; }
+        if (pVal) { prevDate = pVal; break; }
       }
       
-      const currentY = parseInt(cellVal || 'NaN');
-      const diff = (!isNaN(prevY) && !isNaN(currentY) && currentY >= prevY) ? currentY - prevY : null;
+      const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
       
       let cellStr = '';
-      if (diff !== null) cellStr += `${diff + 1}年目> `;
+      if (diff !== null) cellStr += `${diff}年目> `;
       else cellStr += `> `;
       
       cellStr += cellVal;
       if (cellVal) {
-        const suffix = getEraSuffixLocal(cellVal);
+        const suffix = getEraSuffix(cellVal.split('-')[0]);
         if (suffix) cellStr += `(${suffix})`;
       }
       vals.push(cellStr);
@@ -1128,27 +1102,27 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     // 来年度差分
     let finalDiff = null;
     if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-      finalDiff = 1;
+      finalDiff = '1.00';
     } else {
-      let prevY = NaN;
+      let prevDate = '';
       for (let i = pKeys.length - 1; i >= 0; i--) {
-        const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
-        if (!isNaN(y)) { prevY = y; break; }
+        const val = pKeys[i] === 'hireDate' ? emp.hireDate : (emp[pKeys[i]] || '');
+        if (val) { prevDate = val; break; }
       }
-      finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
+      finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
     }
-    vals.push(`> ${finalDiff !== null ? (finalDiff >= 0 ? finalDiff : 0) + '年目' : ''}`);
+    vals.push(`> ${finalDiff !== null ? finalDiff + '年目' : ''}`);
 
     // 履歴
     const promoYearMap = {};
-    if (emp.promoYearChief) promoYearMap[emp.promoYearChief] = "係長級(主査)";
-    if (emp.promoYearAssistant1) promoYearMap[emp.promoYearAssistant1] = "補佐級I(主任)";
-    if (emp.promoYearAssistant2) promoYearMap[emp.promoYearAssistant2] = "補佐級II(班長)";
-    if (emp.promoYearAssistant3) promoYearMap[emp.promoYearAssistant3] = "補佐級III(補佐兼班長)";
-    if (emp.promoYearSecHead) promoYearMap[emp.promoYearSecHead] = "課長級";
-    if (emp.promoYearDivHead) promoYearMap[emp.promoYearDivHead] = "所属長級";
-    if (emp.promoYearDeputyHead) promoYearMap[emp.promoYearDeputyHead] = "次長級";
-    if (emp.promoYearDeptHead) promoYearMap[emp.promoYearDeptHead] = "部長級";
+    if (emp.promoYearChief) promoYearMap[parseInt(emp.promoYearChief.split('-')[0])] = "係長級(主査)";
+    if (emp.promoYearAssistant1) promoYearMap[parseInt(emp.promoYearAssistant1.split('-')[0])] = "補佐級I(主任)";
+    if (emp.promoYearAssistant2) promoYearMap[parseInt(emp.promoYearAssistant2.split('-')[0])] = "補佐級II(班長)";
+    if (emp.promoYearAssistant3) promoYearMap[parseInt(emp.promoYearAssistant3.split('-')[0])] = "補佐級III(補佐兼班長)";
+    if (emp.promoYearSecHead) promoYearMap[parseInt(emp.promoYearSecHead.split('-')[0])] = "課長級";
+    if (emp.promoYearDivHead) promoYearMap[parseInt(emp.promoYearDivHead.split('-')[0])] = "所属長級";
+    if (emp.promoYearDeputyHead) promoYearMap[parseInt(emp.promoYearDeputyHead.split('-')[0])] = "次長級";
+    if (emp.promoYearDeptHead) promoYearMap[parseInt(emp.promoYearDeptHead.split('-')[0])] = "部長級";
 
     const histBgColors = [];
     const histIsChange = [];

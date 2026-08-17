@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { X, GitMerge, List, Award, RotateCcw, FileSpreadsheet, Printer } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
+import { getEmpCurrentYears } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -72,16 +73,21 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     if (!emp || !emp.currentGrade) return '';
     const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
     if (!promoKey) return '';
-    const promoYear = Number(emp[promoKey]);
+    const promoDate = emp[promoKey];
+    if (!promoDate) return '';
+    const promoYear = parseInt(promoDate.split('-')[0], 10);
     if (!promoYear || isNaN(promoYear)) return '';
-    return Math.max(0, targetYear - promoYear);
+    const years = Math.max(0, targetYear - promoYear);
+    return years;
   };
 
   const calculateHosa2Years = (emp, targetYear) => {
     if (!emp || !emp.currentGrade || !String(emp.currentGrade).includes('補佐級III')) return '';
     const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
-    const hosa2PromoYear = Number(emp[hosa2PromoKey]);
-    if (hosa2PromoYear && !isNaN(hosa2PromoYear)) {
+    const hosa2PromoDate = emp[hosa2PromoKey];
+    if (!hosa2PromoDate) return '';
+    const hosa2PromoYear = parseInt(hosa2PromoDate.split('-')[0], 10);
+    if (!isNaN(hosa2PromoYear)) {
       return Math.max(0, targetYear - hosa2PromoYear);
     }
     return '';
@@ -330,7 +336,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         predName: pred.name || '',
         predAge: pred.ageNextYear ?? pred.age ?? '',
         reason: row.reason,
-        currentYears: pred.currentYears || pred.yearsInCurrentPost || '',
+        currentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
         succEmpNo: getEmpNo(succ),
         succName,
         isPromoted,
@@ -517,7 +523,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         gradeLabel: row.gradeLabel,
         predName: pred.name || '',
         predAge: pred.ageNextYear ?? pred.age ?? '',
-        predCurrentYears: pred.currentYears || pred.yearsInCurrentPost || '',
+        predCurrentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
         predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
         predHosa2Years: pred ? calculateHosa2Years(pred, targetYear) : '',
         predReason: predReason,

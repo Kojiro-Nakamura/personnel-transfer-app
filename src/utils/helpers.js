@@ -1,4 +1,4 @@
-import { GRADE_LEVELS } from '../constants/config.js';
+import { GRADE_LEVELS, GRADE_TO_PROMO_KEY } from '../constants/config.js';
 export const cx = (...classes) => classes.filter(Boolean).join(' ');
 export const getGradeLevel = (grade) => GRADE_LEVELS[grade] || 1;
 
@@ -99,6 +99,27 @@ export const parseJapaneseDate = (str) => {
   }
 
   return str;
+};
+
+export const parsePromoDate = (str) => {
+  if (!str) return '';
+  str = String(str).trim();
+  if (/^\d{4}$/.test(str) || /^\d{4}年$/.test(str)) {
+    const y = parseInt(str, 10);
+    return `${y}-04-01`;
+  }
+  const eraMatch = str.match(/^(M|T|S|H|R|明治|大正|昭和|平成|令和)(\d+|元)年?$/i);
+  if (eraMatch) {
+    let [, era, yearStr] = eraMatch;
+    let year = yearStr === '元' ? 1 : parseInt(yearStr, 10);
+    if (era === '明治' || era.toUpperCase() === 'M') year += 1867;
+    else if (era === '大正' || era.toUpperCase() === 'T') year += 1911;
+    else if (era === '昭和' || era.toUpperCase() === 'S') year += 1925;
+    else if (era === '平成' || era.toUpperCase() === 'H') year += 1988;
+    else if (era === '令和' || era.toUpperCase() === 'R') year += 2018;
+    return `${year}-04-01`;
+  }
+  return parseJapaneseDate(str);
 };
 
 export const parseCSVRow = (str) => {
@@ -522,4 +543,78 @@ export const extractYearFromHeader = (str) => {
   }
   
   return null;
+};
+
+export const getEraSuffix = (year) => {
+  if (!year) return '';
+  const y = parseInt(year, 10);
+  if (isNaN(y)) return '';
+  if (y >= 2019) return `R${y - 2018}`;
+  if (y >= 1989) return `H${y - 1988}`;
+  if (y >= 1926) return `S${y - 1925}`;
+  if (y >= 1912) return `T${y - 1911}`;
+  return '';
+};
+
+export const calculateServiceYears = (promoDateStr, targetYearOrDate) => {
+  if (!promoDateStr || !targetYearOrDate) return '';
+  const promoDate = new Date(promoDateStr);
+  if (isNaN(promoDate.getTime())) return '';
+  
+  let targetDate;
+  if (typeof targetYearOrDate === 'string' && targetYearOrDate.includes('-')) {
+    targetDate = new Date(targetYearOrDate);
+  } else {
+    targetDate = new Date(Number(targetYearOrDate), 3, 1);
+  }
+  
+  if (isNaN(targetDate.getTime())) return '';
+
+  const diffTime = targetDate - promoDate;
+  if (diffTime < 0) return '1.00'; 
+  
+  const msPerYear = 1000 * 60 * 60 * 24 * 365.25;
+  const yearsPassed = diffTime / msPerYear;
+  
+  return (yearsPassed + 1).toFixed(2);
+};
+
+export const formatPromoDateWithEra = (promoDateStr, targetYear) => {
+  if (!promoDateStr) return '';
+  let normalizedStr = String(promoDateStr).trim();
+  if (/^\d{4}$/.test(normalizedStr) || /^\d{4}年度?$/.test(normalizedStr)) {
+    normalizedStr = normalizedStr.replace(/\D/g, '') + '-04-01';
+  }
+  const date = new Date(normalizedStr);
+  if (isNaN(date.getTime())) return normalizedStr;
+  
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  
+  const era = getEraSuffix(y);
+  const dateStr = `${y}-${m}-${d}${era ? `(${era})` : ''}`;
+  
+  if (targetYear) {
+    const serviceYears = calculateServiceYears(promoDateStr, targetYear);
+    if (serviceYears) {
+      return `${serviceYears}年目>${dateStr}`;
+    }
+  }
+  return dateStr;
+};
+
+export const getEmpCurrentYears = (emp, targetYear, isNext = false) => {
+  if (!emp) return '';
+  const grade = isNext ? emp.nextGrade : emp.currentGrade;
+  const pKey = GRADE_TO_PROMO_KEY[grade];
+  let calculatedYears = '';
+  if (pKey && emp[pKey]) {
+    const sYears = calculateServiceYears(emp[pKey], targetYear);
+    if (sYears) calculatedYears = sYears;
+  }
+  if (!calculatedYears) {
+    calculatedYears = isNext ? (emp.nextYears || '') : (emp.currentYears || '');
+  }
+  return calculatedYears;
 };

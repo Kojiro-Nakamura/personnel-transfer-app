@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { generateAndDownloadHTML } from '../../utils/exportHtml.js';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getEraFormattedYear, extractYearFromHeader, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName } from '../../utils/helpers.js';
+import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -414,14 +414,6 @@ export const TitleChangeConfirmModal = ({ isOpen, onClose, onConfirm, data }) =>
   );
 };
 
-const getEraSuffixLocal = (year) => {
-  const y = parseInt(year);
-  if (isNaN(y)) return '';
-  if (y >= 2019) return `R${y - 2018}`;
-  if (y >= 1989) return `H${y - 1988}`;
-  if (y >= 1926) return `S${y - 1925}`;
-  return '';
-};
 
 export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments, targetYear }) => {
   const [localEmps, setLocalEmps] = useState([]); 
@@ -971,14 +963,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
             nextSkillsStr: nSkStr !== undefined ? nSkStr : (targetEmp ? targetEmp.nextSkillsStr : ''), 
             nextEmploymentType: nNote !== undefined ? nNote : (targetEmp ? targetEmp.nextEmploymentType : ''), 
             nextExclude: nExclude !== undefined ? nExclude : (targetEmp ? targetEmp.nextExclude : ''), 
-            promoYearChief: pChief !== undefined ? pChief : (targetEmp ? targetEmp.promoYearChief : ''),
-            promoYearAssistant1: pAss1 !== undefined ? pAss1 : (targetEmp ? targetEmp.promoYearAssistant1 : ''),
-            promoYearAssistant2: pAss2 !== undefined ? pAss2 : (targetEmp ? targetEmp.promoYearAssistant2 : ''),
-            promoYearAssistant3: pAss3 !== undefined ? pAss3 : (targetEmp ? targetEmp.promoYearAssistant3 : ''),
-            promoYearSecHead: pSec !== undefined ? pSec : (targetEmp ? targetEmp.promoYearSecHead : ''),
-            promoYearDivHead: pDiv !== undefined ? pDiv : (targetEmp ? targetEmp.promoYearDivHead : ''),
-            promoYearDeputyHead: pDep !== undefined ? pDep : (targetEmp ? targetEmp.promoYearDeputyHead : ''),
-            promoYearDeptHead: pDept !== undefined ? pDept : (targetEmp ? targetEmp.promoYearDeptHead : ''),
+            promoYearChief: pChief !== undefined ? parsePromoDate(pChief) : (targetEmp ? targetEmp.promoYearChief : ''),
+            promoYearAssistant1: pAss1 !== undefined ? parsePromoDate(pAss1) : (targetEmp ? targetEmp.promoYearAssistant1 : ''),
+            promoYearAssistant2: pAss2 !== undefined ? parsePromoDate(pAss2) : (targetEmp ? targetEmp.promoYearAssistant2 : ''),
+            promoYearAssistant3: pAss3 !== undefined ? parsePromoDate(pAss3) : (targetEmp ? targetEmp.promoYearAssistant3 : ''),
+            promoYearSecHead: pSec !== undefined ? parsePromoDate(pSec) : (targetEmp ? targetEmp.promoYearSecHead : ''),
+            promoYearDivHead: pDiv !== undefined ? parsePromoDate(pDiv) : (targetEmp ? targetEmp.promoYearDivHead : ''),
+            promoYearDeputyHead: pDep !== undefined ? parsePromoDate(pDep) : (targetEmp ? targetEmp.promoYearDeputyHead : ''),
+            promoYearDeptHead: pDept !== undefined ? parsePromoDate(pDept) : (targetEmp ? targetEmp.promoYearDeptHead : ''),
           };
 
           if (csvYearsMap.size > 0) {
@@ -1301,13 +1293,21 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
                   const currentIdx = pKeys.indexOf(currentKey);
                   if (currentIdx <= 0) return null;
-                  const currentY = currentKey === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[currentKey] || 'NaN');
+                  
+                  const getYearFromStr = (str) => {
+                    if (!str) return NaN;
+                    return parseInt(str.split('-')[0], 10);
+                  };
+
+                  const currentY = getYearFromStr(emp[currentKey]);
                   if (isNaN(currentY)) return null;
+                  
                   let prevY = NaN;
                   for (let i = currentIdx - 1; i >= 0; i--) {
-                    const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+                    const y = getYearFromStr(emp[pKeys[i]]);
                     if (!isNaN(y)) { prevY = y; break; }
                   }
+                  
                   if (!isNaN(prevY)) {
                     const diff = currentY - prevY;
                     return diff >= 0 ? diff : 0;
@@ -1319,15 +1319,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   const diff = getDiff(emp, key);
                   return (
                     <td key={key} className={cx("bg-fuchsia-50/30 p-0.5 align-middle", isFirst ? "border-l" : "")}>
-                      <div className="flex flex-row items-center justify-center gap-0.5 overflow-hidden">
+                      <div className="flex flex-col items-center justify-center gap-0 overflow-hidden">
                         {diff !== null && (
-                          <div className="flex flex-row items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-0.5 rounded-sm border border-emerald-100 shadow-sm shrink-0 leading-none whitespace-nowrap">
+                          <div className="flex flex-row items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-0.5 rounded-sm border border-emerald-100 shadow-sm shrink-0 leading-none whitespace-nowrap mb-0.5">
                             {diff + 1}年目<ChevronRight className="w-2.5 h-2.5 text-emerald-500" />
                           </div>
                         )}
-                        {diff === null && <ChevronRight className="w-2.5 h-2.5 text-slate-300 shrink-0" />}
-                        <input type="text" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center !px-0 !w-[34px] shrink-0')} />
-                        {emp[key] && <span className="text-[9px] text-slate-500 font-bold tracking-tighter shrink-0 select-none">({getEraSuffixLocal(emp[key])})</span>}
+                        <input type="date" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} className={cx(inputCls, 'text-center !px-0.5 !w-[105px] shrink-0')} />
+                        {emp[key] && <span className="text-[9px] text-slate-500 font-bold tracking-tighter shrink-0 select-none">({getEraSuffix(emp[key].split('-')[0])})</span>}
                       </div>
                     </td>
                   );
@@ -1408,7 +1407,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                         {GRADE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </td>
-                    <td className="bg-slate-50/30"><input type="number" value={emp.currentYears||0} onChange={e => handleChange(emp.id,'currentYears',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-slate-50/30"><div className="text-center px-1 text-slate-600 font-medium text-xs">{getEmpCurrentYears(emp, targetYear - 1, false)}</div></td>
                     <td className="bg-slate-50/30"><input type="text" value={emp.currentSkillsStr||''} onChange={e => handleChange(emp.id,'currentSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-slate-50/30"><input type="text" value={emp.currentEmploymentType||''} onChange={e => handleChange(emp.id,'currentEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-slate-50/30 border-r"><input type="text" list="exclude-list-bulk" value={emp.currentExclude||''} onChange={e => handleChange(emp.id,'currentExclude',e.target.value)} placeholder="事務職など" className={cx(inputCls, 'text-center px-1')} /></td>
@@ -1426,7 +1425,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                         {GRADE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </td>
-                    <td className="bg-blue-50/30"><input type="number" value={emp.nextYears||0} onChange={e => handleChange(emp.id,'nextYears',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-blue-50/30"><div className="text-center px-1 text-slate-600 font-medium text-xs">{getEmpCurrentYears(emp, targetYear, true)}</div></td>
                     <td className="bg-blue-50/30"><input type="text" value={emp.nextSkillsStr||''} onChange={e => handleChange(emp.id,'nextSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-blue-50/30"><input type="text" value={emp.nextEmploymentType||''} onChange={e => handleChange(emp.id,'nextEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-blue-50/30"><input type="text" list="exclude-list-bulk" value={emp.nextExclude||''} onChange={e => handleChange(emp.id,'nextExclude',e.target.value)} placeholder="事務職など" className={cx(inputCls, 'text-center px-1')} /></td>

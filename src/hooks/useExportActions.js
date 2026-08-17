@@ -136,6 +136,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
           } else {
             displayGroupHtml = escapeHtml(groupName);
           }
+        } else {
+          displayGroupHtml = '';
         }
 
         let targetId = '';

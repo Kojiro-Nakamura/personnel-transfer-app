@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, Wand2
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 import { autoFixEmployees } from '../../utils/validation.js';
@@ -325,49 +325,49 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+import React, { useState, useEffect } from 'react';
+import { ChevronRight, Edit2, Trash2, ArrowUp, ArrowDown, X, CornerDownRight } from 'lucide-react';
+import { cx, isPromotedGrade, getPromotedBgClass, getEraFormattedYear, autoFixEmployees, calculateServiceYears } from './helpers';
+import { useApp } from './AppContext';
+import { PlacementSelector, FormInput, FormSelect, FormInputWithList, CommentButton } from './FormComponents';
+import { EmployeeCell } from './EmployeeCell';
 
+const GRADE_OPTIONS = [
+  "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"
+];
 
-const getEraSuffix = (year) => {
-  const y = parseInt(year);
-  if (isNaN(y)) return '';
-  if (y >= 2019) return `R${y - 2018}`;
-  if (y >= 1989) return `H${y - 1988}`;
-  if (y >= 1926) return `S${y - 1925}`;
-  return '';
-};
-
-const YearInput = ({ label, value, onChange, birthDate, bgClass, borderClass }) => {
-  let promoAge = null;
-  if (birthDate && value && !isNaN(parseInt(value))) {
-    promoAge = calculateAge(birthDate, parseInt(value));
-  }
+const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear }) => {
+  const serviceYears = (value && targetYear) ? calculateServiceYears(value, targetYear) : null;
   const activeBorder = (value && borderClass) ? `border-2 ${borderClass}` : "border border-slate-300";
+  
+  const handleDateChange = (e) => {
+    onChange(e.target.value);
+  };
+  
+  const getYearPart = (val) => {
+    if (!val) return '';
+    const y = val.split('-')[0];
+    return y ? getEraSuffix(y) : '';
+  };
+  
   return (
     <div className="flex flex-col w-full">
       <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
       <div className={cx("flex items-center w-full px-1.5 py-1 text-sm rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
         <input 
-          type="text" 
-          maxLength={4}
+          type="date" 
           value={value || ''} 
-          onChange={e => {
-            const val = e.target.value.replace(/[^0-9]/g, '');
-            onChange(val);
-          }} 
-          placeholder="YYYY"
-          className="w-[42px] outline-none bg-transparent placeholder-slate-300" 
+          onChange={handleDateChange} 
+          className="w-full outline-none bg-transparent placeholder-slate-300" 
         />
         {value && (
           <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
-            {getEraSuffix(value)}
+            {getYearPart(value)}
           </span>
         )}
-        {promoAge !== null && !isNaN(promoAge) && (
-          <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
-            {promoAge}歳
+        {serviceYears !== null && (
+          <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none whitespace-nowrap">
+            {serviceYears}年目
           </span>
         )}
       </div>
@@ -621,25 +621,25 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 </div>
               </div>
               <ArrowDiff currentKey="promoYearChief" />
-              <YearInput birthDate={fd.birthDate} label="係長級(主査)" value={fd.promoYearChief} onChange={v => setFd({...fd, promoYearChief: v})} bgClass={activePromoKey === "promoYearChief" ? promoBg : ""} borderClass={getPromotedBorderClass("係長級(主査)")} />
+              <DateInput targetYear={targetYear} label="係長級(主査)" value={fd.promoYearChief} onChange={v => setFd({...fd, promoYearChief: v})} bgClass={activePromoKey === "promoYearChief" ? promoBg : ""} borderClass={getPromotedBorderClass("係長級(主査)")} />
               <ArrowDiff currentKey="promoYearAssistant1" />
-              <YearInput birthDate={fd.birthDate} label="補佐級I(主任)" value={fd.promoYearAssistant1} onChange={v => setFd({...fd, promoYearAssistant1: v})} bgClass={activePromoKey === "promoYearAssistant1" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級I(主任)")} />
+              <DateInput targetYear={targetYear} label="補佐級I(主任)" value={fd.promoYearAssistant1} onChange={v => setFd({...fd, promoYearAssistant1: v})} bgClass={activePromoKey === "promoYearAssistant1" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級I(主任)")} />
               <ArrowDiff currentKey="promoYearAssistant2" />
-              <YearInput birthDate={fd.birthDate} label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} bgClass={activePromoKey === "promoYearAssistant2" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級II(班長)")} />
+              <DateInput targetYear={targetYear} label="補佐級II(班長)" value={fd.promoYearAssistant2} onChange={v => setFd({...fd, promoYearAssistant2: v})} bgClass={activePromoKey === "promoYearAssistant2" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級II(班長)")} />
               <ArrowDiff currentKey="promoYearAssistant3" />
-              <YearInput birthDate={fd.birthDate} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} bgClass={activePromoKey === "promoYearAssistant3" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級III(補佐兼班長)")} />
+              <DateInput targetYear={targetYear} label="補佐級III" value={fd.promoYearAssistant3} onChange={v => setFd({...fd, promoYearAssistant3: v})} bgClass={activePromoKey === "promoYearAssistant3" ? promoBg : ""} borderClass={getPromotedBorderClass("補佐級III(補佐兼班長)")} />
               <div className="w-full opacity-0 pointer-events-none"></div>
 
               {/* Bottom Row */}
               <div className="w-full opacity-0 pointer-events-none"></div>
               <ArrowDiff currentKey="promoYearSecHead" />
-              <YearInput birthDate={fd.birthDate} label="課長級" value={fd.promoYearSecHead} onChange={v => setFd({...fd, promoYearSecHead: v})} bgClass={activePromoKey === "promoYearSecHead" ? promoBg : ""} borderClass={getPromotedBorderClass("課長級")} />
+              <DateInput targetYear={targetYear} label="課長級" value={fd.promoYearSecHead} onChange={v => setFd({...fd, promoYearSecHead: v})} bgClass={activePromoKey === "promoYearSecHead" ? promoBg : ""} borderClass={getPromotedBorderClass("課長級")} />
               <ArrowDiff currentKey="promoYearDivHead" />
-              <YearInput birthDate={fd.birthDate} label="所属長級" value={fd.promoYearDivHead} onChange={v => setFd({...fd, promoYearDivHead: v})} bgClass={activePromoKey === "promoYearDivHead" ? promoBg : ""} borderClass={getPromotedBorderClass("所属長級")} />
+              <DateInput targetYear={targetYear} label="所属長級" value={fd.promoYearDivHead} onChange={v => setFd({...fd, promoYearDivHead: v})} bgClass={activePromoKey === "promoYearDivHead" ? promoBg : ""} borderClass={getPromotedBorderClass("所属長級")} />
               <ArrowDiff currentKey="promoYearDeputyHead" />
-              <YearInput birthDate={fd.birthDate} label="次長級" value={fd.promoYearDeputyHead} onChange={v => setFd({...fd, promoYearDeputyHead: v})} bgClass={activePromoKey === "promoYearDeputyHead" ? promoBg : ""} borderClass={getPromotedBorderClass("次長級")} />
+              <DateInput targetYear={targetYear} label="次長級" value={fd.promoYearDeputyHead} onChange={v => setFd({...fd, promoYearDeputyHead: v})} bgClass={activePromoKey === "promoYearDeputyHead" ? promoBg : ""} borderClass={getPromotedBorderClass("次長級")} />
               <ArrowDiff currentKey="promoYearDeptHead" />
-              <YearInput birthDate={fd.birthDate} label="部長級" value={fd.promoYearDeptHead} onChange={v => setFd({...fd, promoYearDeptHead: v})} bgClass={activePromoKey === "promoYearDeptHead" ? promoBg : ""} borderClass={getPromotedBorderClass("部長級")} />
+              <DateInput targetYear={targetYear} label="部長級" value={fd.promoYearDeptHead} onChange={v => setFd({...fd, promoYearDeptHead: v})} bgClass={activePromoKey === "promoYearDeptHead" ? promoBg : ""} borderClass={getPromotedBorderClass("部長級")} />
               <ArrowDiff currentKey="finalArrow" />
             </div>
           </div>

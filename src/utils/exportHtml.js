@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, formatPromoDateWithEra } from './helpers.js';
 
 const getBorderHexColor = (grade) => {
   switch (grade) {
@@ -26,24 +26,11 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
   const historyYears = Array.from(yearsSet).sort((a, b) => a - b);
 
   const getEraSuffixLocal = (y) => {
-    const eraStr = getEraFormattedYear(y);
-    const match = eraStr.match(/([RSHM])(\d+)/);
-    return match ? `${match[1]}${match[2]}` : String(y).substring(2);
+    return getEraSuffix(y);
   };
 
   const formatWithEra = (dateStr) => {
-    if (!dateStr) return '';
-    const match = dateStr.match(/^(\d{4})[-/]/);
-    if (match) {
-      const year = parseInt(match[1], 10);
-      let era = '';
-      if (year >= 2019) era = `(R${year - 2018})`;
-      else if (year >= 1989) era = `(H${year - 1988})`;
-      else if (year >= 1926) era = `(S${year - 1925})`;
-      else if (year >= 1912) era = `(T${year - 1911})`;
-      return era ? `${dateStr}${era}` : dateStr;
-    }
-    return dateStr;
+    return formatPromoDateWithEra(dateStr);
   };
 
   const gradeToPromoKey = {
@@ -479,36 +466,35 @@ ${summaryHtml}
 
         if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
            isNextPromo = true;
-           cellVal = String(targetYear);
+           cellVal = `${targetYear}-04-01`;
         }
 
-        let prevY = NaN;
+        let prevDate = '';
         if (idx > 0) {
           for (let i = idx - 1; i >= 0; i--) {
-            let pVal = pKeys[i] === 'hireDate' ? (emp.hireDate ? emp.hireDate.substring(0,4) : '') : (emp[pKeys[i]] || '');
+            let pVal = pKeys[i] === 'hireDate' ? emp.hireDate : (emp[pKeys[i]] || '');
             if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === pKeys[i]) {
-                pVal = String(targetYear);
+                pVal = `${targetYear}-04-01`;
             }
-            const y = parseInt(pVal || 'NaN');
-            if (!isNaN(y)) { prevY = y; break; }
+            if (pVal) { prevDate = pVal; break; }
           }
         }
         
-        const currentY = parseInt(cellVal || 'NaN');
-        const diff = (!isNaN(prevY) && !isNaN(currentY) && currentY >= prevY) ? currentY - prevY : null;
+        const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="diff-span diff-emerald">${diff + 1}年目&gt;</span>`;
+          cellHtml += `<span class="diff-span diff-emerald">${diff}年目&gt;</span>`;
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
         cellHtml += cellVal;
         if (cellVal) {
-          const suffix = getEraSuffixLocal(cellVal);
+          const y = parseInt(cellVal.split('-')[0]);
+          const suffix = getEraSuffix(y);
           if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
-          if (emp.birthDate && !isNaN(currentY)) {
-             const promoAge = calculateAge(emp.birthDate, currentY);
+          if (emp.birthDate && !isNaN(y)) {
+             const promoAge = calculateAge(emp.birthDate, y);
              if (promoAge !== null && !isNaN(promoAge)) {
                 cellHtml += `<span style="font-size: 10px; color: #334155; margin-left: 2px;">${promoAge}歳</span>`;
              }
@@ -523,20 +509,20 @@ ${summaryHtml}
       const renderFinalDiff = (nStyle) => {
         let diff = null;
         if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-          diff = 1;
+          diff = '1.00';
         } else {
           const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
-          let prevY = NaN;
+          let prevDate = '';
           for (let i = pKeys.length - 1; i >= 0; i--) {
-            const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
-            if (!isNaN(y)) { prevY = y; break; }
+            const val = pKeys[i] === 'hireDate' ? emp.hireDate : (emp[pKeys[i]] || '');
+            if (val) { prevDate = val; break; }
           }
-          diff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
+          diff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
         }
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff >= 0 ? diff : 0}年目</span>`;
+          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff}年目</span>`;
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
@@ -544,14 +530,14 @@ ${summaryHtml}
       };
 
       const promoYearMap = {};
-      if (emp.promoYearChief) promoYearMap[emp.promoYearChief] = "係長級(主査)";
-      if (emp.promoYearAssistant1) promoYearMap[emp.promoYearAssistant1] = "補佐級I(主任)";
-      if (emp.promoYearAssistant2) promoYearMap[emp.promoYearAssistant2] = "補佐級II(班長)";
-      if (emp.promoYearAssistant3) promoYearMap[emp.promoYearAssistant3] = "補佐級III(補佐兼班長)";
-      if (emp.promoYearSecHead) promoYearMap[emp.promoYearSecHead] = "課長級";
-      if (emp.promoYearDivHead) promoYearMap[emp.promoYearDivHead] = "所属長級";
-      if (emp.promoYearDeputyHead) promoYearMap[emp.promoYearDeputyHead] = "次長級";
-      if (emp.promoYearDeptHead) promoYearMap[emp.promoYearDeptHead] = "部長級";
+      if (emp.promoYearChief) promoYearMap[parseInt(emp.promoYearChief.split('-')[0])] = "係長級(主査)";
+      if (emp.promoYearAssistant1) promoYearMap[parseInt(emp.promoYearAssistant1.split('-')[0])] = "補佐級I(主任)";
+      if (emp.promoYearAssistant2) promoYearMap[parseInt(emp.promoYearAssistant2.split('-')[0])] = "補佐級II(班長)";
+      if (emp.promoYearAssistant3) promoYearMap[parseInt(emp.promoYearAssistant3.split('-')[0])] = "補佐級III(補佐兼班長)";
+      if (emp.promoYearSecHead) promoYearMap[parseInt(emp.promoYearSecHead.split('-')[0])] = "課長級";
+      if (emp.promoYearDivHead) promoYearMap[parseInt(emp.promoYearDivHead.split('-')[0])] = "所属長級";
+      if (emp.promoYearDeputyHead) promoYearMap[parseInt(emp.promoYearDeputyHead.split('-')[0])] = "次長級";
+      if (emp.promoYearDeptHead) promoYearMap[parseInt(emp.promoYearDeptHead.split('-')[0])] = "部長級";
 
       let histHtml = '';
       let prevDept = null;
@@ -626,7 +612,7 @@ ${summaryHtml}
       <td class="bg-amber" data-val="${cDeptName}">${cDeptName}</td>
       <td class="bg-amber" data-val="${emp.currentTitle||''}">${emp.currentTitle||''}</td>
       <td class="bg-amber" data-val="${emp.currentGrade||''}">${emp.currentGrade||''}</td>
-      <td class="bg-amber" data-val="${emp.currentYears||0}">${emp.currentYears||''}</td>
+      <td class="bg-amber" data-val="${getEmpCurrentYears(emp, targetYear - 1, false)}">${getEmpCurrentYears(emp, targetYear - 1, false)}</td>
       <td class="bg-amber" data-val="${(emp.currentSkills || []).join('、')||''}">${(emp.currentSkills || []).join('、')||''}</td>
       <td class="bg-amber" data-val="${emp.currentEmploymentType||''}">${emp.currentEmploymentType||''}</td>
       <td class="bg-amber" data-val="${emp.currentExclude||''}">${emp.currentExclude||''}</td>
@@ -636,10 +622,8 @@ ${summaryHtml}
       <td class="bg-blue" data-val="${nGrade}"${nStyle}>${nGrade}</td>
       ${(() => {
         if (isNextRetired) return `<td class="bg-blue" data-val=""${nStyle}></td>`;
-        const isPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
-        const displayYears = isPromoted ? 1 : (emp.nextYears || '');
-        const valYears = isPromoted ? 1 : (emp.nextYears || 0);
-        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${displayYears}</td>`;
+        const valYears = getEmpCurrentYears(emp, targetYear, true);
+        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${valYears}</td>`;
       })()}
       <td class="bg-blue" data-val="${nSkills}"${nStyle}>${nSkills}</td>
       <td class="bg-blue" data-val="${nEmpType}"${nStyle}>${nEmpType}</td>
@@ -649,7 +633,7 @@ ${summaryHtml}
         const hireYear = emp.hireDate ? emp.hireDate.substring(0,4) : '';
         let cellHtml = hireYear;
         if (hireYear) {
-          const suffix = getEraSuffixLocal(hireYear);
+          const suffix = getEraSuffix(hireYear);
           if (suffix) cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
           if (emp.birthDate) {
              const hAge = calculateAge(emp.birthDate, parseInt(hireYear));
