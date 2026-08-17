@@ -325,17 +325,9 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
           </div>
         </div>
       </div>
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, Edit2, Trash2, ArrowUp, ArrowDown, X, CornerDownRight } from 'lucide-react';
-import { cx, isPromotedGrade, getPromotedBgClass, getEraFormattedYear, autoFixEmployees, calculateServiceYears } from './helpers';
-import { useApp } from './AppContext';
-import { PlacementSelector, FormInput, FormSelect, FormInputWithList, CommentButton } from './FormComponents';
-import { EmployeeCell } from './EmployeeCell';
-
-const GRADE_OPTIONS = [
-  "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"
-];
-
+    </div>
+  );
+};
 const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear }) => {
   const serviceYears = (value && targetYear) ? calculateServiceYears(value, targetYear) : null;
   const activeBorder = (value && borderClass) ? `border-2 ${borderClass}` : "border border-slate-300";
