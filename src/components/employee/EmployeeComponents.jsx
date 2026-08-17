@@ -369,18 +369,24 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
           value={value || ''} 
           onChange={handleDateChange} 
           onBlur={handleBlur}
-          className="w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight" 
+          className={`w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight ${value && String(value).length >= 10 && !String(value).endsWith('-04-01') ? 'text-rose-600' : 'text-slate-900'}`} 
         />
         <div className="flex items-center justify-between mt-[-2px] min-h-[14px]">
           {(value || serviceYears !== null) ? (
-            <>
-              <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none">
-                {value ? getYearPart(value) : ''}
-              </span>
-              <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none whitespace-nowrap">
-                {formatServiceYearsText(serviceYears)}
-              </span>
-            </>
+            (() => {
+              const isNonAprilFirst = value && String(value).length >= 10 && !String(value).endsWith('-04-01');
+              const subColor = isNonAprilFirst ? 'text-rose-600' : 'text-slate-500';
+              return (
+                <>
+                  <span className={`text-[9px] ${subColor} font-bold tracking-tighter pointer-events-none select-none`}>
+                    {value ? getYearPart(value) : ''}
+                  </span>
+                  <span className={`text-[9px] ${subColor} font-bold tracking-tighter pointer-events-none select-none whitespace-nowrap`}>
+                    {formatServiceYearsText(serviceYears)}
+                  </span>
+                </>
+              );
+            })()
           ) : (
             <span className="text-[9px] min-h-[14px]"></span>
           )}
@@ -632,17 +638,19 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[36px] flex flex-col justify-center leading-tight tracking-tighter overflow-hidden">
                   {fd.hireDate ? (() => {
                     const hYear = parseInt(String(fd.hireDate).substring(0, 4));
+                    const isNonAprilFirst = String(fd.hireDate).length >= 10 && !String(fd.hireDate).endsWith('-04-01');
+                    const textClass = isNonAprilFirst ? 'text-rose-600' : '';
                     const displayStr = String(fd.hireDate);
                     const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
                     return (
-                      <div className="flex flex-col items-center justify-center w-full">
+                      <div className={`flex flex-col items-center justify-center w-full ${textClass}`}>
                         <div className="flex items-baseline justify-center w-full truncate">
                           <span>{displayStr}</span>
                         </div>
                         <div className="flex items-baseline justify-center mt-[-1px] w-full truncate">
-                          <span className="text-[10px] text-slate-500 font-bold">({getEraSuffix(hYear)})</span>
+                          <span className={`text-[10px] font-bold ${isNonAprilFirst ? 'text-rose-600' : 'text-slate-500'}`}>({getEraSuffix(hYear)})</span>
                           {hAge !== null && !isNaN(hAge) && (
-                            <span className="ml-1 text-[10px] text-slate-500 font-bold">{hAge}歳</span>
+                            <span className={`ml-1 text-[10px] font-bold ${isNonAprilFirst ? 'text-rose-600' : 'text-slate-500'}`}>{hAge}歳</span>
                           )}
                         </div>
                       </div>

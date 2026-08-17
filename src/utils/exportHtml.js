@@ -488,7 +488,9 @@ ${summaryHtml}
           } else {
             cellHtml += `<span class="arrow">&gt;</span>`;
           }
-          cellHtml += `<span style="font-size: 11px; font-weight: bold; color: #0f172a;">${formatDateForDisplay(cellVal)}</span>`;
+          const isNonAprilFirst = String(cellVal).length >= 10 && !String(cellVal).endsWith('-04-01');
+          const dateColor = isNonAprilFirst ? '#e11d48' : '#0f172a';
+          cellHtml += `<span style="font-size: 11px; font-weight: bold; color: ${dateColor};">${formatDateForDisplay(cellVal)}</span>`;
           const suffix = getEraSuffixForDate(cellVal);
           if (suffix) {
              cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
@@ -633,7 +635,10 @@ ${summaryHtml}
       ${(() => {
         let cellHtml = '';
         if (emp.hireDate) {
-          cellHtml = formatDateForDisplay(emp.hireDate);
+          const isNonAprilFirst = String(emp.hireDate).length >= 10 && !String(emp.hireDate).endsWith('-04-01');
+          const dateColor = isNonAprilFirst ? '#e11d48' : '#0f172a';
+          const displayDate = formatDateForDisplay(emp.hireDate);
+          cellHtml = `<span style="font-size: 11px; font-weight: bold; color: ${dateColor};">${displayDate}</span>`;
         }
         return `<td class="bg-fuchsia" data-val="${cellHtml}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       })()}

@@ -610,11 +610,17 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       const isPostLevelHighlight = structPostHighlight && filterLevel === 0;
   
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        let currentFont = defaultFont;
         if (curFontStyles && curFontStyles[colNumber] === 'change') {
-            cell.font = { ...defaultFont, bold: true, italic: true };
-        } else {
-            cell.font = defaultFont;
+            currentFont = { ...defaultFont, bold: true, italic: true };
         }
+        if (typeof cell.value === 'string') {
+          const match = cell.value.match(/\d{4}-\d{2}-\d{2}/);
+          if (match && !cell.value.includes('-04-01')) {
+            currentFont = { ...currentFont, color: { argb: 'FFE11D48' } };
+          }
+        }
+        cell.font = currentFont;
         cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
         if (colNumber >= 3) {
           cell.alignment = { ...cell.alignment, horizontal: 'center' };
@@ -1177,7 +1183,14 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
 
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      cell.font = listDefaultFont;
+      let currentFont = listDefaultFont;
+      if (typeof cell.value === 'string') {
+        const match = cell.value.match(/\d{4}-\d{2}-\d{2}/);
+        if (match && !cell.value.includes('-04-01')) {
+          currentFont = { ...listDefaultFont, color: { argb: 'FFE11D48' } };
+        }
+      }
+      cell.font = currentFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
       cell.border = getCellBorders(true, true, true, true, true);
       
