@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { generateAndDownloadHTML } from '../../utils/exportHtml.js';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate } from '../../utils/helpers.js';
+import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -536,7 +536,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
         const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
         const getYear = (emp) => {
             for (let i = pKeys.length - 1; i >= 0; i--) {
-                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
                 if (!isNaN(y)) return y;
             }
             return NaN;
@@ -1336,7 +1336,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
                   let prevY = NaN;
                   for (let i = pKeys.length - 1; i >= 0; i--) {
-                    const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+                    const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
                     if (!isNaN(y)) { prevY = y; break; }
                   }
                   const diff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
@@ -1432,7 +1432,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
 
                     <td className="bg-fuchsia-50/30 p-1 align-middle border-l border-r">
                       <div className="flex items-center justify-center h-full min-h-[26px] text-slate-700 text-xs">
-                        {emp.hireDate ? emp.hireDate.substring(0,4) : ''}
+                        {emp.hireDate ? String(emp.hireDate).substring(0,4) : ''}
                       </div>
                     </td>
                     {renderPromoCell(emp, 'promoYearChief', false)}

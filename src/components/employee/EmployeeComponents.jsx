@@ -388,7 +388,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
   
   const getEraStr = (dateStr) => {
     if (!dateStr) return '';
-    const match = dateStr.match(/^(\d{4})/);
+    const match = String(dateStr).match(/^(\d{4})/);
     if (!match) return '';
     const y = parseInt(match[1], 10);
     const eraFormatted = getEraFormattedYear(y);
@@ -502,7 +502,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
   // Find index of last filled
   let lastFilledIdx = 0;
   for (let i = pKeys.length - 1; i >= 0; i--) {
-    const val = pKeys[i] === 'hire' ? (fd.hireDate ? parseInt(fd.hireDate.substring(0,4)) : NaN) : parseInt(fd[pKeys[i]]);
+    const val = pKeys[i] === 'hire' ? (fd.hireDate ? parseInt(String(fd.hireDate).substring(0,4)) : NaN) : parseInt(fd[pKeys[i]]);
     if (!isNaN(val)) {
       lastFilledIdx = i;
       break;
@@ -621,7 +621,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 <span className="text-[11px] font-bold text-slate-600 mb-1">採用</span>
                 <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[30px] flex items-center justify-center tracking-tighter overflow-hidden">
                   {fd.hireDate ? (() => {
-                    const hYear = parseInt(fd.hireDate.substring(0, 4));
+                    const hYear = parseInt(String(fd.hireDate).substring(0, 4));
                     const hAge = (fd.birthDate && !isNaN(hYear)) ? calculateAge(fd.birthDate, hYear) : null;
                     return (
                       <div className="flex items-baseline">

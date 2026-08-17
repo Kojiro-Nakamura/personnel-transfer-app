@@ -403,7 +403,7 @@ ${summaryHtml}
         const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
         const getYear = (emp) => {
             for (let i = pKeys.length - 1; i >= 0; i--) {
-                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
                 if (!isNaN(y)) return y;
             }
             return NaN;
@@ -632,7 +632,7 @@ ${summaryHtml}
       <td class="bg-blue" data-val="${nExclude}"${nStyle}>${nExclude}</td>
       
       ${(() => {
-        const hireYear = emp.hireDate ? emp.hireDate.substring(0,4) : '';
+        const hireYear = emp.hireDate ? String(emp.hireDate).substring(0,4) : '';
         let cellHtml = hireYear;
         if (hireYear) {
           const suffix = getEraSuffix(hireYear);

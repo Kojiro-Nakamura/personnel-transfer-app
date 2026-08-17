@@ -419,7 +419,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       rowVals.push(formatWithEra(extEmp.hireDate));
       rowVals.push(extEmp.note || '');
 
-      const hireYear = extEmp.hireDate ? extEmp.hireDate.substring(0,4) : '';
+      const hireYear = extEmp.hireDate ? String(extEmp.hireDate).substring(0,4) : '';
       let hireStr = hireYear;
       if (hireYear) {
         const suffix = getEraSuffixLocal(hireYear);
@@ -504,7 +504,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       } else {
         let prevY = NaN;
         for (let i = pKeys.length - 1; i >= 0; i--) {
-          const y = pKeys[i] === 'hireDate' ? (extEmp.hireDate ? parseInt(extEmp.hireDate.substring(0,4)) : NaN) : parseInt(extEmp[pKeys[i]] || 'NaN');
+          const y = pKeys[i] === 'hireDate' ? (extEmp.hireDate ? parseInt(String(extEmp.hireDate).substring(0,4)) : NaN) : parseInt(extEmp[pKeys[i]] || 'NaN');
           if (!isNaN(y)) { prevY = y; break; }
         }
         finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
@@ -985,7 +985,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
       const getYear = (emp) => {
           for (let i = pKeys.length - 1; i >= 0; i--) {
-              const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(emp.hireDate.substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
+              const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
               if (!isNaN(y)) return y;
           }
           return NaN;
@@ -1059,7 +1059,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     ];
 
     // 昇級年度の計算 (hireDate, then keys)
-    const hireYear = emp.hireDate ? emp.hireDate.substring(0,4) : '';
+    const hireYear = emp.hireDate ? String(emp.hireDate).substring(0,4) : '';
     let hireStr = hireYear;
     if (hireYear) {
       const suffix = getEraSuffixLocal(hireYear);

@@ -218,7 +218,7 @@ export const AppContent = () => {
         const dispGrade = selEmp.currentGrade;
         const dispAge = calculateAge(selEmp.birthDate, targetYear - 1);
 
-        const hireY = selEmp.hireDate ? parseInt(selEmp.hireDate.substring(0, 4)) : null;
+        const hireY = selEmp.hireDate ? parseInt(String(selEmp.hireDate).substring(0, 4)) : null;
         const timeline = [];
         if (hireY) {
           const milestones = [
