@@ -336,7 +336,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
 
     const isNewDept = deptName !== lastDept;
     const isNewGroup = isNewDept || groupName !== lastGroup;
-    let displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
+    const isNewPost = isNewGroup || formattedPostName !== lastPost;
+    let displayPost = isNewPost ? formattedPostName : '';
     if (displayPost === '班員') displayPost = '';
     
     lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
@@ -700,7 +701,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       
       if ((colNumber === 1 || colNumber === 2 || colNumber === 3) && argb === prevRowColors[colNumber]) {
          const cellText = rowVals[colNumber - 1];
-         if (!cellText || cellText === '') {
+         let shouldMerge = (!cellText || cellText === '');
+         if (colNumber === 3 && isNewPost) shouldMerge = false;
+         
+         if (shouldMerge) {
             if (cell.border && cell.border.top && cell.border.top.style === 'thin') {
                cell.border = { ...cell.border, top: undefined };
             }

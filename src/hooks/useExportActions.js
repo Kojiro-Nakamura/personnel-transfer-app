@@ -72,7 +72,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
 
         const isNewDept = deptName !== lastDept;
         const isNewGroup = isNewDept || groupName !== lastGroup;
-        let displayPost = (isNewGroup || formattedPostName !== lastPost) ? formattedPostName : '';
+        const isNewPost = isNewGroup || formattedPostName !== lastPost;
+        let displayPost = isNewPost ? formattedPostName : '';
         if (displayPost === '班員') displayPost = '';
         
         lastDept = deptName; lastGroup = groupName; lastPost = formattedPostName;
@@ -175,7 +176,11 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         
         const deptClass = isDeptLevelHighlight ? ' class="post-cell"' : ''; 
         const groupClass = isGroupLevelHighlight ? ' class="post-cell"' : ''; 
-        const postClass = isPostLevelHighlight ? ' class="post-cell"' : '';
+        let postClassStr = isPostLevelHighlight ? 'post-cell' : '';
+        if (isNewPost && displayPost === '') {
+           postClassStr += (postClassStr ? ' ' : '') + 'keep-top-border';
+        }
+        const postClass = postClassStr ? ` class="${postClassStr}"` : '';
         const currTds = generateTds(currEmp, currEmp?.id, false, isPostLevelHighlight);
         const nextTds = generateTds(nextEmp, nextEmp?.id, true, isPostLevelHighlight);
         
@@ -237,6 +242,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     tbody tr.highlight + tr.highlight td:nth-child(1):empty,
     tbody tr.highlight + tr.highlight td:nth-child(2):empty,
     tbody tr.highlight + tr.highlight td:nth-child(3):empty { border-top: none !important; }
+    tbody tr.highlight + tr.highlight td.keep-top-border { border-top: 1px solid #94a3b8 !important; }
     .filter-container { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12px; font-weight: normal; } 
     .filter-container label { margin:0; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight: normal; }
 
