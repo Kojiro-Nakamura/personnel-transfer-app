@@ -511,7 +511,7 @@ ${summaryHtml}
       const renderFinalDiff = (nStyle) => {
         let diff = null;
         if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-          diff = '1.00';
+          diff = '1';
         } else {
           const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
           let prevDate = '';

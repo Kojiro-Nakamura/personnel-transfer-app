@@ -1105,7 +1105,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     // 来年度差分
     let finalDiff = null;
     if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade)) {
-      finalDiff = '1.00';
+      finalDiff = '1';
     } else {
       let prevDate = '';
       for (let i = pKeys.length - 1; i >= 0; i--) {
