@@ -355,24 +355,24 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
   return (
     <div className="flex flex-col w-full">
       <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
-      <div className={cx("flex items-center w-full px-1.5 py-1 text-sm rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
+      <div className={cx("flex flex-col w-full px-1.5 py-0.5 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
         <input 
           type="text" 
           placeholder="YYYY-MM-DD"
           value={value || ''} 
           onChange={handleDateChange} 
           onBlur={handleBlur}
-          className="w-full outline-none bg-transparent placeholder-slate-300" 
+          className="w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight" 
         />
-        {value && (
-          <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none">
-            {getYearPart(value)}
-          </span>
-        )}
-        {serviceYears !== null && (
-          <span className="text-[10px] text-slate-500 font-bold tracking-tighter shrink-0 pt-[1px] ml-1 pointer-events-none select-none whitespace-nowrap">
-            {serviceYears}年目
-          </span>
+        {(value || serviceYears !== null) && (
+          <div className="flex items-center justify-between mt-[-2px] pb-[2px]">
+            <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none">
+              {value ? getYearPart(value) : ''}
+            </span>
+            <span className="text-[9px] text-slate-500 font-bold tracking-tighter pointer-events-none select-none whitespace-nowrap">
+              {serviceYears !== null ? `${serviceYears}年目` : ''}
+            </span>
+          </div>
         )}
       </div>
     </div>
