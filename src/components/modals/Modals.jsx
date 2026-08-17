@@ -1296,7 +1296,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                   
                   const getYearFromStr = (str) => {
                     if (!str) return NaN;
-                    return parseInt(str.split('-')[0], 10);
+                    return parseInt(String(str).split('-')[0], 10);
                   };
 
                   const currentY = getYearFromStr(emp[currentKey]);
@@ -1326,7 +1326,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                           </div>
                         )}
                         <input type="text" placeholder="YYYY-MM-DD" value={emp[key]||''} onChange={e => handleChange(emp.id, key, e.target.value)} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) handleChange(emp.id, key, p); }} className={cx(inputCls, 'text-center !px-0.5 !w-[105px] shrink-0')} />
-                        {emp[key] && <span className="text-[9px] text-slate-500 font-bold tracking-tighter shrink-0 select-none">({getEraSuffix(emp[key].split('-')[0])})</span>}
+                        {emp[key] && <span className="text-[9px] text-slate-500 font-bold tracking-tighter shrink-0 select-none">({getEraSuffix(String(emp[key]).split('-')[0])})</span>}
                       </div>
                     </td>
                   );

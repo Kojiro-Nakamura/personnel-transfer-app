@@ -339,7 +339,7 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear })
   
   const getYearPart = (val) => {
     if (!val) return '';
-    const y = val.split('-')[0];
+    const y = String(val).split('-')[0];
     return y ? getEraSuffix(y) : '';
   };
   
