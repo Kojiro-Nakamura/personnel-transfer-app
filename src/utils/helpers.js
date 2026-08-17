@@ -580,12 +580,13 @@ export const calculateServiceYears = (promoDateStr, targetYearOrDate) => {
   if (isNaN(targetDate.getTime())) return '';
 
   const diffTime = targetDate - promoDate;
-  if (diffTime < 0) return '1.00'; 
+  if (diffTime < 0) return '1'; 
   
   const msPerYear = 1000 * 60 * 60 * 24 * 365.25;
   const yearsPassed = diffTime / msPerYear;
   
-  return (yearsPassed + 1).toFixed(2);
+  const formatted = (yearsPassed + 1).toFixed(2);
+  return parseFloat(formatted).toString();
 };
 
 export const getFiscalYear = (dateStr) => {
