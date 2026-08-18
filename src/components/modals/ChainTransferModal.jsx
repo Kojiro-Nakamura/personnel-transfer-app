@@ -692,6 +692,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     moves.forEach(move => {
       if (move.fromPost.type === 'unassigned' || move.fromPost.type === 'retired') return;
       if (move.toPost.type === 'unassigned' && !move.toPost.dept) return;
+      if (move.toPost.type === 'retired') return; // 退職を除外
+      if (move.emp && move.emp.note && String(move.emp.note).includes('臨任')) return; // 臨任を除外
       
       const currentYearsStr = getEmpCurrentYears(move.emp, targetYear - 1, false);
       const currentYears = Number(currentYearsStr);
@@ -700,7 +702,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         shortRows.push({
           name: move.emp.name || '',
           oldPost: (move.fromPost.fullDept || move.fromPost.dept || '') + ' ' + (move.fromPost.title || ''),
-          newPost: move.toPost.type === 'retired' ? '退職' : (move.toPost.type === 'unassigned' ? '未配置' : ((move.toPost.fullDept || move.toPost.dept || '') + ' ' + (move.toPost.title || ''))),
+          newPost: move.toPost.type === 'unassigned' ? '未配置' : ((move.toPost.fullDept || move.toPost.dept || '') + ' ' + (move.toPost.title || '')),
           years: currentYears
         });
       }
