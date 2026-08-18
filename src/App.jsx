@@ -27,7 +27,7 @@ export const AppContent = () => {
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
     undo, redo, canUndo, canRedo, handleRollOver, activePlanId, plans, openModal, mutations, modals, closeModal, 
     targetYear, setTargetYear, switchPlan, duplicatePlan, deletePlan, updatePlanName, expandAll, collapseAll, 
-    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, loadJSON, handleCellClick, handleAssign 
+    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, loadJSON, handleCellClick, handleAssign, notes 
   } = useApp();
   
   const [isDragging, setIsDragging] = useState(false);
