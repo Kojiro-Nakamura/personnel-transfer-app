@@ -1070,7 +1070,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     
     const isNextRetired = emp.departmentId === 'retired';
     const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
-    const valYears = formatServiceYearsText(getEmpCurrentYears(emp, targetYear, true));
+    const valYears = getEmpCurrentYears(emp, targetYear, true);
 
     const vals = [
       emp.name || '',
@@ -1164,7 +1164,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       }
       finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
     }
-    let nYearStr = `> ${finalDiff !== null ? finalDiff : ''}`;
+    let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
     if (finalDiff !== null && emp.birthDate) {
       const ag = calculateAge(emp.birthDate, targetYear);
       if (ag) nYearStr += `(${ag}歳)`;

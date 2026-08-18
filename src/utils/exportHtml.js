@@ -522,7 +522,7 @@ ${summaryHtml}
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff}</span>`;
+          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${formatServiceYearsText(diff)}</span>`;
           if (emp.birthDate) {
               const ag = calculateAge(emp.birthDate, targetYear);
               if (ag) cellHtml += `<span style="font-size: 10px; color: #334155; font-weight: bold; margin-left: 2px;">(${ag}歳)</span>`;
@@ -616,7 +616,7 @@ ${summaryHtml}
       <td class="bg-amber" data-val="${cDeptName}">${cDeptName}</td>
       <td class="bg-amber" data-val="${emp.currentTitle||''}">${emp.currentTitle||''}</td>
       <td class="bg-amber" data-val="${emp.currentGrade||''}">${emp.currentGrade||''}</td>
-      <td class="bg-amber" data-val="${getEmpCurrentYears(emp, targetYear - 1, false)}">${formatServiceYearsText(getEmpCurrentYears(emp, targetYear - 1, false))}</td>
+      <td class="bg-amber" data-val="${getEmpCurrentYears(emp, targetYear - 1, false)}">${getEmpCurrentYears(emp, targetYear - 1, false)}</td>
       <td class="bg-amber" data-val="${(emp.currentSkills || []).join('、')||''}">${(emp.currentSkills || []).join('、')||''}</td>
       <td class="bg-amber" data-val="${emp.currentEmploymentType||''}">${emp.currentEmploymentType||''}</td>
       <td class="bg-amber" data-val="${emp.currentExclude||''}">${emp.currentExclude||''}</td>
@@ -627,7 +627,7 @@ ${summaryHtml}
       ${(() => {
         if (isNextRetired) return `<td class="bg-blue" data-val=""${nStyle}></td>`;
         const valYears = getEmpCurrentYears(emp, targetYear, true);
-        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${formatServiceYearsText(valYears)}</td>`;
+        return `<td class="bg-blue" data-val="${valYears}"${nStyle}>${valYears}</td>`;
       })()}
       <td class="bg-blue" data-val="${nSkills}"${nStyle}>${nSkills}</td>
       <td class="bg-blue" data-val="${nEmpType}"${nStyle}>${nEmpType}</td>
