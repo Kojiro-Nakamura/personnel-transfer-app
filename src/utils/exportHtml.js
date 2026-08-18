@@ -522,7 +522,7 @@ ${summaryHtml}
         
         let cellHtml = '';
         if (diff !== null) {
-          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${formatServiceYearsText(diff)}</span>`;
+          cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${diff}</span>`;
           if (emp.birthDate) {
               const ag = calculateAge(emp.birthDate, targetYear);
               if (ag) cellHtml += `<span style="font-size: 10px; color: #334155; font-weight: bold; margin-left: 2px;">(${ag}歳)</span>`;

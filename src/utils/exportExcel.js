@@ -49,8 +49,17 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     return getEraSuffix(yearStr);
   };
   
-  const formatWithEra = (dateStr) => {
-    return formatPromoDateWithEra(String(dateStr));
+  const formatWithEra = (dateStr, birthDateStr = null) => {
+    let res = formatPromoDateWithEra(String(dateStr));
+    if (birthDateStr && dateStr) {
+      const match = String(dateStr).match(/^(\d{4})[-/]/);
+      if (match) {
+         const year = parseInt(match[1], 10);
+         const ag = calculateAge(birthDateStr, year);
+         if (ag) res += `(${ag}歳)`;
+      }
+    }
+    return res;
   };
 
   const getStandardYears = (gradeName) => {
@@ -416,7 +425,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       rowVals.push(extEmp.gender || '');
       rowVals.push(formatWithEra(extEmp.birthDate));
       rowVals.push(extEmp.education || '');
-      rowVals.push(formatWithEra(extEmp.hireDate));
+      rowVals.push(formatWithEra(extEmp.hireDate, extEmp.birthDate));
       rowVals.push(extEmp.note || '');
 
       let hireStr = '';
@@ -515,7 +524,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
         finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
       }
-      let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+      let nYearStr = `> ${finalDiff !== null ? finalDiff : ''}`;
       if (finalDiff !== null && extEmp.birthDate) {
         const ag = calculateAge(extEmp.birthDate, targetYear);
         if (ag) nYearStr += `(${ag}歳)`;
@@ -809,7 +818,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     return `${str}(${era})`;
   };
   
-  const formatWithEra = (dateStr) => {
+  const formatWithEra = (dateStr, birthDateStr = null) => {
     if (!dateStr) return '';
     const match = String(dateStr).match(/^(\d{4})[-/]/);
     if (match) {
@@ -819,7 +828,13 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       else if (year >= 1989) era = `(H${year - 1988})`;
       else if (year >= 1926) era = `(S${year - 1925})`;
       else if (year >= 1912) era = `(T${year - 1911})`;
-      return era ? `${dateStr}${era}` : String(dateStr);
+      
+      let result = era ? `${dateStr}${era}` : String(dateStr);
+      if (birthDateStr) {
+         const ag = calculateAge(birthDateStr, year);
+         if (ag) result += `(${ag}歳)`;
+      }
+      return result;
     }
     return String(dateStr);
   };
@@ -1069,7 +1084,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       emp.gender || '',
       formatWithEra(emp.birthDate),
       emp.education || '',
-      formatWithEra(emp.hireDate),
+      formatWithEra(emp.hireDate, emp.birthDate),
       emp.note || '',
       cDeptName,
       emp.currentTitle || '',
@@ -1149,7 +1164,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       }
       finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
     }
-    let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+    let nYearStr = `> ${finalDiff !== null ? finalDiff : ''}`;
     if (finalDiff !== null && emp.birthDate) {
       const ag = calculateAge(emp.birthDate, targetYear);
       if (ag) nYearStr += `(${ag}歳)`;
