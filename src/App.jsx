@@ -6,6 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
+import { exportListToExcel, exportUnifiedExcel } from './utils/exportExcel.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
@@ -301,7 +302,7 @@ export const AppContent = () => {
             else exportToHTML(fileName, showCount); 
           } 
           else if (modals.saveFile.data.type === 'list') { 
-            if (format === 'excel') exportToExcel(fileName, showCount); 
+            if (format === 'excel') exportListToExcel(fileName, targetYear, employees, departments); 
             else generateAndDownloadHTML(employees, departments, targetYear, fileName); 
           } 
         }} 
@@ -310,7 +311,19 @@ export const AppContent = () => {
       
       {modals.chainTransfer.isOpen && (
         <NewWindowPortal title={`玉突き異動表（つなぎ表）`} onClose={() => closeModal('chainTransfer')}>
-          <ChainTransferModal isOpen={true} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} currentFileName={currentFileName} notes={history.notes} onExportExcel={() => exports.exportToExcel()} />
+          <ChainTransferModal 
+            isOpen={true} 
+            onClose={() => closeModal('chainTransfer')} 
+            employees={employees} 
+            departments={departments} 
+            targetYear={targetYear} 
+            currentFileName={currentFileName} 
+            notes={history.notes} 
+            onExportExcel={() => exportUnifiedExcel(
+              currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_統合版.xlsx' : '人事異動案_統合版.xlsx', 
+              targetYear, departments, deptMap, currMap, nextMap, employees, history.notes, true
+            )} 
+          />
         </NewWindowPortal>
       )}
 

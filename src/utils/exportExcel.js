@@ -38,7 +38,7 @@ const saveWorkbook = async (workbook, fileName) => {
 };
 
 // --- 人事異動案（Excel）出力 ---
-export const exportPlanToExcel = async (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
+export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const allHistoryYears = new Set();
   allHistoryYears.add(targetYear);
   employees.forEach(e => {
@@ -787,8 +787,14 @@ export const exportPlanToExcel = async (workbook, sheetName, fileName, targetYea
   });
 };
 
+export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
+  const workbook = new ExcelJS.Workbook();
+  addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
+  await saveWorkbook(workbook, fileName);
+};
+
 // --- 職員一覧（Excel）出力 ---
-export const exportListToExcel = async (workbook, sheetName, fileName, targetYear, employees, departments) => {
+export const addListSheet = (workbook, sheetName, fileName, targetYear, employees, departments) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const targetEraShort = getEraFormattedYear(targetYear).split('(')[1].replace(')', '');
   const yearsSet = new Set();
@@ -1327,20 +1333,26 @@ export const exportListToExcel = async (workbook, sheetName, fileName, targetYea
   });
 };
 
+export const exportListToExcel = async (fileName, targetYear, employees, departments) => {
+  const workbook = new ExcelJS.Workbook();
+  addListSheet(workbook, 'つなぎ表', fileName, targetYear, employees, departments);
+  await saveWorkbook(workbook, fileName);
+};
+
 export const exportUnifiedExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount = true) => {
   const workbook = new ExcelJS.Workbook();
   
   // 1. 指定職人事異動 (filterLevel = 9)
-  await exportPlanToExcel(workbook, '指定職人事異動', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, 9, showCount);
+  addPlanSheet(workbook, '指定職人事異動', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, 9, showCount);
   
   // 2. 異動案リスト (filterLevel = 0)
-  await exportPlanToExcel(workbook, '異動案リスト', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, 0, showCount);
+  addPlanSheet(workbook, '異動案リスト', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, 0, showCount);
   
   // 3. 増減理由
   addReasonSheet(workbook, '増減理由', targetYear, departments, deptMap, currMap, nextMap, employees, notes);
   
   // 4. つなぎ表 (職員一覧)
-  await exportListToExcel(workbook, 'つなぎ表', fileName, targetYear, employees, departments);
+  addListSheet(workbook, 'つなぎ表', fileName, targetYear, employees, departments);
   
   await saveWorkbook(workbook, fileName);
 };
