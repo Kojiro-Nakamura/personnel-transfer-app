@@ -492,10 +492,6 @@ ${summaryHtml}
           const dateColor = isNonAprilFirst ? '#e11d48' : '#0f172a';
           const textShadow = isNonAprilFirst ? 'text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -1px 0 0 #fff, 1px 0 0 #fff;' : '';
           cellHtml += `<span style="font-size: 11px; font-weight: bold; color: ${dateColor}; ${textShadow}">${formatDateForDisplay(cellVal)}</span>`;
-          const suffix = getEraSuffixForDate(cellVal);
-          if (suffix) {
-             cellHtml += `<span style="font-size: 9px; color: #64748b; font-weight: bold; margin-left: 1px;">(${suffix})</span>`;
-          }
           const y = parseInt(String(cellVal).split('-')[0], 10);
           if (emp.birthDate && !isNaN(y)) {
              const promoAge = calculateAge(emp.birthDate, y);
@@ -527,6 +523,10 @@ ${summaryHtml}
         let cellHtml = '';
         if (diff !== null) {
           cellHtml += `<span class="arrow">&gt;</span><span class="diff-span diff-blue">${formatServiceYearsText(diff)}</span>`;
+          if (emp.birthDate) {
+              const ag = calculateAge(emp.birthDate, targetYear);
+              if (ag) cellHtml += `<span style="font-size: 10px; color: #334155; font-weight: bold; margin-left: 2px;">(${ag}歳)</span>`;
+          }
         } else {
           cellHtml += `<span class="arrow">&gt;</span>`;
         }
@@ -641,6 +641,12 @@ ${summaryHtml}
           const textShadow = isNonAprilFirst ? 'text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 -1px 0 #fff, 0 1px 0 #fff, -1px 0 0 #fff, 1px 0 0 #fff;' : '';
           const displayDate = formatDateForDisplay(emp.hireDate);
           cellHtml = `<span style="font-size: 11px; font-weight: bold; color: ${dateColor}; ${textShadow}">${displayDate}</span>`;
+          
+          const y = parseInt(String(emp.hireDate).split('-')[0], 10);
+          if (emp.birthDate && !isNaN(y)) {
+             const ag = calculateAge(emp.birthDate, y);
+             if (ag) cellHtml += `<span style="font-size: 10px; color: #334155; margin-left: 2px;">${ag}歳</span>`;
+          }
         }
         return `<td class="bg-fuchsia" data-val="${cellHtml}"><div style="display:flex;align-items:center;justify-content:center;">${cellHtml}</div></td>`;
       })()}

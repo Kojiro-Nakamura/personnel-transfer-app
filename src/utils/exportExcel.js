@@ -419,11 +419,14 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
       rowVals.push(formatWithEra(extEmp.hireDate));
       rowVals.push(extEmp.note || '');
 
-      const hireYear = extEmp.hireDate ? String(extEmp.hireDate).substring(0,4) : '';
-      let hireStr = hireYear;
-      if (hireYear) {
-        const suffix = getEraSuffixLocal(hireYear);
-        if (suffix) hireStr += `(${suffix})`;
+      let hireStr = '';
+      if (extEmp.hireDate) {
+        hireStr = formatDateForDisplay(extEmp.hireDate);
+        const y = parseInt(String(extEmp.hireDate).split('-')[0], 10);
+        if (extEmp.birthDate && !isNaN(y)) {
+           const ag = calculateAge(extEmp.birthDate, y);
+           if (ag) hireStr += `(${ag}歳)`;
+        }
       }
       rowVals.push(hireStr);
 
@@ -460,9 +463,12 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           if (cellVal.includes && cellVal.includes('(追及)')) prefix = '追及:';
           else if (cellVal.includes && cellVal.includes('(免除)')) prefix = '免除:';
           
-          let pStr = cellVal;
-          const suffix = getEraSuffixForDate(cellVal);
-          if (suffix) pStr += `(${suffix})`;
+          let pStr = formatDateForDisplay(cellVal);
+          const y = parseInt(String(cellVal).split('-')[0], 10);
+          if (extEmp.birthDate && !isNaN(y)) {
+             const ag = calculateAge(extEmp.birthDate, y);
+             if (ag) pStr += `(${ag}歳)`;
+          }
           
           let prevDate = '';
           for (let j = idx - 1; j >= 0; j--) {
@@ -509,7 +515,12 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
         finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
       }
-      rowVals.push(`> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`);
+      let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+      if (finalDiff !== null && extEmp.birthDate) {
+        const ag = calculateAge(extEmp.birthDate, targetYear);
+        if (ag) nYearStr += `(${ag}歳)`;
+      }
+      rowVals.push(nYearStr);
       
       if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
            const c = getPromotedBgColorCode(extEmp.nextGrade);
@@ -1077,10 +1088,14 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
     ];
 
     // 昇級年度の計算 (hireDate, then keys)
-    const hireYear = emp.hireDate ? String(emp.hireDate).substring(0,4) : '';
-    let hireStr = hireYear;
+    let hireStr = '';
     if (emp.hireDate) {
       hireStr = formatDateForDisplay(emp.hireDate);
+      const y = parseInt(String(emp.hireDate).split('-')[0], 10);
+      if (emp.birthDate && !isNaN(y)) {
+         const ag = calculateAge(emp.birthDate, y);
+         if (ag) hireStr += `(${ag}歳)`;
+      }
     }
     vals.push(hireStr);
 
@@ -1113,14 +1128,10 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       
       if (cellVal) {
         cellStr += formatDateForDisplayLocal(cellVal);
-        const suffix = getEraSuffixForDate(cellVal);
-        if (suffix) {
-          cellStr += `(${suffix})`;
-        }
         const y = parseInt(String(cellVal).split('-')[0], 10);
         if (emp.birthDate && !isNaN(y)) {
            const ag = calculateAge(emp.birthDate, y);
-           if (ag) cellStr += `${ag}歳`;
+           if (ag) cellStr += `(${ag}歳)`;
         }
       }
       vals.push(cellStr);
@@ -1138,7 +1149,12 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       }
       finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
     }
-    vals.push(`> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`);
+    let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+    if (finalDiff !== null && emp.birthDate) {
+      const ag = calculateAge(emp.birthDate, targetYear);
+      if (ag) nYearStr += `(${ag}歳)`;
+    }
+    vals.push(nYearStr);
 
     // 履歴
     const promoYearMap = {};
