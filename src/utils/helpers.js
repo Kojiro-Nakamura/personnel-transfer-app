@@ -586,7 +586,11 @@ export const calculateServiceYears = (promoDateStr, targetYearOrDate, isOrdinal 
   const msPerYear = 1000 * 60 * 60 * 24 * 365.25;
   const yearsPassed = diffTime / msPerYear;
   
-  const finalYears = isOrdinal ? yearsPassed + 1 : yearsPassed;
+  const isApril1st = promoDate.getMonth() === 3 && promoDate.getDate() === 1;
+  
+  // If isOrdinal is true AND it's an April 1st promotion, use inclusive (+1).
+  // Otherwise, if it's not April 1st, we want the exact duration without +1.
+  const finalYears = (isOrdinal && isApril1st) ? yearsPassed + 1 : yearsPassed;
   const formatted = finalYears.toFixed(2);
   return parseFloat(formatted).toString();
 };

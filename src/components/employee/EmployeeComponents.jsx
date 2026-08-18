@@ -44,9 +44,28 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   }
   
   const ys = isNext ? emp.nextYears : emp.currentYears; 
+  const ysFormatted = ys ? formatServiceYearsText(ys) : '';
   const sk = (isNext ? emp.nextSkills : emp.currentSkills || []).join('、'); 
-  const yd = sk ? `${ys}年(${sk})` : `${ys}年`;
   const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
+  
+  const grade = isNext ? emp.nextGrade : emp.currentGrade;
+  const pKey = GRADE_TO_PROMO_KEY[grade];
+  const promoDateStr = (pKey && emp[pKey]) ? emp[pKey] : null;
+
+  let promoDetails = '';
+  if (promoDateStr) {
+    const pYear = parseInt(promoDateStr.substring(0, 4));
+    const era = getEraSuffix(pYear);
+    const pAge = calculateAge(emp.birthDate, pYear);
+    const ageStr = pAge !== null && !isNaN(pAge) ? `${pAge}歳` : '';
+    promoDetails = `> ${promoDateStr}(${era})${ageStr}`;
+  }
+
+  let yd = sk ? `${ysFormatted}(${sk})` : ysFormatted;
+  if (promoDetails) {
+    yd += ` ${promoDetails}`;
+  }
+
   const showUnassign = emp && emp.departmentId !== 'unassigned';
   const noteText = isNext ? emp.nextEmploymentType : emp.currentEmploymentType;
 
@@ -108,7 +127,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       
       <div className={cx("w-10 text-[12px] text-right shrink-0 font-bold [-webkit-text-stroke:_0.3px_black]", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
-      <div className={cx("w-20 text-[12px] text-right font-bold truncate shrink-0 text-black [-webkit-text-stroke:_0.3px_black]", ys >= 3 ? "bg-rose-300 px-1 rounded" : "")} title={yd}>
+      <div className={cx("w-[160px] text-[10px] text-left font-bold truncate shrink-0 text-black [-webkit-text-stroke:_0.3px_black]", ys >= 3 ? "bg-rose-300 px-1 rounded" : "px-1")} title={yd}>
         {yd}
       </div>
       
