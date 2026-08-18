@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Printer, AlertCircle, TrendingUp } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
@@ -98,6 +98,16 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     if (!isOpen) return null;
     return analyzeChainTransfers(employees, departments, targetYear);
   }, [isOpen, employees, departments, targetYear]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !data) return null;
 

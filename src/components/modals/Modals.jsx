@@ -17,6 +17,13 @@ import { EmployeeFormSection, EmployeeRow, EmployeeCell } from '../employee/Empl
 export const NoteEditModal = ({ isOpen, onClose, onSave, data }) => {
   const [text, setText] = useState('');
   useEffect(() => { if (isOpen) setText(data?.text || ''); }, [isOpen, data]);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
@@ -75,6 +82,14 @@ export const EmployeeSelectModal = ({ isOpen, onClose, onSelect, targetPlacement
       setFilterType('unassigned');
     }
   }, [isOpen]);
+  
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !targetPlacement) return null;
 
