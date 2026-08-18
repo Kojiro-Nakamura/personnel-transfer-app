@@ -1335,7 +1335,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
 export const exportListToExcel = async (fileName, targetYear, employees, departments) => {
   const workbook = new ExcelJS.Workbook();
-  addListSheet(workbook, 'つなぎ表', fileName, targetYear, employees, departments);
+  addListSheet(workbook, '職員一覧', fileName, targetYear, employees, departments);
   await saveWorkbook(workbook, fileName);
 };
 
