@@ -30,7 +30,18 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
   };
 
   const formatWithEra = (dateStr) => {
-    return formatPromoDateWithEra(dateStr);
+    if (!dateStr) return '';
+    const match = String(dateStr).match(/^(\d{4})[-/]/);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      let era = '';
+      if (year >= 2019) era = `(R${year - 2018})`;
+      else if (year >= 1989) era = `(H${year - 1988})`;
+      else if (year >= 1926) era = `(S${year - 1925})`;
+      else if (year >= 1912) era = `(T${year - 1911})`;
+      return era ? `${dateStr}${era}` : String(dateStr);
+    }
+    return String(dateStr);
   };
 
   const gradeToPromoKey = {
