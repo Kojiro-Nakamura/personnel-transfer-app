@@ -527,7 +527,13 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     exportPlanToExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
 
-  return { exportToJSON, exportToHTML, exportToExcel };
+  const exportUnifiedExcelBtn = useCallback((fileName, showCount = true) => {
+    import('../utils/exportExcel.js').then(({ exportUnifiedExcel }) => {
+      exportUnifiedExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount);
+    });
+  }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes]);
+
+  return { exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn };
 }
 
 // ==========================================

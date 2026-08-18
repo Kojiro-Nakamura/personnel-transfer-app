@@ -27,7 +27,7 @@ export const AppContent = () => {
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
     undo, redo, canUndo, canRedo, handleRollOver, activePlanId, plans, openModal, mutations, modals, closeModal, 
     targetYear, setTargetYear, switchPlan, duplicatePlan, deletePlan, updatePlanName, expandAll, collapseAll, 
-    exportToJSON, exportToHTML, exportToExcel, loadJSON, handleCellClick, handleAssign 
+    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, loadJSON, handleCellClick, handleAssign 
   } = useApp();
   
   const [isDragging, setIsDragging] = useState(false);
@@ -126,7 +126,7 @@ export const AppContent = () => {
                   openModal('validation');
                 }
             }} className="bg-yellow-500/30 hover:bg-yellow-500/50 border border-yellow-300 text-yellow-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="職員データの矛盾（昇進年度や経過年数など）をチェックする"><AlertTriangle className="w-4 h-4 mr-1" />矛盾チェック</button>
-            <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }], showCountToggle: true, defaultShowCount: true })} className="bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
+            <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }], showCountToggle: true, defaultShowCount: true })} className="bg-emerald-500/30 hover:emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
             <button onClick={() => openModal('saveFile', { type: 'list', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_職員一覧' : baseFileName + '_職員一覧', options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }] })} className="bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の職員一覧をファイルとして保存する"><FileCode className="w-4 h-4 mr-1" />職員一覧</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <label className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded cursor-pointer flex items-center justify-center text-xs font-bold shadow-sm" title="保存したJSONファイルを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く<input type="file" accept=".json" onChange={loadJSON} className="hidden" /></label>
@@ -311,19 +311,19 @@ export const AppContent = () => {
       
       {modals.chainTransfer.isOpen && (
         <NewWindowPortal title={`玉突き異動表（つなぎ表）`} onClose={() => closeModal('chainTransfer')}>
-          <ChainTransferModal 
-            isOpen={true} 
-            onClose={() => closeModal('chainTransfer')} 
-            employees={employees} 
-            departments={departments} 
-            targetYear={targetYear} 
-            currentFileName={currentFileName} 
-            notes={history.notes} 
-            onExportExcel={() => exportUnifiedExcel(
-              currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_統合版.xlsx' : '人事異動案_統合版.xlsx', 
-              targetYear, departments, deptMap, currMap, nextMap, employees, history.notes, true
-            )} 
-          />
+            <ChainTransferModal 
+              isOpen={true} 
+              onClose={() => closeModal('chainTransfer')} 
+              employees={employees} 
+              departments={departments} 
+              targetYear={targetYear} 
+              currentFileName={currentFileName} 
+              notes={notes || []} 
+              onExportExcel={() => exportUnifiedExcelBtn(
+                currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_統合版.xlsx' : '人事異動案_統合版.xlsx', 
+                true
+              )} 
+            />
         </NewWindowPortal>
       )}
 
