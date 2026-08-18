@@ -63,7 +63,7 @@ const sortData = (rows, sortKey, sortOrder) => {
 };
 
 export const ChainTransferModal = ({ isOpen, onClose, employees, departments, targetYear, currentFileName, notes = [], onExportExcel }) => {
-  const [currentTab, setCurrentTab] = useState('chain');
+  const [currentTab, setCurrentTab] = useState('designated');
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [chainSortOrder, setChainSortOrder] = useState(null);
@@ -120,10 +120,10 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   const tabs = [
-    { id: 'chain', icon: <GitMerge className="w-4 h-4" />, label: 'つなぎ表' },
+    { id: 'designated', icon: <Award className="w-4 h-4" />, label: '指定職人事異動' },
     { id: 'list', icon: <List className="w-4 h-4" />, label: '異動案リスト' },
     { id: 'reason', icon: <Calculator className="w-4 h-4" />, label: '増減理由' },
-    { id: 'designated', icon: <Award className="w-4 h-4" />, label: '指定職人事異動' }
+    { id: 'chain', icon: <GitMerge className="w-4 h-4" />, label: 'つなぎ表' }
   ];
 
   const hasSort = (currentTab === 'chain' && !!chainSortOrder) || 
