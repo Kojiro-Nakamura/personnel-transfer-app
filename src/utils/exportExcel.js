@@ -492,7 +492,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
           }
           
           if (prevDate) {
-             const diffStr = calculateServiceYears(prevDate, cellVal);
+             const diffStr = calculateServiceYears(prevDate, cellVal, true);
              if (diffStr !== '') {
                pStr = `${formatServiceYearsText(diffStr)}> ${pStr}`;
              } else {
@@ -1135,7 +1135,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
         if (pVal) { prevDate = pVal; break; }
       }
       
-      const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
+      const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal, true) : null;
       
       let cellStr = '';
       if (diff !== null) cellStr += `${formatServiceYearsText(diff)}> `;
@@ -1162,7 +1162,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
         const val = pKeys[i] === 'hireDate' ? emp.hireDate : (emp[pKeys[i]] || '');
         if (val) { prevDate = val; break; }
       }
-      finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
+      finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear, true) : null;
     }
     let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
     if (finalDiff !== null && emp.birthDate) {

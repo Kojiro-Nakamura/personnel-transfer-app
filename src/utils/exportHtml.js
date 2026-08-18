@@ -482,7 +482,7 @@ ${summaryHtml}
         
         let cellHtml = '';
         if (cellVal) {
-          const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal) : null;
+          const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal, true) : null;
           if (diff !== null) {
             cellHtml += `<span style="font-size: 10px; color: #1e293b; font-weight: bold; margin-right: 2px;">${formatServiceYearsText(diff)}></span>`;
           } else {
@@ -517,7 +517,7 @@ ${summaryHtml}
             const val = pKeys[i] === 'hireDate' ? emp.hireDate : (emp[pKeys[i]] || '');
             if (val) { prevDate = val; break; }
           }
-          diff = prevDate ? calculateServiceYears(prevDate, targetYear) : null;
+          diff = prevDate ? calculateServiceYears(prevDate, targetYear, true) : null;
         }
         
         let cellHtml = '';
