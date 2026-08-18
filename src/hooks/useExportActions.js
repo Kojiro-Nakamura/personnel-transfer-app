@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
-import { exportPlanToExcel } from '../utils/exportExcel.js';
+import { exportPlanToExcel, exportUnifiedExcel } from '../utils/exportExcel.js';
 
 export function useExportActions({ targetYear, activePlanId, plans, employees, departments, notes, filterLevel, deptMap, currMap, nextMap, setCurrentFileName }) {
   const exportToJSON = useCallback((fileName) => {
@@ -528,9 +528,16 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
 
   const exportUnifiedExcelBtn = useCallback((fileName, showCount = true) => {
-    import('../utils/exportExcel.js').then(({ exportUnifiedExcel }) => {
-      exportUnifiedExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount);
-    });
+    try {
+      exportUnifiedExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount)
+        .catch(err => {
+          console.error("Excel Export Async Error:", err);
+          alert("エクセル出力中にエラーが発生しました。\n" + err.message);
+        });
+    } catch(err) {
+      console.error("Excel Export Sync Error:", err);
+      alert("エクセル出力処理の開始に失敗しました。\n" + err.message);
+    }
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes]);
 
   return { exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn };
