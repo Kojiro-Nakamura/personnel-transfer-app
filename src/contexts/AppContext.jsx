@@ -405,7 +405,8 @@ export function AppProvider({ children }) {
     mutations,
     exportToJSON: exports.exportToJSON,
     exportToHTML: exports.exportToHTML,
-    exportToExcel: exports.exportToExcel
+    exportToExcel: exports.exportToExcel,
+    exportUnifiedExcelBtn: exports.exportUnifiedExcelBtn
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

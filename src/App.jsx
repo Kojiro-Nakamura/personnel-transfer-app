@@ -318,13 +318,10 @@ export const AppContent = () => {
           targetYear={targetYear} 
           currentFileName={currentFileName} 
           notes={notes || []} 
-          onExportExcel={() => {
-            alert('エクセル出力ボタンがクリックされました。');
-            exportUnifiedExcelBtn(
-              currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_統合版.xlsx' : '人事異動案_統合版.xlsx', 
-              true
-            );
-          }} 
+          onExportExcel={() => exportUnifiedExcelBtn(
+            currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_統合版.xlsx' : '人事異動案_統合版.xlsx', 
+            true
+          )} 
         />
       )}
 
