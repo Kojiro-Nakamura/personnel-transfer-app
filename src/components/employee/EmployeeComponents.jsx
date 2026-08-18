@@ -552,7 +552,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       
       let diffStr = null;
       if (currentY && prevY) {
-        diffStr = calculateServiceYears(prevY, currentY, false);
+        diffStr = calculateServiceYears(prevY, currentY, true);
       }
 
       return (
