@@ -665,3 +665,26 @@ export const getEmpCurrentYears = (emp, targetYear, isNext = false) => {
   }
   return calculatedYears;
 };
+
+export const getFormattedNameForPlan = (emp, isNext = false) => {
+  if (!emp) return '';
+  const note = emp.note || '';
+  
+  if (note.includes('再任用')) {
+    if (note.includes('時短')) return `再短 ${emp.name}`;
+    return `再フル ${emp.name}`;
+  }
+  if (note.includes('臨任')) return `臨任 ${emp.name}`;
+  if (isNext && (!emp.currentTitle || emp.currentDeptId === 'unassigned' || !emp.currentDeptId)) {
+    return `新採 ${emp.name}`;
+  }
+  return emp.name;
+};
+
+export const shouldOmitEmployeeNumber = (emp, isNext = false) => {
+  if (!emp) return false;
+  const note = emp.note || '';
+  if (note.includes('再任用') || note.includes('臨任')) return true;
+  if (isNext && (!emp.currentTitle || emp.currentDeptId === 'unassigned' || !emp.currentDeptId)) return true;
+  return false;
+};

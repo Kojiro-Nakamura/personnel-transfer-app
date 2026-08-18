@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber } from './helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
@@ -400,13 +400,13 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     const rowVals = [
       displayDeptStr, displayGroupStr, displayPost,
       currEmp ? currEmp.currentTitle : '',
-      currEmp ? currEmp.name : '',
+      currEmp ? getFormattedNameForPlan(currEmp, false) : '',
       currEmp ? currEmp.currentGrade : '',
       getAgeStr(currEmp, false),
       getYearsStr(currEmp, false),
       getNoteStr(currEmp, false),
       nextEmp ? nextEmp.nextTitle : '',
-      nextEmp ? nextEmp.name : '',
+      nextEmp ? getFormattedNameForPlan(nextEmp, true) : '',
       nextEmp ? nextEmp.nextGrade : '',
       getAgeStr(nextEmp, true),
       getYearsStr(nextEmp, true),
@@ -418,10 +418,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
     let curFontStyles = {};
     if (extEmp) {
       rowVals.push(''); // Blank spacer Q
-      rowVals.push(extEmp.name || '');
+      rowVals.push(getFormattedNameForPlan(extEmp, true));
       rowVals.push(getAgeStr(extEmp, false));
       rowVals.push(extEmp.furigana || '');
-      rowVals.push(extEmp.employeeNumber || '');
+      rowVals.push(shouldOmitEmployeeNumber(extEmp, true) ? '' : (extEmp.employeeNumber || ''));
       rowVals.push(extEmp.gender || '');
       rowVals.push(formatWithEra(extEmp.birthDate));
       rowVals.push(extEmp.education || '');
