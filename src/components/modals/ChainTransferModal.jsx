@@ -124,6 +124,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     { id: 'list', icon: <List className="w-4 h-4" />, label: '異動案リスト' },
     { id: 'reason', icon: <Calculator className="w-4 h-4" />, label: '増減理由' },
     { id: 'short_tenure', icon: <AlertCircle className="w-4 h-4" />, label: '3年未満特記' },
+    { id: 'long_tenure', icon: <AlertCircle className="w-4 h-4" />, label: '6年以上特記' },
     { id: 'chain', icon: <GitMerge className="w-4 h-4" />, label: 'つなぎ表' }
   ];
 
@@ -754,6 +755,80 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       </div>
     );
   };
+  const renderLongTenureTable = () => {
+    let longRows = [];
+    
+    employees.forEach(emp => {
+      // 留任（現在の配置と同じ）かどうかを判定。異動や退職の人は除く。
+      const currentPostStr = (emp.currentDept || '') + ' ' + (emp.currentTitle || '');
+      const nextPostStr = (emp.nextDept || '') + ' ' + (emp.nextTitle || '');
+      
+      const isRetained = currentPostStr === nextPostStr;
+      if (!isRetained) return; // 留任でない人は除外
+      
+      // 臨任や退職を除外
+      if (emp.note && String(emp.note).includes('臨任')) return;
+      if (emp.nextDept === '退職' || emp.currentDept === '退職') return;
+      
+      const currentYearsStr = getEmpCurrentYears(emp, targetYear - 1, false);
+      const currentYears = Number(currentYearsStr);
+      
+      // R8年度に6年以上となる -> 現在（R7末）で5年以上
+      if (currentYears >= 5 && !isNaN(currentYears)) {
+        longRows.push({
+          name: emp.name || '',
+          post: currentPostStr,
+          years: currentYears + 1
+        });
+      }
+    });
+
+    // 部署でソート、または元の並び順を利用
+    longRows.sort((a, b) => a.post.localeCompare(b.post));
+
+    return (
+      <div className="overflow-auto max-h-[75vh] w-full text-sm">
+        <div className="mb-4 text-gray-700 max-w-[1000px] mx-auto">
+          <div className="flex justify-between items-end mb-1">
+            <p className="font-bold text-lg">〇所属年数6年以上となる職員の特記理由</p>
+            <p className="text-xs">令和{targetYear - 2018}年2月5日</p>
+          </div>
+          <p className="text-xs font-bold mb-2">※対象は、R{targetYear - 2018}年度に所属年数6年以上となる職員</p>
+          <div className="flex justify-end text-xs mt-2">
+            <p>職種（　　　　） 担当者所属・氏名（　　　　　　　　　　　　　　）</p>
+          </div>
+        </div>
+        <div className="max-w-[1000px] mx-auto border-2 border-black">
+          <table className="w-full text-left border-collapse bg-white">
+            <thead className="sticky top-0 z-10 whitespace-nowrap">
+              <tr>
+                <th className="border border-black p-2 font-bold w-[15%] text-center bg-white shadow-sm">氏名</th>
+                <th className="border border-black p-2 font-bold w-[30%] text-center bg-white shadow-sm">所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[50%] text-center bg-white shadow-sm">特記事項</th>
+                <th className="border border-black p-2 font-bold w-[5%] text-center bg-white shadow-sm">年数</th>
+              </tr>
+            </thead>
+            <tbody>
+              {longRows.map((row, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 border-b border-black">
+                  <td className="border-r border-black p-2 text-center align-top">{row.name}</td>
+                  <td className="border-r border-black p-2 align-top">{row.post}</td>
+                  <td className="border-r border-black p-2 bg-yellow-50/20 align-top text-xs min-h-[4rem]"></td>
+                  <td className="border-r border-black p-2 text-center align-top">{row.years}</td>
+                </tr>
+              ))}
+              {longRows.length === 0 && (
+                <tr><td colSpan="4" className="text-center p-8 text-gray-500">6年以上の対象者はいません</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 text-xs text-gray-600 space-y-1 max-w-[1000px] mx-auto">
+          <p>※ 特記事項については、適宜ご記入ください。</p>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
@@ -811,6 +886,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         {currentTab === 'list' && renderListTable()}
         {currentTab === 'reason' && renderReasonTable()}
         {currentTab === 'short_tenure' && renderShortTenureTable()}
+        {currentTab === 'long_tenure' && renderLongTenureTable()}
         {currentTab === 'designated' && renderDesignatedTable()}
       </main>
 
