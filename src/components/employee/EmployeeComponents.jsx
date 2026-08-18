@@ -424,6 +424,14 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     } 
   }, [isOpen, initialData]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const isPromoted = isPromotedGrade(fd.currentGrade, fd.nextGrade);
   const promoBg = isPromoted ? getPromotedBgClass(fd.nextGrade) : "";
   const activePromoKey = isPromoted ? GRADE_TO_PROMO_KEY[fd.nextGrade] : null;

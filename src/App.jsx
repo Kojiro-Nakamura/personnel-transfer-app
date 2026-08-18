@@ -70,6 +70,16 @@ export const AppContent = () => {
     document.documentElement.lang = "ja"; 
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && selectedEmp) {
+        cancelSelection();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedEmp, cancelSelection]);
+
   const baseFileName = useMemo(() => { 
     const d = new Date(); 
     return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${getEraFormattedYear(targetYear)}人事異動案_ver1`; 
