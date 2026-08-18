@@ -528,6 +528,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
 
   const exportUnifiedExcelBtn = useCallback((fileName, showCount = true) => {
+    alert("エクセル出力処理を開始します...");
     try {
       exportUnifiedExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount)
         .catch(err => {
