@@ -823,6 +823,10 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   
   const formatWithEra = (dateStr, birthDateStr = null) => {
     if (!dateStr) return '';
+    let cleanStr = String(dateStr);
+    if (cleanStr.endsWith('-04-01')) {
+      cleanStr = cleanStr.substring(0, 4);
+    }
     const match = String(dateStr).match(/^(\d{4})[-/]/);
     if (match) {
       const year = parseInt(match[1], 10);
@@ -832,7 +836,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       else if (year >= 1926) era = `(S${year - 1925})`;
       else if (year >= 1912) era = `(T${year - 1911})`;
       
-      let result = era ? `${dateStr}${era}` : String(dateStr);
+      let result = era ? `${cleanStr}${era}` : cleanStr;
       if (birthDateStr) {
          const ag = calculateAge(birthDateStr, year);
          if (ag) result += `(${ag}歳)`;
