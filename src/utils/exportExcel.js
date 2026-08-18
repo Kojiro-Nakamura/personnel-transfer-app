@@ -24,7 +24,7 @@ const getCellBorders = (top = false, bottom = false, left = false, right = false
   return b;
 };
 
-const saveWorkbook = async (workbook, fileName) => {
+export const saveWorkbook = async (workbook, fileName) => {
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = URL.createObjectURL(blob);

@@ -27,7 +27,7 @@ export const AppContent = () => {
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
     undo, redo, canUndo, canRedo, handleRollOver, activePlanId, plans, openModal, mutations, modals, closeModal, 
     targetYear, setTargetYear, switchPlan, duplicatePlan, deletePlan, updatePlanName, expandAll, collapseAll, 
-    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, loadJSON, handleCellClick, handleAssign, notes 
+    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn, loadJSON, handleCellClick, handleAssign, notes 
   } = useApp();
   
   const [isDragging, setIsDragging] = useState(false);
@@ -318,9 +318,8 @@ export const AppContent = () => {
           targetYear={targetYear} 
           currentFileName={currentFileName} 
           notes={notes || []} 
-          onExportExcel={() => exportUnifiedExcelBtn(
-            currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_統合版.xlsx' : '人事異動案_統合版.xlsx', 
-            true
+          onExportExcel={() => exportModalExcelBtn(
+            currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_つなぎ表.xlsx' : '人事異動案_つなぎ表.xlsx'
           )} 
         />
       )}

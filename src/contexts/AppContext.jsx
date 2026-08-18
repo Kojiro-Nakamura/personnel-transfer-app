@@ -406,7 +406,8 @@ export function AppProvider({ children }) {
     exportToJSON: exports.exportToJSON,
     exportToHTML: exports.exportToHTML,
     exportToExcel: exports.exportToExcel,
-    exportUnifiedExcelBtn: exports.exportUnifiedExcelBtn
+    exportUnifiedExcelBtn: exports.exportUnifiedExcelBtn,
+    exportModalExcelBtn: exports.exportModalExcelBtn
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

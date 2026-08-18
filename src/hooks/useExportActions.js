@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 import { exportPlanToExcel, exportUnifiedExcel } from '../utils/exportExcel.js';
+import { exportModalExcel } from '../utils/exportModalExcel.js';
 
 export function useExportActions({ targetYear, activePlanId, plans, employees, departments, notes, filterLevel, deptMap, currMap, nextMap, setCurrentFileName }) {
   const exportToJSON = useCallback((fileName) => {
@@ -536,11 +537,24 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
         });
     } catch(err) {
       console.error("Excel Export Sync Error:", err);
-      alert("エクセル出力処理の開始に失敗しました。\n" + err.message);
+      alert("エクセル出力中にエラーが発生しました。\n" + err.message);
     }
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes]);
 
-  return { exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn };
+  const exportModalExcelBtn = useCallback((fileName) => {
+    try {
+      exportModalExcel(fileName, targetYear, employees, departments, notes)
+        .catch(err => {
+          console.error("Modal Excel Export Async Error:", err);
+          alert("モーダルエクセル出力中にエラーが発生しました。\n" + err.message);
+        });
+    } catch(err) {
+      console.error("Modal Excel Export Sync Error:", err);
+      alert("モーダルエクセル出力中にエラーが発生しました。\n" + err.message);
+    }
+  }, [targetYear, employees, departments, notes]);
+
+  return { exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn };
 }
 
 // ==========================================
