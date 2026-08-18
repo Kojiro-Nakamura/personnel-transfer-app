@@ -1,4 +1,5 @@
-﻿export const addReasonSheet = (workbook, sheetName, targetYear, departments, deptMap, currMap, nextMap, employees, notes) => {
+export const addReasonSheet = (workbook, sheetName, targetYear, departments, deptMap, currMap, nextMap, employees, notes) => {
+  notes = notes || [];
   const ws = workbook.addWorksheet(sheetName, {
     views: [{ showGridLines: true }],
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
@@ -162,5 +163,4 @@
   ws.addRow(['★', '再任用(フル)、副主任、一般任期付職員(ポスト職のみ)、国からの割愛派遣職員は含み、再任用(短)、臨時的任用職員、育休代替職員等は含みません。']);
   const noteRow = ws.addRow(['', '異動案リストでは再任用職員を含めませんが、本様式では再任用(フルのみ)を含みますのでご注意ください。']);
   noteRow.getCell(2).font = { color: { argb: 'FFFF0000' } }; // Red font
-
 };
