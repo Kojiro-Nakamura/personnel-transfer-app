@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber } from './helpers.js';
+import { addReasonSheet } from './exportReasonSheet.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
@@ -37,7 +38,7 @@ const saveWorkbook = async (workbook, fileName) => {
 };
 
 // --- 人事異動案（Excel）出力 ---
-export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
+export const exportPlanToExcel = async (workbook, sheetName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const allHistoryYears = new Set();
   allHistoryYears.add(targetYear);
   employees.forEach(e => {
@@ -77,8 +78,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const getFastBgColorCode = () => '#fecaca'; // rose-200
 
 
-  const workbook = new ExcelJS.Workbook();
-  const ws = workbook.addWorksheet('人事異動案', {
+  const ws = workbook.addWorksheet(sheetName, {
     views: [{ state: 'frozen', xSplit: 0, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }],
     pageSetup: { paperSize: 8, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.984, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
@@ -785,12 +785,10 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
        }
     }
   });
-
-  await saveWorkbook(workbook, fileName);
 };
 
 // --- 職員一覧（Excel）出力 ---
-export const exportListToExcel = async (fileName, targetYear, employees, departments) => {
+export const exportListToExcel = async (workbook, sheetName, targetYear, employees, departments) => {
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const targetEraShort = getEraFormattedYear(targetYear).split('(')[1].replace(')', '');
   const yearsSet = new Set();
@@ -865,8 +863,7 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
   const listDefaultFont = { name: 'BIZ UDPGothic', size: 8 };
   const listHeaderFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
 
-  const workbook = new ExcelJS.Workbook();
-  const ws = workbook.addWorksheet('職員一覧', {
+  const ws = workbook.addWorksheet(sheetName, {
     views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }], // 氏名・年齢まで固定
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
@@ -1328,6 +1325,22 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
        col.width = maxLength + padding;
     }
   });
+};
 
+export const exportUnifiedExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount = true) => {
+  const workbook = new ExcelJS.Workbook();
+  
+  // 1. 指定職人事異動 (filterLevel = 9)
+  await exportPlanToExcel(workbook, '指定職人事異動', targetYear, departments, deptMap, currMap, nextMap, employees, notes, 9, showCount);
+  
+  // 2. 異動案リスト (filterLevel = 0)
+  await exportPlanToExcel(workbook, '異動案リスト', targetYear, departments, deptMap, currMap, nextMap, employees, notes, 0, showCount);
+  
+  // 3. 増減理由
+  addReasonSheet(workbook, '増減理由', targetYear, departments, deptMap, currMap, nextMap, employees, notes);
+  
+  // 4. つなぎ表 (職員一覧)
+  await exportListToExcel(workbook, 'つなぎ表', targetYear, employees, departments);
+  
   await saveWorkbook(workbook, fileName);
 };

@@ -6,7 +6,6 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
-import { exportListToExcel } from './utils/exportExcel.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
@@ -302,7 +301,7 @@ export const AppContent = () => {
             else exportToHTML(fileName, showCount); 
           } 
           else if (modals.saveFile.data.type === 'list') { 
-            if (format === 'excel') exportListToExcel(fileName, targetYear, employees, departments); 
+            if (format === 'excel') exportToExcel(fileName, showCount); 
             else generateAndDownloadHTML(employees, departments, targetYear, fileName); 
           } 
         }} 

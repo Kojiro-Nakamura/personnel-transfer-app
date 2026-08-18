@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
-import { exportPlanToExcel } from '../utils/exportExcel.js';
+import { exportUnifiedExcel } from '../utils/exportExcel.js';
 
 export function useExportActions({ targetYear, activePlanId, plans, employees, departments, notes, filterLevel, deptMap, currMap, nextMap, setCurrentFileName }) {
   const exportToJSON = useCallback((fileName) => {
@@ -524,8 +524,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
   }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
 
   const exportToExcel = useCallback((fileName, showCount = true) => {
-    exportPlanToExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
-  }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel]);
+    exportUnifiedExcel(fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, showCount);
+  }, [targetYear, departments, deptMap, currMap, nextMap, employees, notes]);
 
   return { exportToJSON, exportToHTML, exportToExcel };
 }
