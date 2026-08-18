@@ -524,7 +524,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
         }
         finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
       }
-      let nYearStr = `> ${finalDiff !== null ? finalDiff : ''}`;
+      let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
       if (finalDiff !== null && extEmp.birthDate) {
         const ag = calculateAge(extEmp.birthDate, targetYear);
         if (ag) nYearStr += `(${ag}歳)`;
