@@ -564,7 +564,7 @@ export const getEraSuffix = (year) => {
   return '';
 };
 
-export const calculateServiceYears = (promoDateStr, targetYearOrDate) => {
+export const calculateServiceYears = (promoDateStr, targetYearOrDate, isOrdinal = false) => {
   if (!promoDateStr || !targetYearOrDate) return '';
   const cleanPromoStr = parsePromoDate(promoDateStr);
 
@@ -586,7 +586,8 @@ export const calculateServiceYears = (promoDateStr, targetYearOrDate) => {
   const msPerYear = 1000 * 60 * 60 * 24 * 365.25;
   const yearsPassed = diffTime / msPerYear;
   
-  const formatted = yearsPassed.toFixed(2);
+  const finalYears = isOrdinal ? yearsPassed + 1 : yearsPassed;
+  const formatted = finalYears.toFixed(2);
   return parseFloat(formatted).toString();
 };
 
@@ -654,7 +655,7 @@ export const getEmpCurrentYears = (emp, targetYear, isNext = false) => {
   const pKey = GRADE_TO_PROMO_KEY[grade];
   let calculatedYears = '';
   if (pKey && emp[pKey]) {
-    const sYears = calculateServiceYears(emp[pKey], targetYear);
+    const sYears = calculateServiceYears(emp[pKey], targetYear, true);
     if (sYears) calculatedYears = sYears;
   }
   if (!calculatedYears) {

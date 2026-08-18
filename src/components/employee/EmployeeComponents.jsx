@@ -536,6 +536,14 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     if (currentIdx <= lastFilledIdx) {
       // Normal arrow between filled
       const currentY = pKeys[currentIdx] === 'hire' ? fd.hireDate : fd[pKeys[currentIdx]];
+      if (!currentY) {
+        return (
+          <div className="flex flex-col items-center justify-end h-full pb-1">
+            <ChevronRight className="w-4 h-4 text-slate-300 mb-1" />
+          </div>
+        );
+      }
+
       let prevY = '';
       for (let i = currentIdx - 1; i >= 0; i--) {
         const y = pKeys[i] === 'hire' ? fd.hireDate : fd[pKeys[i]];
@@ -544,12 +552,12 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       
       let diffStr = null;
       if (currentY && prevY) {
-        diffStr = calculateServiceYears(prevY, currentY);
+        diffStr = calculateServiceYears(prevY, currentY, false);
       }
 
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
-          <span className={cx("text-[10px] font-bold text-emerald-600 px-1 rounded mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-emerald-50")}>{diffStr ? diffStr : 1}年目</span>
+          <span className={cx("text-[10px] font-bold text-emerald-600 px-1 rounded mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-emerald-50")}>{diffStr ? formatServiceYearsText(diffStr) : '1年目'}</span>
           <ChevronRight className="w-4 h-4 text-emerald-500" />
         </div>
       );
@@ -558,13 +566,13 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       const lastY = pKeys[lastFilledIdx] === 'hire' ? fd.hireDate : fd[pKeys[lastFilledIdx]];
       let diffStr = null;
       if (lastY) {
-        diffStr = calculateServiceYears(lastY, targetYear);
+        diffStr = calculateServiceYears(lastY, targetYear, true);
       }
 
       return (
         <div className="flex flex-col items-center justify-end h-full pb-1">
           <span className="text-[9px] font-bold text-blue-600 leading-tight whitespace-nowrap">来年度</span>
-          <span className={cx("text-[10px] font-bold text-blue-700 px-1 rounded border border-blue-200 mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-blue-100")}>{diffStr ? diffStr : 0}年目</span>
+          <span className={cx("text-[10px] font-bold text-blue-700 px-1 rounded border border-blue-200 mb-0.5 whitespace-nowrap", currentKey === activePromoKey && promoBg ? promoBg : "bg-blue-100")}>{diffStr ? formatServiceYearsText(diffStr) : '1年目'}</span>
           <ChevronRight className="w-4 h-4 text-blue-500" />
         </div>
       );
