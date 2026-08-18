@@ -309,8 +309,8 @@ export const AppContent = () => {
       <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} departments={departments} targetYear={targetYear} onEmpClick={(empId) => { const emp = employees.find(e => e.id === empId); if (emp) openModal('emp', emp); }} onAutoFix={(newEmps) => mutations.updateAllEmployees(newEmps)} />
       
       {modals.chainTransfer.isOpen && (
-        <NewWindowPortal title="玉突き異動表（つなぎ表）" onClose={() => closeModal('chainTransfer')}>
-          <ChainTransferModal isOpen={true} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} currentFileName={currentFileName} />
+        <NewWindowPortal title={`玉突き異動表（つなぎ表）`} onClose={() => closeModal('chainTransfer')}>
+          <ChainTransferModal isOpen={true} onClose={() => closeModal('chainTransfer')} employees={employees} departments={departments} targetYear={targetYear} currentFileName={currentFileName} notes={history.notes} onExportExcel={() => exports.exportToExcel()} />
         </NewWindowPortal>
       )}
 

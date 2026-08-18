@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { X, GitMerge, List, Award, RotateCcw, FileSpreadsheet, Printer } from 'lucide-react';
+import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Printer } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
+import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { getEmpCurrentYears } from '../../utils/helpers.js';
 
@@ -61,7 +62,7 @@ const sortData = (rows, sortKey, sortOrder) => {
   });
 };
 
-export const ChainTransferModal = ({ isOpen, onClose, employees, departments, targetYear, currentFileName }) => {
+export const ChainTransferModal = ({ isOpen, onClose, employees, departments, targetYear, currentFileName, notes = [], onExportExcel }) => {
   const [currentTab, setCurrentTab] = useState('chain');
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -121,6 +122,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   const tabs = [
     { id: 'chain', icon: <GitMerge className="w-4 h-4" />, label: 'つなぎ表' },
     { id: 'list', icon: <List className="w-4 h-4" />, label: '異動案リスト' },
+    { id: 'reason', icon: <Calculator className="w-4 h-4" />, label: '増減理由' },
     { id: 'designated', icon: <Award className="w-4 h-4" />, label: '指定職人事異動' }
   ];
 
@@ -419,7 +421,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     
     const getDisplayGrade = (gradeStr) => {
       const g = String(gradeStr || '');
-      if (g.includes('補佐級I(') || g.includes('補佐級Ⅰ') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
+      if (g.includes('補佐級I(') || g.includes('補佐級II') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
       return g;
     };
     
@@ -635,6 +637,56 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     );
   };
 
+  const reasonStats = useMemo(() => {
+    return generateReasonStats(departments, employees, notes);
+  }, [departments, employees, notes]);
+
+  const renderReasonTable = () => {
+    return (
+      <div className="overflow-auto max-h-[75vh] w-full text-sm">
+        <div className="mb-4 text-gray-700">
+          <p className="font-bold mb-1">〇所属毎の増減理由</p>
+          <p className="text-xs">令和{targetYear - 2018}年</p>
+        </div>
+        <table className="w-full text-left border-collapse min-w-[1000px]">
+          <thead className="bg-gray-100 sticky top-0 z-10 whitespace-nowrap shadow-sm text-gray-700">
+            <tr>
+              <th className="border border-gray-300 p-2 font-bold w-[25%] text-center">所属名</th>
+              <th className="border border-gray-300 p-2 font-bold w-[15%] text-center">{targetYear - 1}年度現員数 4/1時点</th>
+              <th className="border border-gray-300 p-2 font-bold w-[15%] text-center">{targetYear}年度 配置予定数</th>
+              <th className="border border-gray-300 p-2 font-bold w-[10%] text-center">増減数</th>
+              <th className="border border-gray-300 p-2 font-bold w-[35%] text-center">増減理由</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white">
+            {reasonStats.map(stat => (
+              <tr key={stat.id} className="hover:bg-gray-50">
+                <td className="border border-gray-300 p-2">{stat.deptName}</td>
+                <td className="border border-gray-300 p-2 text-right">{stat.currCount}</td>
+                <td className="border border-gray-300 p-2 text-right">{stat.nextCount}</td>
+                <td className="border border-gray-300 p-2 text-right">{stat.diff > 0 ? `+${stat.diff}` : stat.diff}</td>
+                <td className="border border-gray-300 p-2 whitespace-pre-line text-[13px]">{stat.reasonText}</td>
+              </tr>
+            ))}
+            <tr className="bg-gray-50 font-bold border-t-2 border-gray-400">
+              <td className="border border-gray-300 p-2 text-center">合　計</td>
+              <td className="border border-gray-300 p-2 text-right">{reasonStats.reduce((sum, s) => sum + s.currCount, 0)}</td>
+              <td className="border border-gray-300 p-2 text-right">{reasonStats.reduce((sum, s) => sum + s.nextCount, 0)}</td>
+              <td className="border border-gray-300 p-2 text-right">{reasonStats.reduce((sum, s) => sum + s.diff, 0) > 0 ? `+${reasonStats.reduce((sum, s) => sum + s.diff, 0)}` : reasonStats.reduce((sum, s) => sum + s.diff, 0)}</td>
+              <td className="border border-gray-300 p-2"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div className="mt-4 text-xs text-gray-600 space-y-1">
+          <p>★ R{targetYear - 1 - 2018}年度またはR{targetYear - 2018}年度に配置されている所属すべてについて記載してください。（増減が無い所属も含みます）</p>
+          <p>★ 増減理由については、相殺せず、増要素と減要素をそれぞれ計上し、個々の理由を詳細に記載して下さい。</p>
+          <p>★ 再任用(フル)、副主任、一般任期付職員(ポスト職のみ)、国からの割愛派遣職員は含み、再任用(短)、臨時的任用職員、育休代替職員等は含みません。</p>
+          <p className="text-red-500 font-bold mt-2">異動案リストでは再任用職員を含めませんが、本様式では再任用(フルのみ)を含みますのでご注意ください。</p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
       {/* Header */}
@@ -647,6 +699,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             </h1>
           </div>
           <div className="flex items-center gap-3 print:hidden">
+            {onExportExcel && (
+              <button onClick={onExportExcel} className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm transition-colors">
+                <FileSpreadsheet className="w-4 h-4" />Excel 出力
+              </button>
+            )}
             <button onClick={handlePrint} className="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm transition-colors">
               <Printer className="w-4 h-4" />印刷 / PDF化
             </button>
@@ -684,6 +741,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         {/* Tab Content */}
         {currentTab === 'chain' && renderChainTable()}
         {currentTab === 'list' && renderListTable()}
+        {currentTab === 'reason' && renderReasonTable()}
         {currentTab === 'designated' && renderDesignatedTable()}
       </main>
 
