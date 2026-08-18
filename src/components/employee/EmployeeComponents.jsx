@@ -745,6 +745,8 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                     cellBg = promoBg;
                   } else if (promoGradeForYear) {
                     cellBg = getPromotedBgClass(promoGradeForYear);
+                  } else if (h.year === getPromoYear(fd.hireDate)) {
+                    cellBg = "bg-slate-200";
                   }
                   
                   const histBorderClass = promoGradeForYear ? `border-2 ${getPromotedBorderClass(promoGradeForYear)}` : "border border-slate-300";
