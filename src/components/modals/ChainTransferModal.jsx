@@ -951,9 +951,9 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <button onClick={handlePrint} className="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm transition-colors">
               <Printer className="w-4 h-4" />印刷 / PDF化
             </button>
-              <button onClick={onClose} className="flex items-center gap-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-1.5 rounded text-sm transition-colors font-bold ml-2">
-                <X className="w-4 h-4" /> 閉じる
-              </button>
+            <button onClick={onClose} className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm transition-colors shadow-sm ml-2">
+              <X className="w-4 h-4" /> 閉じる
+            </button>
           </div>
         </div>
       </header>
