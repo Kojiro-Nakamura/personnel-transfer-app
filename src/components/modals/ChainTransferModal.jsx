@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Printer } from 'lucide-react';
+import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Printer, AlertCircle } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
@@ -123,6 +123,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     { id: 'designated', icon: <Award className="w-4 h-4" />, label: '指定職人事異動' },
     { id: 'list', icon: <List className="w-4 h-4" />, label: '異動案リスト' },
     { id: 'reason', icon: <Calculator className="w-4 h-4" />, label: '増減理由' },
+    { id: 'short_tenure', icon: <AlertCircle className="w-4 h-4" />, label: '3年未満特記' },
     { id: 'chain', icon: <GitMerge className="w-4 h-4" />, label: 'つなぎ表' }
   ];
 
@@ -507,7 +508,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
            succRemark = '昇格';
         }
       }
-      // Removed noteStr from succRemark as requested
 
       let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
 
@@ -539,16 +539,15 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       };
     });
 
-    // Apply default sorting
     desigRows.sort((a, b) => {
       const levelA = GRADE_LEVELS[a.gradeLabel] || 0;
       const levelB = GRADE_LEVELS[b.gradeLabel] || 0;
       if (levelA !== levelB) {
-        return levelB - levelA; // Descending (higher grade first)
+        return levelB - levelA;
       }
       const gyA = Number(a.predGradeYears) || 0;
       const gyB = Number(b.predGradeYears) || 0;
-      return gyB - gyA; // Descending (longer years first)
+      return gyB - gyA;
     });
 
     desigRows = sortData(desigRows, designatedSortKey, designatedSortOrder);
@@ -687,6 +686,73 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     );
   };
 
+  const renderShortTenureTable = () => {
+    let shortRows = [];
+    
+    moves.forEach(move => {
+      if (move.fromPost.type === 'unassigned' || move.fromPost.type === 'retired') return;
+      if (move.toPost.type === 'unassigned' && !move.toPost.dept) return;
+      
+      const currentYearsStr = getEmpCurrentYears(move.emp, targetYear - 1, false);
+      const currentYears = Number(currentYearsStr);
+      
+      if (currentYears < 3 && !isNaN(currentYears)) {
+        shortRows.push({
+          name: move.emp.name || '',
+          oldPost: (move.fromPost.fullDept || move.fromPost.dept || '') + ' ' + (move.fromPost.title || ''),
+          newPost: move.toPost.type === 'retired' ? '退職' : (move.toPost.type === 'unassigned' ? '未配置' : ((move.toPost.fullDept || move.toPost.dept || '') + ' ' + (move.toPost.title || ''))),
+          years: currentYears
+        });
+      }
+    });
+
+    shortRows.sort((a, b) => a.oldPost.localeCompare(b.oldPost));
+
+    return (
+      <div className="overflow-auto max-h-[75vh] w-full text-sm">
+        <div className="mb-4 text-gray-700 max-w-[1000px] mx-auto">
+          <div className="flex justify-between items-end mb-1">
+            <p className="font-bold text-lg">〇所属年数3年未満での異動特記理由</p>
+            <p className="text-xs">令和{targetYear - 2018}年2月5日</p>
+          </div>
+          <div className="flex justify-end text-xs mt-2">
+            <p>職種（　　　　） 担当者所属・氏名（　　　　　　　　　　　　　　）</p>
+          </div>
+        </div>
+        <div className="max-w-[1000px] mx-auto border-2 border-black">
+          <table className="w-full text-left border-collapse bg-white">
+            <thead className="sticky top-0 z-10 whitespace-nowrap">
+              <tr>
+                <th className="border border-black p-2 font-bold w-[15%] text-center bg-white shadow-sm">氏名</th>
+                <th className="border border-black p-2 font-bold w-[25%] text-center bg-white shadow-sm">旧所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[25%] text-center bg-white shadow-sm">新所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[30%] text-center bg-white shadow-sm">異動理由</th>
+                <th className="border border-black p-2 font-bold w-[5%] text-center bg-white shadow-sm">年数</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shortRows.map((row, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 border-b border-black">
+                  <td className="border-r border-black p-2 text-center align-top">{row.name}</td>
+                  <td className="border-r border-black p-2 align-top">{row.oldPost}</td>
+                  <td className="border-r border-black p-2 align-top">{row.newPost}</td>
+                  <td className="border-r border-black p-2 bg-yellow-50/20 align-top text-xs min-h-[4rem]"></td>
+                  <td className="border-r border-black p-2 text-center align-top">{row.years}</td>
+                </tr>
+              ))}
+              {shortRows.length === 0 && (
+                <tr><td colSpan="5" className="text-center p-8 text-gray-500">3年未満の異動者はいません</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 text-xs text-gray-600 space-y-1 max-w-[1000px] mx-auto">
+          <p>※ 異動理由については、適宜ご記入ください。</p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
       {/* Header */}
@@ -742,6 +808,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         {currentTab === 'chain' && renderChainTable()}
         {currentTab === 'list' && renderListTable()}
         {currentTab === 'reason' && renderReasonTable()}
+        {currentTab === 'short_tenure' && renderShortTenureTable()}
         {currentTab === 'designated' && renderDesignatedTable()}
       </main>
 
