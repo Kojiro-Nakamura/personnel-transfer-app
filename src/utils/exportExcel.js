@@ -1113,6 +1113,15 @@ export const exportListToExcel = async (fileName, targetYear, employees, departm
       
       if (cellVal) {
         cellStr += formatDateForDisplayLocal(cellVal);
+        const suffix = getEraSuffixForDate(cellVal);
+        if (suffix) {
+          cellStr += `(${suffix})`;
+        }
+        const y = parseInt(String(cellVal).split('-')[0], 10);
+        if (emp.birthDate && !isNaN(y)) {
+           const ag = calculateAge(emp.birthDate, y);
+           if (ag) cellStr += `${ag}歳`;
+        }
       }
       vals.push(cellStr);
     }
