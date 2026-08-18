@@ -705,15 +705,21 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                 }
 
 
+                const getPromoYear = (dateStr) => {
+                  if (!dateStr) return null;
+                  const y = parseInt(String(dateStr).substring(0, 4));
+                  return isNaN(y) ? null : y;
+                };
+
                 const promoYearMap = {};
-                if (fd.promoYearChief) promoYearMap[fd.promoYearChief] = "係長級(主査)";
-                if (fd.promoYearAssistant1) promoYearMap[fd.promoYearAssistant1] = "補佐級I(主任)";
-                if (fd.promoYearAssistant2) promoYearMap[fd.promoYearAssistant2] = "補佐級II(班長)";
-                if (fd.promoYearAssistant3) promoYearMap[fd.promoYearAssistant3] = "補佐級III(補佐兼班長)";
-                if (fd.promoYearSecHead) promoYearMap[fd.promoYearSecHead] = "課長級";
-                if (fd.promoYearDivHead) promoYearMap[fd.promoYearDivHead] = "所属長級";
-                if (fd.promoYearDeputyHead) promoYearMap[fd.promoYearDeputyHead] = "次長級";
-                if (fd.promoYearDeptHead) promoYearMap[fd.promoYearDeptHead] = "部長級";
+                if (fd.promoYearChief) promoYearMap[getPromoYear(fd.promoYearChief)] = "係長級(主査)";
+                if (fd.promoYearAssistant1) promoYearMap[getPromoYear(fd.promoYearAssistant1)] = "補佐級I(主任)";
+                if (fd.promoYearAssistant2) promoYearMap[getPromoYear(fd.promoYearAssistant2)] = "補佐級II(班長)";
+                if (fd.promoYearAssistant3) promoYearMap[getPromoYear(fd.promoYearAssistant3)] = "補佐級III(補佐兼班長)";
+                if (fd.promoYearSecHead) promoYearMap[getPromoYear(fd.promoYearSecHead)] = "課長級";
+                if (fd.promoYearDivHead) promoYearMap[getPromoYear(fd.promoYearDivHead)] = "所属長級";
+                if (fd.promoYearDeputyHead) promoYearMap[getPromoYear(fd.promoYearDeputyHead)] = "次長級";
+                if (fd.promoYearDeptHead) promoYearMap[getPromoYear(fd.promoYearDeptHead)] = "部長級";
 
                 return displayHistory.length > 0 ? displayHistory.map((h, i, arr) => {
                   const dept = h.department || '-';
