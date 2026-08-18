@@ -194,7 +194,14 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     
     return (
       <div className="bg-white">
-        <div className="mb-2"><div className="text-lg font-bold tracking-widest">つなぎ表</div></div>
+        <div className="mb-2 flex items-baseline gap-4">
+          <div className="text-lg font-bold tracking-widest">つなぎ表</div>
+          <div className="text-xs text-gray-600 font-normal">
+            <span className="mr-3"><span className="font-bold text-black">＊</span>：昇任</span>
+            <span className="mr-3"><span className="font-bold text-black">！</span>：昇格・職名変更</span>
+            <span className="mr-3"><span className="font-bold text-black">E</span>：副主任昇格</span>
+          </div>
+        </div>
         <div className="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
           <table className="border-collapse w-full min-w-max bg-white text-black relative">
             <thead className="sticky top-0 z-10 shadow-[0_2px_0_0_black] print:static print:shadow-none print:border-b-2 print:border-black">
