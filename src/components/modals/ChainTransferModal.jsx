@@ -199,7 +199,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
           <div className="text-xs text-gray-600 font-normal">
             <span className="mr-3"><span className="font-bold text-black">＊</span>：昇任</span>
             <span className="mr-3"><span className="font-bold text-black">！</span>：昇格・職名変更</span>
-            <span className="mr-3"><span className="font-bold text-black">E</span>：副主任昇格</span>
+            <span className="mr-3"><span className="font-bold text-black">E</span>：副主任</span>
           </div>
         </div>
         <div className="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
