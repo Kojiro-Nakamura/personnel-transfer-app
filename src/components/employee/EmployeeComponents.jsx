@@ -724,9 +724,15 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
                   const isLastInRow = (i + 1) % 5 === 0;
                   const isLast = i === arr.length - 1;
                   const isRowStart = i % 5 === 0 && i !== 0;
-                  const cellBg = (h.isNext && isPromoted) ? promoBg : "bg-white";
-                  
                   const promoGradeForYear = promoYearMap[h.year];
+                  
+                  let cellBg = "bg-white";
+                  if (h.isNext && isPromoted) {
+                    cellBg = promoBg;
+                  } else if (promoGradeForYear) {
+                    cellBg = getPromotedBgClass(promoGradeForYear);
+                  }
+                  
                   const histBorderClass = promoGradeForYear ? `border-2 ${getPromotedBorderClass(promoGradeForYear)}` : "border border-slate-300";
                   
                   return (
