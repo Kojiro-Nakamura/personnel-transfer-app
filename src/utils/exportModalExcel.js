@@ -138,13 +138,11 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       predAge: pred.ageNextYear ?? pred.age ?? '',
       predCurrentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
       predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
-      predHosa2Years: pred ? calculateHosa2Years(pred, targetYear) : '',
       predReason: predReason,
       succName: displaySuccName,
       succAge: displaySuccAge,
       succCurrentYears: displaySuccCurrentYears,
       succGradeYears: displaySuccGradeYears,
-      succHosa2Years: succ ? calculateHosa2Years(succ, targetYear) : '',
       succPostLabel: displaySuccPostLabel,
       succRemark: succRemark
     };
