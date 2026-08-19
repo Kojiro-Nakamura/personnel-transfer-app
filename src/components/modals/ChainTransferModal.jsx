@@ -3,7 +3,7 @@ import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Print
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, calculateHosa2Years } from '../../utils/helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -504,6 +504,16 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         } else if (row.successor.isTitleChanged) {
            succRemark = '昇格';
         }
+      }
+      
+      const pMid = pred ? getMidYearPromoRemark(pred) : '';
+      const sMid = succ ? getMidYearPromoRemark(succ) : '';
+      
+      if (pMid && sMid && pMid === sMid && pred === succ) {
+        succRemark = succRemark ? `${succRemark}\n${pMid}` : pMid;
+      } else {
+        if (pMid) succRemark = succRemark ? `${succRemark}\n(前)${pMid}` : `(前)${pMid}`;
+        if (sMid) succRemark = succRemark ? `${succRemark}\n(後)${sMid}` : `(後)${sMid}`;
       }
 
       let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';

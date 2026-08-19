@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, calculateHosa2Years } from './helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 
@@ -109,6 +109,16 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       } else if (row.successor.isTitleChanged) {
          succRemark = '昇格';
       }
+    }
+
+    const pMid = pred ? getMidYearPromoRemark(pred) : '';
+    const sMid = succ ? getMidYearPromoRemark(succ) : '';
+    
+    if (pMid && sMid && pMid === sMid && pred === succ) {
+      succRemark = succRemark ? `${succRemark}\n${pMid}` : pMid;
+    } else {
+      if (pMid) succRemark = succRemark ? `${succRemark}\n(前)${pMid}` : `(前)${pMid}`;
+      if (sMid) succRemark = succRemark ? `${succRemark}\n(後)${sMid}` : `(後)${sMid}`;
     }
 
     let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';

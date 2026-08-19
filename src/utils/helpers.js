@@ -686,6 +686,34 @@ export const getFormattedNameForPlan = (emp, isNext = false) => {
   return emp.name;
 };
 
+export const getMidYearPromoRemark = (emp) => {
+  if (!emp || !emp.currentGrade) return '';
+  const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
+  if (!promoKey) return '';
+  const promoDate = emp[promoKey];
+  if (!promoDate) return '';
+  
+  const parts = promoDate.split('-');
+  const py = parseInt(parts[0], 10);
+  const pm = parseInt(parts[1], 10) || 4;
+  const pd = parseInt(parts[2], 10) || 1;
+  if (!py || isNaN(py)) return '';
+  
+  if (pm !== 4 || pd !== 1) {
+    const eraStr = getEraSuffix(py);
+    const dateStr = `${eraStr}.${pm}.${pd}`;
+    let action = '昇任';
+    if (emp.currentGrade.includes('補佐級II') || emp.currentGrade.includes('補佐級III') || emp.currentGrade.includes('主任') || emp.currentGrade.includes('主査')) {
+      action = '昇格';
+    }
+    let displayGrade = emp.currentGrade.replace(/\(.*\)/, '');
+    if (emp.currentGrade.includes('補佐級II') || emp.currentGrade.includes('補佐級III')) displayGrade = '班長級';
+    
+    return `${displayGrade}への${action}${dateStr}`;
+  }
+  return '';
+};
+
 export const calculateGradeYears = (emp, targetYear) => {
   if (!emp || !emp.currentGrade) return '';
   const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
