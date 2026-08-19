@@ -167,25 +167,22 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   sheet.mergeCells('A1:A2');
   sheet.getCell('A1').value = '所属・職名';
   
-  sheet.mergeCells('B1:F1');
+  sheet.mergeCells('B1:G1');
   sheet.getCell('B1').value = currentConfigTitle;
-  
-  sheet.mergeCells('G1:G2');
-  sheet.getCell('G1').value = `R${targetYearR}\n異動案`;
   
   sheet.mergeCells('H1:M1');
   sheet.getCell('H1').value = `令和${targetYearR}年度配置（案）`;
 
   const headersBottom = [
-    `R${prevYearR}年度\n格付`, '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`,
+    `R${prevYearR}年度\n格付`, '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, '異動案',
     '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, `R${prevYearR}年度\n現所属`, '備考'
   ];
   
   headersBottom.forEach((h, i) => {
-    sheet.getCell(2, i + 2 > 6 ? i + 3 : i + 2).value = h;
+    sheet.getCell(2, i + 2).value = h;
   });
 
-  ['A1', 'B1', 'G1', 'H1'].forEach(c => {
+  ['A1', 'B1', 'H1'].forEach(c => {
     const cell = sheet.getCell(c);
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     cell.font = { bold: true };
@@ -194,7 +191,6 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   });
   
   for(let i=2; i<=13; i++) {
-    if (i === 1 || i === 7) continue;
     const cell = sheet.getCell(2, i);
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     cell.font = { bold: true };

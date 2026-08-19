@@ -579,6 +579,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center bg-gray-50' },
       { label: `現職年数<br>R${targetYearR}.3.31`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
       { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
+      { label: '異動案', key: 'predReason', cls: 'text-center bg-blue-100/50' },
       { label: '氏名', key: 'succName', cls: 'text-center bg-gray-50' },
       { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center bg-gray-50' },
       { label: `現職年数<br>R${targetYearR}.3.31`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
@@ -598,8 +599,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <thead className="sticky top-0 z-10 bg-white">
               <tr>
                 {headerColsTop.map(c => renderTh(c.label, c.key, handleSortClick, true, c.cls, c.rowspan))}
-                <th colSpan="5" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
-                {renderTh(`R${targetYearR}<br>異動案`, 'predReason', handleSortClick, true, 'text-center bg-blue-100/50', '2')}
+                <th colSpan="6" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
                 <th colSpan="6" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">令和{targetYearR}年度配置（案）</th>
               </tr>
               <tr>
