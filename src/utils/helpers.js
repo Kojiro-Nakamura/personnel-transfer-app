@@ -668,16 +668,6 @@ export const getEmpCurrentYears = (emp, targetYear, isNext = false) => {
 
 export const getFormattedNameForPlan = (emp, isNext = false) => {
   if (!emp) return '';
-  const note = emp.note || '';
-  
-  if (note.includes('再任用')) {
-    if (note.includes('時短')) return `再短 ${emp.name}`;
-    return emp.name;
-  }
-  if (note.includes('臨任')) return `臨任 ${emp.name}`;
-  if (isNext && (!emp.currentTitle || emp.currentDeptId === 'unassigned' || !emp.currentDeptId)) {
-    return `新採 ${emp.name}`;
-  }
   return emp.name;
 };
 

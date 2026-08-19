@@ -135,9 +135,9 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
     if (!isRetention) {
        displaySuccName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
-       if (row.successor && succPost.type === 'unassigned') displaySuccName = '新採 ' + displaySuccName;
        displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
-       displaySuccCurrentYears = row.successor ? '1' : ''; 
+       displaySuccCurrentYears = row.successor ? '1' : '';
+       
        displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
        displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
     }
@@ -274,7 +274,6 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     const succPost = row.successor?.fromPost || {};
     
     let succName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
-    if (row.successor && succPost.type === 'unassigned') succName = '新採 ' + succName;
     
     const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
 
