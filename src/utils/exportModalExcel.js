@@ -109,7 +109,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     if (!isRetention) {
        displaySuccName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
        displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
-       displaySuccCurrentYears = row.successor ? '1' : '';
+       displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : '';
        
        displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
        displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));

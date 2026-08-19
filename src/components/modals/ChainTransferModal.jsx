@@ -505,17 +505,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       if (!isRetention) {
          displaySuccName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
          displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
-         displaySuccCurrentYears = row.successor ? '1' : ''; 
-         
-         if (succ && Object.keys(succ).length > 0) {
-           if (succ.currentGrade !== succ.nextGrade && succ.nextGrade) {
-             displaySuccGradeYears = 0;
-           } else {
-             displaySuccGradeYears = calculateGradeYears(succ, targetYear);
-           }
-         } else {
-           displaySuccGradeYears = '';
-         }
+         displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : ''; 
+         displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
          displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
       }
 
