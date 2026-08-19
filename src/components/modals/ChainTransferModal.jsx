@@ -418,7 +418,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     
     const getDisplayGrade = (gradeStr) => {
       const g = String(gradeStr || '');
-      if (g.includes('補佐級I(') || g.includes('補佐級II') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
+      if (g.includes('補佐級II') || g.includes('補佐級III')) return '班長級';
+      if (g.includes('補佐級I(') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
       return g;
     };
     
