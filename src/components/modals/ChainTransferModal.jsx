@@ -610,8 +610,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
               {desigRows.map((r, i) => {
                 const reasonColor = getReasonColorClass(r.predReason);
                 const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
+                const nextRow = desigRows[i + 1];
+                const isGradeChanged = nextRow && nextRow.gradeLabel !== r.gradeLabel;
+                const borderClass = isGradeChanged ? 'border-b-[3px] border-black' : 'border-b border-gray-400';
                 return (
-                  <tr key={i} className="border-b border-gray-400 hover:bg-gray-50 print-break-inside-avoid">
+                  <tr key={i} className={`${borderClass} hover:bg-gray-50 print-break-inside-avoid`}>
                     <td className="border-r border-black p-1.5 text-center whitespace-nowrap">{r.gradeLabel}</td>
                     <td className="border-r border-black p-1.5 break-words font-bold">{r.postLabel}</td>
                     <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
