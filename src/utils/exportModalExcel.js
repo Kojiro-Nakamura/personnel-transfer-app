@@ -194,12 +194,10 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   }
 
   desigRows.forEach(r => {
-    const pGradeYears = r.predHosa2Years !== '' ? `${r.predGradeYears}(${r.predHosa2Years})` : r.predGradeYears;
-    const sGradeYears = r.succHosa2Years !== '' ? `${r.succGradeYears}(${r.succHosa2Years})` : r.succGradeYears;
     const row = sheet.addRow([
-      r.postLabel, r.gradeLabel, r.predName, r.predAge, r.predCurrentYears, pGradeYears,
+      r.postLabel, r.gradeLabel, r.predName, r.predAge, r.predCurrentYears, r.predGradeYears,
       r.predReason,
-      r.succName, r.succAge, r.succCurrentYears, sGradeYears, r.succPostLabel, r.succRemark
+      r.succName, r.succAge, r.succCurrentYears, r.succGradeYears, r.succPostLabel, r.succRemark
     ]);
     row.eachCell((cell, colNumber) => {
       cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };

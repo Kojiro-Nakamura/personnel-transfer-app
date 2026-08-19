@@ -610,7 +610,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className="border-r border-black p-1.5 text-center">{r.predCurrentYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
                       {r.predGradeYears}
-                      {r.predHosa2Years !== '' && <span className="ml-1 font-normal text-xs">({r.predHosa2Years})</span>}
                     </td>
                     <td className={`border-r border-black p-1.5 text-center font-bold bg-blue-50/50 ${reasonColor}`}>{r.predReason}</td>
                     <td className={`border-r border-black p-1.5 whitespace-nowrap ${succNameClass}`}>{r.succName}</td>
@@ -618,7 +617,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className="border-r border-black p-1.5 text-center">{r.succCurrentYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
                       {r.succGradeYears}
-                      {r.succHosa2Years !== '' && <span className="ml-1 font-normal text-xs">({r.succHosa2Years})</span>}
                     </td>
                     <td className="border-r border-black p-1.5 break-words">{r.succPostLabel}</td>
                     <td className={`p-1.5 break-words ${COLORS.RETIRING} font-bold`}>{r.succRemark}</td>
