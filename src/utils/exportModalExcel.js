@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel } from './helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 
@@ -273,7 +273,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
     const succPost = row.successor?.fromPost || {};
     
-    let succName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+    let succName = (succ.name ? getFormattedNameWithPrefix(succ, true) : null) || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
     
     const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
 
@@ -281,7 +281,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
       predGroup: predPost.group || '',
       predEmpNo: getEmpNo(pred),
-      predName: pred.name || '',
+      predName: pred.name ? getFormattedNameWithPrefix(pred, false) : '',
       predAge: pred.ageNextYear ?? pred.age ?? '',
       reason: row.reason,
       currentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',

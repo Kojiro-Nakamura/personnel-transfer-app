@@ -3,7 +3,7 @@ import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Print
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel } from '../../utils/helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -341,7 +341,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
       const succPost = row.successor?.fromPost || {};
       
-      let succName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+      let succName = (succ.name ? getFormattedNameWithPrefix(succ, true) : null) || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
       
       const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
       const getEmpNo = (emp) => {
@@ -354,7 +354,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
         predGroup: predPost.group || '',
         predEmpNo: getEmpNo(pred),
-        predName: pred.name || '',
+        predName: pred.name ? getFormattedNameWithPrefix(pred, false) : '',
         predAge: pred.ageNextYear ?? pred.age ?? '',
         reason: row.reason,
         currentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
