@@ -274,10 +274,10 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
   ];
 
   const headerRow = sheet.addRow(cols);
-  headerRow.eachCell(cell => {
+  headerRow.eachCell((cell, colNumber) => {
     cell.font = { bold: true };
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: colNumber === 7 ? {style:'medium'} : {style:'thin'} };
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
   });
 
@@ -287,7 +287,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       r.succEmpNo, r.succName, r.isPromoted, r.succAge, r.succPostLabel, r.noteStr
     ]);
     row.eachCell((cell, colNumber) => {
-      cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+      cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: colNumber === 7 ? {style:'medium'} : {style:'thin'} };
       if ([3, 5, 7, 8, 10, 11].includes(colNumber)) {
         cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       } else {

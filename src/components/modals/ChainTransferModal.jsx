@@ -357,7 +357,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       { label: '氏名', key: 'predName', cls: 'text-left' },
       { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'predAge', cls: 'text-center leading-tight' },
       { label: '事由', key: 'reason', cls: 'text-left' },
-      { label: '現所属<br>年数', key: 'currentYears', cls: 'text-center leading-tight' },
+      { label: '現所属<br>年数', key: 'currentYears', cls: 'text-center leading-tight !border-r-[3px]' },
       { label: '後任者<br>職員番号', key: 'succEmpNo', cls: 'text-center min-w-[5rem] w-20 leading-tight' },
       { label: '後任者 氏名', key: 'succName', cls: 'text-left leading-tight' },
       { label: '昇任<br>昇格', key: 'isPromoted', cls: 'text-center leading-tight' },
@@ -395,7 +395,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className={`border-r border-black p-1.5 max-w-[120px] break-words font-bold ${reasonColor}`} dangerouslySetInnerHTML={{ __html: r.reason }}></td>
-                    <td className="border-r border-black p-1.5 text-center whitespace-nowrap">{r.currentYears ? r.currentYears + '年' : ''}</td>
+                    <td className="border-r-[3px] border-black p-1.5 text-center whitespace-nowrap">{r.currentYears ? r.currentYears + '年' : ''}</td>
                     <td className="border-r border-black p-1.5 text-center min-w-[5rem] w-20">{r.succEmpNo}</td>
                     <td className={`border-r border-black p-1.5 whitespace-nowrap ${succNameClass}`}>{r.succName}</td>
                     <td className={`border-r border-black p-1.5 text-center ${COLORS.RETIRING} font-bold`}>{r.isPromoted}</td>
