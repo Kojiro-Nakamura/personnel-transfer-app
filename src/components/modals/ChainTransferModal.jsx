@@ -37,7 +37,12 @@ const getDisplayName = (move) => {
 };
 
 const sortData = (rows, sortKey, sortOrder) => {
-  if (!sortKey) return rows;
+  if (!sortKey) {
+    if (rows.length > 0 && 'orgOrder' in rows[0]) {
+      return [...rows].sort((a, b) => a.orgOrder - b.orgOrder);
+    }
+    return rows;
+  }
   return [...rows].sort((a, b) => {
     let valA = a[sortKey];
     let valB = b[sortKey];
@@ -289,6 +294,24 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   const renderListTable = () => {
+    const postOrderMap = {};
+    let order = 0;
+    departments.forEach(dept => {
+      if (dept.type !== 'regular') return;
+      dept.posts.forEach(post => {
+        postOrderMap[`POST|${post.id}|`] = order;
+        postOrderMap[`TITLE|${dept.id}||${post.name}`] = order;
+        order++;
+      });
+      dept.groups.forEach(group => {
+        group.posts.forEach(post => {
+          postOrderMap[`POST||${post.id}`] = order;
+          postOrderMap[`TITLE|${dept.id}|${group.id}|${post.name}`] = order;
+          order++;
+        });
+      });
+    });
+
     let listRows = [];
     const usedToMoves = new Set();
     
@@ -334,7 +357,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         succEmpNo = '';
       }
 
+      const basePostId = row.predecessor ? row.predecessor.fromPostId : (row.successor ? row.successor.toPostId : null);
+      const orgOrder = postOrderMap[basePostId] ?? 999999;
+
       return {
+        orgOrder,
         predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
         predGroup: predPost.group || '',
         predEmpNo: getEmpNo(pred),

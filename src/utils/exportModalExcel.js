@@ -211,9 +211,27 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 };
 
 // 2. 異動案リスト
-const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost) => {
+const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost, departments) => {
   const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
   
+  const postOrderMap = {};
+  let order = 0;
+  departments.forEach(dept => {
+    if (dept.type !== 'regular') return;
+    dept.posts.forEach(post => {
+      postOrderMap[`POST|${post.id}|`] = order;
+      postOrderMap[`TITLE|${dept.id}||${post.name}`] = order;
+      order++;
+    });
+    dept.groups.forEach(group => {
+      group.posts.forEach(post => {
+        postOrderMap[`POST||${post.id}`] = order;
+        postOrderMap[`TITLE|${dept.id}|${group.id}|${post.name}`] = order;
+        order++;
+      });
+    });
+  });
+
   let listRows = [];
   const usedToMoves = new Set();
   
@@ -254,7 +272,11 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       succEmpNo = '';
     }
 
+    const basePostId = row.predecessor ? row.predecessor.fromPostId : (row.successor ? row.successor.toPostId : null);
+    const orgOrder = postOrderMap[basePostId] ?? 999999;
+
     return {
+      orgOrder,
       predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
       predGroup: predPost.group || '',
       predEmpNo: getEmpNo(pred),
@@ -270,6 +292,8 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       noteStr: succ.note || pred.note || ''
     };
   });
+
+  listRows.sort((a, b) => a.orgOrder - b.orgOrder);
 
   const targetYearR = toReiwa(targetYear);
   const prevYearR = targetYearR - 1;
@@ -536,7 +560,7 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   const { chains, movesByToPost, movesByFromPost, moves, retentions } = data;
 
   addModalDesignatedSheet(workbook, '指定職人事異動', targetYear, moves, retentions, movesByToPost);
-  addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost);
+  addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments);
   
   // NOTE: addReasonSheet needs deptMap, currMap, nextMap. We will just pass empty objects or build them.
   // Actually, addReasonSheet from exportExcel.js expects these to just ignore if missing? No, it uses them.
