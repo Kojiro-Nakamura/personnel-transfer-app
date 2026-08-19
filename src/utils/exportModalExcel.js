@@ -261,7 +261,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     listRows.push({
       predecessor: ret,
       successor: null,
-      reason: '留任',
+      reason: '',
       isRetention: true
     });
   });

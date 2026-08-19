@@ -341,7 +341,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         listRows.push({
           predecessor: ret,
           successor: null,
-          reason: '留任',
+          reason: '',
           isRetention: true
         });
       });
