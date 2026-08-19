@@ -238,7 +238,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     }
   });
 
-  listRows = listRows.map(row => {
+  listRows = listRows.filter(row => row.predecessor?.toPost?.type !== 'retired').map(row => {
     const pred = row.predecessor?.emp || {};
     const succ = row.successor?.emp || {};
     const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
@@ -246,7 +246,12 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     
     let succName = (succ.name ? getFormattedNameWithPrefix(succ, true) : null) || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
     
-    const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
+    const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '〇' : '';
+
+    let succEmpNo = getEmpNo(succ);
+    if (succ.note && String(succ.note).includes('再フル')) {
+      succEmpNo = '';
+    }
 
     return {
       predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
@@ -256,7 +261,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       predAge: pred.ageNextYear ?? pred.age ?? '',
       reason: row.reason,
       currentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
-      succEmpNo: getEmpNo(succ),
+      succEmpNo,
       succName,
       isPromoted,
       succAge: succ.ageNextYear ?? succ.age ?? '',

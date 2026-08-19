@@ -313,7 +313,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       }
     });
 
-    listRows = listRows.map(row => {
+    listRows = listRows.filter(row => row.predecessor?.toPost?.type !== 'retired').map(row => {
       const pred = row.predecessor?.emp || {};
       const succ = row.successor?.emp || {};
       const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
@@ -328,6 +328,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         return /[a-zA-Z_\-]/.test(str) ? '' : str;
       };
 
+      let succEmpNo = getEmpNo(succ);
+      if (succ.note && String(succ.note).includes('再フル')) {
+        succEmpNo = '';
+      }
+
       return {
         predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
         predGroup: predPost.group || '',
@@ -336,7 +341,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         predAge: pred.ageNextYear ?? pred.age ?? '',
         reason: row.reason,
         currentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
-        succEmpNo: getEmpNo(succ),
+        succEmpNo,
         succName,
         isPromoted,
         succAge: succ.ageNextYear ?? succ.age ?? '',
