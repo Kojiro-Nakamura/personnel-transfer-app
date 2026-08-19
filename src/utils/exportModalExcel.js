@@ -148,7 +148,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   const currentConfigTitle = `令和${prevYearR}年度配置（R${prevYearR}.12.1現在）`;
 
   sheet.mergeCells('A1:A2');
-  sheet.getCell('A1').value = `R${prevYearR}年度\n格付`;
+  sheet.getCell('A1').value = `格付`;
   
   sheet.mergeCells('B1:B2');
   sheet.getCell('B1').value = '所属・職名';

@@ -552,7 +552,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     };
 
     const headerColsTop = [
-      { label: `R${prevYearR}年度<br>格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight !border-r-[3px]', rowspan: '2' },
+      { label: `格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight !border-r-[3px]', rowspan: '2' },
       { label: '所属・職名', key: 'postLabel', cls: 'text-left min-w-[120px] !border-r-[3px]', rowspan: '2' }
     ];
 
