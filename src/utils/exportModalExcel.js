@@ -161,7 +161,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 
   const headersBottom = [
     '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, '異動案',
-    '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, `R${prevYearR}年度\n現所属`, '備考'
+    '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, `R${prevYearR}年度\n所属・職名`, '備考'
   ];
   
   headersBottom.forEach((h, i) => {

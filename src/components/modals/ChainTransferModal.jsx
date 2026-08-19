@@ -566,7 +566,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center bg-gray-50' },
       { label: `現職年数<br>R${targetYearR}.3.31`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
       { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'succGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
-      { label: `R${prevYearR}年度<br>現所属`, key: 'succPostLabel', cls: 'text-left min-w-[120px]' },
+      { label: `R${prevYearR}年度<br>所属・職名`, key: 'succPostLabel', cls: 'text-left min-w-[120px]' },
       { label: '備考', key: 'succRemark', cls: 'text-left min-w-[80px]' }
     ];
 
