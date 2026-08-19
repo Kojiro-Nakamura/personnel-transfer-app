@@ -260,7 +260,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       succName,
       isPromoted,
       succAge: succ.ageNextYear ?? succ.age ?? '',
-      succPostLabel: succPost.label || '',
+      succPostLabel: succPost.type === 'unassigned' ? '' : (succPost.label || ''),
       noteStr: succ.note || pred.note || ''
     };
   });

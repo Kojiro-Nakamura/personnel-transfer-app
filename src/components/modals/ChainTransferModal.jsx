@@ -340,7 +340,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         succName,
         isPromoted,
         succAge: succ.ageNextYear ?? succ.age ?? '',
-        succPostLabel: succPost.label || '',
+        succPostLabel: succPost.type === 'unassigned' ? '' : (succPost.label || ''),
         noteStr: succ.note || pred.note || ''
       };
     });
