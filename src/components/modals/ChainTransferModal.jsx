@@ -499,7 +499,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       
       const sMid = succ ? getMidYearPromoRemark(succ) : '';
       if (sMid) {
-        succRemark = succRemark ? `${succRemark}\n${sMid}` : sMid;
+        succRemark = succRemark ? `${succRemark}\n(${sMid})` : `(${sMid})`;
       }
 
       let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';

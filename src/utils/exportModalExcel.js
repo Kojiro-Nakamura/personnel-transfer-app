@@ -104,7 +104,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 
     const sMid = succ ? getMidYearPromoRemark(succ) : '';
     if (sMid) {
-      succRemark = succRemark ? `${succRemark}\n${sMid}` : sMid;
+      succRemark = succRemark ? `${succRemark}\n(${sMid})` : `(${sMid})`;
     }
 
     let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
