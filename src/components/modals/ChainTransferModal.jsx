@@ -3,7 +3,7 @@ import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Print
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark } from '../../utils/helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -488,19 +488,10 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       if (row.successor) {
         const cGrade = row.successor.emp.currentGrade || '';
         const nGrade = row.successor.emp.nextGrade || '';
-        const getBaseGrade = (gradeStr) => {
-          if (gradeStr.includes('部長級')) return '部長級';
-          if (gradeStr.includes('次長級')) return '次長級';
-          if (gradeStr.includes('所属長級') || gradeStr.includes('課長級')) return '課長級';
-          if (gradeStr.includes('補佐級')) return '補佐級';
-          return gradeStr; 
-        };
-        const gradeLevels = { '補佐級': 1, '課長級': 2, '次長級': 3, '部長級': 4 };
-        const cBase = getBaseGrade(cGrade), nBase = getBaseGrade(nGrade);
-        const cLevel = gradeLevels[cBase] || 0, nLevel = gradeLevels[nBase] || 0;
-
-        if (cGrade !== nGrade && nGrade !== '') {
-           succRemark = (nLevel > cLevel && ['部長級', '次長級', '課長級', '補佐級'].includes(nBase)) ? '昇任' : '昇格';
+        const promoStr = getPromoRemark(cGrade, nGrade);
+        
+        if (promoStr) {
+           succRemark = promoStr;
         } else if (row.successor.isTitleChanged) {
            succRemark = '昇格';
         }

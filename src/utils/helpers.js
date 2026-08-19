@@ -733,23 +733,23 @@ export const calculateGradeYears = (emp, targetYear) => {
   return Number.isInteger(years) ? years : parseFloat(years.toFixed(2));
 };
 
-export const calculateHosa2Years = (emp, targetYear) => {
-  if (!emp || !emp.currentGrade || !String(emp.currentGrade).includes('補佐級III')) return '';
-  const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
-  const hosa2PromoDate = emp[hosa2PromoKey];
-  if (!hosa2PromoDate) return '';
-  
-  const parts = hosa2PromoDate.split('-');
-  const py = parseInt(parts[0], 10);
-  const pm = parseInt(parts[1], 10) || 4;
-  if (!py || isNaN(py)) return '';
-  
-  const months = (targetYear - py) * 12 + (4 - pm);
-  if (months <= 0) return 0;
-  
-  const years = months / 12;
-  return Number.isInteger(years) ? years : parseFloat(years.toFixed(2));
+export const getPromoRemark = (currentGrade, nextGrade) => {
+  if (!currentGrade || !nextGrade || currentGrade === nextGrade) return '';
+  const cLevel = GRADE_LEVELS[currentGrade] || 0;
+  const nLevel = GRADE_LEVELS[nextGrade] || 0;
+  if (nLevel <= cLevel) return '';
+
+  if (currentGrade.includes('課長級') && nextGrade.includes('所属長級')) return '昇格';
+  if (currentGrade.includes('補佐級II') && nextGrade.includes('補佐級III')) return '昇格';
+  if (currentGrade.includes('補佐級I') && nextGrade.includes('補佐級II')) return '昇格';
+
+  if (nextGrade.includes('部長級') || nextGrade.includes('次長級') || nextGrade.includes('課長級') || nextGrade.includes('補佐級I')) {
+    return '昇任';
+  }
+
+  return '';
 };
+
 
 export const shouldOmitEmployeeNumber = (emp, isNext = false) => {
   if (!emp) return false;
