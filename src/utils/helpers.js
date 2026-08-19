@@ -672,7 +672,7 @@ export const getFormattedNameForPlan = (emp, isNext = false) => {
   
   if (note.includes('再任用')) {
     if (note.includes('時短')) return `再短 ${emp.name}`;
-    return `再フル ${emp.name}`;
+    return emp.name;
   }
   if (note.includes('臨任')) return `臨任 ${emp.name}`;
   if (isNext && (!emp.currentTitle || emp.currentDeptId === 'unassigned' || !emp.currentDeptId)) {
