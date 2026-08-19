@@ -653,17 +653,7 @@ export const formatPromoDateWithEra = (promoDateStr, targetYear) => {
 
 export const getEmpCurrentYears = (emp, targetYear, isNext = false) => {
   if (!emp) return '';
-  const grade = isNext ? emp.nextGrade : emp.currentGrade;
-  const pKey = GRADE_TO_PROMO_KEY[grade];
-  let calculatedYears = '';
-  if (pKey && emp[pKey]) {
-    const sYears = calculateServiceYears(emp[pKey], targetYear, true);
-    if (sYears) calculatedYears = sYears;
-  }
-  if (!calculatedYears) {
-    calculatedYears = isNext ? (emp.nextYears || '') : (emp.currentYears || '');
-  }
-  return calculatedYears;
+  return isNext ? (emp.nextYears || '') : (emp.currentYears || '');
 };
 
 export const getFormattedNameWithPrefix = (emp, isNext = false) => {

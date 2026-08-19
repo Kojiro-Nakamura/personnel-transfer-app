@@ -507,7 +507,15 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
          displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
          displaySuccCurrentYears = row.successor ? '1' : ''; 
          
-         displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
+         if (succ && Object.keys(succ).length > 0) {
+           if (succ.currentGrade !== succ.nextGrade && succ.nextGrade) {
+             displaySuccGradeYears = 0;
+           } else {
+             displaySuccGradeYears = calculateGradeYears(succ, targetYear);
+           }
+         } else {
+           displaySuccGradeYears = '';
+         }
          displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
       }
 
