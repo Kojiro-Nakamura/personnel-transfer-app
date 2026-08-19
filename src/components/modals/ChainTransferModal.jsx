@@ -337,13 +337,27 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       }
     });
 
+      retentions.forEach(ret => {
+        listRows.push({
+          predecessor: ret,
+          successor: null,
+          reason: '留任',
+          isRetention: true
+        });
+      });
+
     listRows = listRows.map(row => {
       const pred = row.predecessor?.emp || {};
       const succ = row.successor?.emp || {};
       const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
       const succPost = row.successor?.fromPost || {};
       
-      let succName = (succ.name ? getFormattedNameWithPrefix(succ, true) : null) || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+        let succName = '';
+        if (succ.name) {
+          succName = getFormattedNameWithPrefix(succ, true);
+        } else if (row.predecessor && !row.successor) {
+          succName = row.isRetention ? '' : '【 廃 止 】';
+        }
       
       const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
       const getEmpNo = (emp) => {

@@ -211,7 +211,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 };
 
 // 2. 異動案リスト
-const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost, departments) => {
+const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost, departments, retentions) => {
   const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
   
   const postOrderMap = {};
@@ -257,13 +257,27 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     }
   });
 
+  retentions.forEach(ret => {
+    listRows.push({
+      predecessor: ret,
+      successor: null,
+      reason: '留任',
+      isRetention: true
+    });
+  });
+
   listRows = listRows.map(row => {
     const pred = row.predecessor?.emp || {};
     const succ = row.successor?.emp || {};
     const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
     const succPost = row.successor?.fromPost || {};
     
-    let succName = (succ.name ? getFormattedNameWithPrefix(succ, true) : null) || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+    let succName = '';
+    if (succ.name) {
+      succName = getFormattedNameWithPrefix(succ, true);
+    } else if (row.predecessor && !row.successor) {
+      succName = row.isRetention ? '' : '【 廃 止 】';
+    }
     
     const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '〇' : '';
 
@@ -560,7 +574,7 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   const { chains, movesByToPost, movesByFromPost, moves, retentions } = data;
 
   addModalDesignatedSheet(workbook, '指定職人事異動', targetYear, moves, retentions, movesByToPost);
-  addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments);
+  addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments, retentions);
   
   // NOTE: addReasonSheet needs deptMap, currMap, nextMap. We will just pass empty objects or build them.
   // Actually, addReasonSheet from exportExcel.js expects these to just ignore if missing? No, it uses them.
