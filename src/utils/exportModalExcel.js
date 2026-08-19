@@ -102,14 +102,9 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       }
     }
 
-    const pMid = pred ? getMidYearPromoRemark(pred) : '';
     const sMid = succ ? getMidYearPromoRemark(succ) : '';
-    
-    if (pMid && sMid && pMid === sMid && pred === succ) {
-      succRemark = succRemark ? `${succRemark}\n${pMid}` : pMid;
-    } else {
-      if (pMid) succRemark = succRemark ? `${succRemark}\n(前)${pMid}` : `(前)${pMid}`;
-      if (sMid) succRemark = succRemark ? `${succRemark}\n(後)${sMid}` : `(後)${sMid}`;
+    if (sMid) {
+      succRemark = succRemark ? `${succRemark}\n${sMid}` : sMid;
     }
 
     let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
