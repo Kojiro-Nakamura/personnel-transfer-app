@@ -281,6 +281,10 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     
     const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '〇' : '';
 
+    let predEmpNo = getEmpNo(pred);
+    if (pred.note && String(pred.note).includes('再フル')) {
+      predEmpNo = '';
+    }
     let succEmpNo = getEmpNo(succ);
     if (succ.note && String(succ.note).includes('再フル')) {
       succEmpNo = '';
@@ -293,7 +297,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       orgOrder,
       predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
       predGroup: predPost.group || '',
-      predEmpNo: getEmpNo(pred),
+      predEmpNo,
       predName: pred.name ? getFormattedNameWithPrefix(pred, false) : '',
       predAge: pred.ageNextYear ?? pred.age ?? '',
       reason: row.reason,

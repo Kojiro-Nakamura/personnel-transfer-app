@@ -662,7 +662,8 @@ export const getFormattedNameWithPrefix = (emp, isNext = false) => {
   
   if (note.includes('再任用')) {
     if (note.includes('時短')) return `再短 ${emp.name}`;
-    return `再フル ${emp.name}`;
+    if (!isNext) return emp.name; // 今年度の再フルは表示しない
+    return `再フル\n${emp.name}`; // 来年度の再フルは改行する
   }
   if (note.includes('臨任')) return `臨任 ${emp.name}`;
   if (isNext && (!emp.currentTitle || emp.currentDeptId === 'unassigned' || !emp.currentDeptId)) {

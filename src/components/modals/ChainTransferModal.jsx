@@ -366,6 +366,10 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         return /[a-zA-Z_\-]/.test(str) ? '' : str;
       };
 
+        let predEmpNo = getEmpNo(pred);
+        if (pred.note && String(pred.note).includes('再フル')) {
+          predEmpNo = '';
+        }
       let succEmpNo = getEmpNo(succ);
       if (succ.note && String(succ.note).includes('再フル')) {
         succEmpNo = '';
@@ -378,7 +382,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         orgOrder,
         predDeptTitle: (predPost.dept || '') + (predPost.title || ''),
         predGroup: predPost.group || '',
-        predEmpNo: getEmpNo(pred),
+          predEmpNo,
         predName: pred.name ? getFormattedNameWithPrefix(pred, false) : '',
         predAge: pred.ageNextYear ?? pred.age ?? '',
         reason: row.reason,
@@ -439,12 +443,12 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className="border-r border-black p-1.5 max-w-[120px] break-words">{r.predDeptTitle}</td>
                     <td className="border-r border-black p-1.5 max-w-[100px] break-words">{showGroup ? r.predGroup : ''}</td>
                     <td className="border-r border-black p-1.5 text-center min-w-[5rem] w-20">{r.predEmpNo}</td>
-                    <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
+                    <td className="border-r border-black p-1.5 whitespace-pre-wrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className={`border-r border-black p-1.5 max-w-[120px] break-words font-bold ${reasonColor}`} dangerouslySetInnerHTML={{ __html: r.reason }}></td>
                     <td className="border-r-[3px] border-black p-1.5 text-center whitespace-nowrap">{r.currentYears ? r.currentYears + '年' : ''}</td>
                     <td className="border-r border-black p-1.5 text-center min-w-[5rem] w-20">{r.succEmpNo}</td>
-                    <td className={`border-r border-black p-1.5 whitespace-nowrap ${succNameClass}`}>{r.succName}</td>
+                    <td className={`border-r border-black p-1.5 whitespace-pre-wrap ${succNameClass}`}>{r.succName}</td>
                     <td className={`border-r border-black p-1.5 text-center ${COLORS.RETIRING} font-bold`}>{r.isPromoted}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succAge}</td>
                     <td className="border-r border-black p-1.5 max-w-[140px] break-words">{r.succPostLabel}</td>
@@ -646,14 +650,14 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                   <tr key={i} className={`${borderClass} hover:bg-gray-50 print-break-inside-avoid`}>
                     <td className="border-r-[3px] border-black p-1.5 text-center whitespace-nowrap">{r.gradeLabel}</td>
                     <td className="border-r-[3px] border-black p-1.5 break-words font-bold">{r.postLabel}</td>
-                    <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
+                    <td className="border-r border-black p-1.5 whitespace-pre-wrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predCurrentYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
                       {r.predGradeYears}
                     </td>
                     <td className={`border-r-[3px] border-black p-1.5 text-center font-bold bg-blue-50/50 ${reasonColor}`}>{r.predReason}</td>
-                    <td className={`border-r border-black p-1.5 whitespace-nowrap ${succNameClass}`}>{r.succName}</td>
+                    <td className={`border-r border-black p-1.5 whitespace-pre-wrap ${succNameClass}`}>{r.succName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succCurrentYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
