@@ -3,7 +3,7 @@ import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Print
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix } from '../../utils/helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, calculateHosa2Years } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -70,29 +70,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   const [designatedSortKey, setDesignatedSortKey] = useState(null);
   const [designatedSortOrder, setDesignatedSortOrder] = useState('asc');
 
-  const calculateGradeYears = (emp, targetYear) => {
-    if (!emp || !emp.currentGrade) return '';
-    const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
-    if (!promoKey) return '';
-    const promoDate = emp[promoKey];
-    if (!promoDate) return '';
-    const promoYear = parseInt(promoDate.split('-')[0], 10);
-    if (!promoYear || isNaN(promoYear)) return '';
-    const years = Math.max(0, targetYear - promoYear);
-    return years;
-  };
 
-  const calculateHosa2Years = (emp, targetYear) => {
-    if (!emp || !emp.currentGrade || !String(emp.currentGrade).includes('補佐級III')) return '';
-    const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
-    const hosa2PromoDate = emp[hosa2PromoKey];
-    if (!hosa2PromoDate) return '';
-    const hosa2PromoYear = parseInt(hosa2PromoDate.split('-')[0], 10);
-    if (!isNaN(hosa2PromoYear)) {
-      return Math.max(0, targetYear - hosa2PromoYear);
-    }
-    return '';
-  };
 
   const data = useMemo(() => {
     if (!isOpen) return null;

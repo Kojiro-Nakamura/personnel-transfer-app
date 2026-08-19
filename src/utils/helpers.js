@@ -686,6 +686,43 @@ export const getFormattedNameForPlan = (emp, isNext = false) => {
   return emp.name;
 };
 
+export const calculateGradeYears = (emp, targetYear) => {
+  if (!emp || !emp.currentGrade) return '';
+  const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
+  if (!promoKey) return '';
+  const promoDate = emp[promoKey];
+  if (!promoDate) return '';
+  
+  const parts = promoDate.split('-');
+  const py = parseInt(parts[0], 10);
+  const pm = parseInt(parts[1], 10) || 4;
+  if (!py || isNaN(py)) return '';
+  
+  const months = (targetYear - py) * 12 + (4 - pm);
+  if (months <= 0) return 0;
+  
+  const years = months / 12;
+  return Number.isInteger(years) ? years : parseFloat(years.toFixed(2));
+};
+
+export const calculateHosa2Years = (emp, targetYear) => {
+  if (!emp || !emp.currentGrade || !String(emp.currentGrade).includes('補佐級III')) return '';
+  const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
+  const hosa2PromoDate = emp[hosa2PromoKey];
+  if (!hosa2PromoDate) return '';
+  
+  const parts = hosa2PromoDate.split('-');
+  const py = parseInt(parts[0], 10);
+  const pm = parseInt(parts[1], 10) || 4;
+  if (!py || isNaN(py)) return '';
+  
+  const months = (targetYear - py) * 12 + (4 - pm);
+  if (months <= 0) return 0;
+  
+  const years = months / 12;
+  return Number.isInteger(years) ? years : parseFloat(years.toFixed(2));
+};
+
 export const shouldOmitEmployeeNumber = (emp, isNext = false) => {
   if (!emp) return false;
   const note = emp.note || '';

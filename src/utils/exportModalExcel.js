@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix } from './helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, calculateHosa2Years } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 
@@ -15,29 +15,7 @@ const isDesignated = (grade, title) => {
   return false;
 };
 
-const calculateGradeYears = (emp, targetYear) => {
-  if (!emp || !emp.currentGrade) return '';
-  const promoKey = GRADE_TO_PROMO_KEY[emp.currentGrade];
-  if (!promoKey) return '';
-  const promoDate = emp[promoKey];
-  if (!promoDate) return '';
-  const promoYear = parseInt(promoDate.split('-')[0], 10);
-  if (!promoYear || isNaN(promoYear)) return '';
-  const years = Math.max(0, targetYear - promoYear);
-  return years;
-};
 
-const calculateHosa2Years = (emp, targetYear) => {
-  if (!emp || !emp.currentGrade || !String(emp.currentGrade).includes('補佐級III')) return '';
-  const hosa2PromoKey = GRADE_TO_PROMO_KEY['補佐級II(班長)']; 
-  const hosa2PromoDate = emp[hosa2PromoKey];
-  if (!hosa2PromoDate) return '';
-  const hosa2PromoYear = parseInt(hosa2PromoDate.split('-')[0], 10);
-  if (!isNaN(hosa2PromoYear)) {
-    return Math.max(0, targetYear - hosa2PromoYear);
-  }
-  return '';
-};
 
 const getEmpNo = (emp) => {
   const no = emp?.employeeNumber || emp?.employeeId || emp?.['職員番号'] || emp?.id || '';
