@@ -169,20 +169,18 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     sheet.getCell(2, i + 3).value = h;
   });
 
-  ['A1', 'B1', 'C1', 'H1'].forEach(c => {
-    const cell = sheet.getCell(c);
-    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-    cell.font = { bold: true };
-    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
-  });
-  
-  for(let i=3; i<=13; i++) {
-    const cell = sheet.getCell(2, i);
-    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-    cell.font = { bold: true };
-    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+  for (let r = 1; r <= 2; r++) {
+    for (let c = 1; c <= 13; c++) {
+      const cell = sheet.getCell(r, c);
+      cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+      cell.font = { bold: true };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+      
+      let bottomStyle = r === 2 ? 'medium' : 'thin';
+      let rightStyle = [1, 2, 7].includes(c) ? 'medium' : 'thin';
+      
+      cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style: bottomStyle}, right: {style: rightStyle} };
+    }
   }
 
   desigRows.forEach((r, i) => {
@@ -197,7 +195,8 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     const borderBottomStyle = isGradeChanged ? 'medium' : 'thin';
 
     row.eachCell((cell, colNumber) => {
-      cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style: borderBottomStyle}, right: {style:'thin'} };
+      let rightStyle = [1, 2, 7].includes(colNumber) ? 'medium' : 'thin';
+      cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style: borderBottomStyle}, right: {style: rightStyle} };
       if ([1, 4, 5, 6, 7, 9, 10, 11].includes(colNumber)) {
         cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       } else {

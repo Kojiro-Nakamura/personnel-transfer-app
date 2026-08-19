@@ -554,8 +554,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     };
 
     const headerColsTop = [
-      { label: `R${prevYearR}年度<br>格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight', rowspan: '2' },
-      { label: '所属・職名', key: 'postLabel', cls: 'text-left min-w-[120px]', rowspan: '2' }
+      { label: `R${prevYearR}年度<br>格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight !border-r-[3px]', rowspan: '2' },
+      { label: '所属・職名', key: 'postLabel', cls: 'text-left min-w-[120px] !border-r-[3px]', rowspan: '2' }
     ];
 
     const headerColsBottom = [
@@ -563,7 +563,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center bg-gray-50' },
       { label: `現職年数<br>R${targetYearR}.3.31`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
       { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
-      { label: '異動案', key: 'predReason', cls: 'text-center bg-blue-100/50' },
+      { label: '異動案', key: 'predReason', cls: 'text-center bg-blue-100/50 !border-r-[3px]' },
       { label: '氏名', key: 'succName', cls: 'text-center bg-gray-50' },
       { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center bg-gray-50' },
       { label: `現職年数<br>R${targetYearR}.3.31`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
@@ -580,10 +580,10 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         
         <div className="overflow-auto border-t-[3px] border-black max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible">
           <table className="border-collapse w-full min-w-max bg-white text-black border-b-2 border-black text-[11px]">
-            <thead className="sticky top-0 z-10 bg-white">
+            <thead className="sticky top-0 z-10 bg-white shadow-[0_3px_0_0_black]">
               <tr>
                 {headerColsTop.map(c => renderTh(c.label, c.key, handleSortClick, true, c.cls, c.rowspan))}
-                <th colSpan="5" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
+                <th colSpan="5" className="border-r-[3px] border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
                 <th colSpan="6" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">令和{targetYearR}年度配置（案）</th>
               </tr>
               <tr>
@@ -599,15 +599,15 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                 const borderClass = isGradeChanged ? 'border-b-[3px] border-black' : 'border-b border-gray-400';
                 return (
                   <tr key={i} className={`${borderClass} hover:bg-gray-50 print-break-inside-avoid`}>
-                    <td className="border-r border-black p-1.5 text-center whitespace-nowrap">{r.gradeLabel}</td>
-                    <td className="border-r border-black p-1.5 break-words font-bold">{r.postLabel}</td>
+                    <td className="border-r-[3px] border-black p-1.5 text-center whitespace-nowrap">{r.gradeLabel}</td>
+                    <td className="border-r-[3px] border-black p-1.5 break-words font-bold">{r.postLabel}</td>
                     <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predCurrentYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
                       {r.predGradeYears}
                     </td>
-                    <td className={`border-r border-black p-1.5 text-center font-bold bg-blue-50/50 ${reasonColor}`}>{r.predReason}</td>
+                    <td className={`border-r-[3px] border-black p-1.5 text-center font-bold bg-blue-50/50 ${reasonColor}`}>{r.predReason}</td>
                     <td className={`border-r border-black p-1.5 whitespace-nowrap ${succNameClass}`}>{r.succName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succCurrentYears}</td>
