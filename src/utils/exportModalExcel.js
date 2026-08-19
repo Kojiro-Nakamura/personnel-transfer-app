@@ -160,8 +160,8 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   sheet.getCell('H1').value = `令和${targetYearR}年度配置（案）`;
 
   const headersBottom = [
-    '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, '異動案',
-    '氏名', `年齢\nR${targetYearR}.4.1`, `現職年数\nR${targetYearR}.3.31`, `現格付年数\nR${targetYearR}.3.31`, `R${prevYearR}年度\n所属・職名`, '備考'
+    '氏名', `年齢\nR${targetYearR}.4.1時点`, `現職年数\nR${targetYearR}.3.31時点`, `現格付年数\nR${targetYearR}.3.31時点`, '異動案',
+    '氏名', `年齢\nR${targetYearR}.4.1時点`, `現職年数\nR${targetYearR}.3.31時点`, `現格付年数\nR${targetYearR}.3.31時点`, `R${prevYearR}年度\n所属・職名`, '備考'
   ];
   
   headersBottom.forEach((h, i) => {
@@ -269,8 +269,8 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
   const prevYearR = targetYearR - 1;
 
   const cols = [
-    '所属・職名', '班係', '職員番号', '氏名', `年齢\nR${targetYearR}.4.1`, '事由', '現所属\n年数', 
-    '後任者\n職員番号', '後任者 氏名', '昇任\n昇格', `年齢\nR${targetYearR}.4.1`, `R${prevYearR}年度所属・職名`, '特記事項'
+    '所属・職名', '班係', '職員番号', '氏名', `年齢\nR${targetYearR}.4.1時点`, '事由', '現所属\n年数', 
+    '後任者\n職員番号', '後任者 氏名', '昇任\n昇格', `年齢\nR${targetYearR}.4.1時点`, `R${prevYearR}年度所属・職名`, '特記事項'
   ];
 
   const headerRow = sheet.addRow(cols);

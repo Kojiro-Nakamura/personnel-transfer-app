@@ -355,13 +355,13 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       { label: '班係', key: 'predGroup', cls: 'text-left' },
       { label: '職員番号', key: 'predEmpNo', cls: 'text-center min-w-[5rem] w-20 leading-tight' },
       { label: '氏名', key: 'predName', cls: 'text-left' },
-      { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center leading-tight' },
+      { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'predAge', cls: 'text-center leading-tight' },
       { label: '事由', key: 'reason', cls: 'text-left' },
       { label: '現所属<br>年数', key: 'currentYears', cls: 'text-center leading-tight' },
       { label: '後任者<br>職員番号', key: 'succEmpNo', cls: 'text-center min-w-[5rem] w-20 leading-tight' },
       { label: '後任者 氏名', key: 'succName', cls: 'text-left leading-tight' },
       { label: '昇任<br>昇格', key: 'isPromoted', cls: 'text-center leading-tight' },
-      { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center leading-tight' },
+      { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'succAge', cls: 'text-center leading-tight' },
       { label: `R${prevYearR}年度所属・職名`, key: 'succPostLabel', cls: 'text-left leading-tight' },
       { label: '特記事項', key: 'noteStr', cls: 'text-left' }
     ];
@@ -558,14 +558,14 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
 
     const headerColsBottom = [
       { label: '氏名', key: 'predName', cls: 'text-center bg-gray-50' },
-      { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center bg-gray-50' },
-      { label: `現職年数<br>R${targetYearR}.3.31`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
-      { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
+      { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'predAge', cls: 'text-center bg-gray-50' },
+      { label: `現職年数<br>R${targetYearR}.3.31時点`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
+      { label: `現格付年数<br>R${targetYearR}.3.31時点`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
       { label: '異動案', key: 'predReason', cls: 'text-center bg-blue-100/50 !border-r-[3px]' },
       { label: '氏名', key: 'succName', cls: 'text-center bg-gray-50' },
-      { label: `年齢<br>R${targetYearR}.4.1`, key: 'succAge', cls: 'text-center bg-gray-50' },
-      { label: `現職年数<br>R${targetYearR}.3.31`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
-      { label: `現格付年数<br>R${targetYearR}.3.31`, key: 'succGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
+      { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'succAge', cls: 'text-center bg-gray-50' },
+      { label: `現職年数<br>R${targetYearR}.3.31時点`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
+      { label: `現格付年数<br>R${targetYearR}.3.31時点`, key: 'succGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
       { label: `R${prevYearR}年度<br>所属・職名`, key: 'succPostLabel', cls: 'text-left min-w-[120px]' },
       { label: '備考', key: 'succRemark', cls: 'text-left min-w-[80px]' }
     ];
