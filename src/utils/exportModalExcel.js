@@ -87,7 +87,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     const succ = row.successor?.emp || {};
     const succPost = row.successor?.fromPost || {};
     
-    let predReason = isRetention ? '留任' : (row.predecessor ? (row.predecessor.toPost.type === 'retired' ? '退職' : '転任') : '新設');
+    let predReason = isRetention ? '留任' : (row.predecessor ? (row.predecessor.toPost.type === 'retired' ? '退職' : '転任') : '（新設）');
     
     let succRemark = '';
     if (row.successor) {

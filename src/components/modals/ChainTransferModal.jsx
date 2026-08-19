@@ -482,7 +482,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       const predEmpNo = getEmpNo(pred);
       const succEmpNo = getEmpNo(succ);
       
-      let predReason = isRetention ? '留任' : (row.predecessor ? (row.predecessor.toPost.type === 'retired' ? '退職' : '転任') : '新設');
+      let predReason = isRetention ? '留任' : (row.predecessor ? (row.predecessor.toPost.type === 'retired' ? '退職' : '転任') : '（新設）');
       
       let succRemark = '';
       if (row.successor) {
@@ -570,11 +570,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     };
 
     const headerColsTop = [
+      { label: `R${prevYearR}年度<br>格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight', rowspan: '2' },
       { label: '所属・職名', key: 'postLabel', cls: 'text-left min-w-[120px]', rowspan: '2' }
     ];
 
     const headerColsBottom = [
-      { label: `R${prevYearR}年度<br>格付`, key: 'gradeLabel', cls: 'text-center min-w-[60px] bg-gray-50 leading-tight' },
       { label: '氏名', key: 'predName', cls: 'text-center bg-gray-50' },
       { label: `年齢<br>R${targetYearR}.4.1`, key: 'predAge', cls: 'text-center bg-gray-50' },
       { label: `現職年数<br>R${targetYearR}.3.31`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
@@ -599,7 +599,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <thead className="sticky top-0 z-10 bg-white">
               <tr>
                 {headerColsTop.map(c => renderTh(c.label, c.key, handleSortClick, true, c.cls, c.rowspan))}
-                <th colSpan="6" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
+                <th colSpan="5" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
                 <th colSpan="6" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">令和{targetYearR}年度配置（案）</th>
               </tr>
               <tr>
@@ -612,8 +612,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                 const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
                 return (
                   <tr key={i} className="border-b border-gray-400 hover:bg-gray-50 print-break-inside-avoid">
-                    <td className="border-r border-black p-1.5 break-words font-bold">{r.postLabel}</td>
                     <td className="border-r border-black p-1.5 text-center whitespace-nowrap">{r.gradeLabel}</td>
+                    <td className="border-r border-black p-1.5 break-words font-bold">{r.postLabel}</td>
                     <td className="border-r border-black p-1.5 whitespace-nowrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predCurrentYears}</td>
