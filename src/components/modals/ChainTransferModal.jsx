@@ -543,8 +543,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     const targetYearR = toReiwa(targetYear);
     const prevYearR = targetYearR - 1;
 
-    const today = new Date();
-    const currentConfigTitle = `令和${prevYearR}年度配置（R${toReiwa(today.getFullYear())}.${today.getMonth() + 1}.${today.getDate()}現在）`;
+    const currentConfigTitle = `令和${prevYearR}年度配置（R${prevYearR}.12.1現在）`;
 
     const handleSortClick = (key) => {
       let newOrder = 'asc';

@@ -145,8 +145,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 
   const targetYearR = toReiwa(targetYear);
   const prevYearR = targetYearR - 1;
-  const today = new Date();
-  const currentConfigTitle = `令和${prevYearR}年度配置（R${toReiwa(today.getFullYear())}.${today.getMonth() + 1}.${today.getDate()}現在）`;
+  const currentConfigTitle = `令和${prevYearR}年度配置（R${prevYearR}.12.1現在）`;
 
   sheet.mergeCells('A1:A2');
   sheet.getCell('A1').value = `R${prevYearR}年度\n格付`;
