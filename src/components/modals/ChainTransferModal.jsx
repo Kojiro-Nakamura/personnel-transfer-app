@@ -306,6 +306,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
 
     moves.forEach(move => {
       if (!usedToMoves.has(move)) {
+        if (move.toPost.type === 'retired') return; // 退職予定者は後任者として扱わない
         listRows.push({
           predecessor: null, successor: move,
           reason: move.fromPost.type === 'unassigned' ? '新採' : '新設'
@@ -313,7 +314,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       }
     });
 
-    listRows = listRows.filter(row => row.predecessor?.toPost?.type !== 'retired').map(row => {
+    listRows = listRows.map(row => {
       const pred = row.predecessor?.emp || {};
       const succ = row.successor?.emp || {};
       const predPost = row.predecessor?.fromPost || row.successor?.toPost || {};
