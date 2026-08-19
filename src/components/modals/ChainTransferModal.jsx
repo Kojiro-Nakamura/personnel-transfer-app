@@ -492,8 +492,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         
         if (promoStr) {
            succRemark = promoStr;
-        } else if (row.successor.isTitleChanged) {
-           succRemark = '昇格';
         }
       }
       

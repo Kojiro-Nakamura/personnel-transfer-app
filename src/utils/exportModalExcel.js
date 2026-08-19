@@ -97,8 +97,6 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       
       if (promoStr) {
          succRemark = promoStr;
-      } else if (row.successor.isTitleChanged) {
-         succRemark = '昇格';
       }
     }
 
