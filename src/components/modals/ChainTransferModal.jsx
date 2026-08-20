@@ -374,6 +374,14 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
           orgOrder = nextOrderMap[row.successor.emp.id];
         }
 
+      let noteStr = '';
+      if (succ && succ.note) {
+        const notes = [];
+        if (String(succ.note).includes('育代')) notes.push('育児休業中');
+        if (String(succ.note).includes('役職定年')) notes.push('役職定年');
+        noteStr = notes.join(' / ');
+      }
+
       return {
         orgOrder,
         predDept: predPost.dept || '',
@@ -389,7 +397,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         isPromoted,
         succAge: succ.ageNextYear ?? succ.age ?? '',
         succPostLabel: succPost.type === 'unassigned' ? '' : (succPost.label || ''),
-        noteStr: succ.note || pred.note || ''
+        noteStr
       };
     });
 
