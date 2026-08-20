@@ -1049,6 +1049,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
           body { background-color: white; overflow: visible !important; }
           .no-print { display: none !important; }
           .print-break-inside-avoid { page-break-inside: avoid; }
+          #app-header, #app-main, #app-floating-bar { display: none !important; }
         }
       `}</style>
       </div>

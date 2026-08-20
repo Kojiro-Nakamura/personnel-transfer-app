@@ -106,7 +106,7 @@ export const AppContent = () => {
       )}
 
       {/* 画面上部ヘッダー（操作パネル） */}
-      <header className="bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]">
+      <header id="app-header" className="bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]">
         <div className="flex justify-between items-center p-2 border-b border-[#4d86c2]">
           <div className="flex items-center gap-3">
             <Building2 className="w-5 h-5 text-white" />
@@ -187,7 +187,7 @@ export const AppContent = () => {
       </header>
 
       {/* メイン画面（表エリア） */}
-      <div className="flex-1 overflow-hidden relative w-full">
+      <div id="app-main" className="flex-1 overflow-hidden relative w-full">
         <main className="absolute top-0 left-0 p-2 flex" style={{ transform: actZoom !== 1 ? `scale(${actZoom})` : 'none', transformOrigin: 'top left', width: `${100/actZoom}%`, height: `${100/actZoom}%` }}>
           <div className="flex flex-col md:flex-row gap-2 w-full h-full">
             <div className="flex-1 w-full bg-white rounded shadow-sm border border-slate-400 flex flex-col h-full overflow-hidden">
@@ -259,7 +259,7 @@ export const AppContent = () => {
 
         
         return (
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#0F828C] text-white px-6 py-4 rounded-xl shadow-2xl z-[150] flex flex-col gap-3 border-2 border-white min-w-[480px]">
+          <div id="app-floating-bar" className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#0F828C] text-white px-6 py-4 rounded-xl shadow-2xl z-[150] flex flex-col gap-3 border-2 border-white min-w-[480px]">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-amber-200" />
