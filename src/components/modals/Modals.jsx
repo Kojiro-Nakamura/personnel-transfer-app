@@ -580,20 +580,20 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   };;
   const handleDownloadTemplate = () => {
     const headers = [
-      "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", 
+      "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", "配属希望", "特殊事情", 
       "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
       "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
       "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
       ...historyYears.map(y => getEraFormattedYear(y))
     ].join(',');
-    const sampleRow = `000001,男,和歌山 太郎,ワカヤマ タロウ,S60.01.01,和歌山大学,H20.04.01,特になし,森林整備課,緑化推進班,班長,班長,補佐級II(班長),1,1,,技術職,森林整備課,緑化推進班,班長,班長,補佐級II(班長),2,1+1,,技術職,2015,2018,2022,,,,,` + historyYears.map(y => ',').join('');
+    const sampleRow = `000001,男,和歌山 太郎,ワカヤマ タロウ,S60.01.01,和歌山大学,H20.04.01,特になし,企画課,介護,森林整備課,緑化推進班,班長,班長,補佐級II(班長),1,1,,技術職,森林整備課,緑化推進班,班長,班長,補佐級II(班長),2,1+1,,技術職,2015,2018,2022,,,,,` + historyYears.map(y => ',').join('');
     const content = "\uFEFF" + headers + "\n" + sampleRow + "\n";
     downloadFile(content, 'text/csv;charset=utf-8;', '職員一括編集_ひな型.csv');
   };
 
   const handleExportCSV = () => {
     const headers = [
-      "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", 
+      "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", "配属希望", "特殊事情", 
       "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
       "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
       "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
@@ -649,6 +649,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
         emp.education || '',
         emp.hireDate || '',
         emp.note || '',
+        emp.desiredAssignment || '',
+        emp.specialCircumstances || '',
         cDName,
         cPName,
         cGpName,
@@ -902,6 +904,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
           const hStr = getVal('採用年月日');
           const edu = getVal('最終学歴');
           const note = getVal('特記事項');
+          const desiredAssignment = getVal('配属希望');
+          const specialCircumstances = getVal('特殊事情');
 
           // 今年度情報
           const cDName = getVal('【今年度】部署名');
@@ -958,6 +962,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
             education: edu !== undefined ? edu : (targetEmp ? targetEmp.education : ''), 
             hireDate: hStr !== undefined ? parseJapaneseDate(hStr) : (targetEmp ? targetEmp.hireDate : ''), 
             note: note !== undefined ? note : (targetEmp ? targetEmp.note : ''), 
+            desiredAssignment: desiredAssignment !== undefined ? desiredAssignment : (targetEmp ? targetEmp.desiredAssignment : ''),
+            specialCircumstances: specialCircumstances !== undefined ? specialCircumstances : (targetEmp ? targetEmp.specialCircumstances : ''),
             currentDeptId: currP.dId, 
             currentPostId: currP.pId, 
             currentGroupId: currP.gId, 

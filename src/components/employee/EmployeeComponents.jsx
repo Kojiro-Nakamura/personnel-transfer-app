@@ -637,6 +637,12 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="text" placeholder="YYYY-MM-DD" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) setFd({...fd, hireDate: p}); }} className="w-[130px] shrink-0" />
               <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="flex-1 min-w-0" />
             </div>
+            <div className="flex gap-2 w-full">
+              <FormInput label="配属希望" value={fd.desiredAssignment} onChange={v => setFd({...fd, desiredAssignment: v})} className="flex-1 min-w-0" />
+            </div>
+            <div className="flex gap-2 w-full">
+              <FormInput label="特殊事情" value={fd.specialCircumstances} onChange={v => setFd({...fd, specialCircumstances: v})} className="flex-1 min-w-0" />
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-3 my-3">

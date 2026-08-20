@@ -217,17 +217,17 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
   ws.mergeCells('R4:R5');
   ws.mergeCells('S4:S5');
   ws.mergeCells('T4:T5');
-  ws.mergeCells('U4:Z4');
-  ws.mergeCells('AA4:AJ4');
+  ws.mergeCells('U4:AB4');
+  ws.mergeCells('AC4:AL4');
   if (historyYears.length > 0) {
-    const endColCode = ws.getColumn(36 + historyYears.length).letter;
-    const startColCode = ws.getColumn(37).letter;
+    const endColCode = ws.getColumn(38 + historyYears.length).letter;
+    const startColCode = ws.getColumn(39).letter;
     if (startColCode !== endColCode) ws.mergeCells(`${startColCode}4:${endColCode}4`);
   }
 
 
   
-  const totalCols = 36 + historyYears.length;
+  const totalCols = 38 + historyYears.length;
   for (let i = 1; i <= totalCols; i++) {
     const col = ws.getColumn(i).letter;
     [4, 5].forEach(rn => {
@@ -261,7 +261,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
             argb = 'FFF5D0FE'; // Fuchsia
          }
       }
-      if (i >= 37) argb = 'FFA7F3D0'; // Emerald (History)
+      if (i >= 39) argb = 'FFA7F3D0'; // Emerald (History)
       
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
@@ -427,6 +427,8 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       rowVals.push(extEmp.education || '');
       rowVals.push(formatWithEra(extEmp.hireDate, extEmp.birthDate));
       rowVals.push(extEmp.note || '');
+      rowVals.push(extEmp.desiredAssignment || '');
+      rowVals.push(extEmp.specialCircumstances || '');
 
       let hireStr = '';
       if (extEmp.hireDate) {
@@ -503,7 +505,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
           }
           
           if (isNextPromo) {
-           curPromoColors[27 + idx] = getPromotedBgColorCode(extEmp.nextGrade);
+           curPromoColors[29 + idx] = getPromotedBgColorCode(extEmp.nextGrade);
           }
           
           rowVals.push(prefix ? `${prefix}${pStr}` : pStr);
@@ -595,11 +597,11 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         
         rowVals.push(displayStr);
         if (isChange) {
-           curFontStyles[37 + i] = 'change'; 
+           curFontStyles[39 + i] = 'change'; 
         }
         if (promoYearMap[y]) {
            const c = getPromotedBgColorCode(promoYearMap[y]);
-           if (c) curPromoColors[37 + i] = c;
+           if (c) curPromoColors[39 + i] = c;
         }
       });
       
@@ -930,7 +932,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   r2.height = 13;
 
   const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 34 + currYearIndex;
+  const legendEndCol = 36 + currYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -1096,6 +1098,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       emp.education || '',
       formatWithEra(emp.hireDate, emp.birthDate),
       emp.note || '',
+      emp.desiredAssignment || '',
+      emp.specialCircumstances || '',
       cDeptName,
       emp.currentTitle || '',
       emp.currentGrade || '',
@@ -1249,20 +1253,20 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
          argb = 'FFE2E8F0';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 16) argb = 'FFF8FAFC';
-      else if (colNumber <= 23) {
+      else if (colNumber <= 18) argb = 'FFF8FAFC';
+      else if (colNumber <= 25) {
          argb = 'FFEFF6FF';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 33) {
+      else if (colNumber <= 35) {
          argb = 'FFFDF4FF';
-         if (colNumber === 33 && nextPromoColor) {
+         if (colNumber === 35 && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
       else {
          argb = 'FFECFDF5';
-         if (colNumber === 33 + historyYears.length && nextPromoColor) {
+         if (colNumber === 35 + historyYears.length && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
@@ -1295,11 +1299,11 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     rowIndex++;
   });
 
-  const lastColLetter = ws.getColumn(34 + historyYears.length).letter;
+  const lastColLetter = ws.getColumn(36 + historyYears.length).letter;
   ws.autoFilter = `A5:${lastColLetter}${rowIndex - 1}`;
 
   ws.columns.forEach((col, i) => {
-    const isHistory = i >= 33;
+    const isHistory = i >= 35;
     let maxLength = 0;
     col.eachCell({ includeEmpty: true }, cell => {
       if (cell.row <= 4) return; 
@@ -1322,7 +1326,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     if (maxLength > 40) maxLength = 40; // cap maximum width
     if (maxLength > 0) {
        let padding = 1.5;
-       if (i === 4 || i === 6 || (i >= 22 && i <= 30)) {
+       if (i === 4 || i === 6 || (i >= 24 && i <= 32)) {
            padding = 4.0;
        } else if (i === 12 || i === 19) { // 詳細列
            padding = 5.0;
