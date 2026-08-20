@@ -965,8 +965,9 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col font-sans text-black overflow-hidden print:static print:bg-white print:overflow-visible">
-      {/* Header */}
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200 print:bg-white print:static print:block">
+      <div className="bg-white rounded-xl shadow-2xl w-[98vw] h-[96vh] max-w-[1920px] flex flex-col font-sans text-black overflow-hidden animate-in zoom-in-95 duration-200 print:w-full print:h-auto print:rounded-none print:shadow-none print:border-none print:block">
+        {/* Header */}
       <header className="bg-white border-b border-gray-300 shadow-sm shrink-0 print:border-none print:shadow-none">
         <div className="w-full px-4 sm:px-8 h-14 flex items-center justify-between print:h-auto print:py-2 print:px-0">
           <div className="flex items-center gap-2">
@@ -1034,6 +1035,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
           .print-break-inside-avoid { page-break-inside: avoid; }
         }
       `}</style>
+      </div>
     </div>
   );
 };
