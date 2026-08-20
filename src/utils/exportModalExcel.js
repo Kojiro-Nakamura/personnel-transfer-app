@@ -1,4 +1,4 @@
-import ExcelJS from 'exceljs';
+﻿import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
 import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
@@ -215,11 +215,13 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
   const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
   
     const { deptMap, currMap, nextMap } = buildDeptMap(departments, employees);
-    const empOrderMap = {};
+    const currOrderMap = {};
+    const nextOrderMap = {};
     let order = 0;
-    traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, title, curr, nxt) => {
-      if (curr) empOrderMap[curr.id] = order;
-      if (nxt) empOrderMap[nxt.id] = order;
+    traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, title, curr, nxt, type) => {
+      if (type === 'system') return;
+      if (curr) currOrderMap[curr.id] = order;
+      if (nxt) nextOrderMap[nxt.id] = order;
       order++;
     });
   let listRows = [];
@@ -239,7 +241,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
 
   moves.forEach(move => {
     if (!usedToMoves.has(move)) {
-      if (move.toPost.type === 'retired') return; // 退職予定者は後任者として扱わない
+      if (move.toPost.type === 'retired' || move.toPost.type === 'unassigned') return; // 退職予定者や未配置は後任者として扱わない
       listRows.push({
         predecessor: null, successor: move,
         reason: move.fromPost.type === 'unassigned' ? '新採' : '新設'
@@ -281,10 +283,10 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     }
 
     let orgOrder = 999999;
-    if (row.predecessor && empOrderMap[row.predecessor.emp.id] !== undefined) {
-      orgOrder = empOrderMap[row.predecessor.emp.id];
-    } else if (row.successor && empOrderMap[row.successor.emp.id] !== undefined) {
-      orgOrder = empOrderMap[row.successor.emp.id];
+    if (row.predecessor && currOrderMap[row.predecessor.emp.id] !== undefined) {
+      orgOrder = currOrderMap[row.predecessor.emp.id];
+    } else if (row.successor && nextOrderMap[row.successor.emp.id] !== undefined) {
+      orgOrder = nextOrderMap[row.successor.emp.id];
     }
 
     return {
