@@ -192,7 +192,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
   const r4 = ws.getRow(4);
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ', ''];
-  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '', '');
+  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '', '');
   historyYears.forEach((y, i) => {
     if (i === 0) r4Vals.push('履歴');
     else r4Vals.push('');
@@ -202,7 +202,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
   const r5 = ws.getRow(5);
   const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '職名', '氏名', '級', '年齢', '在籍', '備考', '', ''];
-  r5Vals.push('氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
+  r5Vals.push('氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配属希望', '特殊事情', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
   historyYears.forEach(y => r5Vals.push(getEraFormattedYear(y)));
   r5.values = r5Vals;
   r5.height = 20;
@@ -243,17 +243,17 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       if (i === 16) argb = 'FFF1F5F9'; // メモ
       if (i === 17) argb = 'FFFFFFFF'; // 空白列
       if (i >= 18 && i <= 20) argb = 'FFCBD5E1'; // 氏名,年齢,フリガナ (same as 部署名)
-      if (i >= 21 && i <= 26) argb = 'FFBFDBFE'; // 基本情報 (Blue)
+      if (i >= 21 && i <= 28) argb = 'FFBFDBFE'; // 基本情報 (Blue)
       if (i >= 29 && i <= 38) {
          const promoColors = {
-            28: getPromotedBgColorCode('係長級(主査)'),
-            29: getPromotedBgColorCode('補佐級I(主任)'),
-            30: getPromotedBgColorCode('補佐級II(班長)'),
-            31: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
-            32: getPromotedBgColorCode('課長級'),
-            33: getPromotedBgColorCode('所属長級'),
-            34: getPromotedBgColorCode('次長級'),
-            35: getPromotedBgColorCode('部長級'),
+            30: getPromotedBgColorCode('係長級(主査)'),
+            31: getPromotedBgColorCode('補佐級I(主任)'),
+            32: getPromotedBgColorCode('補佐級II(班長)'),
+            33: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
+            34: getPromotedBgColorCode('課長級'),
+            35: getPromotedBgColorCode('所属長級'),
+            36: getPromotedBgColorCode('次長級'),
+            37: getPromotedBgColorCode('部長級'),
          };
          if (rn === 5 && promoColors[i]) {
             argb = 'FF' + promoColors[i].replace('#', '').toUpperCase();
