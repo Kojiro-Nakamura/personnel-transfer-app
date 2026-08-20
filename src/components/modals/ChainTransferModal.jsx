@@ -375,10 +375,10 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         }
 
       let noteStr = '';
-      if (succ && succ.note) {
+      if (succ && succ.nextEmploymentType) {
         const notes = [];
-        if (String(succ.note).includes('育代')) notes.push('育児休業中');
-        if (String(succ.note).includes('役職定年')) notes.push('役職定年');
+        if (String(succ.nextEmploymentType).includes('育代')) notes.push('育児休業中');
+        if (String(succ.nextEmploymentType).includes('役職定年')) notes.push('役職定年');
         noteStr = notes.join(' / ');
       }
 
