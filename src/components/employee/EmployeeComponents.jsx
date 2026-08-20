@@ -297,7 +297,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
   return (
     <div className={cx("p-2 rounded border flex flex-col", isCurrent ? "bg-slate-50 border-slate-200" : "bg-blue-50/50 border-blue-200")}>
       <div className="flex justify-between items-center mb-1.5 border-b pb-1">
-        <h4 className={cx("font-bold text-sm", isCurrent ? "text-slate-900" : "text-[#02213d]")}>{title}</h4>
+        <h4 className={cx("font-bold text-[13px]", isCurrent ? "text-slate-900" : "text-[#02213d]")}>{title}</h4>
         {isCurrent && setEditCurrent && (
           <label className="flex items-center gap-1 text-xs cursor-pointer" title="今年度のデータを直接編集する">
             <input type="checkbox" checked={editCurrent} onChange={(e) => setEditCurrent(e.target.checked)} className="cursor-pointer"/>
@@ -307,20 +307,20 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
       </div>
       <div className="relative flex-1">
         {isCurrent && disabled && <div className="absolute inset-0 z-10 bg-slate-50/50 cursor-not-allowed" />}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div>
             <label className="block text-xs mb-1">配置先</label>
             <PlacementSelector disabled={disabled} deptId={fd[pd]} postId={fd[pp]} groupId={fd[pg]} groupPostId={fd[pgp]} departments={departments} isNext={!isCurrent} onChange={v => setFd({...fd, [pd]: v.deptId, [pp]: v.postId, [pg]: v.groupId, [pgp]: v.groupPostId})} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <FormInput label="職名" disabled={disabled} value={fd[`${p}Title`]} onChange={v => setFd({...fd, [`${p}Title`]: v})} className="flex-1" />
             <FormSelect label="級" disabled={disabled} value={fd[`${p}Grade`]} onChange={handleGradeChange} options={GRADE_OPTIONS} className="w-[140px]" selectClassName={promoBg} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <FormInput label="年数" type="number" disabled={disabled} value={fd[`${p}Years`]} onChange={v => setFd({...fd, [`${p}Years`]: v})} className="w-16" />
             <FormInput label="年数詳細" disabled={disabled} placeholder="派1+治1、1+1など" value={fd[`${p}SkillsStr`]} onChange={v => setFd({...fd, [`${p}SkillsStr`]: v})} className="flex-1" />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <FormInput label="備考" disabled={disabled} placeholder="育代No.1：横山など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} className="flex-1" />
             <FormInputWithList label="カウント除外" disabled={disabled} placeholder="事務職など" value={fd[`${p}Exclude`]} onChange={v => setFd({...fd, [`${p}Exclude`]: v})} options={["事務職", "技術職", "短時間"]} listId={`exclude-list-${p}`} className="w-24" />
           </div>
@@ -360,8 +360,8 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear, b
   
   return (
     <div className="flex flex-col w-full">
-      <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
-      <div className={cx("flex flex-col justify-center h-[36px] w-full px-1.5 py-0.5 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
+      <span className="text-[11px] font-bold text-slate-600 mb-0.5">{label}</span>
+      <div className={cx("flex flex-col justify-center h-[28px] w-full px-1.5 py-0 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
         <input 
           type="text" 
           placeholder="YYYY-MM-DD"
@@ -370,7 +370,7 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear, b
           onBlur={handleBlur}
           className={`w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight ${value && String(value).length >= 10 && !String(value).endsWith('-04-01') ? 'text-rose-600 text-outline-white' : 'text-slate-900'}`} 
         />
-        <div className="flex items-center justify-between mt-[-2px] min-h-[14px]">
+        <div className="flex items-center justify-between mt-[-4px] min-h-[14px]">
           {value ? (
             (() => {
               const isNonAprilFirst = value && String(value).length >= 10 && !String(value).endsWith('-04-01');
@@ -623,9 +623,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
         </div>
         
-        <div className="space-y-3 overflow-y-auto flex-1 pr-2 pb-1">
-          <div className="flex flex-col gap-2 w-full">
-            <div className="flex gap-2 w-full">
+        <div className="space-y-2 overflow-y-auto flex-1 pr-2 pb-1">
+          <div className="flex flex-col gap-1 w-full">
+            <div className="flex gap-1 w-full">
               <FormInput label="職員番号" value={fd.employeeNumber} onChange={v => setFd({...fd, employeeNumber: v})} className="w-[75px] shrink-0" />
               <FormInput label="氏名" value={fd.name} onChange={v => setFd({...fd, name: v})} className="w-[100px] flex-1 min-w-0" />
               <FormInput label="フリガナ" value={fd.furigana} onChange={v => setFd({...fd, furigana: v})} className="w-[100px] flex-1 min-w-0" />
@@ -633,19 +633,19 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               <FormInput label={`生年月日${getEraStr(fd.birthDate)}${fd.birthDate ? ` (R${targetYear - 2018 - 1}年齢:${calculateAge(fd.birthDate, targetYear - 1)}歳)` : ''}`} type="text" placeholder="YYYY-MM-DD" value={fd.birthDate} onChange={v => setFd({...fd, birthDate: v})} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) setFd({...fd, birthDate: p}); }} className="w-[200px] shrink-0" />
               <FormInput label="学歴" value={fd.education} onChange={v => setFd({...fd, education: v})} className="w-[80px] shrink-0" />
             </div>
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-1 w-full">
               <FormInput label={`採用年月${getEraStr(fd.hireDate)}`} type="text" placeholder="YYYY-MM-DD" value={fd.hireDate} onChange={v => setFd({...fd, hireDate: v})} onBlur={e => { const p = parsePromoDate(e.target.value); if(p) setFd({...fd, hireDate: p}); }} className="w-[130px] shrink-0" />
               <FormInput label="特記事項" value={fd.note} onChange={v => setFd({...fd, note: v})} className="flex-1 min-w-0" />
             </div>
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-1 w-full">
               <FormInput label="配属希望" value={fd.desiredAssignment} onChange={v => setFd({...fd, desiredAssignment: v})} className="flex-1 min-w-0" />
             </div>
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-1 w-full">
               <FormInput label="特殊事情" value={fd.specialCircumstances} onChange={v => setFd({...fd, specialCircumstances: v})} className="flex-1 min-w-0" />
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-3 my-3">
+          <div className="grid grid-cols-2 gap-2 my-1.5">
             <EmployeeFormSection title={`今年度（現行）${getEraFormattedYear(targetYear - 1)}`} isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
             <EmployeeFormSection title={`来年度（新）${getEraFormattedYear(targetYear)}`} isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
           </div>
@@ -705,9 +705,9 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             </div>
           </div>
 
-          <div className="border border-slate-300 rounded p-2.5 mt-3 bg-slate-50/50">
+          <div className="border border-slate-300 rounded p-1.5 mt-1.5 bg-slate-50/50">
             <h4 className="font-bold text-sm text-slate-900 mb-2">履歴</h4>
-            <div className="grid grid-cols-5 gap-y-2 gap-x-4 pl-4 pr-1">
+            <div className="grid grid-cols-5 gap-y-1 gap-x-3 pl-3 pr-1">
               {(() => {
                 const baseHistory = [...(fd.history || [])].sort((a, b) => a.year - b.year);
                 const nextDeptStr = getPlacementName(fd.departmentId, fd.postId, fd.groupId, fd.groupPostId, departments);

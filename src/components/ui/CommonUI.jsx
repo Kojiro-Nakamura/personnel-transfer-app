@@ -52,7 +52,7 @@ export const CommentButton = ({ targetId, theme = 'light', tooltipPos = 'right',
 
 export const FormInput = ({ label, value, onChange, onBlur, type = "text", disabled = false, placeholder = "", className = "", inputClassName = "" }) => (
   <div className={className}>
-    <label className={cx("block text-xs mb-1", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
+    <label className={cx("block text-[11px] mb-0.5", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
     <input 
       type={type} 
       value={value !== undefined ? value : ''} 
@@ -60,14 +60,14 @@ export const FormInput = ({ label, value, onChange, onBlur, type = "text", disab
       onBlur={onBlur}
       disabled={disabled} 
       placeholder={placeholder} 
-      className={cx("w-full h-[34px] border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (inputClassName || "bg-white"), placeholder ? "placeholder:text-slate-400" : "")} 
+      className={cx("w-full h-[28px] border rounded px-1.5 py-1 text-xs outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (inputClassName || "bg-white"), placeholder ? "placeholder:text-slate-400" : "")} 
     />
   </div>
 );
 
 export const FormInputWithList = ({ label, value, onChange, disabled = false, placeholder = "", listId, options, className = "" }) => (
   <div className={className}>
-    <label className={cx("block text-xs mb-1", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
+    <label className={cx("block text-[11px] mb-0.5", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
     <input 
       type="text" 
       list={listId} 
@@ -75,7 +75,7 @@ export const FormInputWithList = ({ label, value, onChange, disabled = false, pl
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
       placeholder={placeholder} 
-      className={cx("w-full h-[34px] border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : "bg-white", placeholder ? "placeholder:text-slate-400" : "")} 
+      className={cx("w-full h-[28px] border rounded px-1.5 py-1 text-xs outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : "bg-white", placeholder ? "placeholder:text-slate-400" : "")} 
     />
     <datalist id={listId}>
       {options.map(o => <option key={o} value={o} />)}
@@ -85,19 +85,19 @@ export const FormInputWithList = ({ label, value, onChange, disabled = false, pl
 
 export const FormSelect = ({ label, value, onChange, options, disabled = false, className = "", selectClassName = "" }) => (
   <div className={className}>
-    <label className={cx("block text-xs mb-1", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
+    <label className={cx("block text-[11px] mb-0.5", disabled ? "text-slate-400" : "text-slate-600")}>{label}</label>
     <select 
       value={value !== undefined ? value : ''} 
       onChange={e => onChange(e.target.value)} 
       disabled={disabled} 
-      className={cx("w-full h-[34px] border rounded p-1.5 text-sm outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (selectClassName || "bg-white"))}
+      className={cx("w-full h-[28px] border rounded px-1.5 py-1 text-xs outline-none focus:ring-1 focus:ring-[#0F828C]", disabled ? "bg-slate-100 text-slate-500" : (selectClassName || "bg-white"))}
     >
       {options.map(o => <option key={o} value={o}>{o}</option>)}
     </select>
   </div>
 );
 
-export const PlacementSelector = ({ deptId, postId, groupId, groupPostId, departments, isNext, onChange, disabled, className = "flex h-[32px] gap-1" }) => {
+export const PlacementSelector = ({ deptId, postId, groupId, groupPostId, departments, isNext, onChange, disabled, className = "flex h-[28px] gap-1" }) => {
   const parse = (v) => { 
     if (v.startsWith('post:')) return { deptId, postId: v.split(':')[1], groupId: null, groupPostId: null }; 
     if (v.startsWith('groupPost:')) { const p = v.split(':'); return { deptId, postId: null, groupId: p[1], groupPostId: p[2] }; } 
