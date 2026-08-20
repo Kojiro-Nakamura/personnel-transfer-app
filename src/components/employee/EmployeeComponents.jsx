@@ -360,8 +360,8 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear, b
   
   return (
     <div className="flex flex-col w-full">
-      <span className="text-[11px] font-bold text-slate-600 mb-0.5">{label}</span>
-      <div className={cx("flex flex-col justify-center h-[28px] w-full px-1.5 py-0 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
+      <span className="text-[11px] font-bold text-slate-600 mb-1">{label}</span>
+      <div className={cx("flex flex-col justify-center h-[34px] w-full px-1.5 py-0.5 rounded shadow-inner focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-text overflow-hidden", activeBorder, bgClass || "bg-white")}>
         <input 
           type="text" 
           placeholder="YYYY-MM-DD"
@@ -370,7 +370,7 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear, b
           onBlur={handleBlur}
           className={`w-full outline-none bg-transparent placeholder-slate-300 text-[12px] font-bold tracking-tight ${value && String(value).length >= 10 && !String(value).endsWith('-04-01') ? 'text-rose-600 text-outline-white' : 'text-slate-900'}`} 
         />
-        <div className="flex items-center justify-between mt-[-4px] min-h-[14px]">
+        <div className="flex items-center justify-between mt-[-2px] min-h-[14px]">
           {value ? (
             (() => {
               const isNonAprilFirst = value && String(value).length >= 10 && !String(value).endsWith('-04-01');
@@ -658,7 +658,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
               {/* Top Row */}
               <div className="flex flex-col w-full shrink-0">
                 <span className="text-[11px] font-bold text-slate-600 mb-1">採用</span>
-                <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[36px] flex flex-col justify-center leading-tight tracking-tighter overflow-hidden">
+                <div className="px-1 py-1 bg-slate-200 text-slate-900 rounded text-xs font-bold shadow-inner border border-slate-300 h-[34px] flex flex-col justify-center leading-tight tracking-tighter overflow-hidden">
                   {fd.hireDate ? (() => {
                     const hYear = parseInt(String(fd.hireDate).substring(0, 4));
                     const isNonAprilFirst = String(fd.hireDate).length >= 10 && !String(fd.hireDate).endsWith('-04-01');
