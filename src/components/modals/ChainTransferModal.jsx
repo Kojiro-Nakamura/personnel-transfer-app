@@ -436,7 +436,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                 const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
                 const showGroup = i === 0 || !listRows[i - 1] || r.predGroup !== listRows[i - 1].predGroup || r.predDeptTitle !== listRows[i - 1].predDeptTitle || !!sortKey;
                 const isDeptChanged = i > 0 && !sortKey && r.predDept !== listRows[i - 1].predDept;
-                const borderTopClass = isDeptChanged ? 'border-t-[4px] border-black' : '';
+                const borderTopClass = isDeptChanged ? 'border-t-[3px] border-black' : '';
                 return (
                   <tr key={i} className={`border-b border-black text-[11px] hover:bg-gray-50 print-break-inside-avoid ${borderTopClass}`}>
                     <td className="border-r border-black p-1.5 max-w-[120px] break-words">{r.predDeptTitle}</td>
