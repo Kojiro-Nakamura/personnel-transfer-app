@@ -1,4 +1,4 @@
-﻿import ExcelJS from 'exceljs';
+import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
 import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
@@ -395,13 +395,15 @@ const addModalShortTenureSheet = (workbook, sheetName, targetYear, moves) => {
 };
 
 // 5. 6年以上特記
-const addModalLongTenureSheet = (workbook, sheetName, targetYear, employees) => {
+const addModalLongTenureSheet = (workbook, sheetName, targetYear, employees, deptMap) => {
   const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
   
   let longRows = [];
   employees.forEach(emp => {
-    const currentPostStr = (emp.currentDept || '') + ' ' + (emp.currentTitle || '');
-    const nextPostStr = (emp.nextDept || '') + ' ' + (emp.nextTitle || '');
+    const cDeptName = deptMap[emp.currentDeptId]?.name || '';
+    const nDeptName = deptMap[emp.departmentId]?.name || '';
+    const currentPostStr = cDeptName + (cDeptName && emp.currentTitle ? '　' : '') + (emp.currentTitle || '');
+    const nextPostStr = nDeptName + (nDeptName && emp.nextTitle ? '　' : '') + (emp.nextTitle || '');
     
     const isRetained = currentPostStr === nextPostStr;
     if (!isRetained) return;
@@ -446,7 +448,7 @@ const addModalLongTenureSheet = (workbook, sheetName, targetYear, employees) => 
 };
 
 // 6. 昇任者一覧
-const addModalPromotionSheet = (workbook, sheetName, targetYear, employees) => {
+const addModalPromotionSheet = (workbook, sheetName, targetYear, employees, deptMap) => {
   const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
   
   let promotionRows = [];
@@ -463,12 +465,15 @@ const addModalPromotionSheet = (workbook, sheetName, targetYear, employees) => {
   employees.forEach(emp => {
     if (emp.nextDept === '退職') return;
     if (emp.currentGrade && emp.nextGrade && isPromotedGrade(emp.currentGrade, emp.nextGrade)) {
+      const cDeptName = deptMap[emp.currentDeptId]?.name || '';
+      const nDeptName = deptMap[emp.departmentId]?.name || '';
+      
       promotionRows.push({
         nextGradeLabel: getBaseGrade(emp.nextGrade),
         name: emp.name || '',
         age: calculateAge(emp.birthDate, targetYear) || '',
-        oldPost: (emp.currentDept || '') + ' ' + (emp.currentTitle || ''),
-        newPost: (emp.nextDept || '') + ' ' + (emp.nextTitle || ''),
+        oldPost: cDeptName + (cDeptName && emp.currentTitle ? '　' : '') + (emp.currentTitle || ''),
+        newPost: nDeptName + (nDeptName && emp.nextTitle ? '　' : '') + (emp.nextTitle || ''),
         currentYears: getEmpCurrentYears(emp, targetYear - 1, false),
         gradeYears: calculateGradeYears(emp, targetYear),
         nextLevel: getGradeLevel(emp.nextGrade)
@@ -588,8 +593,8 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   
   addReasonSheet(workbook, '増減理由', targetYear, departments, deptMap, currMap, nextMap, employees, notes);
   addModalShortTenureSheet(workbook, '3年未満特記', targetYear, moves);
-  addModalLongTenureSheet(workbook, '6年以上特記', targetYear, employees);
-  addModalPromotionSheet(workbook, '昇任者一覧', targetYear, employees);
+  addModalLongTenureSheet(workbook, '6年以上特記', targetYear, employees, deptMap);
+  addModalPromotionSheet(workbook, '昇任者一覧', targetYear, employees, deptMap);
   addModalChainSheet(workbook, 'つなぎ表', chains, movesByFromPost, movesByToPost);
 
   await saveWorkbook(workbook, fileName);

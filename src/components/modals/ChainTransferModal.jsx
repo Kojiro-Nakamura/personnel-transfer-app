@@ -804,9 +804,11 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     let longRows = [];
     
     employees.forEach(emp => {
-      // 留任（現在の配置と同じ）かどうかを判定。異動や退職の人は除く。
-      const currentPostStr = (emp.currentDept || '') + ' ' + (emp.currentTitle || '');
-      const nextPostStr = (emp.nextDept || '') + ' ' + (emp.nextTitle || '');
+      const cDeptName = departments.find(d => d.id === emp.currentDeptId)?.name || '';
+      const nDeptName = departments.find(d => d.id === emp.departmentId)?.name || '';
+      
+      const currentPostStr = cDeptName + (cDeptName && emp.currentTitle ? '　' : '') + (emp.currentTitle || '');
+      const nextPostStr = nDeptName + (nDeptName && emp.nextTitle ? '　' : '') + (emp.nextTitle || '');
       
       const isRetained = currentPostStr === nextPostStr;
       if (!isRetained) return; // 留任でない人は除外
@@ -897,13 +899,16 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         const currentYearsStr = getEmpCurrentYears(emp, targetYear - 1, false);
         const gradeYearsStr = calculateGradeYears(emp, targetYear);
         
+        const cDeptName = departments.find(d => d.id === emp.currentDeptId)?.name || '';
+        const nDeptName = departments.find(d => d.id === emp.departmentId)?.name || '';
+        
         promotionRows.push({
           emp: emp,
           nextGradeLabel: getBaseGrade(emp.nextGrade),
           name: emp.name || '',
           age: calculateAge(emp.birthDate, targetYear) || '',
-          oldPost: (emp.currentDept || '') + ' ' + (emp.currentTitle || ''),
-          newPost: (emp.nextDept || '') + ' ' + (emp.nextTitle || ''),
+          oldPost: cDeptName + (cDeptName && emp.currentTitle ? '　' : '') + (emp.currentTitle || ''),
+          newPost: nDeptName + (nDeptName && emp.nextTitle ? '　' : '') + (emp.nextTitle || ''),
           currentYears: currentYearsStr,
           gradeYears: gradeYearsStr,
           nextLevel: getGradeLevel(emp.nextGrade)
