@@ -129,14 +129,21 @@ export const validateEmployees = (employees, targetYear, departments) => {
       const dept = departments.find(d => d.id === emp.departmentId);
       if (dept) {
         let postName = '';
+        let locationStr = '';
         if (emp.postId) {
           const post = (dept.posts || []).find(p => p.id === emp.postId);
-          if (post) postName = post.nextName || post.name;
+          if (post) {
+            postName = post.nextName || post.name;
+            locationStr = `${dept.name}${postName}`;
+          }
         } else if (emp.groupId) {
           const group = (dept.groups || []).find(g => g.id === emp.groupId);
           if (group && emp.groupPostId) {
             const gp = (group.posts || []).find(p => p.id === emp.groupPostId);
-            if (gp) postName = gp.nextName || gp.name;
+            if (gp) {
+              postName = gp.nextName || gp.name;
+              locationStr = `${dept.name}${group.name}${postName}`;
+            }
           }
         }
         
@@ -152,7 +159,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
         if (isPostMismatch) {
           warnings.push({
             empId: emp.id,
-            empName: emp.name,
+            empName: locationStr ? `${emp.name}（${locationStr}）` : emp.name,
             type: 'ポストと職名の不整合',
             message: `来年度の配置先ポスト名（**${postName}**）と、本人の職名（**${emp.nextTitle || 'なし'}**）が異なります。`
           });
