@@ -792,6 +792,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const workbook = new ExcelJS.Workbook();
   addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
+  addListSheet(workbook, '職員一覧', fileName, targetYear, employees, departments);
   await saveWorkbook(workbook, fileName);
 };
 
