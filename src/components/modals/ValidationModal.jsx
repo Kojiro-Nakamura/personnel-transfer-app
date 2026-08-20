@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { validateEmployees, autoFixEmployees } from '../../utils/validation.js';
 import { AlertCircle, AlertTriangle, CheckCircle, Check, X } from 'lucide-react';
 
@@ -8,7 +8,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
 
   useEffect(() => {
     if (isOpen && !hasAutoFixed) {
-      const { newEmps, fixes: newFixes } = autoFixEmployees(employees, targetYear);
+      const { newEmps, fixes: newFixes } = autoFixEmployees(employees, targetYear, departments);
       if (newFixes.length > 0) {
         setFixes(newFixes);
         if (onAutoFix) onAutoFix(newEmps);

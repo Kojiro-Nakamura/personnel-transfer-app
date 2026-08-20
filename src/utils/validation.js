@@ -87,6 +87,33 @@ export const validateEmployees = (employees, targetYear, departments) => {
         });
       }
     }
+
+    // 4. ポスト名と本人の職名の不整合
+    if (departments) {
+      const dept = departments.find(d => d.id === emp.departmentId);
+      if (dept) {
+        let postName = '';
+        if (emp.postId) {
+          const post = (dept.posts || []).find(p => p.id === emp.postId);
+          if (post) postName = post.nextName || post.name;
+        } else if (emp.groupId) {
+          const group = (dept.groups || []).find(g => g.id === emp.groupId);
+          if (group && emp.groupPostId) {
+            const gp = (group.posts || []).find(p => p.id === emp.groupPostId);
+            if (gp) postName = gp.nextName || gp.name;
+          }
+        }
+        
+        if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
+          warnings.push({
+            empId: emp.id,
+            empName: emp.name,
+            type: 'ポストと職名の不整合',
+            message: `来年度の配置先ポスト名（${postName}）と、本人の職名（${emp.nextTitle || 'なし'}）が異なります。`
+          });
+        }
+      }
+    }
   });
 
   if (departments) {
@@ -223,27 +250,7 @@ export const autoFixEmployees = (employees, targetYear, departments) => {
       messages.push(`詳細年数を修正`);
     }
 
-    if (departments && emp.departmentId !== 'unassigned' && emp.departmentId !== 'retired') {
-      const dept = departments.find(d => d.id === emp.departmentId);
-      if (dept) {
-        let postName = '';
-        if (emp.postId) {
-          const post = (dept.posts || []).find(p => p.id === emp.postId);
-          if (post) postName = post.nextName || post.name;
-        } else if (emp.groupId) {
-          const group = (dept.groups || []).find(g => g.id === emp.groupId);
-          if (group && emp.groupPostId) {
-            const gp = (group.posts || []).find(p => p.id === emp.groupPostId);
-            if (gp) postName = gp.nextName || gp.name;
-          }
-        }
-        
-        if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
-          fixedThisEmp = true;
-          messages.push(`ポスト名（${postName}）と来年度の職名（${emp.nextTitle || 'なし'}）が異なります（※手動で修正してください）`);
-        }
-      }
-    }
+
 
     if (fixedThisEmp) {
       // Deduplicate messages
