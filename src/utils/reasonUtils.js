@@ -92,7 +92,7 @@ export const generateReasonStats = (departments, employees, notes) => {
         currCount: stats.currCount,
         nextCount: stats.nextCount,
         diff: diff,
-        reasonText: reasonText.join('\n')
+        reasonText: ''
       });
     }
   });
