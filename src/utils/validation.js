@@ -68,12 +68,24 @@ export const validateEmployees = (employees, targetYear, departments) => {
       let mismatch = false;
       let expectedGradeStr = "";
 
+      let isShinkoukyoku = false;
+      if (departments && emp.departmentId) {
+        const dept = departments.find(d => d.id === emp.departmentId);
+        if (dept && dept.name.includes('振興局')) {
+          isShinkoukyoku = true;
+        }
+      }
+
       if (title.includes('部長') && !title.includes('次長') && !title.includes('課長')) {
         if (grade !== '部長級') { mismatch = true; expectedGradeStr = "部長級"; }
       } else if (title.includes('次長')) {
         if (grade !== '次長級') { mismatch = true; expectedGradeStr = "次長級"; }
       } else if (title === '課長' || title === '室長') {
-        if (grade !== '課長級') { mismatch = true; expectedGradeStr = "課長級"; }
+        if (isShinkoukyoku && (grade === '課長級' || grade.includes('補佐級II'))) {
+          // 振興局の課長は補佐級II（班長）でもOK
+        } else if (grade !== '課長級') { 
+          mismatch = true; expectedGradeStr = "課長級"; 
+        }
       } else if (grade === '部長級' && !title.includes('部長')) {
          mismatch = true; expectedGradeStr = "部長を含む役職";
       }
@@ -104,7 +116,16 @@ export const validateEmployees = (employees, targetYear, departments) => {
           }
         }
         
-        if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
+        let isPostMismatch = false;
+        if (postName === '班長') {
+          if (!emp.nextTitle || !emp.nextTitle.includes('班長')) {
+            isPostMismatch = true;
+          }
+        } else if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
+          isPostMismatch = true;
+        }
+
+        if (isPostMismatch) {
           warnings.push({
             empId: emp.id,
             empName: emp.name,
