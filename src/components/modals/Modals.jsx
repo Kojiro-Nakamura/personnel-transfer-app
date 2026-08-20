@@ -1246,7 +1246,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
               <tr>
                 <th className="px-2 py-1 border-b border-slate-300 bg-slate-200 sticky left-0 z-40 w-8 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"></th>
                 <th className="px-2 py-1 border-b border-r-2 border-slate-300 bg-slate-200 sticky left-8 z-30 min-w-[8rem] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.2)] text-center text-slate-800">氏名</th>
-                <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
+                <th colSpan="9" className="px-2 py-1 border-b border-r text-center bg-slate-200 text-slate-700">基本情報</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-slate-100 text-slate-700">今年度</th>
                 <th colSpan="7" className="px-2 py-1 border-b border-r text-center bg-blue-100/50 text-[#065084]">来年度</th>
                 <th colSpan="10" className="px-2 py-1 border-b text-center bg-fuchsia-100/50 text-fuchsia-900">昇進年度 (西暦(和暦))</th>
@@ -1272,6 +1272,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                 <Th label="最終学歴" sortKey="education" className="border-r" />
                 <Th label="採用年月日" sortKey="hireDate" className="border-r" />
                 <Th label="特記事項" sortKey="note" className="border-r" />
+                <Th label="配属希望" sortKey="desiredAssignment" className="border-r" />
+                <Th label="特殊事情" sortKey="specialCircumstances" className="border-r" />
                 <Th label="配置先" sortKey="currentDeptId" className="bg-slate-100 border-r" />
                 <Th label="職名" sortKey="currentTitle" className="bg-slate-100 border-r" />
                 <Th label="級" sortKey="currentGrade" className="bg-slate-100 border-r" />
@@ -1410,6 +1412,24 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
                       {emp.note && (
                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
                           {emp.note}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                        </div>
+                      )}
+                    </td>
+                    <td className="border-r relative group/input">
+                      <input type="text" value={emp.desiredAssignment||''} onChange={e => handleChange(emp.id,'desiredAssignment',e.target.value)} className={cx(inputCls, 'text-center px-1')} />
+                      {emp.desiredAssignment && (
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
+                          {emp.desiredAssignment}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                        </div>
+                      )}
+                    </td>
+                    <td className="border-r relative group/input">
+                      <input type="text" value={emp.specialCircumstances||''} onChange={e => handleChange(emp.id,'specialCircumstances',e.target.value)} className={cx(inputCls, 'text-center px-1')} />
+                      {emp.specialCircumstances && (
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
+                          {emp.specialCircumstances}
                           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
                         </div>
                       )}
