@@ -22,42 +22,52 @@ export const validateEmployees = (employees, targetYear, departments) => {
 
     // 1. 昇進年度の未設定・消し忘れ
     if (isPromoted) {
-      if (activePromoKey && !(emp[activePromoKey] && String(emp[activePromoKey]).startsWith(String(targetYear)))) {
+      if (!activePromoKey || (emp[activePromoKey] && !String(emp[activePromoKey]).startsWith(String(targetYear)))) {
         warnings.push({
           empId: emp.id,
           empName: emp.name,
           type: '昇進年度未設定',
-          message: `来年度の級が上がっていますが、対象の昇進年度（${targetYear}年度）が正しく設定されていません。`
+          message: `来年度の級が上がっていますが、対象の昇進年度（**${targetYear}年度**）が正しく設定されていません。`
         });
       }
     } else {
-      if (hasTargetYearPromo) {
+      let hasStalePromo = false;
+      PROMO_KEYS.forEach(k => {
+        if (emp[k] && String(emp[k]).startsWith(String(targetYear))) {
+          hasStalePromo = true;
+        }
+      });
+      if (hasStalePromo) {
         warnings.push({
           empId: emp.id,
           empName: emp.name,
           type: '昇進年度消し忘れ',
-          message: `来年度の級は上がっていませんが、昇進年度に今年度(${targetYear})が残っています。昇進取り消し時の消し忘れの可能性があります。`
+          message: `来年度の級は上がっていませんが、昇進年度に今年度(**${targetYear}**)が残っています。昇進取り消し時の消し忘れの可能性があります。`
         });
       }
     }
 
     // 2. 経過年数の矛盾
     const isSameDept = emp.currentDeptId === emp.departmentId;
-    const isSamePlacement = isSameDept && emp.currentPostId === emp.postId && emp.currentGroupId === emp.groupId && emp.currentGroupPostId === emp.groupPostId;
-    
-    let expectedNextYears;
+    let expectedNextYears = emp.nextYears;
+    let isYearsMismatch = false;
+
     if (isSameDept) {
       expectedNextYears = (Number(emp.currentYears) || 0) + 1;
     } else {
       expectedNextYears = 1;
     }
 
-    if (Number(emp.nextYears) !== expectedNextYears) {
+    if (Number(emp.nextYears) !== Number(expectedNextYears)) {
+      isYearsMismatch = true;
+    }
+
+    if (isYearsMismatch) {
       warnings.push({
         empId: emp.id,
         empName: emp.name,
         type: '経過年数矛盾',
-        message: `配置変更ルールに基づくと経過年数は「${expectedNextYears}年」になるはずですが、現在「${emp.nextYears}年」になっています。`
+        message: `配置変更ルールに基づくと経過年数は「**${expectedNextYears}年**」になるはずですが、現在「**${emp.nextYears}年**」になっています。`
       });
     }
 
@@ -109,7 +119,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
           empId: emp.id,
           empName: emp.name,
           type: '役職と級の不整合',
-          message: `役職「${title}」に対して級「${grade}」が一致していない可能性があります（想定: ${expectedGradeStr}）。`
+          message: `役職「**${title}**」に対して級「**${grade}**」が一致していない可能性があります（想定: **${expectedGradeStr}**）。`
         });
       }
     }
@@ -144,7 +154,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
             empId: emp.id,
             empName: emp.name,
             type: 'ポストと職名の不整合',
-            message: `来年度の配置先ポスト名（${postName}）と、本人の職名（${emp.nextTitle || 'なし'}）が異なります。`
+            message: `来年度の配置先ポスト名（**${postName}**）と、本人の職名（**${emp.nextTitle || 'なし'}**）が異なります。`
           });
         }
       }
@@ -172,7 +182,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
               empId: nEmp.id,
               type: 'ポスト職名変更',
               targetName: locationStr,
-              message: `同じポスト枠で今年度と来年度の職名が異なります。\n（今年度: ${cTitle} ${cEmp.name} → 来年度: ${nTitle} ${nEmp.name}）`
+              message: `同じポスト枠で今年度と来年度の職名が異なります。\n（今年度: **${cTitle}** ${cEmp.name} → 来年度: **${nTitle}** ${nEmp.name}）`
             });
           }
         }

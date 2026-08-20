@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { validateEmployees, autoFixEmployees } from '../../utils/validation.js';
 import { AlertCircle, AlertTriangle, CheckCircle, Check, X } from 'lucide-react';
 
@@ -23,6 +23,17 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
   if (!isOpen) return null;
 
   const warnings = validateEmployees(employees, targetYear, departments);
+
+  const renderMessage = (msg) => {
+    if (!msg) return null;
+    const parts = msg.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>;
+      }
+      return <React.Fragment key={i}>{part}</React.Fragment>;
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200">
@@ -102,7 +113,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
                             {warn.type}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{warn.message}</p>
+                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{renderMessage(warn.message)}</p>
                       </div>
                     </div>
                   );
@@ -129,7 +140,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
                                 修正済み / 確認
                               </span>
                             </div>
-                            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{fix.message}</p>
+                            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{renderMessage(fix.message)}</p>
                           </div>
                         </div>
                       ))}
