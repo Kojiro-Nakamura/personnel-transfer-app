@@ -70,7 +70,16 @@ export const validateEmployees = (employees, targetYear, departments) => {
       let isShinkoukyoku = false;
       if (departments && emp.departmentId) {
         const dept = departments.find(d => d.id === emp.departmentId);
-        if (dept && dept.name.includes('振興局')) {
+        if (dept && (
+          dept.name.includes('振興局') ||
+          dept.name.includes('海草') ||
+          dept.name.includes('那賀') ||
+          dept.name.includes('伊都') ||
+          dept.name.includes('有田') ||
+          dept.name.includes('日高') ||
+          dept.name.includes('西牟婁') ||
+          dept.name.includes('東牟婁')
+        )) {
           isShinkoukyoku = true;
         }
       }
