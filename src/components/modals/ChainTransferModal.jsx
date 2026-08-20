@@ -3,7 +3,7 @@ import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Print
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark } from '../../utils/helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -294,24 +294,14 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   const renderListTable = () => {
-    const postOrderMap = {};
-    let order = 0;
-    departments.forEach(dept => {
-      if (dept.type !== 'regular') return;
-      dept.posts.forEach(post => {
-        postOrderMap[`POST|${post.id}|`] = order;
-        postOrderMap[`TITLE|${dept.id}||${post.name}`] = order;
+      const { deptMap, currMap, nextMap } = buildDeptMap(departments, employees);
+      const empOrderMap = {};
+      let order = 0;
+      traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, title, curr, nxt) => {
+        if (curr) empOrderMap[curr.id] = order;
+        if (nxt) empOrderMap[nxt.id] = order;
         order++;
       });
-      dept.groups.forEach(group => {
-        group.posts.forEach(post => {
-          postOrderMap[`POST||${post.id}`] = order;
-          postOrderMap[`TITLE|${dept.id}|${group.id}|${post.name}`] = order;
-          order++;
-        });
-      });
-    });
-
     let listRows = [];
     const usedToMoves = new Set();
     
@@ -375,8 +365,12 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         succEmpNo = '';
       }
 
-      const basePostId = row.predecessor ? row.predecessor.fromPostId : (row.successor ? row.successor.toPostId : null);
-      const orgOrder = postOrderMap[basePostId] ?? 999999;
+        let orgOrder = 999999;
+        if (row.predecessor && empOrderMap[row.predecessor.emp.id] !== undefined) {
+          orgOrder = empOrderMap[row.predecessor.emp.id];
+        } else if (row.successor && empOrderMap[row.successor.emp.id] !== undefined) {
+          orgOrder = empOrderMap[row.successor.emp.id];
+        }
 
       return {
         orgOrder,

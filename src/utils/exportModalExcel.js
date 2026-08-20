@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark } from './helpers.js';
+import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 
@@ -211,27 +211,17 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 };
 
 // 2. 異動案リスト
-const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost, departments, retentions) => {
+const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost, departments, retentions, employees) => {
   const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
   
-  const postOrderMap = {};
-  let order = 0;
-  departments.forEach(dept => {
-    if (dept.type !== 'regular') return;
-    dept.posts.forEach(post => {
-      postOrderMap[`POST|${post.id}|`] = order;
-      postOrderMap[`TITLE|${dept.id}||${post.name}`] = order;
+    const { deptMap, currMap, nextMap } = buildDeptMap(departments, employees);
+    const empOrderMap = {};
+    let order = 0;
+    traverseOrgTree(departments, deptMap, currMap, nextMap, 0, (dept, group, title, curr, nxt) => {
+      if (curr) empOrderMap[curr.id] = order;
+      if (nxt) empOrderMap[nxt.id] = order;
       order++;
     });
-    dept.groups.forEach(group => {
-      group.posts.forEach(post => {
-        postOrderMap[`POST||${post.id}`] = order;
-        postOrderMap[`TITLE|${dept.id}|${group.id}|${post.name}`] = order;
-        order++;
-      });
-    });
-  });
-
   let listRows = [];
   const usedToMoves = new Set();
   
@@ -290,8 +280,12 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
       succEmpNo = '';
     }
 
-    const basePostId = row.predecessor ? row.predecessor.fromPostId : (row.successor ? row.successor.toPostId : null);
-    const orgOrder = postOrderMap[basePostId] ?? 999999;
+    let orgOrder = 999999;
+    if (row.predecessor && empOrderMap[row.predecessor.emp.id] !== undefined) {
+      orgOrder = empOrderMap[row.predecessor.emp.id];
+    } else if (row.successor && empOrderMap[row.successor.emp.id] !== undefined) {
+      orgOrder = empOrderMap[row.successor.emp.id];
+    }
 
     return {
       orgOrder,
@@ -578,7 +572,7 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   const { chains, movesByToPost, movesByFromPost, moves, retentions } = data;
 
   addModalDesignatedSheet(workbook, '指定職人事異動', targetYear, moves, retentions, movesByToPost);
-  addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments, retentions);
+  addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments, retentions, employees);
   
   // NOTE: addReasonSheet needs deptMap, currMap, nextMap. We will just pass empty objects or build them.
   // Actually, addReasonSheet from exportExcel.js expects these to just ignore if missing? No, it uses them.
