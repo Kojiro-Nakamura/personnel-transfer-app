@@ -348,7 +348,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         if (succ.name) {
           succName = getFormattedNameWithPrefix(succ, true);
         } else if (row.predecessor && !row.successor) {
-          succName = row.isRetention ? '' : '【 廃 止 】';
+          succName = row.isRetention ? '' : '後任なし';
         }
       
       const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '○' : '';
@@ -441,7 +441,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <tbody>
               {listRows.map((r, i) => {
                 const reasonColor = getReasonColorClass(r.reason);
-                const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
+                const succNameClass = r.succName === '後任なし' ? `${COLORS.RETIRING} font-bold` : '';
                 const showGroup = i === 0 || !listRows[i - 1] || r.predGroup !== listRows[i - 1].predGroup || r.predDeptTitle !== listRows[i - 1].predDeptTitle || !!sortKey;
                 const isDeptChanged = i > 0 && !sortKey && r.predDept !== listRows[i - 1].predDept;
                 const borderTopClass = isDeptChanged ? 'border-t-[3px] border-black' : '';
@@ -561,7 +561,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
 
       if (!isRetention) {
-         displaySuccName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+         displaySuccName = succ.name || (row.predecessor && !row.successor ? '後任なし' : '');
          displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
          displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : ''; 
          displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
@@ -649,7 +649,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <tbody>
               {desigRows.map((r, i) => {
                 const reasonColor = getReasonColorClass(r.predReason);
-                const succNameClass = r.succName === '【 廃 止 】' ? `${COLORS.RETIRING} font-bold` : '';
+                const succNameClass = r.succName === '後任なし' ? `${COLORS.RETIRING} font-bold` : '';
                 const nextRow = desigRows[i + 1];
                 const isGradeChanged = nextRow && nextRow.gradeLabel !== r.gradeLabel;
                 const borderClass = isGradeChanged ? 'border-b-[3px] border-black' : 'border-b border-gray-400';

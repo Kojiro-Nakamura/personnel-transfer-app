@@ -107,7 +107,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 
     let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
     if (!isRetention) {
-       displaySuccName = succ.name || (row.predecessor && !row.successor ? '【 廃 止 】' : '');
+       displaySuccName = succ.name || (row.predecessor && !row.successor ? '後任なし' : '');
        displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
        displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : '';
        
@@ -268,7 +268,7 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     if (succ.name) {
       succName = getFormattedNameWithPrefix(succ, true);
     } else if (row.predecessor && !row.successor) {
-      succName = row.isRetention ? '' : '【 廃 止 】';
+      succName = row.isRetention ? '' : '後任なし';
     }
     
     const isPromoted = row.successor?.isPromoted || row.successor?.isPromotedToFukuShunin || row.successor?.isPromotedToShocho ? '〇' : '';
@@ -551,7 +551,7 @@ const addModalChainSheet = (workbook, sheetName, chains, movesByFromPost, movesB
            const postFrom = cell.move.fromPost.type === 'unassigned' ? '未配置' : ((cell.move.fromPost.dept || '') + ' ' + (cell.move.fromPost.title || ''));
            rowData[cIdx + 1] = postTo + '\n' + (cell.move.emp?.name || '') + '\n' + postFrom;
         } else if (cell.type === 'empty') {
-           rowData[cIdx + 1] = '【廃止】\n' + (cell.move.fromPost.dept || '') + ' ' + (cell.move.fromPost.title || '');
+           rowData[cIdx + 1] = '後任なし\n' + (cell.move.fromPost.dept || '') + ' ' + (cell.move.fromPost.title || '');
         }
       });
       
