@@ -71,16 +71,16 @@ export const validateEmployees = (employees, targetYear, departments) => {
       });
     }
 
-    // 3. 役職と級の不整合（明らかなもの）
-    if (emp.nextTitle && emp.nextGrade) {
-      const title = emp.nextTitle;
-      const grade = emp.nextGrade;
-      let mismatch = false;
-      let expectedGradeStr = "";
-      let isShinkoukyoku = false;
-      if (departments && emp.departmentId) {
-        const dept = departments.find(d => d.id === emp.departmentId);
-        if (dept && (
+    // 共通の所属・ポスト情報を取得
+    let isShinkoukyoku = false;
+    let postName = '';
+    let locationStr = '';
+    let dept = null;
+
+    if (departments && emp.departmentId) {
+      dept = departments.find(d => d.id === emp.departmentId);
+      if (dept) {
+        if (
           dept.name.includes('振興局') ||
           dept.name.includes('海草') ||
           dept.name.includes('那賀') ||
@@ -89,10 +89,35 @@ export const validateEmployees = (employees, targetYear, departments) => {
           dept.name.includes('日高') ||
           dept.name.includes('西牟婁') ||
           dept.name.includes('東牟婁')
-        )) {
+        ) {
           isShinkoukyoku = true;
         }
+
+        if (emp.postId) {
+          const post = (dept.posts || []).find(p => p.id === emp.postId);
+          if (post) {
+            postName = post.nextName || post.name;
+            locationStr = `${dept.name}${postName}`;
+          }
+        } else if (emp.groupId) {
+          const group = (dept.groups || []).find(g => g.id === emp.groupId);
+          if (group && emp.groupPostId) {
+            const gp = (group.posts || []).find(p => p.id === emp.groupPostId);
+            if (gp) {
+              postName = gp.nextName || gp.name;
+              locationStr = `${dept.name}${group.name}${postName}`;
+            }
+          }
+        }
       }
+    }
+
+    // 3. 役職と級の不整合（明らかなもの）
+    if (emp.nextTitle && emp.nextGrade) {
+      const title = emp.nextTitle;
+      const grade = emp.nextGrade;
+      let mismatch = false;
+      let expectedGradeStr = "";
 
       if (title.includes('部長') && !title.includes('次長') && !title.includes('課長')) {
         if (grade !== '部長級') { mismatch = true; expectedGradeStr = "部長級"; }
@@ -117,7 +142,7 @@ export const validateEmployees = (employees, targetYear, departments) => {
       if (mismatch) {
         warnings.push({
           empId: emp.id,
-          empName: emp.name,
+          empName: locationStr ? `${emp.name}（${locationStr}）` : emp.name,
           type: '役職と級の不整合',
           message: `役職「**${title}**」に対して級「**${grade}**」が一致していない可能性があります（想定: **${expectedGradeStr}**）。`
         });
@@ -125,45 +150,23 @@ export const validateEmployees = (employees, targetYear, departments) => {
     }
 
     // 4. ポスト名と本人の職名の不整合
-    if (departments) {
-      const dept = departments.find(d => d.id === emp.departmentId);
-      if (dept) {
-        let postName = '';
-        let locationStr = '';
-        if (emp.postId) {
-          const post = (dept.posts || []).find(p => p.id === emp.postId);
-          if (post) {
-            postName = post.nextName || post.name;
-            locationStr = `${dept.name}${postName}`;
-          }
-        } else if (emp.groupId) {
-          const group = (dept.groups || []).find(g => g.id === emp.groupId);
-          if (group && emp.groupPostId) {
-            const gp = (group.posts || []).find(p => p.id === emp.groupPostId);
-            if (gp) {
-              postName = gp.nextName || gp.name;
-              locationStr = `${dept.name}${group.name}${postName}`;
-            }
-          }
-        }
-        
-        let isPostMismatch = false;
-        if (postName === '班長') {
-          if (!emp.nextTitle || !emp.nextTitle.includes('班長')) {
-            isPostMismatch = true;
-          }
-        } else if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
+    if (dept) {
+      let isPostMismatch = false;
+      if (postName === '班長') {
+        if (!emp.nextTitle || !emp.nextTitle.includes('班長')) {
           isPostMismatch = true;
         }
+      } else if (postName && postName !== 'GL' && postName !== emp.nextTitle) {
+        isPostMismatch = true;
+      }
 
-        if (isPostMismatch) {
-          warnings.push({
-            empId: emp.id,
-            empName: locationStr ? `${emp.name}（${locationStr}）` : emp.name,
-            type: 'ポストと職名の不整合',
-            message: `来年度の配置先ポスト名（**${postName}**）と、本人の職名（**${emp.nextTitle || 'なし'}**）が異なります。`
-          });
-        }
+      if (isPostMismatch) {
+        warnings.push({
+          empId: emp.id,
+          empName: locationStr ? `${emp.name}（${locationStr}）` : emp.name,
+          type: 'ポストと職名の不整合',
+          message: `来年度の配置先ポスト名（**${postName}**）と、本人の職名（**${emp.nextTitle || 'なし'}**）が異なります。`
+        });
       }
     }
   });
