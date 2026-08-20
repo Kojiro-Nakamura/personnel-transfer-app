@@ -244,7 +244,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       if (i === 17) argb = 'FFFFFFFF'; // 空白列
       if (i >= 18 && i <= 20) argb = 'FFCBD5E1'; // 氏名,年齢,フリガナ (same as 部署名)
       if (i >= 21 && i <= 26) argb = 'FFBFDBFE'; // 基本情報 (Blue)
-      if (i >= 27 && i <= 36) {
+      if (i >= 29 && i <= 38) {
          const promoColors = {
             28: getPromotedBgColorCode('係長級(主査)'),
             29: getPromotedBgColorCode('補佐級I(主任)'),
@@ -538,7 +538,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
            if (c) {
                curPromoColors[18] = c;
                curPromoColors[19] = c;
-               curPromoColors[36] = c;
+               curPromoColors[38] = c;
            }
       }
 
@@ -597,7 +597,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         
         rowVals.push(displayStr);
         if (isChange) {
-           curFontStyles[39 + i] = 'change'; 
+           curFontStyles[41 + i] = 'change'; 
         }
         if (promoYearMap[y]) {
            const c = getPromotedBgColorCode(promoYearMap[y]);
@@ -965,7 +965,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
   const r4 = ws.getRow(4);
   r4.height = 13;
-  const headersR4 = ['氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', ''];
+  const headersR4 = ['氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', ''];
   historyYears.forEach((y, i) => {
     if (i === 0) headersR4.push('履歴');
     else headersR4.push('');
@@ -974,20 +974,20 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度'];
+  const headersR5 = ['', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配属希望', '特殊事情', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度'];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
   ws.mergeCells('C4:C5');
-  ws.mergeCells('D4:I4');
-  ws.mergeCells('J4:P4');
-  ws.mergeCells('Q4:W4');
-  ws.mergeCells('X4:AG4');
+  ws.mergeCells('D4:K4');
+  ws.mergeCells('L4:R4');
+  ws.mergeCells('S4:Y4');
+  ws.mergeCells('Z4:AI4');
   if (historyYears.length > 0) {
-    const endColCode = ws.getColumn(33 + historyYears.length).letter;
-    ws.mergeCells(`AH4:${endColCode}4`);
+    const endColCode = ws.getColumn(35 + historyYears.length).letter;
+    ws.mergeCells(`AJ4:${endColCode}4`);
   }
 
   // Header coloring
@@ -1019,10 +1019,10 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       }
       cell.border = getCellBorders(true, true, true, true, true);
       
-      if (colNumber <= 9) cell.fill = fillSlate;
-      else if (colNumber <= 16) cell.fill = fillAmber;
-      else if (colNumber <= 23) cell.fill = fillBlue;
-      else if (colNumber <= 33) {
+      if (colNumber <= 11) cell.fill = fillSlate;
+      else if (colNumber <= 18) cell.fill = fillAmber;
+      else if (colNumber <= 25) cell.fill = fillBlue;
+      else if (colNumber <= 35) {
         if (rn === 5 && promoColors[colNumber]) {
            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[colNumber].replace('#', '').toUpperCase() } };
         } else {
