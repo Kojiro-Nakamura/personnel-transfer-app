@@ -988,7 +988,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       let topStyle = 'thin';
       if (rowIndex === 6) topStyle = 'medium';
       else if (isNewDept) topStyle = 'medium';
-      else if (isNewGroup) topStyle = 'dashed';
+      else if (isNewGroup) topStyle = 'mediumDashed';
       
       const leftStyle = c === 1 ? 'medium' : 'thin';
       const rightStyle = c === 12 ? 'medium' : 'thin';
