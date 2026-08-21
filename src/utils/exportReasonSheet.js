@@ -20,13 +20,13 @@ export const addReasonSheet = (workbook, sheetName, targetYear, departments, dep
   // Title Row
   ws.insertRow(1, ['〇所属毎の増減理由']);
   ws.mergeCells('A1:C1');
-  ws.getCell('A1').font = { name: 'BIZ UDPGothic', size: 12, bold: true };
+  ws.getCell('A1').font = { name: 'BIZ UDPゴシック', size: 12, bold: true };
   
   ws.insertRow(2, ['', '', '', '令和' + (targetYear - 2018) + '年']); // Simplified date
   
   // Header styling
   ws.getRow(3).values = ws.columns.map(c => c.header);
-  ws.getRow(3).font = { name: 'BIZ UDPGothic', size: 10, bold: true };
+  ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
   ws.getRow(3).alignment = { horizontal: 'center', vertical: 'middle' };
 
   let rowIdx = 4;
@@ -68,7 +68,7 @@ export const addReasonSheet = (workbook, sheetName, targetYear, departments, dep
         bottom: { style: 'thin' },
         right: { style: 'thin' }
       };
-      cell.font = { name: 'BIZ UDPGothic', size: 10 };
+      cell.font = { name: 'BIZ UDPゴシック', size: 10 };
     });
   }
 

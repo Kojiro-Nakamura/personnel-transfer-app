@@ -4,8 +4,8 @@ import { addReasonSheet } from './exportReasonSheet.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
 // 基本のフォント設定
-const defaultFont = { name: 'BIZ UDPGothic', size: 8 };
-const headerFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
+const defaultFont = { name: 'BIZ UDPゴシック', size: 8 };
+const headerFont = { name: 'BIZ UDPゴシック', size: 8, bold: true };
 const borderStyle = { style: 'thin', color: { argb: 'FF000000' } };
 const thickBorderStyle = { style: 'medium', color: { argb: 'FF000000' } };
 
@@ -141,20 +141,20 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
   const r1 = ws.getRow(1);
   r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${displayFileName}】`];
-  r1.font = { name: 'BIZ UDPGothic', size: 8, bold: true };
+  r1.font = { name: 'BIZ UDPゴシック', size: 8, bold: true };
   r1.height = 13;
 
   const r2 = ws.getRow(2);
   r2.values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`];
-  r2.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
+  r2.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r2.height = 13;
 
   const r3 = ws.getRow(3);
   r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
-  r3.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
+  r3.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r3.height = 13;
   r3.getCell(18).value = '＜参考＞';
-  r3.getCell(18).font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
+  r3.getCell(18).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
 
   [1, 2, 3].forEach(rn => {
     ws.getRow(rn).getCell(1).alignment = { vertical: 'middle', wrapText: false };
@@ -180,9 +180,9 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       };
       if (i === 0) {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
+        cell.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
       } else {
-        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: false, color: { argb: 'FF000000' } };
+        cell.font = { name: 'BIZ UDPゴシック', size: 8, bold: false, color: { argb: 'FF000000' } };
         const c = getPromotedBgColorCode(legendLabels[i]);
         if (c) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + c.replace('#', '').toUpperCase() } };
       }
@@ -1159,8 +1159,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     }
   };
 
-  const listDefaultFont = { name: 'BIZ UDPGothic', size: 8 };
-  const listHeaderFont = { name: 'BIZ UDPGothic', size: 8, bold: true };
+  const listDefaultFont = { name: 'BIZ UDPゴシック', size: 8 };
+  const listHeaderFont = { name: 'BIZ UDPゴシック', size: 8, bold: true };
 
   const ws = workbook.addWorksheet(sheetName, {
     views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }], // 氏名・年齢まで固定
@@ -1214,12 +1214,12 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
   const r1 = ws.getRow(1);
   r1.values = [`${targetYear}年度(R${targetYear - 2018})人事異動案 【${fileName.replace(/\.xlsx$/, '')}】`];
-  r1.font = { name: 'BIZ UDPGothic', size: 8, bold: true };
+  r1.font = { name: 'BIZ UDPゴシック', size: 8, bold: true };
     r1.height = 13;
 
   const r2 = ws.getRow(2);
   r2.getCell(1).value = `【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${currSummaryStr}`;
-  r2.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
+  r2.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r2.height = 13;
 
   const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
@@ -1236,18 +1236,18 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       cell.border = getCellBorders(true, true, true, true, true);
       if (i === 0) {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
+        cell.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
       } else {
         const colorHex = getPromotedBgColorCode(legendLabels[i])?.replace('#', '')?.toUpperCase() || 'FFFFFF';
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorHex } };
-        cell.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF000000' } };
+        cell.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
       }
     }
   }
 
   const r3 = ws.getRow(3);
   r3.values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummaryStr}`];
-  r3.font = { name: 'BIZ UDPGothic', size: 8, bold: true, color: { argb: 'FF0369A1' } };
+  r3.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r3.height = 13;
 
   [1, 2, 3].forEach(rn => {
