@@ -792,7 +792,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
 export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const ws = workbook.addWorksheet(sheetName, {
-    views: [{ state: 'frozen', xSplit: 0, ySplit: 5, showGridLines: false }],
+    views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false }],
     pageSetup: { paperSize: 8, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
@@ -804,27 +804,28 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(1).values = [fileName];
   ws.getRow(1).font = { bold: true, size: 12, color: { argb: 'FF1E293B' } };
   
-  const curCounts = getCounts(employees.filter(e => e.currentDept), false);
-  ws.getRow(2).values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${formatCountText(curCounts)}`];
+  const curSummary = generateGradeSummary(employees, false);
+  ws.getRow(2).values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${curSummary}`];
   ws.getRow(2).font = { size: 9, color: { argb: 'FF0284C7' } };
   
-  const nextCounts = getCounts(employees.filter(e => e.nextDept), true);
-  ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${formatCountText(nextCounts)}`];
+  const nextSummary = generateGradeSummary(employees, true);
+  ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummary}`];
   ws.getRow(3).font = { size: 9, color: { argb: 'FF0284C7' } };
 
   const r4 = ws.getRow(4);
-  r4.values = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', ''];
+  r4.values = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '備考'];
   r4.height = 20;
 
   const r5 = ws.getRow(5);
-  r5.values = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', '備考'];
+  r5.values = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', ''];
   r5.height = 20;
 
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
   ws.mergeCells('C4:C5');
   ws.mergeCells('D4:G4');
-  ws.mergeCells('H4:L4');
+  ws.mergeCells('H4:K4');
+  ws.mergeCells('L4:L5');
 
   for (let rn = 4; rn <= 5; rn++) {
     const row = ws.getRow(rn);
@@ -836,7 +837,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       let argb = 'FFCBD5E1';
       if (c === 2 || c === 3) argb = 'FF86EFAC';
       else if (c >= 4 && c <= 7) argb = 'FFFDE68A';
-      else if (c >= 8) argb = 'FFBFDBFE';
+      else if (c >= 8 && c <= 11) argb = 'FFBFDBFE';
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
     }
   }
@@ -889,7 +890,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         const cCounts = getCounts(deptCurrEmps, false);
         const nCounts = getCounts(deptNextEmps, true);
         if (showCount) {
-          displayDeptStr = `${deptName} ${cCounts['合計'] || 0}→${nCounts['合計'] || 0}`;
+          displayDeptStr = `${deptName} ${cCounts.main || 0}→${nCounts.main || 0}`;
         } else {
           displayDeptStr = deptName;
         }
@@ -906,7 +907,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         const gCCounts = getCounts(grpCurrEmps, false);
         const gNCounts = getCounts(grpNextEmps, true);
         if (showCount) {
-          displayGroupStr = `${groupName} ${gCCounts['合計'] || 0}→${gNCounts['合計'] || 0}`;
+          displayGroupStr = `${groupName} ${gCCounts.main || 0}→${gNCounts.main || 0}`;
         } else {
           displayGroupStr = groupName;
         }
@@ -953,7 +954,10 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[7] = nextEmp.nextTitle || ''; rowVals[8] = ''; rowVals[9] = ''; rowVals[10] = '';
     }
 
-    rowVals[11] = post ? notes[post.id] || '' : '';
+    if (post && Array.isArray(notes)) {
+      const noteObj = notes.find(n => n.targetId === post.id);
+      rowVals[11] = noteObj ? noteObj.text || '' : '';
+    }
 
     const tr = ws.addRow(rowVals);
 
@@ -968,8 +972,11 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
       if (nextEmp && !isRetained && c >= 8 && c <= 11) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
-          const colorCode = getPromotedBgColorCode(nextEmp.nextGrade).replace('#', '').toUpperCase();
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorCode } };
+          const rawColor = getPromotedBgColorCode(nextEmp.nextGrade);
+          if (rawColor) {
+             const colorCode = rawColor.replace('#', '').toUpperCase();
+             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorCode } };
+          }
         }
       }
     }
