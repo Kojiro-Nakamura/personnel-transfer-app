@@ -427,7 +427,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       rowVals.push(extEmp.education || '');
       rowVals.push(formatWithEra(extEmp.hireDate, extEmp.birthDate));
       rowVals.push(extEmp.note || '');
-      rowVals.push(extEmp.desiredAssignment || '');
+      rowVals.push(extEmp.desiredAssignment ? '〇' + extEmp.desiredAssignment : '');
       rowVals.push(extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '');
 
       let hireStr = '';
@@ -841,6 +841,9 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const cell = row.getCell(c);
       cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true };
+      if (c === 2 || c === 3) {
+        cell.alignment = { ...cell.alignment, textRotation: 'vertical' };
+      }
       
       let topStyle = rn === 4 ? 'medium' : 'hair';
       let bottomStyle = rn === 5 ? 'medium' : 'hair';
@@ -956,7 +959,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[4] = getFormattedNameForPlan(currEmp, false) || '';
       rowVals[5] = cYearsStr;
       rowVals[6] = cAgeVal !== '' ? Number(cAgeVal) : '';
-      rowVals[1] = currEmp.desiredAssignment || '';
+      rowVals[1] = currEmp.desiredAssignment ? '〇' + currEmp.desiredAssignment : '';
       rowVals[2] = currEmp.specialCircumstances ? '●' + currEmp.specialCircumstances : '';
     }
     
@@ -1417,7 +1420,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       emp.education || '',
       formatWithEra(emp.hireDate, emp.birthDate),
       emp.note || '',
-      emp.desiredAssignment || '',
+      emp.desiredAssignment ? '〇' + emp.desiredAssignment : '',
       emp.specialCircumstances ? '●' + emp.specialCircumstances : '',
       cDeptName,
       emp.currentTitle || '',
