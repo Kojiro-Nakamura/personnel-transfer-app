@@ -791,6 +791,18 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
 
 export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
+  const getYearsStr = (emp, isNext) => { 
+    if (!emp) return ''; 
+    const years = getEmpCurrentYears(emp, isNext ? targetYear : targetYear - 1, isNext);
+    const skills = isNext ? emp.nextSkills : emp.currentSkills; 
+    return skills?.length ? `${years}(${skills.join('、')})` : `${years}`; 
+  };
+  const getAgeStr = (emp, isNext) => {
+    if (!emp || !emp.birthDate) return '';
+    const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
+    return age !== '' && age !== null && !isNaN(age) ? `${age}` : '';
+  };
+
   const ws = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }] });
   
   // Define styles
