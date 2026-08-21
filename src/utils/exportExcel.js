@@ -820,19 +820,18 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
   const r4 = ws.getRow(4);
-  r4.values = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '備考'];
+  r4.values = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', ''];
   r4.height = 20;
 
   const r5 = ws.getRow(5);
-  r5.values = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', ''];
+  r5.values = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', '備考'];
   r5.height = 20;
 
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
   ws.mergeCells('C4:C5');
   ws.mergeCells('D4:G4');
-  ws.mergeCells('H4:K4');
-  ws.mergeCells('L4:L5');
+  ws.mergeCells('H4:L4');
 
   for (let rn = 4; rn <= 5; rn++) {
     const row = ws.getRow(rn);
@@ -846,8 +845,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       let leftStyle = c === 1 ? 'medium' : 'thin';
       let rightStyle = c === 12 ? 'medium' : 'thin';
       
-      // 縦にセル結合されている列(1, 2, 3, 12)は、5行目の処理で上罫線が細線で上書きされるのを防ぐため、明示的に上下を太線にする
-      if (c === 1 || c === 2 || c === 3 || c === 12) {
+      // 縦にセル結合されている列(1, 2, 3)は、5行目の処理で上罫線が細線で上書きされるのを防ぐため、明示的に上下を太線にする
+      if (c === 1 || c === 2 || c === 3) {
          topStyle = 'medium';
          bottomStyle = 'medium';
       }
