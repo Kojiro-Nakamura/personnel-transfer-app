@@ -798,7 +798,6 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   const fillAmber = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE68A' } };
   const fillBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } };
 
-  // Write title & headers
   ws.getRow(1).values = [fileName];
   ws.getRow(1).font = { bold: true, size: 12, color: { argb: 'FF1E293B' } };
   
@@ -823,8 +822,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
   ws.mergeCells('C4:C5');
-  ws.mergeCells('D4:G4'); // 今年度
-  ws.mergeCells('H4:L4'); // 来年度
+  ws.mergeCells('D4:G4');
+  ws.mergeCells('H4:L4');
 
   for (let rn = 4; rn <= 5; rn++) {
     const row = ws.getRow(rn);
@@ -840,32 +839,41 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     });
   }
   
-  // Set widths
-  ws.getColumn(1).width = 20; // 部署名
-  ws.getColumn(2).width = 10; // 配属希望
-  ws.getColumn(3).width = 10; // 特殊事情
-  ws.getColumn(4).width = 12; // 職名
-  ws.getColumn(5).width = 18; // 氏名
-  ws.getColumn(6).width = 10; // 在籍
-  ws.getColumn(7).width = 8;  // 年齢
-  ws.getColumn(8).width = 12; // 職名
-  ws.getColumn(9).width = 18; // 氏名
-  ws.getColumn(10).width = 10; // 在籍
-  ws.getColumn(11).width = 8;  // 年齢
-  ws.getColumn(12).width = 25; // 備考
+  ws.getColumn(1).width = 20;
+  ws.getColumn(2).width = 10;
+  ws.getColumn(3).width = 10;
+  ws.getColumn(4).width = 12;
+  ws.getColumn(5).width = 18;
+  ws.getColumn(6).width = 10;
+  ws.getColumn(7).width = 8;
+  ws.getColumn(8).width = 12;
+  ws.getColumn(9).width = 18;
+  ws.getColumn(10).width = 10;
+  ws.getColumn(11).width = 8;
+  ws.getColumn(12).width = 25;
 
-  // We need to iterate over nodes just like addPlanSheet
   let flatNodes = [];
   traverseOrgTree(departments, flatNodes);
   flatNodes = flatNodes.filter(n => n.type === 'dept' || n.type === 'group' || n.type === 'post');
 
-  
   let displayDeptStr = '';
   
   for (const node of flatNodes) {
-    if (node.type === 'dept' || node.type === 'group') {
-       const counts = filterLevel === 9 ? {} : getCounts(currMap, employees, node.type === 'dept' ? node.id : null, node.type === 'group' ? node.id : null);
-       const nCount = filterLevel === 9 ? {} : getCounts(nextMap, employees, node.type === 'dept' ? node.id : null, node.type === 'group' ? node.id : null);
+    if (node.type === 'dept') {
+       const deptCurrEmps = employees.filter(e => e.currentDept === node.id);
+       const deptNextEmps = employees.filter(e => e.nextDept === node.id);
+       const counts = filterLevel === 9 ? {} : getCounts(deptCurrEmps, false);
+       const nCount = filterLevel === 9 ? {} : getCounts(deptNextEmps, true);
+       let curTot = counts['合計'] || 0;
+       let nxTot = nCount['合計'] || 0;
+       let displayStr = node.name;
+       if (showCount) displayStr += ` ${curTot}→${nxTot}`;
+       displayDeptStr = displayStr;
+    } else if (node.type === 'group') {
+       const grpCurrEmps = employees.filter(e => e.currentGroup === node.id);
+       const grpNextEmps = employees.filter(e => e.nextGroup === node.id);
+       const counts = filterLevel === 9 ? {} : getCounts(grpCurrEmps, false);
+       const nCount = filterLevel === 9 ? {} : getCounts(grpNextEmps, true);
        let curTot = counts['合計'] || 0;
        let nxTot = nCount['合計'] || 0;
        let displayStr = node.name;
@@ -888,9 +896,9 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
          let noteStr = notes[node.id] || '';
          
          let rowVals = [
-           displayDeptStr, // 部署名
-           '', // 配属希望
-           '', // 特殊事情
+           displayDeptStr,
+           '',
+           '',
            currEmp ? currEmp.currentTitle : '',
            currEmp ? getFormattedNameForPlan(currEmp, false) : '',
            getYearsStr(currEmp, false),
@@ -901,18 +909,12 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
            getAgeStr(nextEmp, true),
            noteStr
          ];
-         displayDeptStr = ''; // Clear it after printing once
+         displayDeptStr = ''; 
          
          if (isAbolishedPost) {
-           rowVals[7] = '';
-           rowVals[8] = '後任なし';
-           rowVals[9] = '';
-           rowVals[10] = '';
+           rowVals[7] = ''; rowVals[8] = '後任なし'; rowVals[9] = ''; rowVals[10] = '';
          } else if (isRetained) {
-           rowVals[7] = nextEmp.nextTitle;
-           rowVals[8] = '';
-           rowVals[9] = '';
-           rowVals[10] = '';
+           rowVals[7] = nextEmp.nextTitle; rowVals[8] = ''; rowVals[9] = ''; rowVals[10] = '';
          }
          
          if (currEmp && pIdx === 0) {
@@ -931,11 +933,9 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
             cell.font = { size: 9 };
             cell.border = getCellBorders(true, true, true, true, true);
             
-            // Current year light blue if transferred OUT
             if (currEmp && !isRetained && c >= 4 && c <= 7) {
-               cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD6EAF8' } };
+               cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBAE6FD' } };
             }
-            // Next year yellow/color if promoted
             if (nextEmp && !isRetained && c >= 8 && c <= 11) {
                if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
                    const colorCode = getPromotedBgColorCode(nextEmp.nextGrade).replace('#', '').toUpperCase();
@@ -947,7 +947,6 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     }
   }
 };
-
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const workbook = new ExcelJS.Workbook();
   addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
