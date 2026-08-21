@@ -841,10 +841,15 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true };
       
-      const topStyle = rn === 4 ? 'medium' : 'thin';
-      const bottomStyle = rn === 5 ? 'medium' : 'thin';
-      const leftStyle = c === 1 ? 'medium' : 'thin';
-      const rightStyle = c === 12 ? 'medium' : 'thin';
+      let topStyle = rn === 4 ? 'medium' : 'thin';
+      let bottomStyle = rn === 5 ? 'medium' : 'thin';
+      let leftStyle = c === 1 ? 'medium' : 'thin';
+      let rightStyle = c === 12 ? 'medium' : 'thin';
+      
+      // セル結合されている列は4行目でも下側の罫線を太線にしないと表の枠が太線にならない
+      if (rn === 4 && (c === 1 || c === 2 || c === 3 || c === 12)) {
+         bottomStyle = 'medium';
+      }
       
       cell.border = {
         top: { style: topStyle, color: { argb: 'FF000000' } },
