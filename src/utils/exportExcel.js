@@ -848,8 +848,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
 
       let argb = 'FFCBD5E1';
       if (c === 2 || c === 3) argb = 'FF86EFAC';
-      else if (c >= 4 && c <= 7) argb = 'FFFDE68A';
-      else if (c >= 8 && c <= 11) argb = 'FFBFDBFE';
+      else if (c >= 4 && c <= 7) argb = 'FFFEF3C7'; // Amber 100
+      else if (c >= 8 && c <= 12) argb = 'FFDBEAFE'; // Blue 100
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
     }
   }
@@ -1023,7 +1023,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
       
       if (currEmp && !isRetained && c >= 4 && c <= 7) {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBAE6FD' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
       }
       if (nextEmp && !isRetained && c >= 8 && c <= 11) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
