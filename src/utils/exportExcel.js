@@ -428,7 +428,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       rowVals.push(formatWithEra(extEmp.hireDate, extEmp.birthDate));
       rowVals.push(extEmp.note || '');
       rowVals.push(extEmp.desiredAssignment || '');
-      rowVals.push(extEmp.specialCircumstances || '');
+      rowVals.push(extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '');
 
       let hireStr = '';
       if (extEmp.hireDate) {
@@ -861,7 +861,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       };
 
       let argb = 'FFCBD5E1';
-      if (c === 2 || c === 3) argb = 'FFFCE7F3'; // Pink 100
+      if (c === 2 || c === 3) argb = 'FFFBCFE8'; // Pink 200
       else if (c >= 4 && c <= 7) argb = 'FFFEF3C7'; // Amber 100
       else if (c >= 8 && c <= 12) argb = 'FFDBEAFE'; // Blue 100
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
@@ -957,7 +957,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[5] = cYearsStr;
       rowVals[6] = cAgeVal !== '' ? Number(cAgeVal) : '';
       rowVals[1] = currEmp.desiredAssignment || '';
-      rowVals[2] = currEmp.specialCircumstances || '';
+      rowVals[2] = currEmp.specialCircumstances ? '●' + currEmp.specialCircumstances : '';
     }
     
     if (nextEmp) {
@@ -1418,7 +1418,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       formatWithEra(emp.hireDate, emp.birthDate),
       emp.note || '',
       emp.desiredAssignment || '',
-      emp.specialCircumstances || '',
+      emp.specialCircumstances ? '●' + emp.specialCircumstances : '',
       cDeptName,
       emp.currentTitle || '',
       emp.currentGrade || '',
