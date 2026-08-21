@@ -651,7 +651,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
           const num = Number(cell.value);
           if (!isNaN(num)) {
             cell.value = num;
-            cell.numFmt = '000000';
+            cell.numFmt = '[$-411]000000';
           }
         }
 
@@ -1550,7 +1550,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
         const num = Number(cell.value);
         if (!isNaN(num)) {
           cell.value = num;
-          cell.numFmt = '000000';
+          cell.numFmt = '[$-411]000000';
         }
       }
 
