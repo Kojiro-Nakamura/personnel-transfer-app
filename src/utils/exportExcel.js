@@ -839,7 +839,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     const row = ws.getRow(rn);
     for (let c = 1; c <= 12; c++) {
       const cell = row.getCell(c);
-      cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
+      cell.font = { name: 'BIZ UDPゴシック', size: (c === 2 || c === 3) ? 8 : 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true };
       if (c === 2 || c === 3) {
         cell.alignment = { ...cell.alignment, textRotation: 'vertical' };
