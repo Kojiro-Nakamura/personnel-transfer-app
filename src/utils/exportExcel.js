@@ -1051,7 +1051,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
       
       if (currEmp && isCurrTransferred && c >= 4 && c <= 7) {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF86EFAC' } };
       }
       if (nextEmp && isNextTransferred && c >= 8 && c <= 11) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
@@ -1060,8 +1060,6 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
              const colorCode = rawColor.replace('#', '').toUpperCase();
              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorCode } };
           }
-        } else {
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
         }
       }
     }
