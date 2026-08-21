@@ -832,7 +832,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     for (let c = 1; c <= 12; c++) {
       const cell = row.getCell(c);
       cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true };
       
       const topStyle = rn === 4 ? 'medium' : 'thin';
       const bottomStyle = rn === 5 ? 'medium' : 'thin';
@@ -858,14 +858,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getColumn(2).width = 10;
   ws.getColumn(3).width = 10;
   ws.getColumn(4).width = 12;
-  ws.getColumn(5).width = 18;
-  ws.getColumn(6).width = 12; // slightly wider for 3(1+1+1)
-  ws.getColumn(7).width = 8;
   ws.getColumn(8).width = 12;
-  ws.getColumn(9).width = 18;
-  ws.getColumn(10).width = 12; // slightly wider for 3(1+1+1)
-  ws.getColumn(11).width = 8;
-  ws.getColumn(12).width = 25;
 
   let rowIndex = 6;
   let lastDept = null;
@@ -982,7 +975,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
 
     for (let c = 1; c <= 12; c++) {
       const cell = tr.getCell(c);
-      cell.alignment = { vertical: 'middle', horizontal: c === 1 || c === 12 ? 'left' : 'center' };
+      cell.alignment = { vertical: 'middle', horizontal: c === 1 || c === 12 ? 'left' : 'center', shrinkToFit: true };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
       
       let topStyle = 'thin';
@@ -1047,6 +1040,30 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       };
     }
   }
+
+  const fitCols = [5, 6, 7, 9, 10, 11, 12];
+  fitCols.forEach(colIndex => {
+    let maxLength = 0;
+    const col = ws.getColumn(colIndex);
+    col.eachCell({ includeEmpty: true }, cell => {
+      if (cell.row <= 3) return;
+      const v = cell.value ? cell.value.toString() : '';
+      if (v) {
+        const lines = v.split('\n');
+        for (let l of lines) {
+          let lw = 0;
+          for (let c of l) {
+            lw += c.charCodeAt(0) > 255 ? 1.6 : 0.9;
+          }
+          if (lw > maxLength) maxLength = lw;
+        }
+      }
+    });
+    if (maxLength > 0) {
+      if (colIndex === 12 && maxLength > 40) maxLength = 40;
+      col.width = maxLength + 1.5;
+    }
+  });
 };
 
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
