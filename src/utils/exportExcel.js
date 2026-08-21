@@ -802,15 +802,15 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   const fillBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } };
 
   ws.getRow(1).values = [fileName];
-  ws.getRow(1).font = { bold: true, size: 12, color: { argb: 'FF1E293B' } };
+  ws.getRow(1).font = { name: 'BIZ UDPゴシック', bold: true, size: 12, color: { argb: 'FF1E293B' } };
   
   const curSummary = generateGradeSummary(employees, false);
   ws.getRow(2).values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${curSummary}`];
-  ws.getRow(2).font = { size: 9, color: { argb: 'FF0284C7' } };
+  ws.getRow(2).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
   
   const nextSummary = generateGradeSummary(employees, true);
   ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummary}`];
-  ws.getRow(3).font = { size: 9, color: { argb: 'FF0284C7' } };
+  ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
   const r4 = ws.getRow(4);
   r4.values = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '備考'];
@@ -831,7 +831,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     const row = ws.getRow(rn);
     for (let c = 1; c <= 12; c++) {
       const cell = row.getCell(c);
-      cell.font = { size: 9, bold: true };
+      cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = getCellBorders(true, true, true, true, true);
       let argb = 'FFCBD5E1';
@@ -847,17 +847,24 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getColumn(3).width = 10;
   ws.getColumn(4).width = 12;
   ws.getColumn(5).width = 18;
-  ws.getColumn(6).width = 10;
+  ws.getColumn(6).width = 12; // slightly wider for 3(1+1+1)
   ws.getColumn(7).width = 8;
   ws.getColumn(8).width = 12;
   ws.getColumn(9).width = 18;
-  ws.getColumn(10).width = 10;
+  ws.getColumn(10).width = 12; // slightly wider for 3(1+1+1)
   ws.getColumn(11).width = 8;
   ws.getColumn(12).width = 25;
 
   let rowIndex = 6;
   let lastDept = null;
   let lastGroup = null;
+
+  const getYearsStr = (emp, isNext) => {
+    if (!emp) return '';
+    const years = getEmpCurrentYears(emp, isNext ? targetYear : targetYear - 1, isNext);
+    const skills = isNext ? emp.nextSkills : emp.currentSkills;
+    return skills?.length ? `${years}(${skills.join('+')})` : `${years}`;
+  };
 
   traverseOrgTree(departments, deptMap, currMap, nextMap, filterLevel, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
     const isNewDept = lastDept !== dept.id;
@@ -914,8 +921,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
     }
 
-    const cYearsStr = currEmp ? getEmpCurrentYears(currEmp, targetYear - 1, false) : '';
-    const nYearsStr = nextEmp ? getEmpCurrentYears(nextEmp, targetYear, true) : '';
+    const cYearsStr = getYearsStr(currEmp, false);
+    const nYearsStr = getYearsStr(nextEmp, true);
 
     const cAgeStr = currEmp && currEmp.birthDate ? `${calculateAge(currEmp.birthDate, targetYear - 1)}` : '';
     const nAgeStr = nextEmp && nextEmp.birthDate ? `${calculateAge(nextEmp.birthDate, targetYear)}` : '';
@@ -963,8 +970,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
 
     for (let c = 1; c <= 12; c++) {
       const cell = tr.getCell(c);
-      cell.alignment = { vertical: 'middle', horizontal: c >= 6 && c !== 12 ? 'center' : 'left' };
-      cell.font = { size: 9 };
+      cell.alignment = { vertical: 'middle', horizontal: c === 1 || c === 12 ? 'left' : 'center' };
+      cell.font = { name: 'BIZ UDPゴシック', size: 9 };
       cell.border = getCellBorders(true, true, true, true, true);
       
       if (currEmp && !isRetained && c >= 4 && c <= 7) {
