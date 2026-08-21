@@ -872,8 +872,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   }
 
   ws.getColumn(1).width = 20;
-  ws.getColumn(2).width = 3;
-  ws.getColumn(3).width = 3;
+  ws.getColumn(2).width = 1.47;
+  ws.getColumn(3).width = 1.47;
   ws.getColumn(4).width = 12;
   ws.getColumn(8).width = 12;
 
