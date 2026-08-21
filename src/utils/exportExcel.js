@@ -1046,7 +1046,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     let maxLength = 0;
     const col = ws.getColumn(colIndex);
     col.eachCell({ includeEmpty: true }, cell => {
-      if (cell.row <= 3) return;
+      if (cell.row <= 4) return;
       const v = cell.value ? cell.value.toString() : '';
       if (v) {
         const lines = v.split('\n');
