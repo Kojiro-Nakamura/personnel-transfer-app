@@ -846,8 +846,9 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       let leftStyle = c === 1 ? 'medium' : 'thin';
       let rightStyle = c === 12 ? 'medium' : 'thin';
       
-      // セル結合されている列は4行目でも下側の罫線を太線にしないと表の枠が太線にならない
-      if (rn === 4 && (c === 1 || c === 2 || c === 3 || c === 12)) {
+      // 縦にセル結合されている列(1, 2, 3, 12)は、5行目の処理で上罫線が細線で上書きされるのを防ぐため、明示的に上下を太線にする
+      if (c === 1 || c === 2 || c === 3 || c === 12) {
+         topStyle = 'medium';
          bottomStyle = 'medium';
       }
       
