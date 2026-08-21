@@ -646,8 +646,8 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
           </div>
           
           <div className="grid grid-cols-2 gap-2 my-1.5">
-            <EmployeeFormSection title={`今年度（現行）${getEraFormattedYear(targetYear - 1)}`} isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
-            <EmployeeFormSection title={`来年度（新）${getEraFormattedYear(targetYear)}`} isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
+            <EmployeeFormSection title={`今年度（現行）${getEraFormattedYear(targetYear - 1)}${fd.birthDate && calculateAge(fd.birthDate, targetYear - 1) !== null && !isNaN(calculateAge(fd.birthDate, targetYear - 1)) ? ` ${calculateAge(fd.birthDate, targetYear - 1)}歳` : ''}`} isCurrent={true} disabled={!editCurrent} fd={fd} setFd={setFd} departments={departments} editCurrent={editCurrent} setEditCurrent={setEditCurrent} />
+            <EmployeeFormSection title={`来年度（新組織）${getEraFormattedYear(targetYear)}${fd.birthDate && calculateAge(fd.birthDate, targetYear) !== null && !isNaN(calculateAge(fd.birthDate, targetYear)) ? ` ${calculateAge(fd.birthDate, targetYear)}歳` : ''}`} isCurrent={false} disabled={false} fd={fd} setFd={setFd} departments={departments} />
           </div>
 
           <div className="border border-slate-300 rounded p-2.5 mb-3 bg-slate-50/50">
