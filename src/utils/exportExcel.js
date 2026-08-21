@@ -942,10 +942,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[4] = getFormattedNameForPlan(currEmp, false) || '';
       rowVals[5] = cYearsStr;
       rowVals[6] = cAgeStr !== 'null' ? cAgeStr : '';
-      if (i === 0) {
-        rowVals[1] = currEmp.desiredAssignment || '';
-        rowVals[2] = currEmp.specialCircumstances || '';
-      }
+      rowVals[1] = currEmp.desiredAssignment || '';
+      rowVals[2] = currEmp.specialCircumstances || '';
     }
     
     if (nextEmp) {
@@ -953,10 +951,6 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[8] = getFormattedNameForPlan(nextEmp, true) || '';
       rowVals[9] = nYearsStr;
       rowVals[10] = nAgeStr !== 'null' ? nAgeStr : '';
-      if (i === 0 && !currEmp) {
-        rowVals[1] = nextEmp.desiredAssignment || '';
-        rowVals[2] = nextEmp.specialCircumstances || '';
-      }
     }
 
     const isRetained = currEmp && nextEmp && currEmp.id === nextEmp.id;
