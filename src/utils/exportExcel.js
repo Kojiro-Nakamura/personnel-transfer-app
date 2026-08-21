@@ -647,6 +647,13 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         if (colNumber >= 3) {
           cell.alignment = { ...cell.alignment, horizontal: 'center' };
         }
+        if (colNumber === 21 && cell.value && cell.value.toString().trim() !== '') {
+          const num = Number(cell.value);
+          if (!isNaN(num)) {
+            cell.value = num;
+            cell.numFmt = '000000';
+          }
+        }
 
 
         
@@ -1539,6 +1546,14 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
       cell.border = getCellBorders(true, true, true, true, true);
       
+      if (colNumber === 4 && cell.value && cell.value.toString().trim() !== '') {
+        const num = Number(cell.value);
+        if (!isNaN(num)) {
+          cell.value = num;
+          cell.numFmt = '000000';
+        }
+      }
+
       let argb = 'FFFFFFFF'; 
       if (colNumber <= 2) {
          argb = 'FFE2E8F0';
