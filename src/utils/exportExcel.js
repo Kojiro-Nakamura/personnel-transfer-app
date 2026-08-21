@@ -801,11 +801,11 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(1).values = [fileName];
   ws.getRow(1).font = { bold: true, size: 12, color: { argb: 'FF1E293B' } };
   
-  const curCounts = getCounts(currMap, employees);
+  const curCounts = getCounts(employees, false);
   ws.getRow(2).values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${formatCountText(curCounts)}`];
   ws.getRow(2).font = { size: 9, color: { argb: 'FF0284C7' } };
   
-  const nextCounts = getCounts(nextMap, employees);
+  const nextCounts = getCounts(employees, true);
   ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${formatCountText(nextCounts)}`];
   ws.getRow(3).font = { size: 9, color: { argb: 'FF0284C7' } };
 
