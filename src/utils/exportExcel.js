@@ -833,7 +833,19 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const cell = row.getCell(c);
       cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      cell.border = getCellBorders(true, true, true, true, true);
+      
+      const topStyle = rn === 4 ? 'medium' : 'thin';
+      const bottomStyle = rn === 5 ? 'medium' : 'thin';
+      const leftStyle = c === 1 ? 'medium' : 'thin';
+      const rightStyle = c === 12 ? 'medium' : 'thin';
+      
+      cell.border = {
+        top: { style: topStyle, color: { argb: 'FF000000' } },
+        bottom: { style: bottomStyle, color: { argb: 'FF000000' } },
+        left: { style: leftStyle, color: { argb: 'FF000000' } },
+        right: { style: rightStyle, color: { argb: 'FF000000' } }
+      };
+
       let argb = 'FFCBD5E1';
       if (c === 2 || c === 3) argb = 'FF86EFAC';
       else if (c >= 4 && c <= 7) argb = 'FFFDE68A';
@@ -972,7 +984,20 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const cell = tr.getCell(c);
       cell.alignment = { vertical: 'middle', horizontal: c === 1 || c === 12 ? 'left' : 'center' };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
-      cell.border = getCellBorders(true, true, true, true, true);
+      
+      let topStyle = 'thin';
+      if (rowIndex === 6) topStyle = 'medium';
+      else if (isNewDept) topStyle = 'medium';
+      else if (isNewGroup) topStyle = 'dashed';
+      
+      const leftStyle = c === 1 ? 'medium' : 'thin';
+      const rightStyle = c === 12 ? 'medium' : 'thin';
+      
+      cell.border = {
+        top: { style: topStyle, color: { argb: 'FF000000' } },
+        left: { style: leftStyle, color: { argb: 'FF000000' } },
+        right: { style: rightStyle, color: { argb: 'FF000000' } }
+      };
       
       if (currEmp && !isRetained && c >= 4 && c <= 7) {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBAE6FD' } };
@@ -992,6 +1017,18 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     lastGroup = group ? group.id : null;
     rowIndex++;
   });
+
+  const lastRow = rowIndex - 1;
+  if (lastRow >= 6) {
+    const row = ws.getRow(lastRow);
+    for (let c = 1; c <= 12; c++) {
+      const cell = row.getCell(c);
+      cell.border = {
+        ...cell.border,
+        bottom: { style: 'medium', color: { argb: 'FF000000' } }
+      };
+    }
+  }
 };
 
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
