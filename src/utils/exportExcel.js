@@ -970,9 +970,21 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     const isRetained = currEmp && nextEmp && currEmp.id === nextEmp.id;
     if (post && post.isAbolished) {
       rowVals[7] = ''; rowVals[8] = '後任なし'; rowVals[9] = ''; rowVals[10] = '';
-    } else if (isRetained) {
-      rowVals[7] = nextEmp.nextTitle || ''; rowVals[8] = ''; rowVals[9] = ''; rowVals[10] = '';
     }
+
+    const isCurrTransferred = currEmp ? (
+      currEmp.departmentId !== currEmp.currentDeptId ||
+      currEmp.groupId !== currEmp.currentGroupId ||
+      currEmp.postId !== currEmp.currentPostId ||
+      currEmp.groupPostId !== currEmp.currentGroupPostId
+    ) : false;
+
+    const isNextTransferred = nextEmp ? (
+      nextEmp.departmentId !== nextEmp.currentDeptId ||
+      nextEmp.groupId !== nextEmp.currentGroupId ||
+      nextEmp.postId !== nextEmp.currentPostId ||
+      nextEmp.groupPostId !== nextEmp.currentGroupPostId
+    ) : false;
 
     let remarkStr = '';
     if (nextEmp && nextEmp.nextEmploymentType) {
@@ -1038,10 +1050,10 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         };
       }
       
-      if (currEmp && !isRetained && c >= 4 && c <= 7) {
+      if (currEmp && isCurrTransferred && c >= 4 && c <= 7) {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
       }
-      if (nextEmp && !isRetained && c >= 8 && c <= 11) {
+      if (nextEmp && isNextTransferred && c >= 8 && c <= 11) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
           const rawColor = getPromotedBgColorCode(nextEmp.nextGrade);
           if (rawColor) {
