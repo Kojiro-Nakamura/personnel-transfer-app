@@ -791,21 +791,12 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
 
 export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
-  const getYearsStr = (emp, isNext) => { 
-    if (!emp) return ''; 
-    const years = getEmpCurrentYears(emp, isNext ? targetYear : targetYear - 1, isNext);
-    const skills = isNext ? emp.nextSkills : emp.currentSkills; 
-    return skills?.length ? `${years}(${skills.join('、')})` : `${years}`; 
-  };
-  const getAgeStr = (emp, isNext) => {
-    if (!emp || !emp.birthDate) return '';
-    const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
-    return age !== '' && age !== null && !isNaN(age) ? `${age}` : '';
-  };
+  const ws = workbook.addWorksheet(sheetName, {
+    views: [{ state: 'frozen', xSplit: 0, ySplit: 5, showGridLines: false }],
+    pageSetup: { paperSize: 8, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5 } }
+  });
+  ws.pageSetup.printTitlesRow = '1:5';
 
-  const ws = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }] });
-  
-  // Define styles
   const fillSlate = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
   const fillAmber = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE68A' } };
   const fillBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } };
@@ -813,22 +804,20 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(1).values = [fileName];
   ws.getRow(1).font = { bold: true, size: 12, color: { argb: 'FF1E293B' } };
   
-  const curCounts = getCounts(employees, false);
+  const curCounts = getCounts(employees.filter(e => e.currentDept), false);
   ws.getRow(2).values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${formatCountText(curCounts)}`];
   ws.getRow(2).font = { size: 9, color: { argb: 'FF0284C7' } };
   
-  const nextCounts = getCounts(employees, true);
+  const nextCounts = getCounts(employees.filter(e => e.nextDept), true);
   ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${formatCountText(nextCounts)}`];
   ws.getRow(3).font = { size: 9, color: { argb: 'FF0284C7' } };
 
   const r4 = ws.getRow(4);
-  const r4Vals = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', ''];
-  r4.values = r4Vals;
+  r4.values = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', ''];
   r4.height = 20;
 
   const r5 = ws.getRow(5);
-  const r5Vals = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', '備考'];
-  r5.values = r5Vals;
+  r5.values = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', '備考'];
   r5.height = 20;
 
   ws.mergeCells('A4:A5');
@@ -839,18 +828,19 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
 
   for (let rn = 4; rn <= 5; rn++) {
     const row = ws.getRow(rn);
-    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+    for (let c = 1; c <= 12; c++) {
+      const cell = row.getCell(c);
       cell.font = { size: 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = getCellBorders(true, true, true, true, true);
       let argb = 'FFCBD5E1';
-      if (colNumber === 2 || colNumber === 3) argb = 'FF86EFAC';
-      else if (colNumber >= 4 && colNumber <= 7) argb = 'FFFDE68A';
-      else if (colNumber >= 8) argb = 'FFBFDBFE';
+      if (c === 2 || c === 3) argb = 'FF86EFAC';
+      else if (c >= 4 && c <= 7) argb = 'FFFDE68A';
+      else if (c >= 8) argb = 'FFBFDBFE';
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
-    });
+    }
   }
-  
+
   ws.getColumn(1).width = 20;
   ws.getColumn(2).width = 10;
   ws.getColumn(3).width = 10;
@@ -864,101 +854,132 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getColumn(11).width = 8;
   ws.getColumn(12).width = 25;
 
-  let flatNodes = [];
-  traverseOrgTree(departments, flatNodes);
-  flatNodes = flatNodes.filter(n => n.type === 'dept' || n.type === 'group' || n.type === 'post');
+  let rowIndex = 6;
+  let lastDept = null;
+  let lastGroup = null;
 
-  let displayDeptStr = '';
-  
-  for (const node of flatNodes) {
-    if (node.type === 'dept') {
-       const deptCurrEmps = employees.filter(e => e.currentDept === node.id);
-       const deptNextEmps = employees.filter(e => e.nextDept === node.id);
-       const counts = filterLevel === 9 ? {} : getCounts(deptCurrEmps, false);
-       const nCount = filterLevel === 9 ? {} : getCounts(deptNextEmps, true);
-       let curTot = counts['合計'] || 0;
-       let nxTot = nCount['合計'] || 0;
-       let displayStr = node.name;
-       if (showCount) displayStr += ` ${curTot}→${nxTot}`;
-       displayDeptStr = displayStr;
-    } else if (node.type === 'group') {
-       const grpCurrEmps = employees.filter(e => e.currentGroup === node.id);
-       const grpNextEmps = employees.filter(e => e.nextGroup === node.id);
-       const counts = filterLevel === 9 ? {} : getCounts(grpCurrEmps, false);
-       const nCount = filterLevel === 9 ? {} : getCounts(grpNextEmps, true);
-       let curTot = counts['合計'] || 0;
-       let nxTot = nCount['合計'] || 0;
-       let displayStr = node.name;
-       if (showCount) displayStr += ` ${curTot}→${nxTot}`;
-       displayDeptStr = displayStr;
-    } else if (node.type === 'post') {
-       const cList = currMap[node.id] || [];
-       const nList = nextMap[node.id] || [];
-       const maxCount = Math.max(cList.length, nList.length, 1);
-       
-       for (let pIdx = 0; pIdx < maxCount; pIdx++) {
-         const currEmpId = pIdx < cList.length ? cList[pIdx] : null;
-         const nextEmpId = pIdx < nList.length ? nList[pIdx] : null;
-         let currEmp = currEmpId ? employees.find(e => e.id === currEmpId) : null;
-         let nextEmp = nextEmpId ? employees.find(e => e.id === nextEmpId) : null;
-         
-         const isAbolishedPost = node.isAbolished;
-         const isRetained = currEmp && nextEmp && currEmp.id === nextEmp.id;
-         
-         let noteStr = notes[node.id] || '';
-         
-         let rowVals = [
-           displayDeptStr,
-           '',
-           '',
-           currEmp ? currEmp.currentTitle : '',
-           currEmp ? getFormattedNameForPlan(currEmp, false) : '',
-           getYearsStr(currEmp, false),
-           getAgeStr(currEmp, false),
-           nextEmp ? nextEmp.nextTitle : '',
-           nextEmp ? getFormattedNameForPlan(nextEmp, true) : '',
-           getYearsStr(nextEmp, true),
-           getAgeStr(nextEmp, true),
-           noteStr
-         ];
-         displayDeptStr = ''; 
-         
-         if (isAbolishedPost) {
-           rowVals[7] = ''; rowVals[8] = '後任なし'; rowVals[9] = ''; rowVals[10] = '';
-         } else if (isRetained) {
-           rowVals[7] = nextEmp.nextTitle; rowVals[8] = ''; rowVals[9] = ''; rowVals[10] = '';
-         }
-         
-         if (currEmp && pIdx === 0) {
-            rowVals[1] = currEmp.desiredAssignment || '';
-            rowVals[2] = currEmp.specialCircumstances || '';
-         } else if (nextEmp && pIdx === 0) {
-            rowVals[1] = nextEmp.desiredAssignment || '';
-            rowVals[2] = nextEmp.specialCircumstances || '';
-         }
-         
-         const tr = ws.addRow(rowVals);
-         
-         for(let c=1; c<=12; c++){
-            const cell = tr.getCell(c);
-            cell.alignment = { vertical: 'middle', horizontal: c >= 6 && c !== 12 ? 'center' : 'left' };
-            cell.font = { size: 9 };
-            cell.border = getCellBorders(true, true, true, true, true);
-            
-            if (currEmp && !isRetained && c >= 4 && c <= 7) {
-               cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBAE6FD' } };
-            }
-            if (nextEmp && !isRetained && c >= 8 && c <= 11) {
-               if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
-                   const colorCode = getPromotedBgColorCode(nextEmp.nextGrade).replace('#', '').toUpperCase();
-                   cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorCode } };
-               }
-            }
-         }
-       }
+  traverseOrgTree(departments, deptMap, currMap, nextMap, filterLevel, (dept, group, postName, currEmp, nextEmp, rowType, i, post) => {
+    const isNewDept = lastDept !== dept.id;
+    const isNewGroup = isNewDept || (group && lastGroup !== group.id);
+    const deptName = dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name;
+    const groupName = group ? (group.nextName && group.nextName !== group.name ? `${group.name} / ${group.nextName}` : group.name) : '';
+
+    if (filterLevel > 0) {
+      const currLvl = currEmp ? getGradeLevel(currEmp.currentGrade) : 0;
+      const nextLvl = nextEmp ? getGradeLevel(nextEmp.nextGrade) : 0;
+      const hasEmp = currEmp || nextEmp;
+      if (postName !== '班員' && postName !== '') {
+        if (hasEmp && currLvl < filterLevel && nextLvl < filterLevel) return; 
+      } else {
+        if (currLvl < filterLevel && nextLvl < filterLevel) return; 
+      }
     }
-  }
+
+    let displayDeptStr = '';
+    if (isNewDept) {
+      if (dept.id && deptMap[dept.id]) {
+        const dm = deptMap[dept.id];
+        const deptCurrEmps = [...dm.direct.current];
+        const deptNextEmps = [...dm.direct.next];
+        Object.values(dm.posts).forEach(p => { deptCurrEmps.push(...p.current); deptNextEmps.push(...p.next); });
+        Object.values(dm.groups).forEach(g => {
+          deptCurrEmps.push(...g.direct.current); deptNextEmps.push(...g.direct.next);
+          Object.values(g.posts).forEach(gp => { deptCurrEmps.push(...gp.current); deptNextEmps.push(...gp.next); });
+        });
+        const cCounts = getCounts(deptCurrEmps, false);
+        const nCounts = getCounts(deptNextEmps, true);
+        if (showCount) {
+          displayDeptStr = `${deptName} ${cCounts['合計'] || 0}→${nCounts['合計'] || 0}`;
+        } else {
+          displayDeptStr = deptName;
+        }
+      }
+    }
+
+    let displayGroupStr = '';
+    if (isNewGroup && groupName !== '') {
+      if (dept.id && group && group.id && deptMap[dept.id].groups[group.id]) {
+        const gm = deptMap[dept.id].groups[group.id];
+        const grpCurrEmps = [...gm.direct.current];
+        const grpNextEmps = [...gm.direct.next];
+        Object.values(gm.posts).forEach(gp => { grpCurrEmps.push(...gp.current); grpNextEmps.push(...gp.next); });
+        const gCCounts = getCounts(grpCurrEmps, false);
+        const gNCounts = getCounts(grpNextEmps, true);
+        if (showCount) {
+          displayGroupStr = `${groupName} ${gCCounts['合計'] || 0}→${gNCounts['合計'] || 0}`;
+        } else {
+          displayGroupStr = groupName;
+        }
+      }
+    }
+
+    const cYearsStr = currEmp ? getEmpCurrentYears(currEmp, targetYear - 1, false) : '';
+    const nYearsStr = nextEmp ? getEmpCurrentYears(nextEmp, targetYear, true) : '';
+
+    const cAgeStr = currEmp && currEmp.birthDate ? `${calculateAge(currEmp.birthDate, targetYear - 1)}` : '';
+    const nAgeStr = nextEmp && nextEmp.birthDate ? `${calculateAge(nextEmp.birthDate, targetYear)}` : '';
+
+    let rowVals = [
+      displayDeptStr || displayGroupStr,
+      '', '', '', '', '', '', '', '', '', '', ''
+    ];
+
+    if (currEmp) {
+      rowVals[3] = currEmp.currentTitle || '';
+      rowVals[4] = getFormattedNameForPlan(currEmp, false) || '';
+      rowVals[5] = cYearsStr;
+      rowVals[6] = cAgeStr !== 'null' ? cAgeStr : '';
+      if (i === 0) {
+        rowVals[1] = currEmp.desiredAssignment || '';
+        rowVals[2] = currEmp.specialCircumstances || '';
+      }
+    }
+    
+    if (nextEmp) {
+      rowVals[7] = nextEmp.nextTitle || '';
+      rowVals[8] = getFormattedNameForPlan(nextEmp, true) || '';
+      rowVals[9] = nYearsStr;
+      rowVals[10] = nAgeStr !== 'null' ? nAgeStr : '';
+      if (i === 0 && !currEmp) {
+        rowVals[1] = nextEmp.desiredAssignment || '';
+        rowVals[2] = nextEmp.specialCircumstances || '';
+      }
+    }
+
+    const isRetained = currEmp && nextEmp && currEmp.id === nextEmp.id;
+    if (post && post.isAbolished) {
+      rowVals[7] = ''; rowVals[8] = '後任なし'; rowVals[9] = ''; rowVals[10] = '';
+    } else if (isRetained) {
+      rowVals[7] = nextEmp.nextTitle || ''; rowVals[8] = ''; rowVals[9] = ''; rowVals[10] = '';
+    }
+
+    rowVals[11] = post ? notes[post.id] || '' : '';
+
+    const tr = ws.addRow(rowVals);
+
+    for (let c = 1; c <= 12; c++) {
+      const cell = tr.getCell(c);
+      cell.alignment = { vertical: 'middle', horizontal: c >= 6 && c !== 12 ? 'center' : 'left' };
+      cell.font = { size: 9 };
+      cell.border = getCellBorders(true, true, true, true, true);
+      
+      if (currEmp && !isRetained && c >= 4 && c <= 7) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBAE6FD' } };
+      }
+      if (nextEmp && !isRetained && c >= 8 && c <= 11) {
+        if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
+          const colorCode = getPromotedBgColorCode(nextEmp.nextGrade).replace('#', '').toUpperCase();
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorCode } };
+        }
+      }
+    }
+
+    lastDept = dept.id;
+    lastGroup = group ? group.id : null;
+    rowIndex++;
+  });
 };
+
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const workbook = new ExcelJS.Workbook();
   addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
