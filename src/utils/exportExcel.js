@@ -842,8 +842,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true };
       
-      let topStyle = rn === 4 ? 'medium' : 'thin';
-      let bottomStyle = rn === 5 ? 'medium' : 'thin';
+      let topStyle = rn === 4 ? 'medium' : 'hair';
+      let bottomStyle = rn === 5 ? 'medium' : 'hair';
       let leftStyle = c === 1 ? 'medium' : 'thin';
       let rightStyle = c === 12 ? 'medium' : 'thin';
       
@@ -1018,7 +1018,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       cell.alignment = { vertical: 'middle', horizontal: isLeft ? 'left' : 'center', shrinkToFit: shouldShrink, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
       
-      let topStyle = 'thin';
+      let topStyle = 'hair';
       if (rowIndex === 6) topStyle = 'medium';
       else if (isNewDept) topStyle = 'medium';
       else if (isNewGroup) topStyle = 'mediumDashed';
@@ -1033,7 +1033,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         else if (isNewGroup && rowVals[0] !== '') c1Top = 'mediumDashed';
 
         let c1Bottom = undefined;
-        if (rowVals[0] !== '') c1Bottom = 'thin';
+        if (rowVals[0] !== '') c1Bottom = 'hair';
 
         const b = {
           left: { style: leftStyle, color: { argb: 'FF000000' } },
