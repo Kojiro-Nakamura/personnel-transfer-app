@@ -966,10 +966,28 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[7] = nextEmp.nextTitle || ''; rowVals[8] = ''; rowVals[9] = ''; rowVals[10] = '';
     }
 
-    if (post && Array.isArray(notes)) {
-      const noteObj = notes.find(n => n.targetId === post.id);
-      rowVals[11] = noteObj ? noteObj.text || '' : '';
+    let remarkStr = '';
+    if (nextEmp && nextEmp.nextEmploymentType) {
+      remarkStr = nextEmp.nextEmploymentType;
+    } else if (!nextEmp && currEmp && currEmp.currentEmploymentType) {
+      remarkStr = currEmp.currentEmploymentType;
     }
+
+    let targetId = '';
+    if (rowType === 'post') targetId = `postRow-${dept.id}-${post.id}-${i}`;
+    else if (rowType === 'groupPost') targetId = `groupPostRow-${dept.id}-${group.id}-${post.id}-${i}`;
+    else if (rowType === 'direct') targetId = `directRow-${dept.id}-${group.id}-${i}`;
+    else if (rowType === 'deptDirect') targetId = `deptDirectRow-${dept.id}-${i}`;
+    else if (rowType === 'system') targetId = `side-${nextEmp ? nextEmp.id : currEmp?.id}`;
+
+    if (Array.isArray(notes)) {
+      const rowNote = notes.find(n => n.targetId === targetId);
+      if (rowNote && rowNote.text) {
+        if (remarkStr) remarkStr += ' / ';
+        remarkStr += rowNote.text;
+      }
+    }
+    rowVals[11] = remarkStr;
 
     const tr = ws.addRow(rowVals);
 
