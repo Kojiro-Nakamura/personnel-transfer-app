@@ -993,11 +993,29 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const leftStyle = c === 1 ? 'medium' : 'thin';
       const rightStyle = c === 12 ? 'medium' : 'thin';
       
-      cell.border = {
-        top: { style: topStyle, color: { argb: 'FF000000' } },
-        left: { style: leftStyle, color: { argb: 'FF000000' } },
-        right: { style: rightStyle, color: { argb: 'FF000000' } }
-      };
+      if (c === 1) {
+        let c1Top = undefined;
+        if (rowIndex === 6) c1Top = 'medium';
+        else if (isNewDept) c1Top = 'medium';
+        else if (isNewGroup && rowVals[0] !== '') c1Top = 'mediumDashed';
+
+        let c1Bottom = undefined;
+        if (rowVals[0] !== '') c1Bottom = 'thin';
+
+        const b = {
+          left: { style: leftStyle, color: { argb: 'FF000000' } },
+          right: { style: rightStyle, color: { argb: 'FF000000' } }
+        };
+        if (c1Top) b.top = { style: c1Top, color: { argb: 'FF000000' } };
+        if (c1Bottom) b.bottom = { style: c1Bottom, color: { argb: 'FF000000' } };
+        cell.border = b;
+      } else {
+        cell.border = {
+          top: { style: topStyle, color: { argb: 'FF000000' } },
+          left: { style: leftStyle, color: { argb: 'FF000000' } },
+          right: { style: rightStyle, color: { argb: 'FF000000' } }
+        };
+      }
       
       if (currEmp && !isRetained && c >= 4 && c <= 7) {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBAE6FD' } };
