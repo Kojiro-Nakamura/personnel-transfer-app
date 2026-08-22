@@ -1035,15 +1035,11 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         else if (isNewDept) c1Top = 'medium';
         else if (isNewGroup && rowVals[0] !== '') c1Top = 'mediumDashed';
 
-        let c1Bottom = undefined;
-        if (rowVals[0] !== '') c1Bottom = 'hair';
-
         const b = {
           left: { style: leftStyle, color: { argb: 'FF000000' } },
           right: { style: rightStyle, color: { argb: 'FF000000' } }
         };
         if (c1Top) b.top = { style: c1Top, color: { argb: 'FF000000' } };
-        if (c1Bottom) b.bottom = { style: c1Bottom, color: { argb: 'FF000000' } };
         cell.border = b;
       } else {
         cell.border = {
