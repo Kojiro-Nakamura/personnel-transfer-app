@@ -864,7 +864,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       };
 
       let argb = 'FFCBD5E1';
-      if (c === 2 || c === 3) argb = 'FFFBCFE8'; // Pink 200
+      if (c === 2 || c === 3) argb = 'FFFED7AA'; // Orange 200
       else if (c >= 4 && c <= 7) argb = 'FFFEF3C7'; // Amber 100
       else if (c >= 8 && c <= 12) argb = 'FFDBEAFE'; // Blue 100
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
