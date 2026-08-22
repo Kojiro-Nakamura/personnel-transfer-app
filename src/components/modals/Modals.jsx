@@ -5,7 +5,6 @@ import {
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, FileCode, MessageSquare, MessageSquareText
 } from 'lucide-react';
-import { generateAndDownloadHTML } from '../../utils/exportHtml.js';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
@@ -430,7 +429,7 @@ export const TitleChangeConfirmModal = ({ isOpen, onClose, onConfirm, data }) =>
 };
 
 
-export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments, targetYear }) => {
+export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees, departments, targetYear }) => {
   const [localEmps, setLocalEmps] = useState([]); 
   const [localDepts, setLocalDepts] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -573,11 +572,6 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
   }, [localEmps, sortConfig]);
 
   if (!isOpen) return null;
-
-
-    const handleExportHTML = () => {
-    generateAndDownloadHTML(employees, departments, targetYear);
-  };;
   const handleDownloadTemplate = () => {
     const headers = [
       "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", "配属希望", "特殊事情", 
@@ -1229,11 +1223,11 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, employees, departments,
               </button>
             )}
             <button 
-              onClick={handleExportHTML} 
-              className="ml-2 px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs font-bold flex items-center gap-1 border border-orange-200 hover:bg-orange-200 transition-colors" 
-              title="現在の内容をHTML形式で保存します（閲覧・ソート用）"
+              onClick={onExportList} 
+              className="ml-2 px-3 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold flex items-center gap-1 border border-emerald-200 hover:bg-emerald-200 transition-colors" 
+              title="現在の職員一覧をファイルとして保存する"
             >
-              <FileCode className="w-3.5 h-3.5" />職員一覧HTML
+              <FileCode className="w-3.5 h-3.5" />職員一覧
             </button>
           </div>
           <button onClick={onClose} title="閉じる"><X className="w-4 h-4" /></button>

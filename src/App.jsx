@@ -290,7 +290,15 @@ export const AppContent = () => {
       <EmployeeSelectModal isOpen={modals.empSelect.isOpen} onClose={() => closeModal('empSelect')} onSelect={(empId, placement) => handleAssign(empId, placement)} targetPlacement={modals.empSelect.data} employees={employees} departments={departments} />
       <TitleChangeConfirmModal isOpen={modals.titleChangeConfirm.isOpen} onClose={() => closeModal('titleChangeConfirm')} onConfirm={(empId, newTitle) => mutations.updateEmployee(empId, { nextTitle: newTitle })} data={modals.titleChangeConfirm.data} />
       <EmployeeModal isOpen={modals.emp.isOpen} initialData={modals.emp.data} departments={departments} onClose={() => closeModal('emp')} onSave={modals.emp.data ? d => mutations.updateEmployee(modals.emp.data.id, d) : mutations.addEmployee} />
-      <BulkEditModal isOpen={modals.bulkEdit.isOpen} onClose={() => closeModal('bulkEdit')} employees={employees} departments={departments} targetYear={targetYear} onSave={(u, d, a, ud) => { if (ud) mutations.updateAllDepartments(ud); mutations.bulkProcessEmployees(u, d, a); closeModal('bulkEdit'); }} />
+      <BulkEditModal 
+        isOpen={modals.bulkEdit.isOpen} 
+        onClose={() => closeModal('bulkEdit')} 
+        employees={employees} 
+        departments={departments} 
+        targetYear={targetYear} 
+        onSave={(u, d, a, ud) => { if (ud) mutations.updateAllDepartments(ud); mutations.bulkProcessEmployees(u, d, a); closeModal('bulkEdit'); }} 
+        onExportList={() => openModal('saveFile', { type: 'list', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_職員一覧' : baseFileName + '_職員一覧', options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }] })}
+      />
       <NameEditModal isOpen={modals.dept.isOpen} title="部署編集" data={modals.dept.data} onClose={() => closeModal('dept')} onSave={d => modals.dept.data ? mutations.updateDepartment(modals.dept.data.id, d) : mutations.addDepartment(d)} />
       <NameEditModal isOpen={modals.post.isOpen} title="ポスト編集" data={modals.post.data?.post} onClose={() => closeModal('post')} onSave={d => modals.post.data?.post ? mutations.updatePost(modals.post.data.deptId, modals.post.data.post.id, d) : mutations.addPost(modals.post.data.deptId, d)} />
       <NameEditModal isOpen={modals.group.isOpen} title="班編集" data={modals.group.data?.group} onClose={() => closeModal('group')} onSave={d => modals.group.data?.group ? mutations.updateGroup(modals.group.data.deptId, modals.group.data.group.id, d) : mutations.addGroup(modals.group.data.deptId, d)} />
