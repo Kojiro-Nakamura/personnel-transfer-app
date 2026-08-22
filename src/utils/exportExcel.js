@@ -989,7 +989,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       nextEmp.groupPostId !== nextEmp.currentGroupPostId
     ) : false;
 
-    let remarkStr = nextEmp ? (nextEmp.note || '') : '';
+    let remarkStr = nextEmp ? (nextEmp.nextEmploymentType || '') : '';
 
     let targetId = '';
     if (rowType === 'post') targetId = `postRow-${dept.id}-${post.id}-${i}`;
