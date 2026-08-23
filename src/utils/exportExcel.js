@@ -1120,7 +1120,7 @@ const getHireFiscalYearShort = (dateStr) => {
   let year = parseInt(match[1], 10);
   const month = parseInt(match[2], 10);
   const day = parseInt(match[3], 10);
-  if (month < 4 || (month === 4 && day === 1)) year -= 1;
+  if (month < 4) year -= 1;
   if (year >= 2019) return 'R' + (year - 2018);
   if (year >= 1989) return 'H' + (year - 1988);
   if (year >= 1926) return 'S' + (year - 1925);
