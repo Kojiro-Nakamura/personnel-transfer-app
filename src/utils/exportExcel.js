@@ -1335,8 +1335,6 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     currentRowIndex += maxEmpCount;
     
     const summaryRows = [
-      { label: '振興局外', valFn: (y) => (grouped[y] || []).filter(e => !e.isShinkokyoku).length },
-      { label: '振興局', valFn: (y) => (grouped[y] || []).filter(e => e.isShinkokyoku).length },
       { label: '計', valFn: (y) => (grouped[y] || []).length },
       { label: '累計', valFn: (y) => cumulativeMap[y] }
     ];
