@@ -1139,6 +1139,7 @@ const getEraYearOnly = (year) => {
 export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, departments) => {
   const ws = workbook.addWorksheet(sheetName, {
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: { left: 0.2, right: 0.2, top: 0.3, bottom: 0.3, header: 0.1, footer: 0.1 } },
+    views: [{ showGridLines: false }],
     views: [{ showGridLines: false }]
   });
 
@@ -1202,7 +1203,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   const yearsPerBlock = 20;
   let currentRowIndex = 1;
 
-  ws.getCell(currentRowIndex, 1).value = '令和' + (targetYear - 2018) + '年度林学職生年別一覧';
+  ws.getCell(currentRowIndex, 1).value = '令和' + (targetYear - 2019) + '年度林学職生年別一覧';
   ws.getCell(currentRowIndex, 1).font = titleFont;
   currentRowIndex += 2;
 
@@ -1233,7 +1234,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
       ws.getColumn(cIdx).width = 4;
       ws.getColumn(cIdx + 1).width = 8;
       
-      const age = targetYear - y;
+      const age = (targetYear - 1) - y;
       ageRow.getCell(cIdx).value = age;
       ws.mergeCells(currentRowIndex, cIdx, currentRowIndex, cIdx + 1);
       
@@ -1249,7 +1250,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
       for(let c = 1; c < cIdx; c++) {
         const cell = row.getCell(c);
         cell.font = boldFont;
-        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: true };
         cell.border = { top: {style:'thin'}, bottom: {style:'thin'}, left: {style:'thin'}, right: {style:'thin'} };
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
       }
@@ -1263,7 +1264,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
       row.getCell(1).value = r + 1;
       row.getCell(1).font = defaultFont;
       row.getCell(1).border = { top: {style:'hair'}, bottom: {style:'hair'}, left: {style:'thin'}, right: {style:'thin'} };
-      row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+      row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: true };
       
       let cIdx = 2;
       yearsInBlock.forEach(y => {
@@ -1276,8 +1277,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
         cell1.font = { name: 'BIZ UDPゴシック', size: 8 };
         cell2.font = defaultFont;
         
-        cell1.alignment = { horizontal: 'center', vertical: 'middle' };
-        cell2.alignment = { horizontal: 'left', vertical: 'middle' };
+        cell1.alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: true };
+        cell2.alignment = { horizontal: 'left', vertical: 'middle', shrinkToFit: true };
         
         cell1.border = { top: {style:'hair'}, bottom: {style:'hair'}, left: {style:'thin'} };
         cell2.border = { top: {style:'hair'}, bottom: {style:'hair'}, right: {style:'thin'} };
@@ -1316,7 +1317,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
       row.getCell(1).value = sr.label;
       row.getCell(1).font = defaultFont;
       row.getCell(1).border = { top: {style:'thin'}, bottom: {style:'thin'}, left: {style:'thin'}, right: {style:'thin'} };
-      row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+      row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: true };
       
       let cIdx = 2;
       yearsInBlock.forEach(y => {
@@ -1325,7 +1326,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
         const mergedCell = row.getCell(cIdx);
         mergedCell.font = defaultFont;
         mergedCell.border = { top: {style:'thin'}, bottom: {style:'thin'}, left: {style:'thin'}, right: {style:'thin'} };
-        mergedCell.alignment = { horizontal: 'right', vertical: 'middle' };
+        mergedCell.alignment = { horizontal: 'right', vertical: 'middle', shrinkToFit: true };
         cIdx += 2;
       });
       currentRowIndex++;
