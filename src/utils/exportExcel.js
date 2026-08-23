@@ -1138,7 +1138,7 @@ const getEraYearOnly = (year) => {
 
 export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, departments) => {
   const ws = workbook.addWorksheet(sheetName, {
-    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: { left: 0.2, right: 0.2, top: 0.8, bottom: 0.3, header: 0.1, footer: 0.1 } },
+    pageSetup: { paperSize: 9, orientation: 'landscape', horizontalCentered: true, fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: { left: 0.2, right: 0.2, top: 0.8, bottom: 0.3, header: 0.1, footer: 0.1 } },
     views: [{ showGridLines: false }],
     views: [{ showGridLines: false }]
   });
@@ -1212,6 +1212,18 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     '部長級', '次長級', '所属長級', '課長級', '補佐級III(補佐兼班長)', '補佐級II(班長)', '補佐級I(主任)', '係長級(主査)'
   ];
   let legendCol = 42 - (legendLabels.length * 2);
+  
+  // "凡例" text
+  const hanreiCol = legendCol - 2;
+  for (let c = 0; c < 2; c++) {
+    ws.getCell(2, hanreiCol + c).border = { top: {style:'thin'}, bottom: {style:'thin'}, left: {style:'thin'}, right: {style:'thin'} };
+  }
+  const hanreiCell = ws.getCell(2, hanreiCol);
+  hanreiCell.value = '凡例';
+  hanreiCell.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
+  hanreiCell.alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: true };
+  ws.mergeCells(2, hanreiCol, 2, hanreiCol + 1);
+
   for (let i = 0; i < legendLabels.length; i++) {
     for (let c = 0; c < 2; c++) {
       const cCell = ws.getCell(2, legendCol + c);
@@ -1227,7 +1239,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     legendCol += 2;
   }
 
-  currentRowIndex += 2;
+  currentRowIndex += 3;
 
   let currentBlockStartYear = minYear;
 
