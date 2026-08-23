@@ -1138,7 +1138,8 @@ const getEraYearOnly = (year) => {
 
 export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, departments) => {
   const ws = workbook.addWorksheet(sheetName, {
-    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: { left: 0.2, right: 0.2, top: 0.3, bottom: 0.3, header: 0.1, footer: 0.1 } }
+    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: { left: 0.2, right: 0.2, top: 0.3, bottom: 0.3, header: 0.1, footer: 0.1 } },
+    views: [{ showGridLines: false }]
   });
 
   const deptMap = new Map();
@@ -1225,7 +1226,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     ageRow.getCell(1).value = '年齢';
     birthYearRow.getCell(1).value = '生年';
     
-    ws.getColumn(1).width = 4;
+    ws.getColumn(1).width = 9.51;
     
     let cIdx = 2;
     yearsInBlock.forEach(y => {
@@ -1258,6 +1259,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
 
     for (let r = 0; r < maxEmpCount; r++) {
       const row = ws.getRow(currentRowIndex + r);
+      row.height = 13.20;
       row.getCell(1).value = r + 1;
       row.getCell(1).font = defaultFont;
       row.getCell(1).border = { top: {style:'hair'}, bottom: {style:'hair'}, left: {style:'thin'}, right: {style:'thin'} };
@@ -1310,6 +1312,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     
     summaryRows.forEach(sr => {
       const row = ws.getRow(currentRowIndex);
+      row.height = 13.20;
       row.getCell(1).value = sr.label;
       row.getCell(1).font = defaultFont;
       row.getCell(1).border = { top: {style:'thin'}, bottom: {style:'thin'}, left: {style:'thin'}, right: {style:'thin'} };
