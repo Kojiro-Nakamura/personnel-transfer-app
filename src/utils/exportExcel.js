@@ -1287,15 +1287,11 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
           cell1.value = emp.hYearShort;
           cell2.value = emp.name;
           
-          if (emp.hYearShort && emp.hYearShort.includes('H')) {
-             cell1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FC' } };
-             cell2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FC' } };
-          }
-        } else {
-          // background colors for empty cells like the image
-          if (y >= 1989) { // H era
-             cell1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FC' } };
-             cell2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FC' } };
+          const bgRaw = getPromotedBgColorCode(emp.currentGrade);
+          if (bgRaw) {
+             const bgArgb = 'FF' + bgRaw.replace('#', '').toUpperCase();
+             cell1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgArgb } };
+             cell2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgArgb } };
           }
         }
         cIdx += 2;
