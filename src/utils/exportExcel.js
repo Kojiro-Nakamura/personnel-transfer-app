@@ -1234,7 +1234,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
       ws.getColumn(cIdx).width = 4;
       ws.getColumn(cIdx + 1).width = 8;
       
-      const age = (targetYear - 1) - y;
+      const age = (targetYear - 2) - y;
       ageRow.getCell(cIdx).value = age;
       ws.mergeCells(currentRowIndex, cIdx, currentRowIndex, cIdx + 1);
       
