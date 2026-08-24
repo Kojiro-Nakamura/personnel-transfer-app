@@ -1044,10 +1044,15 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         };
       }
       
+      const isNextRetired = nextEmp && nextEmp.departmentId === 'retired';
       if (dept && dept.name === '【退職】') {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
       } else if (currEmp && isCurrTransferred && c >= 4 && c <= 7) {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+        if (isNextRetired) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
+        } else {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+        }
       }
       if (nextEmp && isNextTransferred && c >= 8 && c <= 11) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
