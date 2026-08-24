@@ -1143,7 +1143,7 @@ const getEraYearOnly = (year) => {
   return year.toString();
 };
 
-export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, departments) => {
+export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, departments, isNextYear = false) => {
   const ws = workbook.addWorksheet(sheetName, {
     pageSetup: { paperSize: 9, orientation: 'landscape', horizontalCentered: true, fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: { left: 0.2, right: 0.2, top: 0.8, bottom: 0.3, header: 0.1, footer: 0.1 } },
     views: [{ showGridLines: false }],
@@ -1158,7 +1158,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   // Filter employees
   const activeEmps = employees.filter(emp => {
     if (emp.isArchived) return false;
-    if (!emp.currentDeptId) return false;
+    const dId = isNextYear ? emp.departmentId : emp.currentDeptId;
+      if (!dId || dId === 'unassigned' || dId === 'retired') return false;
     const isTemp = /臨任|臨時/.test(emp.currentEmploymentType || '') || /臨任|臨時/.test(emp.note || '');
     if (isTemp) return false;
     return true;
@@ -1167,7 +1168,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   const parsedEmps = activeEmps.map(emp => {
     const bYear = getBirthFiscalYear(emp.birthDate);
     const hYearShort = getHireFiscalYearShort(emp.hireDate);
-    const dept = deptMap.get(emp.currentDeptId);
+    const dId = isNextYear ? emp.departmentId : emp.currentDeptId;
+      const dept = deptMap.get(dId);
     const isShinkokyoku = dept ? (dept.name || '').includes('振興局') : false;
     return { ...emp, bYear, hYearShort, isShinkokyoku };
   }).filter(emp => emp.bYear !== null);
@@ -1211,7 +1213,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   let currentRowIndex = 1;
 
   
-  ws.getCell(currentRowIndex, 1).value = '令和' + (targetYear - 2019) + '年度林学職生年別一覧';
+  const yearOffset = isNextYear ? 2018 : 2019;
+    ws.getCell(currentRowIndex, 1).value = '令和' + (targetYear - yearOffset) + '年度林学職生年別一覧';
   ws.getCell(currentRowIndex, 1).font = titleFont;
   
   // Legend
@@ -1275,7 +1278,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
       ws.getColumn(cIdx).width = 4;
       ws.getColumn(cIdx + 1).width = 8;
       
-      const age = (targetYear - 2) - y;
+      const ageOffset = isNextYear ? 1 : 2;
+          const age = (targetYear - ageOffset) - y;
       ageRow.getCell(cIdx).value = age;
       ws.mergeCells(currentRowIndex, cIdx, currentRowIndex, cIdx + 1);
       
@@ -1328,7 +1332,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
           cell1.value = emp.hYearShort;
           cell2.value = emp.name;
           
-          const bgRaw = getPromotedBgColorCode(emp.currentGrade);
+          const grade = isNextYear ? (emp.nextGrade || emp.currentGrade) : emp.currentGrade;
+            const bgRaw = getPromotedBgColorCode(grade);
           if (bgRaw) {
              const bgArgb = 'FF' + bgRaw.replace('#', '').toUpperCase();
              cell1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgArgb } };
@@ -1376,7 +1381,8 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   addSimplePlanSheet(workbook, '人事異動案（シンプル）', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   addListSheet(workbook, '職員一覧', fileName, targetYear, employees, departments);
-    addBirthYearSheet(workbook, '生年別一覧', targetYear, employees, departments);
+    addBirthYearSheet(workbook, '生年別一覧（今年度）', targetYear, employees, departments, false);
+    addBirthYearSheet(workbook, '生年別一覧（来年度）', targetYear, employees, departments, true);
   await saveWorkbook(workbook, fileName);
 };
 
@@ -1935,7 +1941,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 export const exportListToExcel = async (fileName, targetYear, employees, departments) => {
     const workbook = new ExcelJS.Workbook();
     addListSheet(workbook, '職員一覧', fileName, targetYear, employees, departments);
-    addBirthYearSheet(workbook, '生年別一覧', targetYear, employees, departments);
+    addBirthYearSheet(workbook, '生年別一覧（今年度）', targetYear, employees, departments, false);
+    addBirthYearSheet(workbook, '生年別一覧（来年度）', targetYear, employees, departments, true);
   await saveWorkbook(workbook, fileName);
 };
 
@@ -1953,7 +1960,8 @@ export const exportUnifiedExcel = async (fileName, targetYear, departments, dept
   
   // 4. つなぎ表 (職員一覧)
   addListSheet(workbook, 'つなぎ表', fileName, targetYear, employees, departments);
-    addBirthYearSheet(workbook, '生年別一覧', targetYear, employees, departments);
+    addBirthYearSheet(workbook, '生年別一覧（今年度）', targetYear, employees, departments, false);
+    addBirthYearSheet(workbook, '生年別一覧（来年度）', targetYear, employees, departments, true);
   
   await saveWorkbook(workbook, fileName);
 };
