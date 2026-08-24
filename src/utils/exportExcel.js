@@ -847,8 +847,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       
       let topStyle = rn === 4 ? 'medium' : 'hair';
       let bottomStyle = rn === 5 ? 'medium' : 'hair';
-      let leftStyle = c === 1 ? 'medium' : 'thin';
-      let rightStyle = c === 12 ? 'medium' : 'thin';
+      let leftStyle = (c === 1 || c === 2 || c === 8) ? 'medium' : 'thin';
+      let rightStyle = (c === 12 || c === 1 || c === 7) ? 'medium' : 'thin';
       
       // 縦にセル結合されている列(1, 2, 3)は、5行目の処理で上罫線が細線で上書きされるのを防ぐため、明示的に上下を太線にする
       if (c === 1 || c === 2 || c === 3) {
@@ -1021,8 +1021,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       else if (isNewDept) topStyle = 'medium';
       else if (isNewGroup) topStyle = 'mediumDashed';
       
-      const leftStyle = c === 1 ? 'medium' : 'thin';
-      const rightStyle = c === 12 ? 'medium' : 'thin';
+      const leftStyle = (c === 1 || c === 2 || c === 8) ? 'medium' : 'thin';
+      const rightStyle = (c === 12 || c === 1 || c === 7) ? 'medium' : 'thin';
       
       if (c === 1) {
         let c1Top = undefined;
