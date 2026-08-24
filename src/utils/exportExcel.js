@@ -1332,8 +1332,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
           cell1.value = emp.hYearShort;
           cell2.value = emp.name;
           
-          const grade = isNextYear ? (emp.nextGrade || emp.currentGrade) : emp.currentGrade;
-            const bgRaw = getPromotedBgColorCode(grade);
+          const grade = isNextYear ? (emp.nextGrade !== undefined && emp.nextGrade !== null ? emp.nextGrade : emp.currentGrade) : emp.currentGrade;
+          const bgRaw = getPromotedBgColorCode(grade);
           if (bgRaw) {
              const bgArgb = 'FF' + bgRaw.replace('#', '').toUpperCase();
              cell1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgArgb } };
