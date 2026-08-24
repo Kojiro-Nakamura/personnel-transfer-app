@@ -1332,8 +1332,16 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
           cell1.value = emp.hYearShort;
           cell2.value = emp.name;
           
-          const grade = isNextYear ? (emp.nextGrade !== undefined && emp.nextGrade !== null ? emp.nextGrade : emp.currentGrade) : emp.currentGrade;
-          const bgRaw = getPromotedBgColorCode(grade);
+          const ageOffset = isNextYear ? 1 : 2;
+          const age = (targetYear - ageOffset) - y;
+          let bgRaw = null;
+          if (isNextYear && age >= 60) {
+            // 来年度60歳以上になる人は役職定年などで級が外れるため色なし
+            bgRaw = ''; 
+          } else {
+            const grade = isNextYear ? (emp.nextGrade !== undefined && emp.nextGrade !== null ? emp.nextGrade : emp.currentGrade) : emp.currentGrade;
+            bgRaw = getPromotedBgColorCode(grade);
+          }
           if (bgRaw) {
              const bgArgb = 'FF' + bgRaw.replace('#', '').toUpperCase();
              cell1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgArgb } };
