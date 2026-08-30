@@ -978,18 +978,32 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       }
 
-      cell.border = {
-        top: { style: topStyle, color: { argb: 'FF000000' } },
-        bottom: { style: bottomStyle, color: { argb: 'FF000000' } },
-        left: { style: leftStyle, color: { argb: 'FF000000' } },
-        right: { style: rightStyle, color: { argb: 'FF000000' } }
-      };
+      if (c >= 14) {
+        const topB = rn === 4 ? 'thick' : false;
+        let bottomB = rn === 5 ? 'thick' : false;
+        if (rn === 4) bottomB = true; 
+        
+        const leftB = [14, 15, 16, 17, 23, 33].includes(c) ? 'thick' : true;
+        const rightB = [14, 15, 16, 22, 32, totalCols].includes(c) ? 'thick' : true;
+        
+        const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
+        cell.border = newBorder;
+      } else {
+        cell.border = {
+          top: { style: topStyle, color: { argb: 'FF000000' } },
+          bottom: { style: bottomStyle, color: { argb: 'FF000000' } },
+          left: { style: leftStyle, color: { argb: 'FF000000' } },
+          right: { style: rightStyle, color: { argb: 'FF000000' } }
+        };
+      }
 
-      let argb = 'FFCBD5E1';
-      if (c === 2 || c === 3) argb = 'FFFDBA74'; // Orange 300
-      else if (c >= 4 && c <= 7) argb = 'FFFEF3C7'; // Amber 100
-      else if (c >= 8 && c <= 12) argb = 'FFDBEAFE'; // Blue 100
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
+      if (c <= 12) {
+        let argb = 'FFCBD5E1';
+        if (c === 2 || c === 3) argb = 'FFFDBA74'; // Orange 300
+        else if (c >= 4 && c <= 7) argb = 'FFFEF3C7'; // Amber 100
+        else if (c >= 8 && c <= 12) argb = 'FFDBEAFE'; // Blue 100
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
+      }
     }
   }
 
@@ -1230,7 +1244,19 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const leftStyle = (c === 1 || c === 2 || c === 8) ? 'medium' : 'thin';
       const rightStyle = (c === 12 || c === 1 || c === 7) ? 'medium' : 'thin';
       
-      if (c === 1) {
+      if (c >= 14) {
+        let topBorder = false;
+        let bottomBorder = false;
+        if (isNewDept) topBorder = 'thick';
+        else if (extEmp) topBorder = true;
+        
+        if (extEmp) bottomBorder = true;
+        
+        const isLeftEdge = [14, 15, 16, 17, 23, 33].includes(c);
+        const isRightEdge = [14, 15, 16, 22, 32, totalCols].includes(c);
+        
+        cell.border = getCellBorders(topBorder, bottomBorder, isLeftEdge ? 'thick' : true, isRightEdge ? 'thick' : true);
+      } else if (c === 1) {
         let c1Top = undefined;
         if (rowIndex === 6) c1Top = 'medium';
         else if (isNewDept) c1Top = 'medium';
