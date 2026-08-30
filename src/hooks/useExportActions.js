@@ -1,3 +1,4 @@
+import { saveSnapshot } from '../utils/indexedDB.js';
 import { useCallback } from 'react';
 import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
@@ -13,6 +14,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     };
     downloadFile(JSON.stringify(dataToSave, null, 2), 'application/json', fileName);
     setCurrentFileName(fileName);
+    saveSnapshot(fileName, dataToSave).catch(err => console.error("Failed to save snapshot", err));
   }, [targetYear, activePlanId, plans, employees, departments, notes, setCurrentFileName]);
 
   const exportToHTML = useCallback((fileName, showCount = true) => {

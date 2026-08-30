@@ -61,6 +61,7 @@ export function AppProvider({ children }) {
     validation: { isOpen: false, data: null },
     bulkEdit: { isOpen: false, data: null }, 
     saveFile: { isOpen: false, data: null },
+    openFile: { isOpen: false, data: null },
     empSelect: { isOpen: false, data: null },
     titleChangeConfirm: { isOpen: false, data: null },
     note: { isOpen: false, data: null },
@@ -333,22 +334,8 @@ export function AppProvider({ children }) {
     history.setNotes([]);
   }, [history]);
 
-  const loadJSON = useCallback(async (e) => {
-    let file = null;
-    let targetInput = null;
-
-    if (e instanceof File || (e && e.name)) {
-      file = e;
-    } else if (e && e.target) {
-      targetInput = e.target; 
-      file = targetInput.files ? targetInput.files[0] : null;
-    }
-    
-    if(!file) return;
-    
+  const loadFromData = useCallback((data, fileName) => {
     try {
-      const text = await file.text(); 
-      const data = JSON.parse(text); 
       if (data.plans) { 
         data.plans.forEach(p => { 
           if (!p.notes) p.notes = []; 
@@ -368,14 +355,38 @@ export function AppProvider({ children }) {
         history.setEmployees(planToLoad.employees); 
         history.setDepartments(planToLoad.departments); 
         history.setNotes(planToLoad.notes || []); 
-        history.setCurrentFileName(file.name);
+        if (fileName) {
+          history.setCurrentFileName(fileName);
+        }
       } 
     } catch(err) { 
-      console.error('ファイルの読み込みに失敗しました。', err);
+      console.error('Error loading data:', err);
+    }
+  }, [history]);
+
+  const loadJSON = useCallback(async (e) => {
+    let file = null;
+    let targetInput = null;
+
+    if (e instanceof File || (e && e.name)) {
+      file = e;
+    } else if (e && e.target) {
+      targetInput = e.target; 
+      file = targetInput.files ? targetInput.files[0] : null;
+    }
+    
+    if(!file) return;
+    
+    try {
+      const text = await file.text(); 
+      const data = JSON.parse(text); 
+      loadFromData(data, file.name);
+    } catch(err) { 
+      console.error('Error loading JSON:', err);
     } finally { 
       if (targetInput) targetInput.value = ''; 
     }
-  }, [history]);
+  }, [loadFromData]);
 
   const exports = useExportActions({
     targetYear: history.targetYear, 
@@ -404,6 +415,7 @@ export function AppProvider({ children }) {
     cancelSelection: () => history.setSelectedEmp(null), 
     mutations,
     exportToJSON: exports.exportToJSON,
+    loadFromData,
     exportToHTML: exports.exportToHTML,
     exportToExcel: exports.exportToExcel,
     exportUnifiedExcelBtn: exports.exportUnifiedExcelBtn,

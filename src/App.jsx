@@ -1,3 +1,4 @@
+import { getSnapshots, deleteSnapshot } from './utils/indexedDB.js';
 import React, { useState, useMemo, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { 
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, AlertTriangle,
@@ -18,7 +19,7 @@ import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelec
 import { EmployeeCell, EmployeeRow, EmployeeFormSection, EmployeeModal } from './components/employee/EmployeeComponents.jsx';
 import { AddSlotRow, DepartmentBlock } from './components/department/DepartmentComponents.jsx';
 import { SidebarCard, AppSidebar } from './components/layout/AppSidebar.jsx';
-import { NoteEditModal, EmployeeSelectModal, FileSaveModal, NameEditModal, DeleteConfirmModal, TitleChangeConfirmModal, BulkEditModal } from './components/modals/Modals.jsx';
+import { NoteEditModal, EmployeeSelectModal, FileSaveModal, FileOpenModal, NameEditModal, DeleteConfirmModal, TitleChangeConfirmModal, BulkEditModal } from './components/modals/Modals.jsx';
 import { ValidationModal } from './components/modals/ValidationModal.jsx';
 import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
 import { NewWindowPortal } from './components/common/NewWindowPortal.jsx';
@@ -27,7 +28,7 @@ export const AppContent = () => {
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
     undo, redo, canUndo, canRedo, handleRollOver, activePlanId, plans, openModal, mutations, modals, closeModal, 
     targetYear, setTargetYear, switchPlan, duplicatePlan, deletePlan, updatePlanName, expandAll, collapseAll, 
-    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn, loadJSON, handleCellClick, handleAssign, notes 
+    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn, loadJSON, loadFromData, handleCellClick, handleAssign, notes 
   } = useApp();
   
   const [isDragging, setIsDragging] = useState(false);
@@ -138,7 +139,7 @@ export const AppContent = () => {
             <button onClick={() => openModal('chainTransfer')} className="bg-fuchsia-500/30 hover:bg-fuchsia-500/50 border border-fuchsia-300 text-fuchsia-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="玉突き異動表（つなぎ表）を表示する"><GitMerge className="w-4 h-4 mr-1" />つなぎ表</button>
             <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }], showCountToggle: true, defaultShowCount: true })} className="bg-emerald-500/30 hover:emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
-            <label className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded cursor-pointer flex items-center justify-center text-xs font-bold shadow-sm" title="保存したJSONファイルを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く<input type="file" accept=".json" onChange={loadJSON} className="hidden" /></label>
+            <button onClick={() => openModal('openFile')} className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="保存したデータを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く</button>
           </div>
         </div>
         <div className="flex justify-between items-center bg-[#3972ac] px-2 pt-2 border-b border-[#2d5f91]">
@@ -304,6 +305,14 @@ export const AppContent = () => {
       <NameEditModal isOpen={modals.groupPost.isOpen} title="班内ポスト編集" data={modals.groupPost.data?.post} onClose={() => closeModal('groupPost')} onSave={d => modals.groupPost.data?.post ? mutations.updateGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, modals.groupPost.data.post.id, d) : mutations.addGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, d)} />
       <NameEditModal isOpen={modals.planName.isOpen} title="名前変更" data={{ name: modals.planName.data }} onClose={() => closeModal('planName')} onSave={d => updatePlanName(activePlanId, d.name)} />
       <DeleteConfirmModal isOpen={modals.delConfirm.isOpen} data={modals.delConfirm.data} onClose={() => closeModal('delConfirm')} onConfirm={d => { if (d.type === 'dept') mutations.deleteDepartment(d.id); else if (d.type === 'post') mutations.deletePost(d.deptId, d.id); else if (d.type === 'group') mutations.deleteGroup(d.deptId, d.id); else if (d.type === 'groupPost') mutations.deleteGroupPost(d.deptId, d.groupId, d.id); else if (d.type === 'emp') mutations.deleteEmployee(d.id); }} />
+      <FileOpenModal
+        isOpen={modals.openFile.isOpen}
+        onClose={() => closeModal('openFile')}
+        onLoadFile={loadJSON}
+        onLoadData={(data, fileName) => loadFromData(data, fileName)}
+        onListSnapshots={getSnapshots}
+        onDeleteSnapshot={deleteSnapshot}
+      />
       <FileSaveModal 
         isOpen={modals.saveFile.isOpen} 
         defaultName={modals.saveFile.data?.defaultName} 
