@@ -417,6 +417,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
     
     const extEmp = nextEmp;
     let curFontStyles = {};
+    let curPromoColors = {};
     if (extEmp) {
       rowVals.push(''); // Blank spacer Q
       rowVals.push(getFormattedNameForPlan(extEmp, true));
@@ -445,8 +446,6 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
       const gradeList = ['', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級'];
       const gradeToPromoKey = { "部長級": "promoYearDeptHead", "次長級": "promoYearDeputyHead", "所属長級": "promoYearDivHead", "課長級": "promoYearSecHead", "補佐級III(補佐兼班長)": "promoYearAssistant3", "補佐級II(班長)": "promoYearAssistant2", "補佐級I(主任)": "promoYearAssistant1", "係長級(主査)": "promoYearChief" };
-      
-      const curPromoColors = {}; // cell colors for promo
       
       const promoYearMap = {};
       if (extEmp) {
@@ -1114,6 +1113,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     }
     
     const extEmp = nextEmp;
+    let curPromoColors = {};
     if (extEmp) {
       rowVals[12] = '';
       rowVals[13] = getFormattedNameForPlan(extEmp, true);
@@ -1134,7 +1134,6 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       
       const pKeys = ['promoYearHire', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
       const gradeToPromoKey = { '係長級(主査)': 'promoYearChief', '補佐級I(主任)': 'promoYearAssistant1', '補佐級II(班長)': 'promoYearAssistant2', '補佐級III(補佐兼班長)': 'promoYearAssistant3', '課長級': 'promoYearSecHead', '所属長級': 'promoYearDivHead', '次長級': 'promoYearDeputyHead', '部長級': 'promoYearDeptHead' };
-      const curPromoColors = {};
 
       const promoYearMap = {};
       if (extEmp.promoYearChief) promoYearMap[parseInt(extEmp.promoYearChief)] = "係長級(主査)";
@@ -1180,7 +1179,10 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
           if (h) historyStr = h.department ? h.department + (h.title ? ' / ' + h.title : '') : (h.title || '');
         }
         rowVals[34 + i] = historyStr;
-        if (promoYearMap[y]) {
+        if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade) && y === targetYear) {
+           const c = getPromotedBgColorCode(extEmp.nextGrade);
+           if (c) curPromoColors[34 + i + 1] = c;
+        } else if (promoYearMap[y]) {
            const c = getPromotedBgColorCode(promoYearMap[y]);
            if (c) curPromoColors[34 + i + 1] = c;
         }
@@ -1291,7 +1293,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
     }
     
-    if (extEmp && typeof curPromoColors !== 'undefined') {
+    if (extEmp) {
       Object.keys(curPromoColors).forEach(cIdx => {
          const cell = tr.getCell(parseInt(cIdx));
          const color = curPromoColors[cIdx].replace('#', '').toUpperCase();
@@ -2101,17 +2103,14 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
          argb = 'FFEFF6FF';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 35) {
+      else if (colNumber <= 33) {
          argb = 'FFFDF4FF';
-         if (colNumber === 35 && nextPromoColor) {
+         if (colNumber === 33 && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
       else {
          argb = 'FFECFDF5';
-         if (colNumber === 35 + historyYears.length && nextPromoColor) {
-             argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
-         }
       }
       
       // 昇進ハイライト (昇級年度の枠)
