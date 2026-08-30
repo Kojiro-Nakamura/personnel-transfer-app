@@ -1216,20 +1216,39 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       historyYears.forEach((y, i) => {
         let historyStr = '';
         if (y === targetYear) {
-           let dName = '';
-           if (extEmp.departmentId && extEmp.departmentId !== 'unassigned' && extEmp.departmentId !== 'retired') {
-              if (deptMap && deptMap[extEmp.departmentId]) dName = deptMap[extEmp.departmentId].name;
-              else if (departments) {
-                 const d = departments.find(d => d.id === extEmp.departmentId);
-                 if (d) dName = d.name;
+           let nDeptName = '';
+           if (extEmp.departmentId === 'retired') {
+              nDeptName = '退職';
+           } else if (!extEmp.departmentId || extEmp.departmentId === 'unassigned') {
+              nDeptName = '未配置';
+           } else {
+              const nDept = departments.find(d => d.id === extEmp.departmentId);
+              const nGroup = nDept && extEmp.groupId ? (nDept.groups || []).find(g => g.id === extEmp.groupId) : null;
+              const d = nDept ? (nDept.nextName || nDept.name) : '';
+              const g = nGroup ? (nGroup.nextName || nGroup.name) : '';
+              let pStr = '';
+              if (extEmp.postId && nDept) {
+                  const p = (nDept.posts || []).find(x => x.id === extEmp.postId);
+                  if (p) pStr = '（' + (p.nextName || p.name) + '）';
+              } else if (extEmp.groupPostId && nGroup) {
+                  const gp = (nGroup.posts || []).find(x => x.id === extEmp.groupPostId);
+                  if (gp) pStr = '（' + (gp.nextName || gp.name) + '）';
               }
+              if (d === 'システム用外枠') nDeptName = '未配置';
+              else if (d && !g) nDeptName = `${d}${pStr}`;
+              else nDeptName = `${d} ${g}${pStr}`;
            }
-           const tName = extEmp.nextTitle || '';
-           historyStr = dName ? dName + (tName ? ' / ' + tName : '') : (tName || '-');
+           historyStr = nDeptName;
         } else {
            if (extEmp.history) {
              const h = extEmp.history.find(x => x.year === y);
              if (h) historyStr = h.department ? h.department + (h.title ? ' / ' + h.title : '') : (h.title || '');
+           }
+        }
+        if (historyStr && historyStr !== ' / 課直轄' && historyStr !== '未配置' && historyStr !== '-') {
+           const histAge = (extEmp.birthDate && !isNaN(y)) ? calculateAge(extEmp.birthDate, y) : null;
+           if (histAge !== null && !isNaN(histAge)) {
+              historyStr = `${historyStr} (${histAge}歳)`;
            }
         }
         rowVals[34 + i] = historyStr;
