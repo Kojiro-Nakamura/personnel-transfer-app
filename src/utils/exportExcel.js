@@ -1160,7 +1160,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         }
       }
       
-      if (isPromotedThisYear) {
+      if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
          const c = getPromotedBgColorCode(extEmp.nextGrade);
          if (c) {
              curPromoColors[14] = c; // 氏名
@@ -1219,14 +1219,6 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     rowVals[11] = remarkStr;
 
     const tr = ws.addRow(rowVals);
-
-    if (extEmp && typeof curPromoColors !== 'undefined') {
-      Object.keys(curPromoColors).forEach(cIdx => {
-         const cell = tr.getCell(parseInt(cIdx));
-         const color = curPromoColors[cIdx].replace('#', '').toUpperCase();
-         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + color } };
-      });
-    }
 
     for (let c = 1; c <= totalCols; c++) {
       if (c === 13) continue;
@@ -1295,6 +1287,14 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
           }
         }
       }
+    }
+    
+    if (extEmp && typeof curPromoColors !== 'undefined') {
+      Object.keys(curPromoColors).forEach(cIdx => {
+         const cell = tr.getCell(parseInt(cIdx));
+         const color = curPromoColors[cIdx].replace('#', '').toUpperCase();
+         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + color } };
+      });
     }
 
     lastDept = dept.id;
