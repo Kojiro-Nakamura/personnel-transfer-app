@@ -1125,8 +1125,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[19] = extEmp.education || '';
       rowVals[20] = formatWithEra(extEmp.hireDate, extEmp.birthDate);
       rowVals[21] = extEmp.note || '';
-      rowVals[22] = extEmp.desiredAssignment ? '・ ' + extEmp.desiredAssignment : '';
-      rowVals[23] = extEmp.specialCircumstances ? '※ ' + extEmp.specialCircumstances : '';
+      rowVals[22] = extEmp.desiredAssignment ? '〇' + extEmp.desiredAssignment : '';
+      rowVals[23] = extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '';
       
       let hireStr = '';
       if (extEmp.hireDate) hireStr = formatDateForDisplay(extEmp.hireDate);
