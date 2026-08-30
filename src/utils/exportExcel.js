@@ -192,7 +192,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
   const r4 = ws.getRow(4);
   const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
   const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', 'メモ', ''];
-  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '', '');
+  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '');
   historyYears.forEach((y, i) => {
     if (i === 0) r4Vals.push('履歴');
     else r4Vals.push('');
@@ -222,7 +222,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
   if (historyYears.length > 0) {
     const endColCode = ws.getColumn(38 + historyYears.length).letter;
     const startColCode = ws.getColumn(39).letter;
-    if (startColCode !== endColCode) ws.mergeCells(`${startColCode}4:${endColCode}4`);
+    ws.mergeCells(`${startColCode}4:${endColCode}4`);
   }
 
 
@@ -895,7 +895,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   const r4 = ws.getRow(4);
   const r4Vals = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', ''];
   const currentEraShort = `R${targetYear - 2019}`;
-  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '', '');
+  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '');
   historyYears.forEach((y, i) => {
     if (i === 0) r4Vals.push('履歴');
     else r4Vals.push('');
@@ -925,7 +925,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   if (historyYears.length > 0) {
     const endColCode = ws.getColumn(34 + historyYears.length).letter;
     const startColCode = ws.getColumn(35).letter;
-    if (startColCode !== endColCode) ws.mergeCells(`${startColCode}4:${endColCode}4`);
+    ws.mergeCells(`${startColCode}4:${endColCode}4`);
   }
 
 
@@ -1215,9 +1215,22 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       
       historyYears.forEach((y, i) => {
         let historyStr = '';
-        if (extEmp.history) {
-          const h = extEmp.history.find(x => x.year === y);
-          if (h) historyStr = h.department ? h.department + (h.title ? ' / ' + h.title : '') : (h.title || '');
+        if (y === targetYear) {
+           let dName = '';
+           if (extEmp.departmentId && extEmp.departmentId !== 'unassigned' && extEmp.departmentId !== 'retired') {
+              if (deptMap && deptMap[extEmp.departmentId]) dName = deptMap[extEmp.departmentId].name;
+              else if (departments) {
+                 const d = departments.find(d => d.id === extEmp.departmentId);
+                 if (d) dName = d.name;
+              }
+           }
+           const tName = extEmp.nextTitle || '';
+           historyStr = dName ? dName + (tName ? ' / ' + tName : '') : (tName || '-');
+        } else {
+           if (extEmp.history) {
+             const h = extEmp.history.find(x => x.year === y);
+             if (h) historyStr = h.department ? h.department + (h.title ? ' / ' + h.title : '') : (h.title || '');
+           }
         }
         rowVals[34 + i] = historyStr;
         if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade) && y === targetYear) {
