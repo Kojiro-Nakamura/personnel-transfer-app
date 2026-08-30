@@ -1170,7 +1170,23 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
          }
       }
       
-      rowVals[33] = extEmp.nextEmploymentType || '';
+      let finalDiff = null;
+      if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
+        finalDiff = 1;
+      } else {
+        let prevY = NaN;
+        for (let i = pKeys.length - 1; i >= 0; i--) {
+          const y = pKeys[i] === 'promoYearHire' ? (extEmp.hireDate ? parseInt(String(extEmp.hireDate).substring(0,4)) : NaN) : parseInt(extEmp[pKeys[i]] || 'NaN');
+          if (!isNaN(y)) { prevY = y; break; }
+        }
+        finalDiff = (!isNaN(prevY)) ? targetYear - prevY + 1 : null;
+      }
+      let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+      if (finalDiff !== null && extEmp.birthDate) {
+        const ag = calculateAge(extEmp.birthDate, targetYear);
+        if (ag) nYearStr += `(${ag}歳)`;
+      }
+      rowVals[33] = nYearStr;
       
       historyYears.forEach((y, i) => {
         let historyStr = '';
