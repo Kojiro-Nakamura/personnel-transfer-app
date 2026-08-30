@@ -265,7 +265,8 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       
-      const topB = rn === 4 && i !== 17 ? 'thick' : false;
+      let topB = rn === 4 && i !== 17 ? 'thick' : false;
+      if (rn === 5 && [16, 18, 19, 20].includes(i)) topB = 'thick';
       let bottomB = rn === 5 && i !== 17 ? 'thick' : false;
       if (rn === 4 && i >= 4 && i <= 15) bottomB = true; 
       if (rn === 4 && i >= 21 && i <= 26) bottomB = true;
@@ -979,7 +980,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
 
       if (c >= 14) {
-        const topB = rn === 4 ? 'thick' : false;
+        let topB = rn === 4 ? 'thick' : false;
+        if (rn === 5 && [14, 15, 16].includes(c)) topB = 'thick';
         let bottomB = rn === 5 ? 'thick' : false;
         if (rn === 4) bottomB = true; 
         
