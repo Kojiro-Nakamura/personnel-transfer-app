@@ -1155,7 +1155,32 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
            isPromotedThisYear = true;
            cellVal = targetYear + '-04-01';
         }
-        rowVals[24 + idx] = cellVal ? formatDateForDisplay(cellVal) : '';
+        
+        let prevDate = '';
+        if (cellVal) {
+           for (let i = idx - 1; i >= 0; i--) {
+             let pVal = pKeys[i] === 'promoYearHire' ? extEmp.hireDate : (extEmp[pKeys[i]] || '');
+             if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade) && gradeToPromoKey[extEmp.nextGrade] === pKeys[i]) {
+                 pVal = `${targetYear}-04-01`;
+             }
+             if (pVal) { prevDate = pVal; break; }
+           }
+        }
+        
+        const diff = (prevDate && cellVal) ? calculateServiceYears(prevDate, cellVal, true) : null;
+        let cellStr = '';
+        if (cellVal) {
+           if (diff !== null) cellStr += `${formatServiceYearsText(diff)}> `;
+           else cellStr += `> `;
+           
+           cellStr += formatDateForDisplay(cellVal);
+           const y = parseInt(String(cellVal).split('-')[0], 10);
+           if (extEmp.birthDate && !isNaN(y)) {
+              const ag = calculateAge(extEmp.birthDate, y);
+              if (ag) cellStr += `(${ag}歳)`;
+           }
+        }
+        rowVals[24 + idx] = cellStr;
         if (isNextPromo) {
            curPromoColors[24 + idx + 1] = getPromotedBgColorCode(extEmp.nextGrade); // +1 because rowVals is 0-indexed, excel columns are 1-indexed
         }
