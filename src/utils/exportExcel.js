@@ -643,7 +643,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
           }
         }
         cell.font = currentFont;
-        const isNoShrink = (colNumber === 27 || colNumber === 28);
+        const isNoShrink = (colNumber >= 26 && colNumber <= 28);
         cell.alignment = { vertical: 'middle', shrinkToFit: !isNoShrink, wrapText: false };
         if (colNumber >= 3) {
           const align = isNoShrink ? 'left' : 'center';
@@ -1223,8 +1223,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     for (let c = 1; c <= totalCols; c++) {
       if (c === 13) continue;
       const cell = tr.getCell(c);
-      const isLeft = (c === 1 || c === 12 || c === 2 || c === 3 || (c >= 14 && c <= 24) || c >= 35);
-      const shouldShrink = (c !== 2 && c !== 3);
+      const isLeft = (c === 1 || c === 12 || c === 2 || c === 3 || (c >= 14 && c <= 16) || (c >= 22 && c <= 24) || c >= 35);
+      const shouldShrink = (c !== 2 && c !== 3 && !(c >= 22 && c <= 24));
       cell.alignment = { vertical: 'middle', horizontal: isLeft ? 'left' : 'center', shrinkToFit: shouldShrink, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
       
@@ -2076,7 +2076,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
         }
       }
       cell.font = currentFont;
-      const isNoShrink = (colNumber === 10 || colNumber === 11);
+      const isNoShrink = (colNumber >= 9 && colNumber <= 11);
       const align = isNoShrink ? 'left' : 'center';
       cell.alignment = { vertical: 'middle', horizontal: align, shrinkToFit: !isNoShrink, wrapText: false };
       cell.border = getCellBorders(true, true, true, true, true);
