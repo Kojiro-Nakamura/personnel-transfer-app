@@ -1300,7 +1300,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     for (let c = 1; c <= totalCols; c++) {
       if (c === 13) continue;
       const cell = tr.getCell(c);
-      const isLeft = (c === 1 || c === 12 || c === 2 || c === 3 || (c >= 14 && c <= 16) || (c >= 22 && c <= 24) || c >= 35);
+      const isLeft = (c === 1 || c === 12 || c === 2 || c === 3 || (c >= 22 && c <= 24) || c >= 35);
       const shouldShrink = (c !== 2 && c !== 3 && !(c >= 22 && c <= 24));
       cell.alignment = { vertical: 'middle', horizontal: isLeft ? 'left' : 'center', shrinkToFit: shouldShrink, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
