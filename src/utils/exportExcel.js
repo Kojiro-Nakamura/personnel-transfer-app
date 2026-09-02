@@ -984,8 +984,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         let bottomB = rn === 5 ? 'thick' : false;
         if (rn === 4) bottomB = true; 
         
-        const leftB = [14, 15, 16, 17, 23, 33].includes(c) ? 'thick' : true;
-        const rightB = [14, 15, 16, 22, 32, totalCols].includes(c) ? 'thick' : true;
+        const leftB = [14, 15, 16, 17, 25, 35].includes(c) ? 'thick' : true;
+        const rightB = [14, 15, 16, 24, 34, totalCols].includes(c) ? 'thick' : true;
         
         const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
         cell.border = newBorder;
@@ -1321,8 +1321,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         
         if (extEmp) bottomBorder = true;
         
-        const isLeftEdge = [14, 15, 16, 17, 23, 33].includes(c);
-        const isRightEdge = [14, 15, 16, 22, 32, totalCols].includes(c);
+        const isLeftEdge = [14, 15, 16, 17, 25, 35].includes(c);
+        const isRightEdge = [14, 15, 16, 24, 34, totalCols].includes(c);
         
         cell.border = getCellBorders(topBorder, bottomBorder, isLeftEdge ? 'thick' : true, isRightEdge ? 'thick' : true);
       } else if (c === 1) {
@@ -1392,6 +1392,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   }
 
   const fitCols = [5, 6, 7, 9, 10, 11, 12];
+  for (let c = 14; c <= totalCols; c++) fitCols.push(c);
   fitCols.forEach(colIndex => {
     let maxLength = 0;
     const col = ws.getColumn(colIndex);
