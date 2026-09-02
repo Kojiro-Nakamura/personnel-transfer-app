@@ -273,8 +273,8 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
       if (rn === 4 && i >= 27 && i <= 36) bottomB = true;
       if (rn === 4 && i >= 37) bottomB = true;
       
-      const leftB = [1, 4, 10, 16, 17, 18, 19, 20, 21, 27, 37].includes(i) ? 'thick' : true;
-      const rightB = [3, 9, 15, 16, 17, 18, 19, 20, 26, 36, totalCols].includes(i) ? 'thick' : true;
+      const leftB = [1, 4, 10, 16, 18, 21, 29, 39].includes(i) ? 'thick' : true;
+      const rightB = [3, 9, 15, 16, 20, 28, 38, totalCols].includes(i) ? 'thick' : true;
       
       const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
       cell.border = { ...(cell.border || {}), ...newBorder };
@@ -659,8 +659,8 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
 
         
-        const isLeftEdge = colNumber === 1 || colNumber === 4 || colNumber === 10 || colNumber === 16;
-        const isRightEdge = colNumber === 3 || colNumber === 9 || colNumber === 15 || colNumber === 16;
+        const isLeftEdge = [1, 4, 10, 16, 18, 21, 29, 39].includes(colNumber);
+        const isRightEdge = [3, 9, 15, 16, 20, 28, 38, totalCols].includes(colNumber);
         
         let topBorder = true;
         let bottomBorder = false;
@@ -984,8 +984,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         let bottomB = rn === 5 ? 'thick' : false;
         if (rn === 4) bottomB = true; 
         
-        const leftB = [14, 15, 16, 17, 25, 35].includes(c) ? 'thick' : true;
-        const rightB = [14, 15, 16, 24, 34, totalCols].includes(c) ? 'thick' : true;
+        const leftB = [14, 17, 25, 35].includes(c) ? 'thick' : true;
+        const rightB = [16, 24, 34, totalCols].includes(c) ? 'thick' : true;
         
         const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
         cell.border = newBorder;
@@ -1324,8 +1324,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         
         if (extEmp) bottomBorder = true;
         
-        const isLeftEdge = [14, 15, 16, 17, 25, 35].includes(c);
-        const isRightEdge = [14, 15, 16, 24, 34, totalCols].includes(c);
+        const isLeftEdge = [14, 17, 25, 35].includes(c);
+        const isRightEdge = [16, 24, 34, totalCols].includes(c);
         
         cell.border = getCellBorders(topBorder, bottomBorder, isLeftEdge ? 'thick' : true, isRightEdge ? 'thick' : true);
       } else if (c === 1) {
