@@ -897,7 +897,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   }
 
   const r4 = ws.getRow(4);
-  const r4Vals = ['部署名', '〇配属希望', '●特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', ''];
+  const r4Vals = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', ''];
   const currentEraShort = `R${targetYear - 2019}`;
   r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '');
   historyYears.forEach((y, i) => {
