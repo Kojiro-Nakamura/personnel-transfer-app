@@ -1431,6 +1431,14 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       col.width = maxLength + 1.5;
     }
   });
+
+  const lastRowToPrint = rowIndex > 6 ? rowIndex - 1 : 6;
+  ws.pageSetup.printArea = `A1:L${lastRowToPrint}`;
+  ws.pageSetup.paperSize = 9; // A4
+  ws.pageSetup.orientation = 'portrait';
+  ws.pageSetup.fitToPage = true;
+  ws.pageSetup.fitToWidth = 1;
+  ws.pageSetup.fitToHeight = 0;
 };
 
 ﻿const getBirthFiscalYear = (dateStr) => {
