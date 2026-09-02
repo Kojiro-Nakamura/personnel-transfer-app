@@ -1136,7 +1136,14 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       rowVals[23] = extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '';
       
       let hireStr = '';
-      if (extEmp.hireDate) hireStr = formatDateForDisplay(extEmp.hireDate);
+      if (extEmp.hireDate) {
+        hireStr = formatDateForDisplay(extEmp.hireDate);
+        const y = parseInt(String(extEmp.hireDate).split('-')[0], 10);
+        if (extEmp.birthDate && !isNaN(y)) {
+           const ag = calculateAge(extEmp.birthDate, y);
+           if (ag) hireStr += `(${ag}歳)`;
+        }
+      }
       rowVals[24] = hireStr;
       
       const pKeys = ['promoYearHire', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
