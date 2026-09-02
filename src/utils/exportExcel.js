@@ -1439,6 +1439,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.pageSetup.fitToPage = true;
   ws.pageSetup.fitToWidth = 1;
   ws.pageSetup.fitToHeight = 0;
+  ws.pageSetup.horizontalCentered = true;
+  ws.pageSetup.margins = { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
 };
 
 ﻿const getBirthFiscalYear = (dateStr) => {
