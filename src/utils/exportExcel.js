@@ -768,6 +768,10 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
 
   ws.columns.forEach((col, i) => {
+    if (i === 25 || i === 26 || i === 27) {
+       col.width = 20;
+       return;
+    }
     if (i >= 17) { // 'R' (氏名) 以降
        const isHistory = i >= 36;
        let maxLength = 0;
