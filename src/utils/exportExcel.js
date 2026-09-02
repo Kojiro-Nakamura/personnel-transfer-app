@@ -1013,6 +1013,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getColumn(3).width = 1.98;
   ws.getColumn(4).width = 12;
   ws.getColumn(8).width = 12;
+  ws.getColumn(23).width = 20;
+  ws.getColumn(24).width = 20;
 
   let rowIndex = 6;
   let lastDept = null;
@@ -1392,7 +1394,9 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   }
 
   const fitCols = [5, 6, 7, 9, 10, 11, 12];
-  for (let c = 14; c <= totalCols; c++) fitCols.push(c);
+  for (let c = 14; c <= totalCols; c++) {
+    if (c !== 23 && c !== 24) fitCols.push(c);
+  }
   fitCols.forEach(colIndex => {
     let maxLength = 0;
     const col = ws.getColumn(colIndex);
