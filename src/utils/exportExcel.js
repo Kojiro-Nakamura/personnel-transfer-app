@@ -162,7 +162,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
   
   const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 35 + currYearIndex;
+  const legendEndCol = 39 + currYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -869,7 +869,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(3).getCell(14).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
 
   const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 31 + currYearIndex;
+  const legendEndCol = 35 + currYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
