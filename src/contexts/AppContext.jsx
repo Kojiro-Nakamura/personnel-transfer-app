@@ -225,7 +225,10 @@ export function AppProvider({ children }) {
       if (history.selectedEmp.id === tId && history.selectedEmp.isSource === src) {
         history.setSelectedEmp(null);
       } else {
-        if (src) return;
+        if (src) {
+          if (tId) history.setSelectedEmp({ id: tId, isSource: src });
+          return;
+        }
         handleAssign(history.selectedEmp.id, { dId, pId, gId, gpId });
         history.setSelectedEmp(null);
       }

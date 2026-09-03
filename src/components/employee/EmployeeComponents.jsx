@@ -87,7 +87,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
 
   return (
     <div 
-      onClick={(!isNext && isPickingMode && !isSelected) ? undefined : onClick} 
+      onClick={onClick} 
       onMouseEnter={() => setHoveredEmpId(emp.id)} 
       onMouseLeave={() => setHoveredEmpId(null)} 
       className={cellClasses} 
