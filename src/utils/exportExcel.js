@@ -2411,7 +2411,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
   departments.forEach((dept) => {
     let dNamePrinted = false;
-    const currD = deptMap.current[dept.id] || { groups: {} };
+    const currD = deptMap[dept.id] || { groups: {} };
 
     const getEmpIdsForPost = (groupObj, postId) => {
       if (!groupObj || !groupObj.posts || !groupObj.posts[postId]) return [];
@@ -2487,7 +2487,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const getGroupNameStr = (dId, gId) => {
            const d = departments.find(x => x.id === dId);
            if (!d) return '';
-           const g = d.groups.find(x => x.id === gId);
+           const g = (d.groups || []).find(x => x.id === gId);
            return g ? (g.nextName || g.name) : '';
         };
 
@@ -2565,7 +2565,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     });
   });
 
-  const uObj = deptMap.current['unassigned'];
+  const uObj = deptMap['unassigned'];
   if (uObj && uObj.direct && uObj.direct.current && uObj.direct.current.length > 0) {
     const row = ws.getRow(currentRowIndex);
     row.height = 24;
@@ -2611,7 +2611,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       const getGroupNameStr = (dId, gId) => {
          const d = departments.find(x => x.id === dId);
          if (!d) return '';
-         const g = d.groups.find(x => x.id === gId);
+         const g = (d.groups || []).find(x => x.id === gId);
          return g ? (g.nextName || g.name) : '';
       };
 
