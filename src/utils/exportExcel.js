@@ -2437,7 +2437,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       if (filteredEmps.length === 0) {
         if (filterLevel > 0) return;
         const row = ws.getRow(currentRowIndex);
-        row.height = 24;
+        row.height = 13.20;
         const vals = new Array(17).fill('');
         vals[0] = (!dNamePrinted) ? dept.name : ''; dNamePrinted = true;
         vals[1] = groupName || '';
@@ -2458,7 +2458,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         if (!emp) return;
 
         const row = ws.getRow(currentRowIndex);
-        row.height = 24;
+        row.height = 13.20;
         const vals = new Array(17).fill('');
 
         vals[0] = (!dNamePrinted) ? dept.name : ''; dNamePrinted = true;
@@ -2530,10 +2530,10 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           }
 
           if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
-             if (emp.departmentId !== dept.id) {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDBA74' } }; // orange-300
-             } else if (emp.groupId !== currentGroupId) {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE047' } }; // yellow-300
+             const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
+             const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
+             if (nextPromoColor) {
+                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
              }
           }
         }
@@ -2566,7 +2566,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   const uObj = deptMap['unassigned'];
   if (uObj && uObj.direct && uObj.direct.current && uObj.direct.current.length > 0) {
     const row = ws.getRow(currentRowIndex);
-    row.height = 24;
+    row.height = 13.20;
     const vals = new Array(17).fill('');
     vals[0] = '未配置';
     row.values = vals;
@@ -2587,7 +2587,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         if (cLvl < filterLevel && nLvl < filterLevel) return;
       }
       const r = ws.getRow(currentRowIndex);
-      r.height = 24;
+      r.height = 13.20;
       const v = new Array(17).fill('');
       v[3] = emp.currentTitle || '';
       v[4] = emp.name || '';
@@ -2643,8 +2643,10 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         if (c === 7 || c === 8 || c === 10 || c === 15 || c === 16) cell.alignment = { vertical: 'middle', horizontal: 'center' };
         
         if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
-           if (emp.departmentId !== 'unassigned') {
-              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDBA74' } }; // orange-300
+           const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
+           const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
+           if (nextPromoColor) {
+               cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
            }
         }
       }
