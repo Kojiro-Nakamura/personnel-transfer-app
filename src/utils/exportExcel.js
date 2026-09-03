@@ -2446,8 +2446,15 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         
         for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
-          cell.border = borderStyle;
-          cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
+          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
+          if (c === 1 || c === 2) {
+             cBorder.bottom = undefined;
+             if (!cell.value || cell.value.toString().trim() === '') {
+                 cBorder.top = undefined;
+             }
+          }
+          cell.border = cBorder;
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         }
         currentRowIndex++;
@@ -2515,8 +2522,15 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
         for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
-          cell.border = borderStyle;
-          cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
+          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
+          if (c === 1 || c === 2) {
+             cBorder.bottom = undefined;
+             if (!cell.value || cell.value.toString().trim() === '') {
+                 cBorder.top = undefined;
+             }
+          }
+          cell.border = cBorder;
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
           
           if (c === 5) {
@@ -2572,8 +2586,15 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     row.values = vals;
     for (let c = 1; c <= 16; c++) {
       const cell = row.getCell(c);
-      cell.border = borderStyle;
-      cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
+      let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
+          if (c === 1 || c === 2) {
+             cBorder.bottom = undefined;
+             if (!cell.value || cell.value.toString().trim() === '') {
+                 cBorder.top = undefined;
+             }
+          }
+          cell.border = cBorder;
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
     }
     currentRowIndex++;
@@ -2635,8 +2656,15 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       r.values = v;
       for (let c = 1; c <= 16; c++) {
         const cell = r.getCell(c);
-        cell.border = borderStyle;
-        cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
+        let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
+          if (c === 1 || c === 2) {
+             cBorder.bottom = undefined;
+             if (!cell.value || cell.value.toString().trim() === '') {
+                 cBorder.top = undefined;
+             }
+          }
+          cell.border = cBorder;
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         if (c === 5) cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
         if (c === 7 || c === 8 || c === 9 || c === 14 || c === 15) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
@@ -2651,6 +2679,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       }
       currentRowIndex++;
     });
+  }
+  
+  const lastRow = ws.getRow(currentRowIndex - 1);
+  if (lastRow) {
+    const c1 = lastRow.getCell(1);
+    const c2 = lastRow.getCell(2);
+    if (c1.border) c1.border = { ...c1.border, bottom: { style: 'thin' } };
+    if (c2.border) c2.border = { ...c2.border, bottom: { style: 'thin' } };
   }
 };
 
