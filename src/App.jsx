@@ -235,13 +235,13 @@ export const AppContent = () => {
 
         const getAssignStr = (dId, gId, isNext) => {
           if (dId === 'retired') return '退職';
-          if (!dId || dId === 'unassigned') return '未定';
+          if (!dId || dId === 'unassigned') return '未配置';
           const nDept = departments.find(d => d.id === dId);
           const nGroup = nDept && gId ? (nDept.groups || []).find(g => g.id === gId) : null;
           const d = nDept ? (isNext ? (nDept.nextName || nDept.name) : nDept.name) : '';
           const g = nGroup ? (isNext ? (nGroup.nextName || nGroup.name) : nGroup.name) : '';
           
-          if (d === 'システム用ダミー') return '未定';
+          if (d === 'システム用ダミー') return '未配置';
           let finalName = '';
           if (d) finalName += d;
           if (g) finalName += (finalName ? ' ' : '') + g;
@@ -328,6 +328,14 @@ export const AppContent = () => {
                       <span className="w-20 shrink-0 text-right font-medium"></span>
                       <span className="w-10 shrink-0 text-right">{nextAge !== '' ? `${nextAge}歳` : ''}</span>
                       <span className="w-32 shrink-0 truncate ml-1"></span>
+                    </React.Fragment>
+                  ) : (!selEmp.departmentId || selEmp.departmentId === 'unassigned') ? (
+                    <React.Fragment>
+                      <span className="w-24 shrink-0 truncate"></span>
+                      <span className="w-28 shrink-0 truncate"></span>
+                      <span className="w-20 shrink-0 text-right font-medium"></span>
+                      <span className="w-10 shrink-0 text-right">{nextAge !== '' ? `${nextAge}歳` : ''}</span>
+                      <span className="w-32 shrink-0 truncate ml-1" title={selEmp.nextEmploymentType || ''}>{selEmp.nextEmploymentType || ''}</span>
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
