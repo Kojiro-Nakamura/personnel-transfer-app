@@ -2426,8 +2426,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     const processEmps = (emps, groupName, postName, isPost, currentGroupId) => {
       let filteredEmps = emps;
       if (filterLevel > 0) {
-        filteredEmps = emps.filter(eId => {
-          const emp = employees.find(e => e.id === eId);
+        filteredEmps = emps.filter(emp => {
           if (!emp) return false;
           const cLvl = getGradeLevel(emp.currentGrade);
           const nLvl = getGradeLevel(emp.nextGrade);
@@ -2455,8 +2454,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         return;
       }
 
-      filteredEmps.forEach((eId, idx) => {
-        const emp = employees.find(e => e.id === eId);
+      filteredEmps.forEach((emp, idx) => {
         if (!emp) return;
 
         const row = ws.getRow(currentRowIndex);
@@ -2581,8 +2579,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     currentRowIndex++;
     
     // We can't reuse processEmps because it captures `dept`, but we can just inline or recreate a similar loop.
-    uObj.direct.current.forEach(eId => {
-      const emp = employees.find(e => e.id === eId);
+    uObj.direct.current.forEach(emp => {
       if (!emp) return;
       if (filterLevel > 0) {
         const cLvl = getGradeLevel(emp.currentGrade);
