@@ -4,7 +4,7 @@ import {
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, AlertTriangle,
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
-  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge
+  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge, Maximize
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { exportListToExcel, exportUnifiedExcel } from './utils/exportExcel.js';
@@ -32,6 +32,24 @@ export const AppContent = () => {
   } = useApp();
   
   const [isDragging, setIsDragging] = useState(false);
+  const [autoFit, setAutoFit] = useState(true);
+
+  useEffect(() => {
+    if (!autoFit) return;
+    const calculateFit = () => {
+      const W = window.innerWidth;
+      // 基準幅1300pxに対してどれくらいか。actZoom = zoom * 0.9。
+      // なので、W / 1300 を actZoom にしたい。
+      // zoom = (W / 1300) / 0.9 = W / 1170
+      let newZoom = W / 1170;
+      if (newZoom > 1.5) newZoom = 1.5;
+      if (newZoom < 0.4) newZoom = 0.4;
+      setZoom(newZoom);
+    };
+    calculateFit();
+    window.addEventListener('resize', calculateFit);
+    return () => window.removeEventListener('resize', calculateFit);
+  }, [autoFit, setZoom]);
 
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
@@ -118,9 +136,10 @@ export const AppContent = () => {
           </div>
           <div className="flex gap-2 items-center">
             <div className="flex items-center bg-white/10 border border-white/20 rounded overflow-hidden mr-1">
-              <button onClick={() => setZoom(z => Math.max(0.5, z - 0.1))} className="p-1.5 hover:bg-white/20 text-white transition-colors" title="縮小"><ZoomOut className="w-4 h-4"/></button>
+              <button onClick={() => { setAutoFit(!autoFit); }} className={cx("p-1.5 transition-colors border-r border-white/20", autoFit ? "text-amber-300 bg-white/10" : "text-white hover:bg-white/20")} title="画面幅に自動フィット"><Maximize className="w-4 h-4"/></button>
+              <button onClick={() => { setAutoFit(false); setZoom(z => Math.max(0.4, z - 0.1)); }} className="p-1.5 hover:bg-white/20 text-white transition-colors" title="縮小"><ZoomOut className="w-4 h-4"/></button>
               <span className="text-xs font-bold w-10 text-center text-white" title="現在の表示倍率">{Math.round(zoom * 100)}%</span>
-              <button onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} className="p-1.5 hover:bg-white/20 text-white transition-colors" title="拡大"><ZoomIn className="w-4 h-4"/></button>
+              <button onClick={() => { setAutoFit(false); setZoom(z => Math.min(1.5, z + 0.1)); }} className="p-1.5 hover:bg-white/20 text-white transition-colors" title="拡大"><ZoomIn className="w-4 h-4"/></button>
             </div>
             
             <div className="flex gap-0.5">
