@@ -2336,15 +2336,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     { width: 16 }, // F [今年] 級
     { width: 6 },  // G [今年] 年齢
     { width: 12 }, // H [今年] 在籍
-    { width: 12 }, // I [今年] 備考
-    { width: 4 },  // J →
-    { width: 14 }, // K [来年] 部署名
-    { width: 14 }, // L [来年] 班・グループ
-    { width: 12 }, // M [来年] 職名
-    { width: 16 }, // N [来年] 級
-    { width: 6 },  // O [来年] 年齢
-    { width: 12 }, // P [来年] 在籍
-    { width: 12 }, // Q [来年] 備考
+    { width: 4 },  // I 矢印
+    { width: 14 }, // J [来年] 部署名
+    { width: 14 }, // K [来年] 班・グループ
+    { width: 12 }, // L [来年] 職名
+    { width: 16 }, // M [来年] 級
+    { width: 6 },  // N [来年] 年齢
+    { width: 12 }, // O [来年] 在籍
+    { width: 12 }, // P [来年] 備考
   ];
 
   ws.getRow(1).values = [fileName];
@@ -2364,7 +2363,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getCell('A3').alignment = { shrinkToFit: true, vertical: 'middle' };
 
   const r4 = ws.getRow(4);
-  const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`];
+  const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`];
   r4.values = r4Vals;
   r4.height = 20;
 
@@ -2410,6 +2409,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   let currentRowIndex = 6;
 
   departments.forEach((dept) => {
+    if (dept.id === 'unassigned' || dept.id === 'retired') return;
     let dNamePrinted = false;
     const currD = deptMap[dept.id] || { groups: {} };
 
@@ -2472,9 +2472,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const cy = emp.currentYears || 0;
         const cs = (emp.currentSkills || []).join('＋');
         vals[7] = cs ? `${cy}(${cs})` : `${cy}`;
-        vals[8] = emp.currentEmploymentType || '';
+        
 
-        vals[9] = '→';
+        vals[8] = '→';
 
         const getDeptNameStr = (dId) => {
            if (dId === 'unassigned') return '未配置';
@@ -2493,22 +2493,22 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const isRetired = emp.departmentId === 'retired';
 
         if (isRetired) {
-          vals[10] = '退職';
-          vals[14] = calculateAge(emp.birthDate, targetYear) !== '' ? calculateAge(emp.birthDate, targetYear) + '歳' : '';
+          vals[9] = '退職';
+          vals[13] = calculateAge(emp.birthDate, targetYear);
         } else if (isUnassigned) {
-          vals[10] = '未配置';
-          vals[14] = calculateAge(emp.birthDate, targetYear) !== '' ? calculateAge(emp.birthDate, targetYear) + '歳' : '';
-          vals[16] = emp.nextEmploymentType || '';
+          vals[9] = '未配置';
+          vals[13] = calculateAge(emp.birthDate, targetYear);
+          vals[15] = emp.nextEmploymentType || '';
         } else {
-          vals[10] = getDeptNameStr(emp.departmentId);
-          vals[11] = getGroupNameStr(emp.departmentId, emp.groupId);
-          vals[12] = emp.nextTitle || '';
-          vals[13] = emp.nextGrade || '';
-          vals[14] = calculateAge(emp.birthDate, targetYear) !== '' ? calculateAge(emp.birthDate, targetYear) + '歳' : '';
+          vals[9] = getDeptNameStr(emp.departmentId);
+          vals[10] = getGroupNameStr(emp.departmentId, emp.groupId);
+          vals[11] = emp.nextTitle || '';
+          vals[12] = emp.nextGrade || '';
+          vals[13] = calculateAge(emp.birthDate, targetYear);
           const ny = emp.nextYears || 0;
           const ns = (emp.nextSkills || []).join('＋');
-          vals[15] = ns ? `${ny}年(${ns})` : `${ny}年`;
-          vals[16] = emp.nextEmploymentType || '';
+          vals[14] = ns ? `${ny}(${ns})` : `${ny}`;
+          vals[15] = emp.nextEmploymentType || '';
         }
 
         row.values = vals;
