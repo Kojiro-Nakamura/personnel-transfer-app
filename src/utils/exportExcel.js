@@ -864,6 +864,11 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummary}`];
   ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
+  ws.mergeCells('A2:L2');
+  ws.getCell('A2').alignment = { shrinkToFit: true, vertical: 'middle' };
+  ws.mergeCells('A3:L3');
+  ws.getCell('A3').alignment = { shrinkToFit: true, vertical: 'middle' };
+
 
   ws.getRow(3).getCell(14).value = '＜参考＞';
   ws.getRow(3).getCell(14).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
