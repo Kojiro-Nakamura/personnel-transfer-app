@@ -42,7 +42,7 @@ export const AppContent = () => {
       // なので、W / 1300 を actZoom にしたい。
       // zoom = (W / 1300) / 0.9 = W / 1170
       let newZoom = W / 1170;
-      if (newZoom > 1.5) newZoom = 1.5;
+      if (newZoom > 1.0) newZoom = 1.0;
       if (newZoom < 0.4) newZoom = 0.4;
       setZoom(newZoom);
     };
