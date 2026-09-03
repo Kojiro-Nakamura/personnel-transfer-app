@@ -14,7 +14,7 @@ import { autoFixEmployees } from '../../utils/validation.js';
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
 export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer, isIncreased }) => {
-  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp, departments } = useApp();
+  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
   
   if (isEmpty || !emp) {
@@ -75,39 +75,6 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const isPromoted = isNext && emp && isPromotedGrade(emp.currentGrade, emp.nextGrade);
   const promoBg = isPromoted ? getPromotedBgClass(emp.nextGrade) : "";
 
-  let nextAssignStr = "";
-  if (!isNext && emp) {
-    if (emp.departmentId === 'retired') {
-      nextAssignStr = "来年度: 退職";
-    } else if (!emp.departmentId || emp.departmentId === 'unassigned') {
-      nextAssignStr = "来年度: 未定";
-    } else {
-      const nDept = departments.find(d => d.id === emp.departmentId);
-      const nGroup = nDept && emp.groupId ? (nDept.groups || [])?.find(g => g.id === emp.groupId) : null;
-      const d = nDept ? (nDept.nextName || nDept.name) : '';
-      const g = nGroup ? (nGroup.nextName || nGroup.name) : '';
-      let pStr = '';
-      if (emp.postId && nDept) {
-          const p = (nDept.posts || [])?.find(x => x.id === emp.postId);
-          if (p) pStr = (p.nextName || p.name);
-      } else if (emp.groupPostId && nGroup) {
-          const gp = (nGroup.posts || [])?.find(x => x.id === emp.groupPostId);
-          if (gp) pStr = (gp.nextName || gp.name);
-      }
-      
-      let finalName = '';
-      if (d === 'システム用ダミー') {
-         finalName = '未定';
-      } else {
-         if (d) finalName += d;
-         if (g) finalName += (finalName ? ' ' : '') + g;
-         if (pStr) finalName += (finalName ? ' ' : '') + pStr;
-      }
-      
-      nextAssignStr = finalName ? "来年度: " + finalName : "来年度: 未定";
-    }
-  }
-
   const cellClasses = cx(
     "flex-1 flex items-center px-2 py-1 gap-2 relative group/emp cursor-pointer",
     borderClass,
@@ -124,7 +91,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       onMouseEnter={() => setHoveredEmpId(emp.id)} 
       onMouseLeave={() => setHoveredEmpId(null)} 
       className={cellClasses} 
-      title={!isNext ? nextAssignStr : (isPickingMode && isNext ? "選択中の職員を配置します" : "")}
+      title={isPickingMode && isNext ? "選択中の職員をここに配置します" : ""}
     >
       <div className={cx("w-14 truncate text-[11px] font-bold [-webkit-text-stroke:_0.3px_black]", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
         {isNext ? emp.nextTitle : emp.currentTitle}
