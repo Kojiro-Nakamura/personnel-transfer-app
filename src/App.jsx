@@ -316,7 +316,7 @@ export const AppContent = () => {
                   <span className="w-28 shrink-0 truncate">{selEmp.currentGrade || ''}</span>
                   <span className={cx("w-20 shrink-0 text-right font-medium", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "")}>{yd}</span>
                   <span className="w-10 shrink-0 text-right">{dispAge !== '' ? `${dispAge}歳` : ''}</span>
-                  <span className="w-20 shrink-0 truncate ml-1">{selEmp.currentEmploymentType || ''}</span>
+                  <span className="w-32 shrink-0 truncate ml-1" title={selEmp.currentEmploymentType || ''}>{selEmp.currentEmploymentType || ''}</span>
                 </div>
                 <div className="flex gap-2 items-center text-blue-700">
                   <span className="w-10 shrink-0 font-bold">来年度:</span>
@@ -327,7 +327,7 @@ export const AppContent = () => {
                       <span className="w-28 shrink-0 truncate"></span>
                       <span className="w-20 shrink-0 text-right font-medium"></span>
                       <span className="w-10 shrink-0 text-right">{nextAge !== '' ? `${nextAge}歳` : ''}</span>
-                      <span className="w-20 shrink-0 truncate ml-1"></span>
+                      <span className="w-32 shrink-0 truncate ml-1"></span>
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
@@ -335,7 +335,7 @@ export const AppContent = () => {
                       <span className="w-28 shrink-0 truncate">{selEmp.nextGrade || ''}</span>
                       <span className={cx("w-20 shrink-0 text-right font-medium", nextYs >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "")}>{nextYd}</span>
                       <span className="w-10 shrink-0 text-right">{nextAge !== '' ? `${nextAge}歳` : ''}</span>
-                      <span className="w-20 shrink-0 truncate ml-1">{selEmp.nextEmploymentType || ''}</span>
+                      <span className="w-32 shrink-0 truncate ml-1" title={selEmp.nextEmploymentType || ''}>{selEmp.nextEmploymentType || ''}</span>
                     </React.Fragment>
                   )}
                 </div>
