@@ -243,16 +243,15 @@ export const AppContent = () => {
           return finalName || '未定';
         };
 
-        const currHist = selEmp.history?.find(h => h.year === (targetYear - 1));
-        const cDeptId = currHist ? currHist.departmentId : (selEmp.departmentId === 'unassigned' ? 'unassigned' : selEmp.currentDeptId);
-        const cGroupId = currHist ? currHist.groupId : (selEmp.departmentId === 'unassigned' ? null : selEmp.currentGroupId);
-
-        let currDeptStr = getAssignStr(cDeptId, cGroupId, false);
+        let currDeptStr = getAssignStr(selEmp.currentDeptId, selEmp.currentGroupId, false);
         let nextDeptStr = getAssignStr(selEmp.departmentId, selEmp.groupId, true);
         
-        // If history is just plain text string format (older data model)
-        if (currHist && (!cDeptId && currHist.department)) {
-          currDeptStr = currHist.department;
+        // Fallback for older formats or missing data
+        if (!selEmp.currentDeptId && selEmp.history) {
+           const currHist = selEmp.history.find(h => h.year === (targetYear - 1));
+           if (currHist && currHist.department) {
+             currDeptStr = currHist.department;
+           }
         }
 
         const hireY = selEmp.hireDate ? parseInt(String(selEmp.hireDate).substring(0, 4)) : null;
