@@ -844,7 +844,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   const formatDateForDisplay = formatPromoDateWithEra;
 
   const ws = workbook.addWorksheet(sheetName, {
-    views: [{ state: 'frozen', xSplit: 12, ySplit: 5, showGridLines: false }],
+    views: [{ state: 'frozen', xSplit: 9, ySplit: 5, showGridLines: false }],
     pageSetup: { paperSize: 8, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5, header: 0.1, footer: 0.1 } }
   });
   ws.pageSetup.printTitlesRow = '1:5';
