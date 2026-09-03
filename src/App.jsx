@@ -294,7 +294,7 @@ export const AppContent = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-amber-200" />
-                <span className="font-bold text-sm text-slate-50">配置先の枠をクリックしてください</span>
+                <span className="font-bold text-sm text-slate-50">来年度の配属先の枠をクリックしてください</span>
               </div>
               <button 
                 onClick={cancelSelection} 
