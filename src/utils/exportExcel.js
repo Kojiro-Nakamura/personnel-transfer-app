@@ -2358,9 +2358,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummary}`];
   ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
-  ws.mergeCells('A2:Q2');
+  ws.mergeCells('A2:P2');
   ws.getCell('A2').alignment = { shrinkToFit: true, vertical: 'middle' };
-  ws.mergeCells('A3:Q3');
+  ws.mergeCells('A3:P3');
   ws.getCell('A3').alignment = { shrinkToFit: true, vertical: 'middle' };
 
   const r4 = ws.getRow(4);
@@ -2369,23 +2369,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   r4.height = 20;
 
   const r5 = ws.getRow(5);
-  const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '', '部署名', '班・グループ', '職名', '級', '年齢', '在籍', '備考'];
+  const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '', '部署名', '班・グループ', '職名', '級', '年齢', '在籍', '備考'];
   r5.values = r5Vals;
   r5.height = 20;
 
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
   ws.mergeCells('C4:C5');
-  ws.mergeCells('D4:I4');
-  ws.mergeCells('J4:J5');
-  ws.mergeCells('K4:Q4');
+  ws.mergeCells('D4:H4');
+  ws.mergeCells('I4:I5');
+  ws.mergeCells('J4:P4');
 
   const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
   const currFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFBEB' } };
   const nextFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F9FF' } };
   const borderStyle = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
 
-  for (let c = 1; c <= 17; c++) {
+  for (let c = 1; c <= 16; c++) {
     const c4 = ws.getCell(4, c);
     const c5 = ws.getCell(5, c);
     c4.border = borderStyle;
@@ -2438,13 +2438,13 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         if (filterLevel > 0) return;
         const row = ws.getRow(currentRowIndex);
         row.height = 13.20;
-        const vals = new Array(17).fill('');
+        const vals = new Array(16).fill('');
         vals[0] = (!dNamePrinted) ? dept.name : ''; dNamePrinted = true;
         vals[1] = groupName || '';
         vals[2] = postName || '';
         row.values = vals;
         
-        for (let c = 1; c <= 17; c++) {
+        for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
           cell.border = borderStyle;
           cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
@@ -2459,7 +2459,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
         const row = ws.getRow(currentRowIndex);
         row.height = 13.20;
-        const vals = new Array(17).fill('');
+        const vals = new Array(16).fill('');
 
         vals[0] = (!dNamePrinted) ? dept.name : ''; dNamePrinted = true;
         vals[1] = (idx === 0 && groupName) ? groupName : '';
@@ -2468,10 +2468,10 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         vals[3] = emp.currentTitle || '';
         vals[4] = emp.name || '';
         vals[5] = emp.currentGrade || '';
-        vals[6] = calculateAge(emp.birthDate, targetYear - 1) !== '' ? calculateAge(emp.birthDate, targetYear - 1) + '歳' : '';
+        vals[6] = calculateAge(emp.birthDate, targetYear - 1);
         const cy = emp.currentYears || 0;
         const cs = (emp.currentSkills || []).join('＋');
-        vals[7] = cs ? `${cy}年(${cs})` : `${cy}年`;
+        vals[7] = cs ? `${cy}(${cs})` : `${cy}`;
         vals[8] = emp.currentEmploymentType || '';
 
         vals[9] = '→';
@@ -2513,7 +2513,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
         row.values = vals;
 
-        for (let c = 1; c <= 17; c++) {
+        for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
           cell.border = borderStyle;
           cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
@@ -2522,14 +2522,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (c === 5) {
              cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
           }
-          if (c === 7 || c === 8 || c === 15 || c === 16) {
+          if (c === 7 || c === 8 || c === 14 || c === 15) {
              cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           }
-          if (c === 10) {
+          if (c === 9) {
              cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           }
 
-          if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
+          if (c >= 10 && c <= 16 && !isRetired && !isUnassigned) {
              const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
              const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
              if (nextPromoColor) {
@@ -2567,10 +2567,10 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   if (uObj && uObj.direct && uObj.direct.current && uObj.direct.current.length > 0) {
     const row = ws.getRow(currentRowIndex);
     row.height = 13.20;
-    const vals = new Array(17).fill('');
+    const vals = new Array(16).fill('');
     vals[0] = '未配置';
     row.values = vals;
-    for (let c = 1; c <= 17; c++) {
+    for (let c = 1; c <= 16; c++) {
       const cell = row.getCell(c);
       cell.border = borderStyle;
       cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
@@ -2588,16 +2588,15 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       }
       const r = ws.getRow(currentRowIndex);
       r.height = 13.20;
-      const v = new Array(17).fill('');
+      const v = new Array(16).fill('');
       v[3] = emp.currentTitle || '';
       v[4] = emp.name || '';
       v[5] = emp.currentGrade || '';
-      v[6] = calculateAge(emp.birthDate, targetYear - 1) !== '' ? calculateAge(emp.birthDate, targetYear - 1) + '歳' : '';
+      v[6] = calculateAge(emp.birthDate, targetYear - 1);
       const cy = emp.currentYears || 0;
       const cs = (emp.currentSkills || []).join('＋');
-      v[7] = cs ? `${cy}年(${cs})` : `${cy}年`;
-      v[8] = emp.currentEmploymentType || '';
-      v[9] = '→';
+      v[7] = cs ? `${cy}(${cs})` : `${cy}`;
+      v[8] = '→';
 
       const getDeptNameStr = (dId) => {
          if (dId === 'unassigned') return '未配置';
@@ -2616,33 +2615,33 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       const isRetired = emp.departmentId === 'retired';
 
       if (isRetired) {
-        v[10] = '退職';
-        v[14] = calculateAge(emp.birthDate, targetYear) !== '' ? calculateAge(emp.birthDate, targetYear) + '歳' : '';
+        v[9] = '退職';
+        v[13] = calculateAge(emp.birthDate, targetYear);
       } else if (isUnassigned) {
-        v[10] = '未配置';
-        v[14] = calculateAge(emp.birthDate, targetYear) !== '' ? calculateAge(emp.birthDate, targetYear) + '歳' : '';
-        v[16] = emp.nextEmploymentType || '';
+        v[9] = '未配置';
+        v[13] = calculateAge(emp.birthDate, targetYear);
+        v[15] = emp.nextEmploymentType || '';
       } else {
-        v[10] = getDeptNameStr(emp.departmentId);
-        v[11] = getGroupNameStr(emp.departmentId, emp.groupId);
-        v[12] = emp.nextTitle || '';
-        v[13] = emp.nextGrade || '';
-        v[14] = calculateAge(emp.birthDate, targetYear) !== '' ? calculateAge(emp.birthDate, targetYear) + '歳' : '';
+        v[9] = getDeptNameStr(emp.departmentId);
+        v[10] = getGroupNameStr(emp.departmentId, emp.groupId);
+        v[11] = emp.nextTitle || '';
+        v[12] = emp.nextGrade || '';
+        v[13] = calculateAge(emp.birthDate, targetYear);
         const ny = emp.nextYears || 0;
         const ns = (emp.nextSkills || []).join('＋');
-        v[15] = ns ? `${ny}年(${ns})` : `${ny}年`;
-        v[16] = emp.nextEmploymentType || '';
+        v[14] = ns ? `${ny}(${ns})` : `${ny}`;
+        v[15] = emp.nextEmploymentType || '';
       }
       r.values = v;
-      for (let c = 1; c <= 17; c++) {
+      for (let c = 1; c <= 16; c++) {
         const cell = r.getCell(c);
         cell.border = borderStyle;
         cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         if (c === 5) cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
-        if (c === 7 || c === 8 || c === 10 || c === 15 || c === 16) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+        if (c === 7 || c === 8 || c === 9 || c === 14 || c === 15) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
         
-        if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
+        if (c >= 10 && c <= 16 && !isRetired && !isUnassigned) {
            const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
            const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
            if (nextPromoColor) {
