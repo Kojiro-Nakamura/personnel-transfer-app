@@ -2447,7 +2447,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         for (let c = 1; c <= 17; c++) {
           const cell = row.getCell(c);
           cell.border = borderStyle;
-          cell.alignment = { vertical: 'middle', wrapText: true };
+          cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         }
         currentRowIndex++;
@@ -2516,17 +2516,17 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         for (let c = 1; c <= 17; c++) {
           const cell = row.getCell(c);
           cell.border = borderStyle;
-          cell.alignment = { vertical: 'middle', wrapText: true };
+          cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
           
           if (c === 5) {
              cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
           }
           if (c === 7 || c === 8 || c === 15 || c === 16) {
-             cell.alignment = { vertical: 'middle', horizontal: 'center' };
+             cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           }
           if (c === 10) {
-             cell.alignment = { vertical: 'middle', horizontal: 'center' };
+             cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           }
 
           if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
@@ -2573,7 +2573,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     for (let c = 1; c <= 17; c++) {
       const cell = row.getCell(c);
       cell.border = borderStyle;
-      cell.alignment = { vertical: 'middle', wrapText: true };
+      cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
     }
     currentRowIndex++;
@@ -2637,10 +2637,10 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       for (let c = 1; c <= 17; c++) {
         const cell = r.getCell(c);
         cell.border = borderStyle;
-        cell.alignment = { vertical: 'middle', wrapText: true };
+        cell.alignment = { vertical: 'middle', shrinkToFit: true, wrapText: false };
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         if (c === 5) cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
-        if (c === 7 || c === 8 || c === 10 || c === 15 || c === 16) cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        if (c === 7 || c === 8 || c === 10 || c === 15 || c === 16) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
         
         if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
            const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
