@@ -38,10 +38,11 @@ export const AppContent = () => {
     if (!autoFit) return;
     const calculateFit = () => {
       const W = window.innerWidth;
-      // 基準幅1300pxに対してどれくらいか。actZoom = zoom * 0.9。
-      // なので、W / 1300 を actZoom にしたい。
-      // zoom = (W / 1300) / 0.9 = W / 1170
-      let newZoom = W / 1170;
+      // 基準幅を少し広めに設定（1300 -> 1400強程度を想定）して、やや小さめにフィットさせる
+      let baseZoom = W / 1300;
+      // 10%刻み（0.1単位）で切り捨てて、画面に確実に収まるようにする
+      let newZoom = Math.floor(baseZoom * 10) / 10;
+      
       if (newZoom > 1.0) newZoom = 1.0;
       if (newZoom < 0.4) newZoom = 0.4;
       setZoom(newZoom);
