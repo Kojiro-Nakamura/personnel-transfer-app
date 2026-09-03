@@ -96,7 +96,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
           </span>
           
           {(onMoveUp || onMoveDown) && (
-            <div className="opacity-0 group-hover/dept:opacity-100 flex gap-0.5 ml-2">
+            <div className="opacity-70 hover:opacity-100 transition-opacity flex gap-0.5 ml-2">
               <button 
                 onClick={onMoveUp} 
                 className={cx("p-1 rounded transition-colors text-white/70", onMoveUp ? "hover:bg-white/20 hover:text-white" : "invisible")} 
@@ -116,7 +116,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
         </div>
         
         <div className="flex gap-2 items-center">
-          <div className="opacity-0 group-hover/dept:opacity-100 flex gap-1 items-center">
+          <div className="opacity-70 hover:opacity-100 transition-opacity flex gap-1 items-center">
             <button 
               onClick={() => openModal('dept', dept)} 
               className="px-2 py-0.5 bg-white/20 hover:bg-white/30 text-white rounded text-xs transition-colors shadow-sm" 
@@ -226,7 +226,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                       </span>
                       
                       {(gIdx > 0 || gIdx < dept.groups.length - 1) && (
-                        <div className="opacity-0 group-hover/grp:opacity-100 flex gap-0.5 ml-2">
+                        <div className="opacity-70 hover:opacity-100 transition-opacity flex gap-0.5 ml-2">
                           <button 
                             onClick={gIdx > 0 ? () => mutations.moveGroup(dept.id, grp.id, 'up') : undefined} 
                             className={cx("p-0.5 rounded transition-colors text-slate-500", gIdx > 0 ? "hover:bg-white/50 text-slate-900" : "invisible")} 
@@ -246,7 +246,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                     </div>
                     
                     <div className="flex gap-1 items-center">
-                      <div className="opacity-0 group-hover/grp:opacity-100 flex gap-1 items-center">
+                      <div className="opacity-70 hover:opacity-100 transition-opacity flex gap-1 items-center">
                         <button 
                           onClick={() => openModal('groupPost', { deptId: dept.id, groupId: grp.id })} 
                           className="px-1.5 py-0.5 bg-white/50 hover:bg-white rounded text-[10px] text-slate-900 transition-colors shadow-sm" 
