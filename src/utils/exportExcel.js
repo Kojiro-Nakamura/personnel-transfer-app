@@ -1722,8 +1722,8 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
 };
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const workbook = new ExcelJS.Workbook();
-  addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   addSimplePlanSheet(workbook, '人事異動案（シンプル）', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
+  addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   addListSheet(workbook, '職員一覧', fileName, targetYear, employees, departments);
     addBirthYearSheet(workbook, '生年別一覧（今年度）', targetYear, employees, departments, false);
     addBirthYearSheet(workbook, '生年別一覧（来年度）', targetYear, employees, departments, true);
