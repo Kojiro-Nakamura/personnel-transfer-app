@@ -2750,18 +2750,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
             vals[29 + pi] = pStr;
           }
           
-          let ny = '';
-          if (extEmp.nextGrade && extEmp.nextGrade !== '-' && extEmp.nextGrade !== '') {
-            if (extEmp.nextGrade === '10' && extEmp.nextEmploymentType) {
-              ny = extEmp.nextEmploymentType;
-            } else {
-              const gl = parseInt(extEmp.nextGrade, 10);
-              if (!isNaN(gl) && gl >= 1 && gl <= 8) {
-                ny = gradeList[gl];
-              }
+          let finalDiff = calculateServiceYears(extEmp.hireDate, targetYear, true);
+          if (extEmp.currentGrade === '10' && extEmp.nextEmploymentType) {
+             // do nothing
+          } else {
+            let prevDate = null;
+            for (let i = pKeys.length - 1; i >= 0; i--) {
+              const val = pKeys[i] === 'hireDate' ? extEmp.hireDate : (extEmp[pKeys[i]] || '');
+              if (val) { prevDate = val; break; }
             }
+            finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear, true) : null;
           }
-          vals[38] = ny;
+          let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+          if (finalDiff !== null && extEmp.birthDate) {
+            const ag = calculateAge(extEmp.birthDate, targetYear);
+            if (ag) nYearStr += `(${ag}歳)`;
+          }
+          vals[38] = nYearStr;
           
           const changeIndexes = [];
           const promoYearMap = {};
@@ -2882,11 +2887,20 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
           }
-          if (((c >= 11 && c <= 17) || c === 4 || c === 5 || c === 19 || c === 39) && !isRetired && !isUnassigned) {
+          if (((c >= 11 && c <= 17) || c === 4 || c === 5 || c === 19 || c === 39 || (c >= 31 && c <= 38)) && !isRetired && !isUnassigned) {
              const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
              const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
              if (nextPromoColor) {
-                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
+                 if (c >= 31 && c <= 38) {
+                     const gradeToPromoKey = { '係長級(主査)': 'promoYearChief', '補佐級I(主任)': 'promoYearAssistant1', '補佐級II(班長)': 'promoYearAssistant2', '補佐級III(補佐兼班長)': 'promoYearAssistant3', '課長級': 'promoYearSecHead', '所属長級': 'promoYearDivHead', '次長級': 'promoYearDeputyHead', '部長級': 'promoYearDeptHead' };
+                     const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+                     const key = pKeys[c - 30];
+                     if (gradeToPromoKey[emp.nextGrade] === key) {
+                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
+                     }
+                 } else {
+                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
+                 }
              }
           }
         }
@@ -3062,18 +3076,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
             v[29 + pi] = pStr;
           }
           
-          let ny = '';
-          if (extEmp.nextGrade && extEmp.nextGrade !== '-' && extEmp.nextGrade !== '') {
-            if (extEmp.nextGrade === '10' && extEmp.nextEmploymentType) {
-              ny = extEmp.nextEmploymentType;
-            } else {
-              const gl = parseInt(extEmp.nextGrade, 10);
-              if (!isNaN(gl) && gl >= 1 && gl <= 8) {
-                ny = gradeList[gl];
-              }
+          let finalDiff = calculateServiceYears(extEmp.hireDate, targetYear, true);
+          if (extEmp.currentGrade === '10' && extEmp.nextEmploymentType) {
+             // do nothing
+          } else {
+            let prevDate = null;
+            for (let i = pKeys.length - 1; i >= 0; i--) {
+              const val = pKeys[i] === 'hireDate' ? extEmp.hireDate : (extEmp[pKeys[i]] || '');
+              if (val) { prevDate = val; break; }
             }
+            finalDiff = prevDate ? calculateServiceYears(prevDate, targetYear, true) : null;
           }
-          v[38] = ny;
+          let nYearStr = `> ${finalDiff !== null ? formatServiceYearsText(finalDiff) : ''}`;
+          if (finalDiff !== null && extEmp.birthDate) {
+            const ag = calculateAge(extEmp.birthDate, targetYear);
+            if (ag) nYearStr += `(${ag}歳)`;
+          }
+          v[38] = nYearStr;
           
           const changeIndexes = [];
           const promoYearMap = {};
@@ -3185,11 +3204,20 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
           }
-        if (((c >= 11 && c <= 17) || c === 4 || c === 5 || c === 19 || c === 39) && !isRetired && !isUnassigned) {
+        if (((c >= 11 && c <= 17) || c === 4 || c === 5 || c === 19 || c === 39 || (c >= 31 && c <= 38)) && !isRetired && !isUnassigned) {
            const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
            const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
            if (nextPromoColor) {
-               cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
+               if (c >= 31 && c <= 38) {
+                   const gradeToPromoKey = { '係長級(主査)': 'promoYearChief', '補佐級I(主任)': 'promoYearAssistant1', '補佐級II(班長)': 'promoYearAssistant2', '補佐級III(補佐兼班長)': 'promoYearAssistant3', '課長級': 'promoYearSecHead', '所属長級': 'promoYearDivHead', '次長級': 'promoYearDeputyHead', '部長級': 'promoYearDeptHead' };
+                   const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+                   const key = pKeys[c - 30];
+                   if (gradeToPromoKey[emp.nextGrade] === key) {
+                       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
+                   }
+               } else {
+                   cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
+               }
            }
         }
       }
