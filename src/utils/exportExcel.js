@@ -99,13 +99,13 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
     { width: 8 },  // 採用 (AA)
     { width: 8 },  // 係長級 (AB)
     { width: 8 },  // 補佐I (AC)
-    { width: 8 },  // 補佐II (AD)
-    { width: 8 },  // 補佐III (AE)
-    { width: 8 },  // 課長級 (AF)
-    { width: 8 },  // 所属長級 (AG)
-    { width: 8 },  // 次長級 (AH)
-    { width: 8 },  // 部長級 (AI)
-    { width: 14 }, // 来年度 (AJ)
+    { width: 15 },  // 補佐II (AD)
+    { width: 15 },  // 補佐III (AE)
+    { width: 15 },  // 課長級 (AF)
+    { width: 15 },  // 所属長級 (AG)
+    { width: 15 },  // 次長級 (AH)
+    { width: 15 },  // 部長級 (AI)
+    { width: 15 }, // 来年度 (AJ)
   ];
   historyYears.forEach(() => extraCols.push({ width: 14 }));
   ws.columns = [
@@ -2634,7 +2634,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
-          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+          const isNoShrink = (c === 28 || c === 29);
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: !isNoShrink, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         }
         currentRowIndex++;
@@ -2860,7 +2861,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
-          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+          const isNoShrink = (c === 28 || c === 29);
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: !isNoShrink, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
           
           if (c === 5) {
@@ -2974,7 +2976,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
-          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+          const isNoShrink = (c === 28 || c === 29);
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: !isNoShrink, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
     }
     currentRowIndex++;
@@ -3185,7 +3188,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
-          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+          const isNoShrink = (c === 28 || c === 29);
+          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: !isNoShrink, wrapText: false };
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         if (c === 5) cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
         if (c === 7 || c === 8 || c === 10 || c === 15 || c === 16) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
