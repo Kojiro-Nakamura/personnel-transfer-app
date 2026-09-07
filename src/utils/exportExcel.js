@@ -162,7 +162,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
 
   
   const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
-  const legendEndCol = 37 + targetYearIndex;
+  const legendEndCol = 36 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -874,7 +874,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(3).getCell(14).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
 
   const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
-  const legendEndCol = 35 + targetYearIndex;
+  const legendEndCol = 34 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -1873,7 +1873,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   r2.height = 13;
 
   const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
-  const legendEndCol = 34 + targetYearIndex;
+  const legendEndCol = 33 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -2419,7 +2419,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   
   // Add legend
   const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
-  const legendEndCol = 40 + targetYearIndex;
+  const legendEndCol = 39 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
   
@@ -2910,12 +2910,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (c >= 40) {
              const targetRow = typeof row !== 'undefined' ? row : (typeof r !== 'undefined' ? r : null);
              const targetYear = historyYears[c - 40];
-             let bgColor = 'FFA7F3D0'; // Emerald default
+             let bgColor = null;
              if (targetRow && targetRow.promoYearMap && targetRow.promoYearMap[targetYear]) {
                 const pColor = getPromotedBgColorCode(targetRow.promoYearMap[targetYear]);
                 if (pColor) bgColor = 'FF' + pColor.replace('#', '').toUpperCase();
              }
-             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+             if (bgColor) {
+                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+             }
              if (targetRow && targetRow.changeIndexes && targetRow.changeIndexes.includes(c - 1)) {
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
@@ -3231,12 +3233,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (c >= 40) {
              const targetRow = typeof row !== 'undefined' ? row : (typeof r !== 'undefined' ? r : null);
              const targetYear = historyYears[c - 40];
-             let bgColor = 'FFA7F3D0'; // Emerald default
+             let bgColor = null;
              if (targetRow && targetRow.promoYearMap && targetRow.promoYearMap[targetYear]) {
                 const pColor = getPromotedBgColorCode(targetRow.promoYearMap[targetYear]);
                 if (pColor) bgColor = 'FF' + pColor.replace('#', '').toUpperCase();
              }
-             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+             if (bgColor) {
+                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+             }
              if (targetRow && targetRow.changeIndexes && targetRow.changeIndexes.includes(c - 1)) {
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
