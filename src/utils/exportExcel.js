@@ -2435,7 +2435,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       }
 
       if (filteredEmps.length === 0) {
-        if (filterLevel > 0) return;
+        return; // 不要な空白行を挿入しない
         const row = ws.getRow(currentRowIndex);
         row.height = 13.20;
         const vals = new Array(16).fill('');
@@ -2446,13 +2446,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         
         for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
-          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
-          if (c === 1 || c === 2) {
-             cBorder.bottom = undefined;
-             if (!cell.value || cell.value.toString().trim() === '') {
-                 cBorder.top = undefined;
-             }
+          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
+          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          
+          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let bottomStyle = 'thin';
+
+          if (c === 1) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = isNewDeptRow ? 'thin' : null;
+          } else if (c === 2) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
           }
+
+          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          if (topStyle) cBorder.top = { style: topStyle };
+          if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
           cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
@@ -2481,7 +2491,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         vals[7] = cs ? `${cy}(${cs})` : `${cy}`;
         
 
-        vals[8] = '⇒';
+        vals[8] = '→';
 
         const getDeptNameStr = (dId) => {
            if (dId === 'unassigned') return '未配置';
@@ -2522,13 +2532,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
         for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
-          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
-          if (c === 1 || c === 2) {
-             cBorder.bottom = undefined;
-             if (!cell.value || cell.value.toString().trim() === '') {
-                 cBorder.top = undefined;
-             }
+          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
+          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          
+          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let bottomStyle = 'thin';
+
+          if (c === 1) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = isNewDeptRow ? 'thin' : null;
+          } else if (c === 2) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
           }
+
+          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          if (topStyle) cBorder.top = { style: topStyle };
+          if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
           cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
@@ -2587,13 +2607,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     row.values = vals;
     for (let c = 1; c <= 16; c++) {
       const cell = row.getCell(c);
-      let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
-          if (c === 1 || c === 2) {
-             cBorder.bottom = undefined;
-             if (!cell.value || cell.value.toString().trim() === '') {
-                 cBorder.top = undefined;
-             }
+          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
+          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          
+          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let bottomStyle = 'thin';
+
+          if (c === 1) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = isNewDeptRow ? 'thin' : null;
+          } else if (c === 2) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
           }
+
+          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          if (topStyle) cBorder.top = { style: topStyle };
+          if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
           cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
@@ -2618,7 +2648,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       const cy = emp.currentYears || 0;
       const cs = (emp.currentSkills || []).join('＋');
       v[7] = cs ? `${cy}(${cs})` : `${cy}`;
-      v[8] = '⇒';
+      v[8] = '→';
 
       const getDeptNameStr = (dId) => {
          if (dId === 'unassigned') return '未配置';
@@ -2657,13 +2687,23 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       r.values = v;
       for (let c = 1; c <= 16; c++) {
         const cell = r.getCell(c);
-        let cBorder = { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } };
-          if (c === 1 || c === 2) {
-             cBorder.bottom = undefined;
-             if (!cell.value || cell.value.toString().trim() === '') {
-                 cBorder.top = undefined;
-             }
+          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
+          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          
+          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let bottomStyle = 'thin';
+
+          if (c === 1) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = isNewDeptRow ? 'thin' : null;
+          } else if (c === 2) {
+             if (!isNewDeptRow) topStyle = null;
+             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
           }
+
+          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          if (topStyle) cBorder.top = { style: topStyle };
+          if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
           cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
