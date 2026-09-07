@@ -2446,8 +2446,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         
         for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
-          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
-          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
+          const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
@@ -2532,8 +2532,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
         for (let c = 1; c <= 16; c++) {
           const cell = row.getCell(c);
-          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
-          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
+          const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
@@ -2607,8 +2607,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     row.values = vals;
     for (let c = 1; c <= 16; c++) {
       const cell = row.getCell(c);
-          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
-          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
+          const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
@@ -2687,8 +2687,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       r.values = v;
       for (let c = 1; c <= 16; c++) {
         const cell = r.getCell(c);
-          const isNewDeptRow = (cell.row.getCell(1).value !== '' && cell.row.getCell(1).value !== null);
-          const isNewGroupRow = (cell.row.getCell(2).value !== '' && cell.row.getCell(2).value !== null);
+          const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
+          const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
