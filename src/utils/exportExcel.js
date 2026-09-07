@@ -2315,6 +2315,33 @@ export const exportUnifiedExcel = async (fileName, targetYear, departments, dept
 
 
 export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
+  const allHistoryYears = new Set();
+  employees.forEach(emp => {
+    (emp.history || []).forEach(h => {
+      if (h.year >= targetYear - 10 && h.year <= targetYear) {
+         allHistoryYears.add(h.year);
+      }
+    });
+  });
+  const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b);
+  const getAgeStr = (emp, isNext) => {
+    if (!emp || !emp.birthDate) return '';
+    const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
+    return age !== '' ? `${age}歳` : '';
+  };
+  const formatWithEra = (dateStr, birthDateStr = null) => {
+    let res = formatPromoDateWithEra(String(dateStr));
+    if (birthDateStr && dateStr) {
+      const match = String(dateStr).match(/^(\d{4})[-/]/);
+      if (match) {
+         const year = parseInt(match[1], 10);
+         const ag = calculateAge(birthDateStr, year);
+         if (ag) res += `(${ag}歳)`;
+      }
+    }
+    return res;
+  };
+
   const getEraSuffixLocal = (yearStr) => {
     const y = parseInt(yearStr);
     if (isNaN(y)) return '';
@@ -2704,13 +2731,11 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           }
 
           if (c >= 40) {
-             const histIdx = c - 40;
-             const hy = historyYears[histIdx];
-             const [hBg, hChange] = getHistoryColors(extEmp.history, hy);
-             if (hBg) {
-                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + hBg.replace('#', '').toUpperCase() } };
+             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } }; // Emerald (History)
+             const targetRow = typeof row !== 'undefined' ? row : (typeof r !== 'undefined' ? r : null);
+             if (targetRow && targetRow.changeIndexes && targetRow.changeIndexes.includes(c - 1)) {
+                 cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
-             if (hChange) cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
           }
           if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
              const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
@@ -2891,13 +2916,11 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         if (c === 10) cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
         
           if (c >= 40) {
-             const histIdx = c - 40;
-             const hy = historyYears[histIdx];
-             const [hBg, hChange] = getHistoryColors(extEmp.history, hy);
-             if (hBg) {
-                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + hBg.replace('#', '').toUpperCase() } };
+             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } }; // Emerald (History)
+             const targetRow = typeof row !== 'undefined' ? row : (typeof r !== 'undefined' ? r : null);
+             if (targetRow && targetRow.changeIndexes && targetRow.changeIndexes.includes(c - 1)) {
+                 cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
-             if (hChange) cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
           }
         if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
            const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
