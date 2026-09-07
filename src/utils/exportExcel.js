@@ -2412,6 +2412,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     if (dept.id === 'unassigned' || dept.id === 'retired') return;
     let dNamePrinted = false;
     let lastPrintedGroup = '';
+    let firstGroupPrinted = false;
     const currD = deptMap[dept.id] || { groups: {} };
 
     const getEmpIdsForPost = (groupObj, postId) => {
@@ -2453,7 +2454,16 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
-          if (c === 1 || c === 2) {
+          if (c === 1) {
+             if (isNewDeptRow) {
+                 topStyle = 'thick';
+             } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
+                 topStyle = 'thin';
+             } else {
+                 topStyle = null;
+             }
+             bottomStyle = null;
+          } else if (c === 2) {
              if (isNewDeptRow) {
                  topStyle = 'thick';
              } else if (isNewGroupRow) {
@@ -2483,9 +2493,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const vals = new Array(16).fill('');
 
         vals[0] = (!dNamePrinted) ? dept.name : ''; dNamePrinted = true;
-                if (idx === 0 && groupName && groupName !== lastPrintedGroup) {
+                let isFirstGroupOfDept = false;
+        if (idx === 0 && groupName && groupName !== lastPrintedGroup) {
           vals[1] = groupName;
           lastPrintedGroup = groupName;
+          if (!firstGroupPrinted) {
+             isFirstGroupOfDept = true;
+             firstGroupPrinted = true;
+          }
         } else {
           vals[1] = '';
         }
@@ -2547,7 +2562,16 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
-          if (c === 1 || c === 2) {
+          if (c === 1) {
+             if (isNewDeptRow) {
+                 topStyle = 'thick';
+             } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
+                 topStyle = 'thin';
+             } else {
+                 topStyle = null;
+             }
+             bottomStyle = null;
+          } else if (c === 2) {
              if (isNewDeptRow) {
                  topStyle = 'thick';
              } else if (isNewGroupRow) {
@@ -2625,7 +2649,16 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
-          if (c === 1 || c === 2) {
+          if (c === 1) {
+             if (isNewDeptRow) {
+                 topStyle = 'thick';
+             } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
+                 topStyle = 'thin';
+             } else {
+                 topStyle = null;
+             }
+             bottomStyle = null;
+          } else if (c === 2) {
              if (isNewDeptRow) {
                  topStyle = 'thick';
              } else if (isNewGroupRow) {
@@ -2708,7 +2741,16 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
-          if (c === 1 || c === 2) {
+          if (c === 1) {
+             if (isNewDeptRow) {
+                 topStyle = 'thick';
+             } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
+                 topStyle = 'thin';
+             } else {
+                 topStyle = null;
+             }
+             bottomStyle = null;
+          } else if (c === 2) {
              if (isNewDeptRow) {
                  topStyle = 'thick';
              } else if (isNewGroupRow) {
