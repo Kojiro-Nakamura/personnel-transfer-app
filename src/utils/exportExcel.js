@@ -2427,6 +2427,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
   const r5 = ws.getRow(5);
   const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '', '部署名', '班・グループ', '職名', '級', '年齢', '在籍', '備考'];
+  r5Vals.push('', '氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
+  historyYears.forEach(y => r5Vals.push(getEraFormattedYear(y)));
   r5.values = r5Vals;
   r5.height = 20;
 
@@ -2490,29 +2492,27 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     } else if (c === 18) {
       c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
       c5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-    } else if (c >= 19 && c <= 21) {
-      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
-      c5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
-    } else if (c >= 22 && c <= 29) {
-      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } };
-      c5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } };
-    } else if (c >= 30 && c <= 39) {
-      const promoColors = {
-        30: getPromotedBgColorCode('係長(主査)'),
-        31: getPromotedBgColorCode('補佐I(主任)'),
-        32: getPromotedBgColorCode('補佐II(班長)'),
-        33: getPromotedBgColorCode('補佐III(補佐兼班長)'),
-        34: getPromotedBgColorCode('課長'),
-        35: getPromotedBgColorCode('所属長'),
-        36: getPromotedBgColorCode('次長'),
-        37: getPromotedBgColorCode('部長')
-      };
-      const pColor = promoColors[c] || getPromotedBgColorCode('');
-      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + pColor.replace('#', '').toUpperCase() } };
+    } else if (c >= 19 && c <= 25) {
+      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } }; // Blue
       c5.fill = c4.fill;
-    } else if (c >= 40) {
-      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
-      c5.fill = c4.fill;    } else if (c !== 10) {
+    } else if (c >= 26 && c <= 35) {
+      const promoColors = {
+        31: getPromotedBgColorCode('係長(主査)'),
+        32: getPromotedBgColorCode('補佐I(主任)'),
+        33: getPromotedBgColorCode('補佐II(班長)'),
+        34: getPromotedBgColorCode('補佐III(補佐兼班長)'),
+        35: getPromotedBgColorCode('課長')
+      };
+      if (promoColors[c]) {
+         c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[c].replace('#', '').toUpperCase() } };
+      } else {
+         c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5D0FE' } }; // Fuchsia
+      }
+      c5.fill = c4.fill;
+    } else if (c >= 36) {
+      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } }; // Emerald
+      c5.fill = c4.fill;
+    } else if (c !== 10) {
       c4.fill = headerFill;
       c5.fill = headerFill;
     }
@@ -2676,6 +2676,102 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const ns = (emp.nextSkills || []).join('＋');
           vals[15] = ns ? `${ny}(${ns})` : `${ny}`;
           vals[16] = emp.nextEmploymentType || '';
+        }
+
+        const extEmp = emp;
+        if (extEmp) {
+          vals[18] = getFormattedNameForPlan(extEmp, true);
+          vals[19] = getAgeStr(extEmp, false);
+          vals[20] = extEmp.furigana || '';
+          vals[21] = shouldOmitEmployeeNumber(extEmp, true) ? '' : (extEmp.employeeNumber || '');
+          vals[22] = extEmp.gender || '';
+          vals[23] = formatWithEra(extEmp.birthDate);
+          vals[24] = extEmp.education || '';
+          vals[25] = formatWithEra(extEmp.hireDate, extEmp.birthDate);
+          vals[26] = extEmp.note || '';
+          vals[27] = extEmp.desiredAssignment ? '〇' + extEmp.desiredAssignment : '';
+          vals[28] = extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '';
+          
+          let hireStr = '';
+          if (extEmp.hireDate) {
+            hireStr = formatDateForDisplay(extEmp.hireDate);
+            const y = parseInt(String(extEmp.hireDate).split('-')[0], 10);
+            if (extEmp.birthDate && !isNaN(y)) {
+               const ag = calculateAge(extEmp.birthDate, y);
+               if (ag) hireStr += `(${ag}歳)`;
+            }
+          }
+          vals[29] = hireStr;
+          
+          const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+          const gradeList = ['', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級'];
+          for (let pi = 1; pi < pKeys.length; pi++) {
+            let pStr = '';
+            const key = pKeys[pi];
+            if (extEmp[key]) {
+               pStr = formatDateForDisplay(extEmp[key]);
+               const y = parseInt(String(extEmp[key]).split('-')[0], 10);
+               if (extEmp.birthDate && !isNaN(y)) {
+                 const ag = calculateAge(extEmp.birthDate, y);
+                 if (ag) pStr += `(${ag}歳)`;
+               }
+            }
+            vals[29 + pi] = pStr;
+          }
+          
+          let ny = '';
+          if (extEmp.nextGrade && extEmp.nextGrade !== '-' && extEmp.nextGrade !== '') {
+            if (extEmp.nextGrade === '10' && extEmp.nextEmploymentType) {
+              ny = extEmp.nextEmploymentType;
+            } else {
+              const gl = parseInt(extEmp.nextGrade, 10);
+              if (!isNaN(gl) && gl >= 1 && gl <= 8) {
+                ny = gradeList[gl];
+              }
+            }
+          }
+          vals[39] = ny;
+          
+          const changeIndexes = [];
+          let lastValidHStr = '-';
+          historyYears.forEach((hy, idx) => {
+             let hStr = '';
+             if (hy === targetYear) {
+                const nDept = departments.find(d => d.id === extEmp.departmentId);
+                const nGroup = nDept && extEmp.groupId ? (nDept.groups || []).find(g => g.id === extEmp.groupId) : null;
+                const p = extEmp.postId ? (nDept?.posts?.find(x => x.id === extEmp.postId) || nGroup?.posts?.find(x => x.id === extEmp.postId)) : null;
+                const d = nDept ? (nDept.nextName || nDept.name) : '';
+                const g = nGroup ? (nGroup.nextName || nGroup.name) : '';
+                const pStr = p ? (p.nextName || p.name) : '';
+                if (extEmp.departmentId === 'unassigned') hStr = '未配置';
+                else if (extEmp.departmentId === 'retired') hStr = '退職';
+                else if (d === 'システム用部署') hStr = '未配置';
+                else hStr = `${d} ${g}${pStr}`;
+             } else {
+                const hist = (extEmp.history || []).find(h => h.year === hy);
+                hStr = hist ? hist.department : '';
+             }
+             
+             let isChange = false;
+             if (hStr !== '' && hStr !== '-') {
+                if (hStr !== lastValidHStr) {
+                   isChange = true;
+                }
+                lastValidHStr = hStr;
+             }
+             
+             let displayStr = hStr;
+             if (hStr && hStr !== ' / 退職' && hStr !== '未配置' && hStr !== '-') {
+               const histAge = (extEmp.birthDate && !isNaN(hy)) ? calculateAge(extEmp.birthDate, hy) : null;
+               if (histAge) displayStr += ` (${histAge}歳)`;
+             }
+             
+             vals[40 + idx] = displayStr;
+             if (isChange) {
+                changeIndexes.push(40 + idx);
+             }
+          });
+          row.changeIndexes = changeIndexes;
         }
 
         row.values = vals;
@@ -2868,8 +2964,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const ny = emp.nextYears || 0;
         const ns = (emp.nextSkills || []).join('＋');
         v[15] = ns ? `${ny}(${ns})` : `${ny}`;
-        v[16] = emp.nextEmploymentType || '';
-      }
+          v[16] = emp.nextEmploymentType || '';
+        }
+
         const extEmp = emp;
         if (extEmp) {
           v[18] = getFormattedNameForPlan(extEmp, true);
@@ -2965,8 +3062,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           });
           r.changeIndexes = changeIndexes;
         }
-        r.values = vals;
 
+        r.values = vals;
   for (let c = 1; c <= totalCols; c++) {
         const cell = r.getCell(c);
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
