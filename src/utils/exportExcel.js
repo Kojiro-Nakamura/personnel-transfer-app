@@ -2597,7 +2597,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           if (c === 7 || c === 8 || c === 14 || c === 15) {
              cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
           }
-          if (c === 9) {
+          if (c === 10) {
              cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
              cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
           }
