@@ -161,8 +161,8 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
   });
 
   
-  const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 39 + currYearIndex;
+  const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
+  const legendEndCol = 37 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -873,8 +873,8 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(3).getCell(14).value = '＜参考＞';
   ws.getRow(3).getCell(14).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
 
-  const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 35 + currYearIndex;
+  const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
+  const legendEndCol = 35 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -1872,8 +1872,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   r2.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r2.height = 13;
 
-  const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 36 + currYearIndex;
+  const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
+  const legendEndCol = 34 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -2418,8 +2418,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getCell('A3').alignment = { shrinkToFit: true, vertical: 'middle' };
   
   // Add legend
-  const currYearIndex = Math.max(0, historyYears.indexOf(targetYear - 1));
-  const legendEndCol = 42 + currYearIndex;
+  const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
+  const legendEndCol = 40 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
   
