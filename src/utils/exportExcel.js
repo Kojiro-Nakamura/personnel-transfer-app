@@ -2411,6 +2411,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   departments.forEach((dept) => {
     if (dept.id === 'unassigned' || dept.id === 'retired') return;
     let dNamePrinted = false;
+    let lastPrintedGroup = '';
     const currD = deptMap[dept.id] || { groups: {} };
 
     const getEmpIdsForPost = (groupObj, postId) => {
@@ -2449,15 +2450,26 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
+          let structDeptHighlight = isNewDeptRow;
+          let structGroupHighlight = isNewDeptRow || isNewGroupRow;
+          
+          if (typeof idx !== 'undefined' && typeof groupName !== 'undefined' && typeof postName !== 'undefined') {
+             const isPostRow = (idx === 0 && !!postName);
+             const isDeptPost = isPostRow && !groupName;
+             const isGroupPost = isPostRow && !!groupName;
+             structDeptHighlight = isNewDeptRow || isDeptPost;
+             structGroupHighlight = structDeptHighlight || isNewGroupRow || isGroupPost;
+          }
+
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = isNewDeptRow ? 'thin' : null;
+             bottomStyle = structDeptHighlight ? 'thin' : null;
           } else if (c === 2) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
+             bottomStyle = structGroupHighlight ? 'thin' : null;
           }
 
           let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
@@ -2479,7 +2491,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const vals = new Array(16).fill('');
 
         vals[0] = (!dNamePrinted) ? dept.name : ''; dNamePrinted = true;
-        vals[1] = (idx === 0 && groupName) ? groupName : '';
+                if (idx === 0 && groupName && groupName !== lastPrintedGroup) {
+          vals[1] = groupName;
+          lastPrintedGroup = groupName;
+        } else {
+          vals[1] = '';
+        }
         vals[2] = (idx === 0 && postName) ? postName : '';
         
         vals[3] = emp.currentTitle || '';
@@ -2535,15 +2552,26 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
+          let structDeptHighlight = isNewDeptRow;
+          let structGroupHighlight = isNewDeptRow || isNewGroupRow;
+          
+          if (typeof idx !== 'undefined' && typeof groupName !== 'undefined' && typeof postName !== 'undefined') {
+             const isPostRow = (idx === 0 && !!postName);
+             const isDeptPost = isPostRow && !groupName;
+             const isGroupPost = isPostRow && !!groupName;
+             structDeptHighlight = isNewDeptRow || isDeptPost;
+             structGroupHighlight = structDeptHighlight || isNewGroupRow || isGroupPost;
+          }
+
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = isNewDeptRow ? 'thin' : null;
+             bottomStyle = structDeptHighlight ? 'thin' : null;
           } else if (c === 2) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
+             bottomStyle = structGroupHighlight ? 'thin' : null;
           }
 
           let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
@@ -2610,15 +2638,26 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
+          let structDeptHighlight = isNewDeptRow;
+          let structGroupHighlight = isNewDeptRow || isNewGroupRow;
+          
+          if (typeof idx !== 'undefined' && typeof groupName !== 'undefined' && typeof postName !== 'undefined') {
+             const isPostRow = (idx === 0 && !!postName);
+             const isDeptPost = isPostRow && !groupName;
+             const isGroupPost = isPostRow && !!groupName;
+             structDeptHighlight = isNewDeptRow || isDeptPost;
+             structGroupHighlight = structDeptHighlight || isNewGroupRow || isGroupPost;
+          }
+
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = isNewDeptRow ? 'thin' : null;
+             bottomStyle = structDeptHighlight ? 'thin' : null;
           } else if (c === 2) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
+             bottomStyle = structGroupHighlight ? 'thin' : null;
           }
 
           let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
@@ -2690,15 +2729,26 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
+          let structDeptHighlight = isNewDeptRow;
+          let structGroupHighlight = isNewDeptRow || isNewGroupRow;
+          
+          if (typeof idx !== 'undefined' && typeof groupName !== 'undefined' && typeof postName !== 'undefined') {
+             const isPostRow = (idx === 0 && !!postName);
+             const isDeptPost = isPostRow && !groupName;
+             const isGroupPost = isPostRow && !!groupName;
+             structDeptHighlight = isNewDeptRow || isDeptPost;
+             structGroupHighlight = structDeptHighlight || isNewGroupRow || isGroupPost;
+          }
+
           let topStyle = isNewDeptRow ? 'thick' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = isNewDeptRow ? 'thin' : null;
+             bottomStyle = structDeptHighlight ? 'thin' : null;
           } else if (c === 2) {
              if (!isNewDeptRow) topStyle = null;
-             bottomStyle = (isNewDeptRow || isNewGroupRow) ? 'thin' : null;
+             bottomStyle = structGroupHighlight ? 'thin' : null;
           }
 
           let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
