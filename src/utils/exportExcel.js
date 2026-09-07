@@ -2316,11 +2316,10 @@ export const exportUnifiedExcel = async (fileName, targetYear, departments, dept
 
 export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
   const allHistoryYears = new Set();
+  allHistoryYears.add(targetYear);
   employees.forEach(emp => {
     (emp.history || []).forEach(h => {
-      if (h.year >= targetYear - 10 && h.year <= targetYear) {
-         allHistoryYears.add(h.year);
-      }
+      allHistoryYears.add(h.year);
     });
   });
   const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b);
