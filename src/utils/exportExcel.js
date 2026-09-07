@@ -2440,11 +2440,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   r5.height = 20;
 
 
-  if (historyYears.length > 0) {
-    const endColCode = ws.getColumn(39 + historyYears.length).letter;
-    const startColCode = ws.getColumn(40).letter;
-    ws.mergeCells(`${startColCode}5:${endColCode}5`);
-  }
+
 
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
@@ -2766,7 +2762,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
               }
             }
           }
-          vals[39] = ny;
+          vals[38] = ny;
           
           const changeIndexes = [];
           const promoYearMap = {};
@@ -2813,9 +2809,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                if (histAge) displayStr += ` (${histAge}歳)`;
              }
              
-             vals[40 + idx] = displayStr;
+             vals[39 + idx] = displayStr;
              if (isChange) {
-                changeIndexes.push(40 + idx);
+                changeIndexes.push(39 + idx);
              }
           });
           row.changeIndexes = changeIndexes;
@@ -3078,7 +3074,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
               }
             }
           }
-          v[39] = ny;
+          v[38] = ny;
           
           const changeIndexes = [];
           const promoYearMap = {};
@@ -3125,9 +3121,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                if (histAge) displayStr += ` (${histAge}歳)`;
              }
              
-             v[40 + idx] = displayStr;
+             v[39 + idx] = displayStr;
              if (isChange) {
-                changeIndexes.push(40 + idx);
+                changeIndexes.push(39 + idx);
              }
           });
           r.changeIndexes = changeIndexes;
