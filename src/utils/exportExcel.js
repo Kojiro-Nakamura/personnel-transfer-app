@@ -1729,7 +1729,7 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const workbook = new ExcelJS.Workbook();
   addSimplePlanSheet(workbook, '人事異動案（シンプル）', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   addPlanSheet(workbook, '人事異動案', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
-  addCurrentBasePlanSheet(workbook, '人事異動案（今年度ベース）', fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
+  addCurrentBasePlanSheet(workbook, `R${targetYear - 2019}→R${targetYear - 2018}`, fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount);
   addListSheet(workbook, '職員一覧', fileName, targetYear, employees, departments);
     addBirthYearSheet(workbook, '生年別一覧（今年度）', targetYear, employees, departments, false);
     addBirthYearSheet(workbook, '生年別一覧（来年度）', targetYear, employees, departments, true);
@@ -2380,8 +2380,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.mergeCells('J4:P4');
 
   const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
-  const currFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFBEB' } };
-  const nextFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F9FF' } };
+  const currFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+  const nextFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
   const borderStyle = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
 
   for (let c = 1; c <= 16; c++) {
@@ -2394,13 +2394,13 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     c4.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
     c5.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
 
-    if (c >= 4 && c <= 9) {
+    if (c >= 4 && c <= 8) {
       c4.fill = currFill;
       c5.fill = currFill;
-    } else if (c >= 11 && c <= 17) {
+    } else if (c >= 10 && c <= 16) {
       c4.fill = nextFill;
       c5.fill = nextFill;
-    } else {
+    } else if (c !== 9) {
       c4.fill = headerFill;
       c5.fill = headerFill;
     }
@@ -2481,7 +2481,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         vals[7] = cs ? `${cy}(${cs})` : `${cy}`;
         
 
-        vals[8] = '→';
+        vals[8] = '⇒';
 
         const getDeptNameStr = (dId) => {
            if (dId === 'unassigned') return '未配置';
@@ -2541,6 +2541,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           }
           if (c === 9) {
              cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+             cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
           }
 
           if (c >= 10 && c <= 16 && !isRetired && !isUnassigned) {
@@ -2617,7 +2618,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       const cy = emp.currentYears || 0;
       const cs = (emp.currentSkills || []).join('＋');
       v[7] = cs ? `${cy}(${cs})` : `${cy}`;
-      v[8] = '→';
+      v[8] = '⇒';
 
       const getDeptNameStr = (dId) => {
          if (dId === 'unassigned') return '未配置';
@@ -2668,6 +2669,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
         if (c === 5) cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
         if (c === 7 || c === 8 || c === 9 || c === 14 || c === 15) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
+        if (c === 9) cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
         
         if (c >= 10 && c <= 16 && !isRetired && !isUnassigned) {
            const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
