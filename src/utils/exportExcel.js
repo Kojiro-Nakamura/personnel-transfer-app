@@ -2415,8 +2415,11 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   const endTitleCol = ws.getColumn(17 + extraCols.length).letter;
   ws.mergeCells(`A2:${endTitleCol}2`);
   ws.getCell('A2').alignment = { shrinkToFit: true, vertical: 'middle' };
-  ws.mergeCells(`A3:${endTitleCol}3`);
+  ws.mergeCells(`A3:Q3`);
   ws.getCell('A3').alignment = { shrinkToFit: true, vertical: 'middle' };
+  const r3 = ws.getRow(3);
+  r3.getCell(19).value = '＜参考＞';
+  r3.getCell(19).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
 
   const r4 = ws.getRow(4);
   const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', ''];
@@ -2449,7 +2452,11 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.mergeCells('K4:Q4');
 
   ws.mergeCells('R4:R5');
-  ws.mergeCells('S4:AM4');
+  ws.mergeCells('S4:S5');
+  ws.mergeCells('T4:T5');
+  ws.mergeCells('U4:U5');
+  ws.mergeCells('V4:AC4');
+  ws.mergeCells('AD4:AM4');
   if (historyYears.length > 0) {
     const endColCode = ws.getColumn(39 + historyYears.length).letter;
     const startColCode = ws.getColumn(40).letter;
@@ -2492,16 +2499,22 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     } else if (c === 18) {
       c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
       c5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
-    } else if (c >= 19 && c <= 25) {
+    } else if (c >= 19 && c <= 21) {
+      c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } }; // Slate
+      c5.fill = c4.fill;
+    } else if (c >= 22 && c <= 29) {
       c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFDBFE' } }; // Blue
       c5.fill = c4.fill;
-    } else if (c >= 26 && c <= 35) {
+    } else if (c >= 30 && c <= 39) {
       const promoColors = {
         31: getPromotedBgColorCode('係長(主査)'),
         32: getPromotedBgColorCode('補佐I(主任)'),
         33: getPromotedBgColorCode('補佐II(班長)'),
         34: getPromotedBgColorCode('補佐III(補佐兼班長)'),
-        35: getPromotedBgColorCode('課長')
+        35: getPromotedBgColorCode('課長'),
+        36: getPromotedBgColorCode('所属長'),
+        37: getPromotedBgColorCode('次長'),
+        38: getPromotedBgColorCode('部長')
       };
       if (promoColors[c]) {
          c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[c].replace('#', '').toUpperCase() } };
@@ -2509,7 +2522,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
          c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5D0FE' } }; // Fuchsia
       }
       c5.fill = c4.fill;
-    } else if (c >= 36) {
+    } else if (c >= 40) {
       c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } }; // Emerald
       c5.fill = c4.fill;
     } else if (c !== 10) {
@@ -2525,7 +2538,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getCell('J4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
   ws.getCell('D4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
   ws.getCell('K4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
-  ws.getCell('R4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
+  ws.getCell('R4').border = { left: { style: 'thin' }, right: { style: 'thin' } };
+  ws.getCell('R5').border = { left: { style: 'thin' }, right: { style: 'thin' } };
   ws.getCell('S4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
 
 
@@ -2594,6 +2608,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              } else {
                  topStyle = null;
              }
+             bottomStyle = null;
+          } else if (c === 18) {
+             topStyle = null;
              bottomStyle = null;
           }
 
@@ -2802,6 +2819,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  topStyle = null;
              }
              bottomStyle = null;
+          } else if (c === 18) {
+             topStyle = null;
+             bottomStyle = null;
           }
 
           const isLeftEdge = [1, 4, 11, 19, 22, 30, 40].includes(c);
@@ -2897,6 +2917,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              } else {
                  topStyle = null;
              }
+             bottomStyle = null;
+          } else if (c === 18) {
+             topStyle = null;
              bottomStyle = null;
           }
 
@@ -3089,6 +3112,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              } else {
                  topStyle = null;
              }
+             bottomStyle = null;
+          } else if (c === 18) {
+             topStyle = null;
              bottomStyle = null;
           }
 
