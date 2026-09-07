@@ -2418,6 +2418,15 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
     }
   }
 
+  // Fix borders for merged cells
+  ws.getCell('A4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'medium' }, right: { style: 'thin' } };
+  ws.getCell('B4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
+  ws.getCell('C4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'medium' } };
+  ws.getCell('J4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
+  ws.getCell('D4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
+  ws.getCell('K4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
+
+
   let currentRowIndex = 6;
 
   departments.forEach((dept) => {
