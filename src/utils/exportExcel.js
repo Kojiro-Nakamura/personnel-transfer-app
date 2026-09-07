@@ -2434,14 +2434,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
   const r5 = ws.getRow(5);
   const r5Vals = ['', '', '', '職名', '氏名', '級', '年齢', '在籍', '備考', '', '部署名', '班・グループ', '職名', '級', '年齢', '在籍', '備考'];
-  r5Vals.push('', '氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
+  r5Vals.push('', '氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '配属希望', '特殊事情', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
   historyYears.forEach(y => r5Vals.push(getEraFormattedYear(y)));
   r5.values = r5Vals;
   r5.height = 20;
 
-  ws.mergeCells('W5:X5');
-  ws.mergeCells('AB5:AC5');
-  ws.mergeCells('AD5:AM5');
+
   if (historyYears.length > 0) {
     const endColCode = ws.getColumn(39 + historyYears.length).letter;
     const startColCode = ws.getColumn(40).letter;
@@ -2544,12 +2542,24 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getCell('K4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
   ws.getCell('R4').border = { left: { style: 'thin' }, right: { style: 'thin' } };
   ws.getCell('R5').border = { left: { style: 'thin' }, right: { style: 'thin' } };
-  ws.getCell('S4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'medium' }, right: { style: 'thin' } };
-  ws.getCell('S5').border = { left: { style: 'medium' }, right: { style: 'thin' } };
-  ws.getCell('T4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
-  ws.getCell('T5').border = { left: { style: 'thin' }, right: { style: 'thin' } };
-  ws.getCell('U4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'medium' } };
-  ws.getCell('U5').border = { left: { style: 'thin' }, right: { style: 'medium' } };
+  
+  // Custom borders for Reference Section
+  for (let c = 19; c <= totalCols; c++) {
+     let leftStyle = 'thin';
+     let rightStyle = 'thin';
+     
+     if ([19, 22, 30, 40].includes(c)) leftStyle = 'medium';
+     if ([21, 29, 39, totalCols].includes(c)) rightStyle = 'medium';
+     
+     if (c >= 19 && c <= 21) {
+        // Vertically merged (S4:S5, T4:T5, U4:U5)
+        ws.getCell(4, c).border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: leftStyle }, right: { style: rightStyle } };
+     } else {
+        // Horizontally merged in row 4, individual in row 5
+        ws.getCell(4, c).border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: leftStyle }, right: { style: rightStyle } };
+        ws.getCell(5, c).border = { top: { style: 'thin' }, bottom: { style: 'medium' }, left: { style: leftStyle }, right: { style: rightStyle } };
+     }
+  }
 
 
   let currentRowIndex = 6;
@@ -2759,6 +2769,17 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           vals[39] = ny;
           
           const changeIndexes = [];
+          const promoYearMap = {};
+          if (emp.promoYearChief) promoYearMap[parseInt(String(emp.promoYearChief).split('-')[0])] = "係長(主査)";
+          if (emp.promoYearAssistant1) promoYearMap[parseInt(String(emp.promoYearAssistant1).split('-')[0])] = "補佐I(主任)";
+          if (emp.promoYearAssistant2) promoYearMap[parseInt(String(emp.promoYearAssistant2).split('-')[0])] = "補佐II(班長)";
+          if (emp.promoYearAssistant3) promoYearMap[parseInt(String(emp.promoYearAssistant3).split('-')[0])] = "補佐III(補佐兼班長)";
+          if (emp.promoYearSecHead) promoYearMap[parseInt(String(emp.promoYearSecHead).split('-')[0])] = "課長";
+          if (emp.promoYearDivHead) promoYearMap[parseInt(String(emp.promoYearDivHead).split('-')[0])] = "所属長";
+          if (emp.promoYearDeputyHead) promoYearMap[parseInt(String(emp.promoYearDeputyHead).split('-')[0])] = "次長";
+          if (emp.promoYearDeptHead) promoYearMap[parseInt(String(emp.promoYearDeptHead).split('-')[0])] = "部長";
+          r.promoYearMap = promoYearMap;
+
           let lastValidHStr = '-';
           historyYears.forEach((hy, idx) => {
              let hStr = '';
@@ -2854,8 +2875,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           }
 
           if (c >= 40) {
-             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } }; // Emerald (History)
              const targetRow = typeof row !== 'undefined' ? row : (typeof r !== 'undefined' ? r : null);
+             const targetYear = historyYears[c - 40];
+             let bgColor = 'FFA7F3D0'; // Emerald default
+             if (targetRow && targetRow.promoYearMap && targetRow.promoYearMap[targetYear]) {
+                const pColor = getPromotedBgColorCode(targetRow.promoYearMap[targetYear]);
+                if (pColor) bgColor = 'FF' + pColor.replace('#', '').toUpperCase();
+             }
+             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
              if (targetRow && targetRow.changeIndexes && targetRow.changeIndexes.includes(c - 1)) {
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
@@ -3054,6 +3081,17 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           v[39] = ny;
           
           const changeIndexes = [];
+          const promoYearMap = {};
+          if (emp.promoYearChief) promoYearMap[parseInt(String(emp.promoYearChief).split('-')[0])] = "係長(主査)";
+          if (emp.promoYearAssistant1) promoYearMap[parseInt(String(emp.promoYearAssistant1).split('-')[0])] = "補佐I(主任)";
+          if (emp.promoYearAssistant2) promoYearMap[parseInt(String(emp.promoYearAssistant2).split('-')[0])] = "補佐II(班長)";
+          if (emp.promoYearAssistant3) promoYearMap[parseInt(String(emp.promoYearAssistant3).split('-')[0])] = "補佐III(補佐兼班長)";
+          if (emp.promoYearSecHead) promoYearMap[parseInt(String(emp.promoYearSecHead).split('-')[0])] = "課長";
+          if (emp.promoYearDivHead) promoYearMap[parseInt(String(emp.promoYearDivHead).split('-')[0])] = "所属長";
+          if (emp.promoYearDeputyHead) promoYearMap[parseInt(String(emp.promoYearDeputyHead).split('-')[0])] = "次長";
+          if (emp.promoYearDeptHead) promoYearMap[parseInt(String(emp.promoYearDeptHead).split('-')[0])] = "部長";
+          r.promoYearMap = promoYearMap;
+
           let lastValidHStr = '-';
           historyYears.forEach((hy, idx) => {
              let hStr = '';
@@ -3140,8 +3178,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         if (c === 10) cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
         
           if (c >= 40) {
-             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA7F3D0' } }; // Emerald (History)
              const targetRow = typeof row !== 'undefined' ? row : (typeof r !== 'undefined' ? r : null);
+             const targetYear = historyYears[c - 40];
+             let bgColor = 'FFA7F3D0'; // Emerald default
+             if (targetRow && targetRow.promoYearMap && targetRow.promoYearMap[targetYear]) {
+                const pColor = getPromotedBgColorCode(targetRow.promoYearMap[targetYear]);
+                if (pColor) bgColor = 'FF' + pColor.replace('#', '').toUpperCase();
+             }
+             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
              if (targetRow && targetRow.changeIndexes && targetRow.changeIndexes.includes(c - 1)) {
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
