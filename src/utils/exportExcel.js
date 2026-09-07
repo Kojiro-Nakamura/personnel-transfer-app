@@ -2516,7 +2516,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         vals[7] = cs ? `${cy}(${cs})` : `${cy}`;
         
 
-        vals[8] = '→';
+        vals[8] = emp.currentEmploymentType || '';
+        vals[9] = '→';
 
         const getDeptNameStr = (dId) => {
            if (dId === 'unassigned') return '未配置';
@@ -2535,22 +2536,22 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const isRetired = emp.departmentId === 'retired';
 
         if (isRetired) {
-          vals[9] = '退職';
-          vals[13] = calculateAge(emp.birthDate, targetYear);
+          vals[10] = '退職';
+          vals[14] = calculateAge(emp.birthDate, targetYear);
         } else if (isUnassigned) {
-          vals[9] = '未配置';
-          vals[13] = calculateAge(emp.birthDate, targetYear);
-          vals[15] = emp.nextEmploymentType || '';
+          vals[10] = '未配置';
+          vals[14] = calculateAge(emp.birthDate, targetYear);
+          vals[16] = emp.nextEmploymentType || '';
         } else {
-          vals[9] = getDeptNameStr(emp.departmentId);
-          vals[10] = getGroupNameStr(emp.departmentId, emp.groupId);
-          vals[11] = emp.nextTitle || '';
-          vals[12] = emp.nextGrade || '';
-          vals[13] = calculateAge(emp.birthDate, targetYear);
+          vals[10] = getDeptNameStr(emp.departmentId);
+          vals[11] = getGroupNameStr(emp.departmentId, emp.groupId);
+          vals[12] = emp.nextTitle || '';
+          vals[13] = emp.nextGrade || '';
+          vals[14] = calculateAge(emp.birthDate, targetYear);
           const ny = emp.nextYears || 0;
           const ns = (emp.nextSkills || []).join('＋');
-          vals[14] = ns ? `${ny}(${ns})` : `${ny}`;
-          vals[15] = emp.nextEmploymentType || '';
+          vals[15] = ns ? `${ny}(${ns})` : `${ny}`;
+          vals[16] = emp.nextEmploymentType || '';
         }
 
         row.values = vals;
@@ -2697,7 +2698,8 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       const cy = emp.currentYears || 0;
       const cs = (emp.currentSkills || []).join('＋');
       v[7] = cs ? `${cy}(${cs})` : `${cy}`;
-      v[8] = '→';
+      v[8] = emp.currentEmploymentType || '';
+      v[9] = '→';
 
       const getDeptNameStr = (dId) => {
          if (dId === 'unassigned') return '未配置';
@@ -2716,22 +2718,22 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       const isRetired = emp.departmentId === 'retired';
 
       if (isRetired) {
-        v[9] = '退職';
-        v[13] = calculateAge(emp.birthDate, targetYear);
+        v[10] = '退職';
+        v[14] = calculateAge(emp.birthDate, targetYear);
       } else if (isUnassigned) {
-        v[9] = '未配置';
-        v[13] = calculateAge(emp.birthDate, targetYear);
-        v[15] = emp.nextEmploymentType || '';
+        v[10] = '未配置';
+        v[14] = calculateAge(emp.birthDate, targetYear);
+        v[16] = emp.nextEmploymentType || '';
       } else {
-        v[9] = getDeptNameStr(emp.departmentId);
-        v[10] = getGroupNameStr(emp.departmentId, emp.groupId);
-        v[11] = emp.nextTitle || '';
-        v[12] = emp.nextGrade || '';
-        v[13] = calculateAge(emp.birthDate, targetYear);
+        v[10] = getDeptNameStr(emp.departmentId);
+        v[11] = getGroupNameStr(emp.departmentId, emp.groupId);
+        v[12] = emp.nextTitle || '';
+        v[13] = emp.nextGrade || '';
+        v[14] = calculateAge(emp.birthDate, targetYear);
         const ny = emp.nextYears || 0;
         const ns = (emp.nextSkills || []).join('＋');
-        v[14] = ns ? `${ny}(${ns})` : `${ny}`;
-        v[15] = emp.nextEmploymentType || '';
+        v[15] = ns ? `${ny}(${ns})` : `${ny}`;
+        v[16] = emp.nextEmploymentType || '';
       }
       r.values = v;
       for (let c = 1; c <= 17; c++) {
