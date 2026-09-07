@@ -2504,14 +2504,14 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
       c5.fill = c4.fill;
     } else if (c >= 30 && c <= 39) {
       const promoColors = {
-        31: getPromotedBgColorCode('係長(主査)'),
-        32: getPromotedBgColorCode('補佐I(主任)'),
-        33: getPromotedBgColorCode('補佐II(班長)'),
-        34: getPromotedBgColorCode('補佐III(補佐兼班長)'),
-        35: getPromotedBgColorCode('課長'),
-        36: getPromotedBgColorCode('所属長'),
-        37: getPromotedBgColorCode('次長'),
-        38: getPromotedBgColorCode('部長')
+        31: getPromotedBgColorCode('係長級(主査)'),
+        32: getPromotedBgColorCode('補佐級I(主任)'),
+        33: getPromotedBgColorCode('補佐級II(班長)'),
+        34: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
+        35: getPromotedBgColorCode('課長級'),
+        36: getPromotedBgColorCode('所属長級'),
+        37: getPromotedBgColorCode('次長級'),
+        38: getPromotedBgColorCode('部長級')
       };
       if (promoColors[c]) {
          c4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[c].replace('#', '').toUpperCase() } };
@@ -2882,7 +2882,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
           }
-          if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
+          if (((c >= 11 && c <= 17) || c === 4 || c === 5 || c === 19 || c === 39) && !isRetired && !isUnassigned) {
              const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
              const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
              if (nextPromoColor) {
@@ -3185,7 +3185,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true, italic: true };
              }
           }
-        if (c >= 11 && c <= 17 && !isRetired && !isUnassigned) {
+        if (((c >= 11 && c <= 17) || c === 4 || c === 5 || c === 19 || c === 39) && !isRetired && !isUnassigned) {
            const isNextPromoted = getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade);
            const nextPromoColor = isNextPromoted ? getPromotedBgColorCode(emp.nextGrade) : null;
            if (nextPromoColor) {
