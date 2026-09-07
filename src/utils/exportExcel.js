@@ -2569,7 +2569,6 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         vals[2] = postName || '';
         row.values = vals;
         
-  const totalCols = 17 + extraCols.length;
   for (let c = 1; c <= totalCols; c++) {
           const cell = row.getCell(c);
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
@@ -2681,7 +2680,6 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
         row.values = vals;
 
-  const totalCols = 17 + extraCols.length;
   for (let c = 1; c <= totalCols; c++) {
           const cell = row.getCell(c);
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
@@ -2778,7 +2776,6 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         const vals = new Array(totalCols).fill('');
     vals[0] = '未配置';
     row.values = vals;
-  const totalCols = 17 + extraCols.length;
   for (let c = 1; c <= totalCols; c++) {
       const cell = row.getCell(c);
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
@@ -2873,8 +2870,103 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
         v[15] = ns ? `${ny}(${ns})` : `${ny}`;
         v[16] = emp.nextEmploymentType || '';
       }
-      r.values = v;
-  const totalCols = 17 + extraCols.length;
+        const extEmp = emp;
+        if (extEmp) {
+          v[18] = getFormattedNameForPlan(extEmp, true);
+          v[19] = getAgeStr(extEmp, false);
+          v[20] = extEmp.furigana || '';
+          v[21] = shouldOmitEmployeeNumber(extEmp, true) ? '' : (extEmp.employeeNumber || '');
+          v[22] = extEmp.gender || '';
+          v[23] = formatWithEra(extEmp.birthDate);
+          v[24] = extEmp.education || '';
+          v[25] = formatWithEra(extEmp.hireDate, extEmp.birthDate);
+          v[26] = extEmp.note || '';
+          v[27] = extEmp.desiredAssignment ? '〇' + extEmp.desiredAssignment : '';
+          v[28] = extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '';
+          
+          let hireStr = '';
+          if (extEmp.hireDate) {
+            hireStr = formatDateForDisplay(extEmp.hireDate);
+            const y = parseInt(String(extEmp.hireDate).split('-')[0], 10);
+            if (extEmp.birthDate && !isNaN(y)) {
+               const ag = calculateAge(extEmp.birthDate, y);
+               if (ag) hireStr += `(${ag}歳)`;
+            }
+          }
+          v[29] = hireStr;
+          
+          const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+          const gradeList = ['', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級'];
+          for (let pi = 1; pi < pKeys.length; pi++) {
+            let pStr = '';
+            const key = pKeys[pi];
+            if (extEmp[key]) {
+               pStr = formatDateForDisplay(extEmp[key]);
+               const y = parseInt(String(extEmp[key]).split('-')[0], 10);
+               if (extEmp.birthDate && !isNaN(y)) {
+                 const ag = calculateAge(extEmp.birthDate, y);
+                 if (ag) pStr += `(${ag}歳)`;
+               }
+            }
+            v[29 + pi] = pStr;
+          }
+          
+          let ny = '';
+          if (extEmp.nextGrade && extEmp.nextGrade !== '-' && extEmp.nextGrade !== '') {
+            if (extEmp.nextGrade === '10' && extEmp.nextEmploymentType) {
+              ny = extEmp.nextEmploymentType;
+            } else {
+              const gl = parseInt(extEmp.nextGrade, 10);
+              if (!isNaN(gl) && gl >= 1 && gl <= 8) {
+                ny = gradeList[gl];
+              }
+            }
+          }
+          v[39] = ny;
+          
+          const changeIndexes = [];
+          let lastValidHStr = '-';
+          historyYears.forEach((hy, idx) => {
+             let hStr = '';
+             if (hy === targetYear) {
+                const nDept = departments.find(d => d.id === extEmp.departmentId);
+                const nGroup = nDept && extEmp.groupId ? (nDept.groups || []).find(g => g.id === extEmp.groupId) : null;
+                const p = extEmp.postId ? (nDept?.posts?.find(x => x.id === extEmp.postId) || nGroup?.posts?.find(x => x.id === extEmp.postId)) : null;
+                const d = nDept ? (nDept.nextName || nDept.name) : '';
+                const g = nGroup ? (nGroup.nextName || nGroup.name) : '';
+                const pStr = p ? (p.nextName || p.name) : '';
+                if (extEmp.departmentId === 'unassigned') hStr = '未配置';
+                else if (extEmp.departmentId === 'retired') hStr = '退職';
+                else if (d === 'システム用部署') hStr = '未配置';
+                else hStr = `${d} ${g}${pStr}`;
+             } else {
+                const hist = (extEmp.history || []).find(h => h.year === hy);
+                hStr = hist ? hist.department : '';
+             }
+             
+             let isChange = false;
+             if (hStr !== '' && hStr !== '-') {
+                if (hStr !== lastValidHStr) {
+                   isChange = true;
+                }
+                lastValidHStr = hStr;
+             }
+             
+             let displayStr = hStr;
+             if (hStr && hStr !== ' / 退職' && hStr !== '未配置' && hStr !== '-') {
+               const histAge = (extEmp.birthDate && !isNaN(hy)) ? calculateAge(extEmp.birthDate, hy) : null;
+               if (histAge) displayStr += ` (${histAge}歳)`;
+             }
+             
+             v[40 + idx] = displayStr;
+             if (isChange) {
+                changeIndexes.push(40 + idx);
+             }
+          });
+          r.changeIndexes = changeIndexes;
+        }
+        r.values = vals;
+
   for (let c = 1; c <= totalCols; c++) {
         const cell = r.getCell(c);
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
@@ -2936,7 +3028,6 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   
   const lastRow = ws.getRow(currentRowIndex - 1);
   if (lastRow && (currentRowIndex - 1) >= 6) {
-  const totalCols = 17 + extraCols.length;
   for (let c = 1; c <= totalCols; c++) {
       const cell = lastRow.getCell(c);
       if (cell.border) {
