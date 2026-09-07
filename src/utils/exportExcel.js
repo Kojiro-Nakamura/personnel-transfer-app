@@ -2423,8 +2423,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
 
   const r4 = ws.getRow(4);
   const r4Vals = ['部署名', '班・グループ', 'ポスト', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', ''];
-  r4Vals.push('', '＜参考＞', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
-  historyYears.forEach(() => r4Vals.push(''));
+  const currentEraShort = getEraFormattedYear(targetYear - 1).split('(')[1].replace(')', '');
+  r4Vals.push('', '氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇任年等', '', '', '', '', '', '', '', '', '');
+  historyYears.forEach((y, i) => {
+    if (i === 0) r4Vals.push('経歴');
+    else r4Vals.push('');
+  });
   r4.values = r4Vals;
   r4.height = 20;
 
@@ -2540,7 +2544,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getCell('K4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
   ws.getCell('R4').border = { left: { style: 'thin' }, right: { style: 'thin' } };
   ws.getCell('R5').border = { left: { style: 'thin' }, right: { style: 'thin' } };
-  ws.getCell('S4').border = { top: { style: 'medium' }, bottom: { style: 'thin' }, left: { style: 'medium' }, right: { style: 'medium' } };
+  ws.getCell('S4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'medium' }, right: { style: 'thin' } };
+  ws.getCell('S5').border = { left: { style: 'medium' }, right: { style: 'thin' } };
+  ws.getCell('T4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
+  ws.getCell('T5').border = { left: { style: 'thin' }, right: { style: 'thin' } };
+  ws.getCell('U4').border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'medium' } };
+  ws.getCell('U5').border = { left: { style: 'thin' }, right: { style: 'medium' } };
 
 
   let currentRowIndex = 6;
