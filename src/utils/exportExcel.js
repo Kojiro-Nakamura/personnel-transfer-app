@@ -2383,13 +2383,24 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
   const currFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
   const nextFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
-  const borderStyle = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
-
   for (let c = 1; c <= 17; c++) {
     const c4 = ws.getCell(4, c);
     const c5 = ws.getCell(5, c);
-    c4.border = borderStyle;
-    c5.border = borderStyle;
+    const isLeftEdge = [1, 4, 11].includes(c);
+    const isRightEdge = [3, 9, 17].includes(c);
+    
+    c4.border = {
+       top: { style: 'medium' },
+       bottom: { style: 'thin' },
+       left: { style: isLeftEdge ? 'medium' : 'thin' },
+       right: { style: isRightEdge ? 'medium' : 'thin' }
+    };
+    c5.border = {
+       top: { style: 'thin' },
+       bottom: { style: 'medium' },
+       left: { style: isLeftEdge ? 'medium' : 'thin' },
+       right: { style: isRightEdge ? 'medium' : 'thin' }
+    };
     c4.alignment = { horizontal: 'center', vertical: 'middle' };
     c5.alignment = { horizontal: 'center', vertical: 'middle' };
     c4.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };
@@ -2452,12 +2463,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
-          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let topStyle = isNewDeptRow ? 'medium' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
                  topStyle = 'thin';
              } else {
@@ -2466,7 +2477,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           } else if (c === 2) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow) {
                  topStyle = 'thin';
              } else {
@@ -2475,7 +2486,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           }
 
-          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          const isLeftEdge = [1, 4, 11].includes(c);
+          const isRightEdge = [3, 9, 17].includes(c);
+          let cBorder = { left: { style: isLeftEdge ? 'medium' : 'thin' }, right: { style: isRightEdge ? 'medium' : 'thin' } };
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
@@ -2561,12 +2574,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
-          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let topStyle = isNewDeptRow ? 'medium' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
                  topStyle = 'thin';
              } else {
@@ -2575,7 +2588,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           } else if (c === 2) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow) {
                  topStyle = 'thin';
              } else {
@@ -2584,7 +2597,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           }
 
-          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          const isLeftEdge = [1, 4, 11].includes(c);
+          const isRightEdge = [3, 9, 17].includes(c);
+          let cBorder = { left: { style: isLeftEdge ? 'medium' : 'thin' }, right: { style: isRightEdge ? 'medium' : 'thin' } };
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
@@ -2648,12 +2663,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
-          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let topStyle = isNewDeptRow ? 'medium' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
                  topStyle = 'thin';
              } else {
@@ -2662,7 +2677,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           } else if (c === 2) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow) {
                  topStyle = 'thin';
              } else {
@@ -2671,7 +2686,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           }
 
-          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          const isLeftEdge = [1, 4, 11].includes(c);
+          const isRightEdge = [3, 9, 17].includes(c);
+          let cBorder = { left: { style: isLeftEdge ? 'medium' : 'thin' }, right: { style: isRightEdge ? 'medium' : 'thin' } };
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
@@ -2741,12 +2758,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const isNewDeptRow = (ws.getCell(cell.row, 1).value !== '' && ws.getCell(cell.row, 1).value !== null);
           const isNewGroupRow = (ws.getCell(cell.row, 2).value !== '' && ws.getCell(cell.row, 2).value !== null);
           
-          let topStyle = isNewDeptRow ? 'thick' : 'thin';
+          let topStyle = isNewDeptRow ? 'medium' : 'thin';
           let bottomStyle = 'thin';
 
           if (c === 1) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow && typeof isFirstGroupOfDept !== 'undefined' && isFirstGroupOfDept) {
                  topStyle = 'thin';
              } else {
@@ -2755,7 +2772,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           } else if (c === 2) {
              if (isNewDeptRow) {
-                 topStyle = 'thick';
+                 topStyle = 'medium';
              } else if (isNewGroupRow) {
                  topStyle = 'thin';
              } else {
@@ -2764,7 +2781,9 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
              bottomStyle = null;
           }
 
-          let cBorder = { left: { style: 'thin' }, right: { style: 'thin' } };
+          const isLeftEdge = [1, 4, 11].includes(c);
+          const isRightEdge = [3, 9, 17].includes(c);
+          let cBorder = { left: { style: isLeftEdge ? 'medium' : 'thin' }, right: { style: isRightEdge ? 'medium' : 'thin' } };
           if (topStyle) cBorder.top = { style: topStyle };
           if (bottomStyle) cBorder.bottom = { style: bottomStyle };
           cell.border = cBorder;
@@ -2787,11 +2806,13 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   }
   
   const lastRow = ws.getRow(currentRowIndex - 1);
-  if (lastRow) {
-    const c1 = lastRow.getCell(1);
-    const c2 = lastRow.getCell(2);
-    if (c1.border) c1.border = { ...c1.border, bottom: { style: 'thin' } };
-    if (c2.border) c2.border = { ...c2.border, bottom: { style: 'thin' } };
+  if (lastRow && (currentRowIndex - 1) >= 6) {
+    for (let c = 1; c <= 17; c++) {
+      const cell = lastRow.getCell(c);
+      if (cell.border) {
+         cell.border = { ...cell.border, bottom: { style: 'medium' } };
+      }
+    }
   }
 };
 
