@@ -106,7 +106,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const cCounts = getCounts(deptCurrEmps, false);
             const nCounts = getCounts(deptNextEmps, true);
           if (showCount) {
-            displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）</span>`;
+            displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（${formatCountText(cCounts)}→${formatCountText(nCounts)}）</span>`;
           } else {
             displayDeptHtml = escapeHtml(deptName);
           }
@@ -132,7 +132,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const gCCounts = getCounts(grpCurrEmps, false);
             const gNCounts = getCounts(grpNextEmps, true);
             if (showCount) {
-              displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）</span>`;
+              displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（${formatCountText(gCCounts)}→${formatCountText(gNCounts)}）</span>`;
             } else {
               displayGroupHtml = escapeHtml(groupName);
             }

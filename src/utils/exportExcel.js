@@ -342,7 +342,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         const cCounts = getCounts(deptCurrEmps, false);
         const nCounts = getCounts(deptNextEmps, true);
         if (showCount) {
-          displayDeptStr = `${deptName} （今:${formatCountText(cCounts)} / 来:${formatCountText(nCounts)}）`;
+          displayDeptStr = `${deptName} （${formatCountText(cCounts)}→${formatCountText(nCounts)}）`;
         } else {
           displayDeptStr = deptName;
         }
@@ -361,7 +361,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         const gCCounts = getCounts(grpCurrEmps, false);
         const gNCounts = getCounts(grpNextEmps, true);
         if (showCount) {
-          displayGroupStr = `${groupName} （今:${formatCountText(gCCounts)} / 来:${formatCountText(gNCounts)}）`;
+          displayGroupStr = `${groupName} （${formatCountText(gCCounts)}→${formatCountText(gNCounts)}）`;
         } else {
           displayGroupStr = groupName;
         }

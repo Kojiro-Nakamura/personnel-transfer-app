@@ -271,7 +271,7 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension,
                   onChange={(e) => setShowCount(e.target.checked)} 
                   className="w-4 h-4 text-[#0F828C] rounded border-slate-300"
                 />
-                （今：〇人／来：〇人）の人数カウントを出力する
+                （〇人→〇人）の人数カウントを出力する
               </label>
             </div>
           )}
