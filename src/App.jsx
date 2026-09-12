@@ -316,13 +316,23 @@ export const AppContent = () => {
                 <Users className="w-5 h-5 text-amber-200" />
                 <span className="font-bold text-sm text-slate-50">来年度の配属先の枠をクリックしてください</span>
               </div>
-              <button 
-                onClick={cancelSelection} 
-                className="bg-white text-[#0F828C] hover:bg-slate-100 px-4 py-1.5 rounded-full text-xs font-bold transition-colors shadow" 
-                title="職員の選択をキャンセルする"
-              >
-                キャンセル
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); openModal('emp', selEmp); }} 
+                  className="bg-sky-600/80 hover:bg-sky-500 text-white px-3 py-1.5 rounded-full text-xs font-bold transition-colors flex items-center shadow"
+                  title="この職員の情報を編集する"
+                >
+                  <Edit2 className="w-3.5 h-3.5 mr-1" />
+                  職員情報を編集
+                </button>
+                <button 
+                  onClick={cancelSelection} 
+                  className="bg-white text-[#0F828C] hover:bg-slate-100 px-4 py-1.5 rounded-full text-xs font-bold transition-colors shadow" 
+                  title="職員の選択をキャンセルする"
+                >
+                  キャンセル
+                </button>
+              </div>
             </div>
             <div className="bg-white text-slate-900 rounded px-3 py-2 flex flex-col gap-1 shadow-inner text-[11px]">
               <div className="flex items-center gap-3 font-bold text-sm text-[#065084] border-b pb-1 mb-1 border-slate-200">
