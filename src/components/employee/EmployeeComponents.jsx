@@ -709,7 +709,7 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             <h4 className="font-bold text-sm text-slate-900 mb-2">履歴</h4>
             <div className="grid grid-cols-5 gap-y-1 gap-x-3 pl-3 pr-1">
               {(() => {
-                const baseHistory = [...(fd.history || [])].sort((a, b) => a.year - b.year);
+                const baseHistory = [...(fd.history || [])].filter(h => h.department && h.department.trim() !== '').sort((a, b) => a.year - b.year);
                 const nextDeptStr = getPlacementName(fd.departmentId, fd.postId, fd.groupId, fd.groupPostId, departments);
                 const displayHistory = [...baseHistory];
                 if (nextDeptStr && nextDeptStr !== ' / 課直属' && nextDeptStr !== '未配置') {
