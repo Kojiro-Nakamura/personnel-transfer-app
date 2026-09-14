@@ -2209,9 +2209,9 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
          argb = 'FFEFF6FF';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 33) {
+      else if (colNumber <= 35) {
          argb = 'FFFDF4FF';
-         if (colNumber === 33 && nextPromoColor) {
+         if (colNumber === 35 && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
@@ -2220,8 +2220,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       }
       
       // 昇進ハイライト (昇級年度の枠)
-      if (colNumber >= 25 && colNumber <= 32) {
-         const pKeysOffset = colNumber - 24;
+      if (colNumber >= 27 && colNumber <= 34) {
+         const pKeysOffset = colNumber - 26;
          const key = pKeys[pKeysOffset];
          if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
              const pc = getPromotedBgColorCode(emp.nextGrade);
@@ -2230,8 +2230,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       }
 
       // 履歴セルの着色と変更検知
-      if (colNumber > 33) {
-         const hcOffset = colNumber - 34;
+      if (colNumber > 35) {
+         const hcOffset = colNumber - 36;
          const hc = histBgColors[hcOffset];
          if (hc) {
             argb = 'FF' + hc.replace('#', '').toUpperCase();
