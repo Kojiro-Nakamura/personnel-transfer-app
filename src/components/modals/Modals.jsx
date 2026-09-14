@@ -1303,6 +1303,19 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
               {sortedEmps.map((emp, empIdx) => {
                 const isS = selectedIds.has(emp.id);
                 const handleChange = (id, key, val) => setLocalEmps(prev => prev.map(e => e.id === id ? { ...e, [key]: val } : e));
+                const handleHistoryChange = (id, year, val) => {
+                    setLocalEmps(prev => prev.map(e => {
+                        if (e.id !== id) return e;
+                        const newHistory = [...(e.history || [])];
+                        const histIdx = newHistory.findIndex(h => h.year === year);
+                        if (histIdx >= 0) {
+                            newHistory[histIdx] = { ...newHistory[histIdx], department: val };
+                        } else {
+                            newHistory.push({ year, department: val });
+                        }
+                        return { ...e, history: newHistory };
+                    }));
+                };
 
 
 
@@ -1508,7 +1521,11 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                       const isRight = yIdx >= historyYears.length - 2;
                       return (
                         <td key={`hist-d-${year}`} className="bg-emerald-50/30 border-l p-1 min-w-[60px] w-[60px] relative group/hist">
-                          <input type="text" value={histStr} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center cursor-default"} title="" />
+                          {year === targetYear ? (
+                             <input type="text" value={histStr} readOnly className={inputCls + " bg-transparent border-transparent text-slate-600 text-center cursor-default"} title="" />
+                          ) : (
+                             <input type="text" value={histStr} onChange={(e) => handleHistoryChange(emp.id, year, e.target.value)} className={inputCls + " focus:bg-white focus:ring-1 text-center"} title="" />
+                          )}
                           {histStr && (
                             <div className={cx(
                                 "absolute hidden group-hover/hist:block z-[999] bg-slate-800 text-white text-[11px] rounded py-1 px-2 whitespace-nowrap shadow-xl pointer-events-none",
