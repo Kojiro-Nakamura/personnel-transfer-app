@@ -1307,11 +1307,11 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                     setLocalEmps(prev => prev.map(e => {
                         if (e.id !== id) return e;
                         const newHistory = [...(e.history || [])];
-                        const histIdx = newHistory.findIndex(h => h.year === year);
+                        const histIdx = newHistory.findIndex(h => Number(h.year) === Number(year));
                         if (histIdx >= 0) {
                             newHistory[histIdx] = { ...newHistory[histIdx], department: val };
                         } else {
-                            newHistory.push({ year, department: val });
+                            newHistory.push({ year: Number(year), department: val });
                         }
                         return { ...e, history: newHistory };
                     }));
@@ -1513,7 +1513,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                               }
                           }
                       } else {
-                          const hist = (emp.history || []).find(h => h.year === year);
+                          const hist = (emp.history || []).find(h => Number(h.year) === Number(year));
                           histStr = hist ? hist.department : '';
                       }
                       
