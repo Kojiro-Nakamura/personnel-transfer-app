@@ -129,7 +129,7 @@ export const AppContent = () => {
       <header id="app-header" className="bg-[#3972ac] text-white shadow-md z-20 sticky top-0 border-b border-[#2d5f91]">
         <div className="flex justify-between items-center p-2 border-b border-[#4d86c2]">
           <div className="flex items-center gap-3">
-            <img src="/favicon.svg" alt="Logo" className="w-7 h-7 rounded shadow-sm" />
+            <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Logo" className="w-7 h-7 rounded shadow-sm" />
             <div className="flex items-center bg-white/20 border border-white/30 rounded overflow-hidden p-1">
               <input type="number" value={targetYear} onChange={(e) => setTargetYear(Number(e.target.value))} className="w-20 bg-transparent text-center text-sm font-bold text-white outline-none always-show-spinners" title="対象年度" />
             </div>
