@@ -21,6 +21,7 @@ import { AddSlotRow, DepartmentBlock } from './components/department/DepartmentC
 import { SidebarCard, AppSidebar } from './components/layout/AppSidebar.jsx';
 import { NoteEditModal, EmployeeSelectModal, FileSaveModal, FileOpenModal, NameEditModal, DeleteConfirmModal, TitleChangeConfirmModal, BulkEditModal } from './components/modals/Modals.jsx';
 import { ValidationModal } from './components/modals/ValidationModal.jsx';
+import { PartialImportConfirmModal } from './components/modals/PartialImportConfirmModal.jsx';
 import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
 import { NewWindowPortal } from './components/common/NewWindowPortal.jsx';
 export const AppContent = () => {
@@ -52,19 +53,37 @@ export const AppContent = () => {
         importedEmpsArray.forEach(imp => {
            const match = employees.find(emp => emp.name === imp.name && emp.employeeNumber === imp.employeeNumber);
            if (match) {
-             updates.push({
-               id: match.id,
-               note: imp.note !== undefined ? imp.note : match.note,
-               desiredAssignment: imp.desiredAssignment !== undefined ? imp.desiredAssignment : match.desiredAssignment,
-               specialCircumstances: imp.specialCircumstances !== undefined ? imp.specialCircumstances : match.specialCircumstances,
-             });
-             matchCount++;
+             const newNote = imp.note !== undefined ? imp.note : match.note;
+             const newDesiredAssignment = imp.desiredAssignment !== undefined ? imp.desiredAssignment : match.desiredAssignment;
+             const newSpecialCircumstances = imp.specialCircumstances !== undefined ? imp.specialCircumstances : match.specialCircumstances;
+             
+             if (newNote !== match.note || newDesiredAssignment !== match.desiredAssignment || newSpecialCircumstances !== match.specialCircumstances) {
+               updates.push({
+                 id: match.id,
+                 name: match.name,
+                 employeeNumber: match.employeeNumber,
+                 old: {
+                   note: match.note || '',
+                   desiredAssignment: match.desiredAssignment || '',
+                   specialCircumstances: match.specialCircumstances || ''
+                 },
+                 new: {
+                   note: newNote || '',
+                   desiredAssignment: newDesiredAssignment || '',
+                   specialCircumstances: newSpecialCircumstances || ''
+                 },
+                 // For mutations.bulkProcessEmployees to use:
+                 note: newNote,
+                 desiredAssignment: newDesiredAssignment,
+                 specialCircumstances: newSpecialCircumstances,
+               });
+               matchCount++;
+             }
            }
         });
 
         if (updates.length > 0) {
-          mutations.bulkProcessEmployees(updates);
-          alert(`${matchCount}件のデータを上書きしました。`);
+          openModal('partialImportConfirm', updates);
         } else {
           alert('氏名と職員番号が一致する職員が見つかりませんでした。');
         }
@@ -480,6 +499,12 @@ export const AppContent = () => {
         }} 
       />
       <ValidationModal isOpen={modals.validation.isOpen} onClose={() => closeModal('validation')} employees={employees} departments={departments} targetYear={targetYear} onEmpClick={(empId) => { const emp = employees.find(e => e.id === empId); if (emp) openModal('emp', emp); }} onAutoFix={(newEmps) => mutations.updateAllEmployees(newEmps)} />
+      <PartialImportConfirmModal isOpen={modals.partialImportConfirm?.isOpen} data={modals.partialImportConfirm?.data} updates={modals.partialImportConfirm?.data || []} onClose={() => closeModal('partialImportConfirm')} onConfirm={(updates) => { 
+        const cleanUpdates = updates.map(u => ({ id: u.id, note: u.note, desiredAssignment: u.desiredAssignment, specialCircumstances: u.specialCircumstances }));
+        mutations.bulkProcessEmployees(cleanUpdates); 
+        closeModal('partialImportConfirm'); 
+        alert(`${updates.length}件のデータを上書きしました。`); 
+      }} />
       
       {modals.chainTransfer.isOpen && (
         <ChainTransferModal 
