@@ -3,6 +3,7 @@ import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../constants/initialData
 import { useAppHistory } from '../hooks/useAppHistory.js';
 import { useAppMutations } from '../hooks/useAppMutations.js';
 import { useExportActions } from '../hooks/useExportActions.js';
+import { saveSnapshot } from '../utils/indexedDB.js';
 import { STORAGE_KEY } from '../constants/config.js';
 import { getGradeLevel } from '../utils/helpers.js';
 export const AppContext = createContext(null);
@@ -384,6 +385,7 @@ export function AppProvider({ children }) {
       const text = await file.text(); 
       const data = JSON.parse(text); 
       loadFromData(data, file.name);
+      saveSnapshot(file.name, data).catch(err => console.error('Failed to save snapshot on load:', err));
     } catch(err) { 
       console.error('Error loading JSON:', err);
     } finally { 
