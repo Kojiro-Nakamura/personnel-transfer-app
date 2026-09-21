@@ -31,6 +31,52 @@ export const AppContent = () => {
     exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn, loadJSON, loadFromData, handleCellClick, handleAssign, notes 
   } = useApp();
   
+  const partialImportInputRef = useRef(null);
+
+  const handlePartialImport = async (e) => {
+    let file = null;
+    if (e && e.target && e.target.files) {
+      file = e.target.files[0];
+    }
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (data.plans) {
+        const planToLoad = data.plans.find(x => x.id === (data.activePlanId || data.plans[0].id)) || data.plans[0];
+        const importedEmpsArray = planToLoad.employees || [];
+
+        const updates = [];
+        let matchCount = 0;
+        importedEmpsArray.forEach(imp => {
+           const match = employees.find(emp => emp.name === imp.name && emp.employeeNumber === imp.employeeNumber);
+           if (match) {
+             updates.push({
+               id: match.id,
+               note: imp.note !== undefined ? imp.note : match.note,
+               desiredAssignment: imp.desiredAssignment !== undefined ? imp.desiredAssignment : match.desiredAssignment,
+               specialCircumstances: imp.specialCircumstances !== undefined ? imp.specialCircumstances : match.specialCircumstances,
+             });
+             matchCount++;
+           }
+        });
+
+        if (updates.length > 0) {
+          mutations.bulkProcessEmployees(updates);
+          alert(`${matchCount}件のデータを上書きしました。`);
+        } else {
+          alert('氏名と職員番号が一致する職員が見つかりませんでした。');
+        }
+      }
+    } catch(err) {
+      console.error('Error loading JSON for partial import:', err);
+      alert('ファイルの読み込みに失敗しました。');
+    } finally {
+      if (e.target) e.target.value = '';
+    }
+  };
+
   const [isDragging, setIsDragging] = useState(false);
   const [autoFit, setAutoFit] = useState(true);
 
@@ -160,6 +206,8 @@ export const AppContent = () => {
             <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }], showCountToggle: true, defaultShowCount: true })} className="bg-emerald-500/30 hover:emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <button onClick={() => openModal('openFile')} className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="保存したデータを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く</button>
+            <input type="file" accept=".json" className="hidden" ref={partialImportInputRef} onChange={handlePartialImport} />
+            <button onClick={() => partialImportInputRef.current?.click()} className="bg-orange-500/30 hover:bg-orange-500/50 border border-orange-300 text-orange-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="他のJSONファイルから一部のデータ（特記事項など）のみを読み込んで上書きします"><Download className="w-4 h-4 mr-1" />一部インポート</button>
           </div>
         </div>
         <div className="flex justify-between items-center bg-[#3972ac] px-2 pt-2 border-b border-[#2d5f91]">
