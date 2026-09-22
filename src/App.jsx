@@ -53,9 +53,9 @@ export const AppContent = () => {
         importedEmpsArray.forEach(imp => {
            const match = employees.find(emp => emp.name === imp.name && emp.employeeNumber === imp.employeeNumber);
            if (match) {
-             const newNote = imp.note !== undefined ? imp.note : match.note;
-             const newDesiredAssignment = imp.desiredAssignment !== undefined ? imp.desiredAssignment : match.desiredAssignment;
-             const newSpecialCircumstances = imp.specialCircumstances !== undefined ? imp.specialCircumstances : match.specialCircumstances;
+             const newNote = imp.note !== undefined ? imp.note : "";
+             const newDesiredAssignment = imp.desiredAssignment !== undefined ? imp.desiredAssignment : "";
+             const newSpecialCircumstances = imp.specialCircumstances !== undefined ? imp.specialCircumstances : "";
              
              if (newNote !== match.note || newDesiredAssignment !== match.desiredAssignment || newSpecialCircumstances !== match.specialCircumstances) {
                updates.push({
