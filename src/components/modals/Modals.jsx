@@ -729,7 +729,10 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
       
       const colMap = new Map();
       headerCols.forEach((col, i) => {
-        colMap.set(col.trim(), i);
+        let cleanCol = col.trim();
+        if (cleanCol === '〇配属希望') cleanCol = '配属希望';
+        if (cleanCol === '●特殊事情') cleanCol = '特殊事情';
+        colMap.set(cleanCol, i);
       });
 
       const csvYearsMap = new Map();
