@@ -1374,7 +1374,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
         }
       }
-      if (nextEmp && isNextTransferred && c >= 8 && c <= 11) {
+      if (nextEmp && c >= 8 && c <= 11) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
           const rawColor = getPromotedBgColorCode(nextEmp.nextGrade);
           if (rawColor) {
