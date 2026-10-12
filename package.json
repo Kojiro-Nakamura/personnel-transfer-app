@@ -1,11 +1,12 @@
 {
   "name": "temp-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "bump-version": "node scripts/bump-version.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },

@@ -12,6 +12,7 @@ import { useApp, AppProvider } from './contexts/AppContext.jsx';
 import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from './constants/initialData.js';
+import { APP_VERSION } from './constants/version.js';
 import { validateEmployees, autoFixEmployees } from './utils/validation.js';
 
 
@@ -151,7 +152,7 @@ export const AppContent = () => {
   const nextSummary = useMemo(() => generateGradeSummary(employees, true), [employees]);
 
   useEffect(() => { 
-    document.title = "人事異動案作成アプリ"; 
+    document.title = `人事異動案作成アプリ ${APP_VERSION}`; 
     document.documentElement.lang = "ja"; 
   }, []);
 
@@ -198,7 +199,10 @@ export const AppContent = () => {
             <div className="flex items-center bg-white/20 border border-white/30 rounded overflow-hidden p-1">
               <input type="number" value={targetYear} onChange={(e) => setTargetYear(Number(e.target.value))} className="w-20 bg-transparent text-center text-sm font-bold text-white outline-none always-show-spinners" title="対象年度" />
             </div>
-            <h1 className="text-base font-bold text-white">年度(R{targetYear - 2018})人事異動案</h1>
+            <h1 className="text-base font-bold text-white flex items-center gap-2">
+              <span>年度(R{targetYear - 2018})人事異動案</span>
+              <span className="text-xs font-normal bg-white/20 text-white/90 px-1.5 py-0.5 rounded border border-white/20 font-mono tracking-tight" title={`バージョン: ${APP_VERSION}`}>{APP_VERSION}</span>
+            </h1>
           </div>
           <div className="flex gap-2 items-center">
             <div className="flex items-center bg-white/10 border border-white/20 rounded overflow-hidden mr-1">
