@@ -69,6 +69,18 @@ export function AppProvider({ children }) {
     chainTransfer: { isOpen: false, data: null }
   });
 
+  const [contextMenu, setContextMenu] = useState(null);
+
+  const showContextMenu = useCallback((e, type, data) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, type, data });
+  }, []);
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
   const openModal = useCallback((type, data = null) => {
     setModals(prev => ({ ...prev, [type]: { isOpen: true, data } }));
   }, []);
@@ -412,6 +424,7 @@ export function AppProvider({ children }) {
     deptMap, nextMap, currMap,
     zoom, setZoom, hoveredEmpId, setHoveredEmpId, collapsedDepts, toggleDept,
     filterLevel, setFilterLevel, modals, openModal, closeModal,
+    contextMenu, showContextMenu, closeContextMenu,
     isPickingMode: !!history.selectedEmp, 
     canUndo: history.past.length > 0, 
     canRedo: history.future.length > 0, 

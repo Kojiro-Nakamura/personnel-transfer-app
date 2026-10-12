@@ -14,7 +14,7 @@ import { autoFixEmployees } from '../../utils/validation.js';
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
 export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer, isIncreased }) => {
-  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp } = useApp();
+  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp, showContextMenu } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
   
   if (isEmpty || !emp) {
@@ -88,6 +88,11 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   return (
     <div 
       onClick={onClick} 
+      onContextMenu={(e) => {
+        if (emp) {
+          showContextMenu(e, 'employee', { emp, isNext, moveProps });
+        }
+      }}
       onMouseEnter={() => setHoveredEmpId(emp.id)} 
       onMouseLeave={() => setHoveredEmpId(null)} 
       className={cellClasses} 
@@ -165,13 +170,26 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
 };
 
 export const EmployeeRow = ({ isFirst, titleIcon, titleText, onTitleEdit, onTitleDelete, onMoveUp, onMoveDown, currentEmp, nextEmp, onCurrentClick, onNextClick, isIndent = false, isPost = false, currentMove, nextMove, currConflict, nextConflict, rowAnchorId }) => {
-  const { filterLevel } = useApp();
+  const { filterLevel, showContextMenu } = useApp();
   const applyPostStyle = isPost && filterLevel === 0;
   const isNewlyAssigned = !currentEmp && !!nextEmp;
   
   return (
   <div className={cx("flex border-b relative group/row", applyPostStyle ? "border-sky-400 bg-sky-50" : "border-slate-500 hover:bg-slate-50")}>
-    <div className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-100 border-l-4 border-l-sky-600" : "border-slate-500 bg-slate-50 border-l-4 border-l-transparent")}>
+    <div 
+      onContextMenu={(e) => {
+        if (isPost && (onTitleEdit || onTitleDelete || onMoveUp || onMoveDown)) {
+          showContextMenu(e, 'post', {
+            postName: titleText,
+            onTitleEdit,
+            onTitleDelete,
+            onMoveUp,
+            onMoveDown,
+          });
+        }
+      }}
+      className={cx("w-[140px] px-2 py-1.5 border-r flex items-center shrink-0 relative", applyPostStyle ? "border-sky-400 bg-sky-100 border-l-4 border-l-sky-600" : "border-slate-500 bg-slate-50 border-l-4 border-l-transparent")}
+    >
       <div className="flex items-center gap-1.5 truncate w-full" title={titleText}>
         {isIndent && isFirst && <CornerDownRight className="w-3 h-3 text-slate-400 ml-4 shrink-0" />}
         {isFirst && titleIcon}

@@ -25,13 +25,16 @@ import { ValidationModal } from './components/modals/ValidationModal.jsx';
 import { PartialImportConfirmModal } from './components/modals/PartialImportConfirmModal.jsx';
 import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
 import { NewWindowPortal } from './components/common/NewWindowPortal.jsx';
+import { ContextMenu } from './components/ui/ContextMenu.jsx';
 export const AppContent = () => {
+  const app = useApp();
   const { 
     zoom, departments, selectedEmp, employees, currentFileName, cancelSelection, setZoom, filterLevel, setFilterLevel, 
     undo, redo, canUndo, canRedo, handleRollOver, activePlanId, plans, openModal, mutations, modals, closeModal, 
     targetYear, setTargetYear, switchPlan, duplicatePlan, deletePlan, updatePlanName, expandAll, collapseAll, 
-    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn, loadJSON, loadFromData, handleCellClick, handleAssign, notes 
-  } = useApp();
+    exportToJSON, exportToHTML, exportToExcel, exportUnifiedExcelBtn, exportModalExcelBtn, loadJSON, loadFromData, handleCellClick, handleAssign, notes,
+    contextMenu, closeContextMenu 
+  } = app;
   
   const partialImportInputRef = useRef(null);
 
@@ -548,6 +551,13 @@ export const AppContent = () => {
             </div>
           </div>
         </div>
+      )}
+      {contextMenu && (
+        <ContextMenu 
+          contextMenu={contextMenu} 
+          onClose={closeContextMenu} 
+          useAppHook={app} 
+        />
       )}
     </div>
   );

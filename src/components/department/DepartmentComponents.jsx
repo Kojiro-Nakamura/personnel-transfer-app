@@ -42,7 +42,7 @@ export const AddSlotRow = ({ label, indentClass, onClickNext, anchorId }) => {
 };
 
 export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
-  const { deptMap, filterLevel, collapsedDepts, toggleDept, openModal, mutations, handleCellClick } = useApp();
+  const { deptMap, filterLevel, collapsedDepts, toggleDept, openModal, mutations, handleCellClick, showContextMenu } = useApp();
   const isCollapsed = !!collapsedDepts[dept.id]; console.log('DEPT RENDER:', dept.name, dept.nextName); 
   const dm = deptMap[dept.id];
   
@@ -73,7 +73,12 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
   return (
     <div className="border-b-4 border-white relative">
       {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-50/50 pointer-events-none z-[5]" />}
-      <div className="bg-[#5f8cc5] text-white border-b-2 border-white px-2 py-1 flex justify-between items-center relative z-10 group/dept">
+      <div 
+        onContextMenu={(e) => {
+          showContextMenu(e, 'department', { dept, onMoveUp, onMoveDown });
+        }}
+        className="bg-[#5f8cc5] text-white border-b-2 border-white px-2 py-1 flex justify-between items-center relative z-10 group/dept"
+      >
         <div className="flex items-center gap-2">
           <div 
             className="cursor-pointer hover:bg-white/20 rounded p-0.5 transition-colors" 
@@ -216,7 +221,17 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             
             return (
               <React.Fragment key={grp.id}>
-                <div className="flex border-b border-white bg-[#b2cbe6] group/grp relative z-10">
+                <div 
+                  onContextMenu={(e) => {
+                    showContextMenu(e, 'group', {
+                      deptId: dept.id,
+                      group: grp,
+                      onMoveUp: gIdx > 0 ? () => mutations.moveGroup(dept.id, grp.id, 'up') : undefined,
+                      onMoveDown: gIdx < dept.groups.length - 1 ? () => mutations.moveGroup(dept.id, grp.id, 'down') : undefined,
+                    });
+                  }}
+                  className="flex border-b border-white bg-[#b2cbe6] group/grp relative z-10"
+                >
                   <div className="w-full px-2 py-1 text-[14px] font-bold text-black flex justify-between items-center">
                     <div className="flex items-center gap-1.5" title={grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}>
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
