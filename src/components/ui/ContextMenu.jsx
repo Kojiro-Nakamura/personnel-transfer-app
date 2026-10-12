@@ -8,69 +8,18 @@ import { cx } from '../../utils/helpers.js';
 
 export const ContextMenu = ({ contextMenu, onClose, useAppHook }) => {
   const menuRef = useRef(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  useLayoutEffect(() => {
-    if (!contextMenu) return;
-    const { x, y } = contextMenu;
-    const menuEl = menuRef.current;
-    if (!menuEl) return;
-
-    const rect = menuEl.getBoundingClientRect();
-    const width = rect.width || 220;
-    const height = rect.height || 260;
-
-    let posX = x;
-    let posY = y;
-
-    if (x + width > window.innerWidth - 8) {
-      posX = Math.max(8, window.innerWidth - width - 8);
-    }
-    if (y + height > window.innerHeight - 8) {
-      posY = Math.max(8, window.innerHeight - height - 8);
-    }
-
-    setPosition({ x: posX, y: posY });
-  }, [contextMenu]);
 
   useEffect(() => {
-    if (!contextMenu) return;
-
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        onClose();
-      }
-    };
-
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
     };
-
-    const handleScroll = (e) => {
-      // Close on scroll if not inside the menu
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        onClose();
-      }
-    };
-
-    // Use setTimeout so the current right-click event doesn't trigger the click listener
-    const timer = setTimeout(() => {
-      window.addEventListener('click', handleClickOutside);
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('scroll', handleScroll, true);
-    }, 10);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('click', handleClickOutside);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('scroll', handleScroll, true);
-    };
-  }, [contextMenu, onClose]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   if (!contextMenu) return null;
 
-  const { type, data } = contextMenu;
+  const { x, y, type, data } = contextMenu;
   const { openModal, mutations, toggleDept, handleCellClick, selectedEmp, cancelSelection } = useAppHook;
 
   const MenuItem = ({ icon: Icon, label, onClick, disabled = false, danger = false, hint }) => (
@@ -117,13 +66,21 @@ export const ContextMenu = ({ contextMenu, onClose, useAppHook }) => {
   );
 
   return (
-    <div
-      ref={menuRef}
-      style={{ top: `${position.y}px`, left: `${position.x}px` }}
-      className="fixed z-[9999] min-w-[210px] max-w-[280px] bg-white/95 backdrop-blur-md border border-slate-200 shadow-2xl rounded-xl p-1.5 text-slate-800 animate-in fade-in zoom-in-95 duration-100"
-      onClick={(e) => e.stopPropagation()}
-      onContextMenu={(e) => e.preventDefault()}
-    >
+    <>
+      <div 
+        className="fixed inset-0 z-[9998] bg-transparent"
+        onMouseDown={onClose}
+        onContextMenu={(e) => {
+          onClose();
+        }}
+      />
+      <div
+        ref={menuRef}
+        style={{ top: `${y}px`, left: `${x}px` }}
+        className="fixed z-[9999] min-w-[210px] max-w-[280px] bg-white border border-slate-200/90 shadow-2xl rounded-xl p-1.5 text-slate-800 select-none animate-in fade-in duration-75"
+        onClick={(e) => e.stopPropagation()}
+        onContextMenu={(e) => e.preventDefault()}
+      >
       {type === 'employee' && (() => {
         const { emp, isNext, moveProps } = data;
         const isPickingThis = selectedEmp && selectedEmp.id === emp.id;
@@ -371,5 +328,6 @@ export const ContextMenu = ({ contextMenu, onClose, useAppHook }) => {
         );
       })()}
     </div>
+    </>
   );
 };

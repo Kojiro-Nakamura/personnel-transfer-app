@@ -74,7 +74,11 @@ export function AppProvider({ children }) {
   const showContextMenu = useCallback((e, type, data) => {
     e.preventDefault();
     e.stopPropagation();
-    setContextMenu({ x: e.clientX, y: e.clientY, type, data });
+    const menuWidth = 240;
+    const menuHeight = 280;
+    const x = Math.min(e.clientX, Math.max(8, window.innerWidth - menuWidth - 8));
+    const y = Math.min(e.clientY, Math.max(8, window.innerHeight - menuHeight - 8));
+    setContextMenu({ id: Date.now(), x, y, type, data });
   }, []);
 
   const closeContextMenu = useCallback(() => {

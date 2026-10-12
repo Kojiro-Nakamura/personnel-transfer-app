@@ -554,6 +554,7 @@ export const AppContent = () => {
       )}
       {contextMenu && (
         <ContextMenu 
+          key={contextMenu.id}
           contextMenu={contextMenu} 
           onClose={closeContextMenu} 
           useAppHook={app} 
