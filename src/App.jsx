@@ -57,6 +57,7 @@ export const AppContent = () => {
         importedEmpsArray.forEach(imp => {
            const match = employees.find(emp => emp.name === imp.name && emp.employeeNumber === imp.employeeNumber);
            if (match) {
+             matchCount++;
              const newNote = imp.note !== undefined ? imp.note : "";
              const newDesiredAssignment = imp.desiredAssignment !== undefined ? imp.desiredAssignment : "";
              const newSpecialCircumstances = imp.specialCircumstances !== undefined ? imp.specialCircumstances : "";
@@ -81,13 +82,14 @@ export const AppContent = () => {
                  desiredAssignment: newDesiredAssignment,
                  specialCircumstances: newSpecialCircumstances,
                });
-               matchCount++;
              }
            }
         });
 
         if (updates.length > 0) {
           openModal('partialImportConfirm', updates);
+        } else if (matchCount > 0) {
+          alert('対象となる職員（氏名・職員番号が一致）は見つかりましたが、特記事項・配属希望・特殊事情に変更はありませんでした。');
         } else {
           alert('氏名と職員番号が一致する職員が見つかりませんでした。');
         }
@@ -233,7 +235,7 @@ export const AppContent = () => {
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <button onClick={() => openModal('openFile')} className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="保存したデータを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く</button>
             <input type="file" accept=".json" className="hidden" ref={partialImportInputRef} onChange={handlePartialImport} />
-            <button onClick={() => partialImportInputRef.current?.click()} className="bg-orange-500/30 hover:bg-orange-500/50 border border-orange-300 text-orange-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="他のJSONファイルから一部のデータ（特記事項など）のみを読み込んで上書きします"><Download className="w-4 h-4 mr-1" />一部インポート</button>
+            <button onClick={() => partialImportInputRef.current?.click()} className="bg-orange-500/30 hover:bg-orange-500/50 border border-orange-300 text-orange-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="他のJSONファイルから「特記事項」「配属希望」「特殊事情」の3項目のみを読み込んで上書きします（氏名・職員番号で突合）"><Download className="w-4 h-4 mr-1" />一部インポート</button>
           </div>
         </div>
         <div className="flex justify-between items-center bg-[#3972ac] px-2 pt-2 border-b border-[#2d5f91]">

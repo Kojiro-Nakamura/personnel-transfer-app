@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { X, Check } from 'lucide-react';
 import { cx } from '../../utils/helpers.js';
 
@@ -12,7 +12,7 @@ export const PartialImportConfirmModal = ({ isOpen, onClose, onConfirm, updates 
           一部インポートの確認
         </h3>
         <p className="text-sm text-slate-600 mb-4">
-          以下の職員のデータ（特記事項、配属希望、特殊事情）が上書きされます。内容を確認し、「上書きを実行」をクリックしてください。
+          以下の職員のデータ（特記事項・配属希望・特殊事情）が上書きされます。内容を確認し、「上書きを実行」をクリックしてください。
           （変更がない職員は表示されていません）
         </p>
 
