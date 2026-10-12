@@ -292,7 +292,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
   const getAgeStr = (emp, isNext) => {
     if (!emp || !emp.birthDate) return '';
     const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
-    return age !== '' ? `${age}歳` : '';
+    return (age !== '' && age !== null && !isNaN(age)) ? Number(age) : '';
   };
 
   let rowIndex = 6;
@@ -1129,7 +1129,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     if (extEmp) {
       rowVals[12] = '';
       rowVals[13] = getFormattedNameForPlan(extEmp, true);
-      rowVals[14] = extEmp.birthDate ? calculateAge(extEmp.birthDate, targetYear - 1) + '歳' : '';
+      rowVals[14] = (extEmp.birthDate && calculateAge(extEmp.birthDate, targetYear - 1) !== '') ? Number(calculateAge(extEmp.birthDate, targetYear - 1)) : '';
       rowVals[15] = extEmp.furigana || '';
       rowVals[16] = extEmp.employeeNumber || '';
       rowVals[17] = extEmp.gender || '';
@@ -2030,7 +2030,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       (() => {
         if (!emp.birthDate) return '';
         const a = calculateAge(emp.birthDate, targetYear - 1);
-        return (a !== null && !isNaN(a)) ? a + '歳' : '';
+        return (a !== null && !isNaN(a) && a !== '') ? Number(a) : '';
       })(),
       emp.furigana || '',
       emp.employeeNumber || '',
@@ -2326,7 +2326,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   const getAgeStr = (emp, isNext) => {
     if (!emp || !emp.birthDate) return '';
     const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
-    return age !== '' ? `${age}歳` : '';
+    return (age !== '' && age !== null && !isNaN(age)) ? Number(age) : '';
   };
   const formatWithEra = (dateStr, birthDateStr = null) => {
     let res = formatPromoDateWithEra(String(dateStr));
