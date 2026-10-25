@@ -2,7 +2,7 @@
 
 @theme {
   --font-sans: 'BIZ UDPGothic', 'BIZ UDPゴシック', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-  --font-weight-bold: 600;
+  --font-weight-bold: 700;
 }
 
 @layer base {

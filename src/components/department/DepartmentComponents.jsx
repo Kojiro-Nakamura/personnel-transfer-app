@@ -72,7 +72,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
 
   return (
     <div className="border-b-4 border-white relative">
-      {!isCollapsed && <div className="absolute inset-y-0 left-[140px] w-[calc(100%-140px-40px)] bg-slate-50/50 pointer-events-none z-[5]" />}
+
       <div 
         onContextMenu={(e) => {
           showContextMenu(e, 'department', { dept, onMoveUp, onMoveDown });
