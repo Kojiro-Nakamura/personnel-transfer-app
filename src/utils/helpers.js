@@ -852,14 +852,16 @@ export const sortEmployeeList = (employees, targetYear) => {
 
   const isNonRegularOrSenior = (emp) => {
     const age = getCurrentAgeNum(emp);
-    const hasRinnin = /臨任/.test(emp.currentEmploymentType || '');
-    return (age >= 60) || hasRinnin;
+    const r8Remark = String(emp.currentEmploymentType || '');
+    const note = String(emp.note || '');
+    const hasSpecialRemark = /役職定年|再任用|再フル|再短|定年前|時短|臨任|臨時/.test(r8Remark) || /臨任|臨時/.test(note);
+    return (age >= 60) || hasSpecialRemark;
   };
 
   const getMainCategory = (emp) => {
     if (isGradeSet(emp)) return 1; // R8級の設定がある職員
-    if (!isNonRegularOrSenior(emp)) return 2; // R8級の設定なし・60歳未満かつR8備考に臨任なし（現役職員）
-    return 3; // R8級の設定なし・60歳以上またはR8備考に臨任あり（非現役職員）
+    if (!isNonRegularOrSenior(emp)) return 2; // R8級の設定なし・60歳未満かつR8備考に臨任等なし（現役職員）
+    return 3; // R8級の設定なし・60歳以上またはR8備考に役職定年/再任用/臨任等あり（非現役職員）
   };
 
   const getActiveTitleRank = (titleStr) => {
@@ -870,10 +872,32 @@ export const sortEmployeeList = (employees, targetYear) => {
     return 4;
   };
 
+  const getInactiveRemarkRank = (emp) => {
+    const r = String(emp.currentEmploymentType || '').trim();
+    const n = String(emp.note || '').trim();
+    const combined = r + ' ' + n;
+
+    // 1. 役職定年
+    if (r.includes('役職定年') || (!r && n.includes('役職定年'))) return 1;
+    // 3. 定年前再任用時短（時短・再短・定年前）※「再任用」を含むため先に判定
+    if (r.includes('定年前') || r.includes('時短') || r.includes('再短') || r.includes('短時間')) return 3;
+    // 2. 再任用（フルタイム等）
+    if (r.includes('再任用') || r.includes('再フル')) return 2;
+    // 4. 臨任
+    if (r.includes('臨任') || r.includes('臨時')) return 4;
+
+    // R8備考が空欄等で特記事項(note)に記載がある場合のフォールバック
+    if (combined.includes('定年前') || combined.includes('時短') || combined.includes('再短') || combined.includes('短時間')) return 3;
+    if (combined.includes('再任用') || combined.includes('再フル')) return 2;
+    if (combined.includes('臨任') || combined.includes('臨時')) return 4;
+
+    return 5;
+  };
+
   const getInactiveTitleRank = (titleStr) => {
     const t = String(titleStr || '').trim();
     if (t === '副主任' || t.includes('副主任')) return 1;
-    if (t === '副主査' || t === '副主査研究員' || t.includes('副主査')) return 2;
+    if (t === '副主査' || t === '副主査研究員' || t === '主査' || t.includes('主査')) return 2;
     if (t === '技師' || t === '主事' || t === '研究員') return 3;
     if (t !== '') return 4;
     return 5;
@@ -892,7 +916,7 @@ export const sortEmployeeList = (employees, targetYear) => {
       const gradeA = getGradeLevel(a.currentGrade);
       const gradeB = getGradeLevel(b.currentGrade);
       if (gradeA !== gradeB) return gradeB - gradeA;
-      if (ageA !== ageB) return ageB - ageA;
+      if (ageA !== ageB) return ageA - ageA;
     } else if (catA === 2) {
       // 2. 現役職員（級なし・60歳未満・臨任なし）：R8職名（副主査・副主査研究員 -> 技師・研究員） -> R8年齢順（降順）
       const rankA = getActiveTitleRank(a.currentTitle);
@@ -900,11 +924,14 @@ export const sortEmployeeList = (employees, targetYear) => {
       if (rankA !== rankB) return rankA - rankB;
       if (ageA !== ageB) return ageB - ageA;
     } else {
-      // 3. 非現役職員（級なし・60歳以上または臨任あり）：R8職名（副主任 -> 副主査 -> 技師・主事・研究員） -> R8年齢順（降順）
+      // 3. 60歳以上および臨任等：R8備考（役職定年 -> 再任用 -> 定年前再任用時短 -> 臨任） -> R8年齢順（降順） -> 職名順
+      const remA = getInactiveRemarkRank(a);
+      const remB = getInactiveRemarkRank(b);
+      if (remA !== remB) return remA - remB;
+      if (ageA !== ageB) return ageB - ageA;
       const rankA = getInactiveTitleRank(a.currentTitle);
       const rankB = getInactiveTitleRank(b.currentTitle);
       if (rankA !== rankB) return rankA - rankB;
-      if (ageA !== ageB) return ageB - ageA;
     }
 
     // 同年齢の場合：生年月日が早い順（より年長が上）
