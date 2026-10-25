@@ -916,7 +916,7 @@ export const sortEmployeeList = (employees, targetYear) => {
       const gradeA = getGradeLevel(a.currentGrade);
       const gradeB = getGradeLevel(b.currentGrade);
       if (gradeA !== gradeB) return gradeB - gradeA;
-      if (ageA !== ageB) return ageA - ageA;
+      if (ageA !== ageB) return ageB - ageA;
     } else if (catA === 2) {
       // 2. 現役職員（級なし・60歳未満・臨任なし）：R8職名（副主査・副主査研究員 -> 技師・研究員） -> R8年齢順（降順）
       const rankA = getActiveTitleRank(a.currentTitle);
