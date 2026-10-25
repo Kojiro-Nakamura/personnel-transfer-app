@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, getEraSuffixForDate, formatPromoDateWithEra, formatServiceYearsText, formatDateForDisplay } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPlacementName, getPromotedBgColorCode, generateGradeSummary, calculateServiceYears, getEmpCurrentYears, getEraSuffix, getEraSuffixForDate, formatPromoDateWithEra, formatServiceYearsText, formatDateForDisplay, sortEmployeeList } from './helpers.js';
 
 const getBorderHexColor = (grade) => {
   switch (grade) {
@@ -410,33 +410,7 @@ ${summaryHtml}
 
     const dMap = new Map(departments.map(d => [d.id, d]));
     
-    const sortedEmployees = [...employees].sort((a, b) => {
-        const gradeA = getGradeLevel(a.currentGrade);
-        const gradeB = getGradeLevel(b.currentGrade);
-        if (gradeA !== gradeB) {
-          return gradeB - gradeA;
-        }
-        
-        const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
-        const getYear = (emp) => {
-            for (let i = pKeys.length - 1; i >= 0; i--) {
-                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
-                if (!isNaN(y)) return y;
-            }
-            return NaN;
-        };
-        const yA = getYear(a);
-        const yB = getYear(b);
-        
-        if (!isNaN(yA) && !isNaN(yB)) {
-            return yA - yB;
-        } else if (!isNaN(yA)) {
-            return -1;
-        } else if (!isNaN(yB)) {
-            return 1;
-        }
-        return 0;
-    });
+    const sortedEmployees = sortEmployeeList(employees, targetYear);
 
     sortedEmployees.forEach((emp, index) => {
       const getDeptName = (deptId, postId, groupId, groupPostId, isNext) => {

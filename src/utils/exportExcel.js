@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber } from './helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from './helpers.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 
@@ -1975,25 +1975,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   });
 
   const dMap = new Map(departments.map(d => [d.id, d]));
-  const sortedEmployees = [...employees].sort((a, b) => {
-      const gradeA = getGradeLevel(a.currentGrade);
-      const gradeB = getGradeLevel(b.currentGrade);
-      if (gradeA !== gradeB) return gradeB - gradeA;
-      const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
-      const getYear = (emp) => {
-          for (let i = pKeys.length - 1; i >= 0; i--) {
-              const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
-              if (!isNaN(y)) return y;
-          }
-          return NaN;
-      };
-      const yA = getYear(a);
-      const yB = getYear(b);
-      if (!isNaN(yA) && !isNaN(yB)) return yA - yB;
-      else if (!isNaN(yA)) return -1;
-      else if (!isNaN(yB)) return 1;
-      return 0;
-  });
+  const sortedEmployees = sortEmployeeList(employees, targetYear);
 
   let rowIndex = 6;
   sortedEmployees.forEach(emp => {

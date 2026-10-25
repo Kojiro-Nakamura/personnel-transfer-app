@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, FileCode, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear } from '../../utils/helpers.js';
+import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear, sortEmployeeList } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -540,36 +540,10 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
         return 0;
       });
     } else {
-      items.sort((a, b) => {
-        const gradeA = getGradeLevel(a.currentGrade);
-        const gradeB = getGradeLevel(b.currentGrade);
-        if (gradeA !== gradeB) {
-          return gradeB - gradeA;
-        }
-        
-        const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
-        const getYear = (emp) => {
-            for (let i = pKeys.length - 1; i >= 0; i--) {
-                const y = pKeys[i] === 'hireDate' ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0,4)) : NaN) : parseInt(emp[pKeys[i]] || 'NaN');
-                if (!isNaN(y)) return y;
-            }
-            return NaN;
-        };
-        const yA = getYear(a);
-        const yB = getYear(b);
-        
-        if (!isNaN(yA) && !isNaN(yB)) {
-            return yA - yB; // Ascending year = Descending tenure
-        } else if (!isNaN(yA)) {
-            return -1;
-        } else if (!isNaN(yB)) {
-            return 1;
-        }
-        return 0;
-      });
+      items = sortEmployeeList(items, targetYear);
     }
     return items;
-  }, [localEmps, sortConfig]);
+  }, [localEmps, sortConfig, targetYear]);
 
   if (!isOpen) return null;
   const handleDownloadTemplate = () => {

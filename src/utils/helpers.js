@@ -824,3 +824,101 @@ export const shouldOmitEmployeeNumber = (emp, isNext = false) => {
   if (isNext && (!emp.currentTitle || emp.currentDeptId === 'unassigned' || !emp.currentDeptId)) return true;
   return false;
 };
+
+
+export const sortEmployeeList = (employees, targetYear) => {
+  const currentYear = (targetYear || new Date().getFullYear()) - 1;
+  const pKeys = ['hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+
+  const getLatestPromoYear = (emp) => {
+    for (let i = pKeys.length - 1; i >= 0; i--) {
+      const y = pKeys[i] === 'hireDate'
+        ? (emp.hireDate ? parseInt(String(emp.hireDate).substring(0, 4), 10) : NaN)
+        : parseInt(emp[pKeys[i]] || 'NaN', 10);
+      if (!isNaN(y)) return y;
+    }
+    return NaN;
+  };
+
+  const getCurrentAgeNum = (emp) => {
+    if (!emp || !emp.birthDate) return -1;
+    const a = calculateAge(emp.birthDate, currentYear);
+    return (a !== '' && a !== null && !isNaN(a)) ? Number(a) : -1;
+  };
+
+  const isGradeSet = (emp) => {
+    return getGradeLevel(emp.currentGrade) >= 3;
+  };
+
+  const isNonRegularOrSenior = (emp) => {
+    const age = getCurrentAgeNum(emp);
+    const hasRinnin = /臨任/.test(emp.currentEmploymentType || '');
+    return (age >= 60) || hasRinnin;
+  };
+
+  const getMainCategory = (emp) => {
+    if (isGradeSet(emp)) return 1; // R8級の設定がある職員
+    if (!isNonRegularOrSenior(emp)) return 2; // R8級の設定なし・60歳未満かつR8備考に臨任なし（現役職員）
+    return 3; // R8級の設定なし・60歳以上またはR8備考に臨任あり（非現役職員）
+  };
+
+  const getActiveTitleRank = (titleStr) => {
+    const t = String(titleStr || '').trim();
+    if (t === '副主査' || t === '副主査研究員' || t.includes('副主査')) return 1;
+    if (t === '技師' || t === '研究員' || t === '主事') return 2;
+    if (t !== '') return 3;
+    return 4;
+  };
+
+  const getInactiveTitleRank = (titleStr) => {
+    const t = String(titleStr || '').trim();
+    if (t === '副主任' || t.includes('副主任')) return 1;
+    if (t === '副主査' || t === '副主査研究員' || t.includes('副主査')) return 2;
+    if (t === '技師' || t === '主事' || t === '研究員') return 3;
+    if (t !== '') return 4;
+    return 5;
+  };
+
+  return [...employees].sort((a, b) => {
+    const catA = getMainCategory(a);
+    const catB = getMainCategory(b);
+    if (catA !== catB) return catA - catB;
+
+    const ageA = getCurrentAgeNum(a);
+    const ageB = getCurrentAgeNum(b);
+
+    if (catA === 1) {
+      // 1. R8級の設定がある人：級の並び順（降順） -> 同じ級内でR8年齢順（降順）
+      const gradeA = getGradeLevel(a.currentGrade);
+      const gradeB = getGradeLevel(b.currentGrade);
+      if (gradeA !== gradeB) return gradeB - gradeA;
+      if (ageA !== ageB) return ageB - ageA;
+    } else if (catA === 2) {
+      // 2. 現役職員（級なし・60歳未満・臨任なし）：R8職名（副主査・副主査研究員 -> 技師・研究員） -> R8年齢順（降順）
+      const rankA = getActiveTitleRank(a.currentTitle);
+      const rankB = getActiveTitleRank(b.currentTitle);
+      if (rankA !== rankB) return rankA - rankB;
+      if (ageA !== ageB) return ageB - ageA;
+    } else {
+      // 3. 非現役職員（級なし・60歳以上または臨任あり）：R8職名（副主任 -> 副主査 -> 技師・主事・研究員） -> R8年齢順（降順）
+      const rankA = getInactiveTitleRank(a.currentTitle);
+      const rankB = getInactiveTitleRank(b.currentTitle);
+      if (rankA !== rankB) return rankA - rankB;
+      if (ageA !== ageB) return ageB - ageA;
+    }
+
+    // 同年齢の場合：生年月日が早い順（より年長が上）
+    if (a.birthDate && b.birthDate && a.birthDate !== b.birthDate) {
+      return a.birthDate < b.birthDate ? -1 : 1;
+    }
+
+    // さらに同じ場合：昇格・採用年度が早い順
+    const yA = getLatestPromoYear(a);
+    const yB = getLatestPromoYear(b);
+    if (!isNaN(yA) && !isNaN(yB) && yA !== yB) return yA - yB;
+    else if (!isNaN(yA) && isNaN(yB)) return -1;
+    else if (isNaN(yA) && !isNaN(yB)) return 1;
+
+    return 0;
+  });
+};
