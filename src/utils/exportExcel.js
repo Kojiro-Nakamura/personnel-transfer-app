@@ -1499,25 +1499,36 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   // Filter employees
   const activeEmps = employees.filter(emp => {
     if (emp.isArchived) return false;
-    const dId = isNextYear ? emp.departmentId : emp.currentDeptId;
+    if (isNextYear) {
+      const isRetired = emp.departmentId === 'retired' || (deptMap.get(emp.departmentId)?.name || '').includes('退職');
+      if (isRetired) {
+        if (emp.currentDeptId === 'retired') return false;
+      } else {
+        if (!emp.departmentId || emp.departmentId === 'unassigned') return false;
+      }
+    } else {
+      const dId = emp.currentDeptId;
       if (!dId || dId === 'unassigned' || dId === 'retired') return false;
+    }
     const isTemp = /臨任|臨時/.test(emp.currentEmploymentType || '') || /臨任|臨時/.test(emp.note || '');
     if (isTemp) return false;
     return true;
   });
 
+  const ageOffset = isNextYear ? 1 : 2;
   const parsedEmps = activeEmps.map(emp => {
     const bYear = getBirthFiscalYear(emp.birthDate);
     const hYearShort = getHireFiscalYearShort(emp.hireDate);
     const dId = isNextYear ? emp.departmentId : emp.currentDeptId;
-      const dept = deptMap.get(dId);
+    const dept = deptMap.get(dId);
     const isShinkokyoku = dept ? (dept.name || '').includes('振興局') : false;
     return { ...emp, bYear, hYearShort, isShinkokyoku };
   }).filter(emp => emp.bYear !== null);
 
-  // Group by bYear
+  // Group by bYear (筆頭を64歳にする: 64歳相当年度または最年長者の年度)
   const grouped = {};
-  let minYear = 9999;
+  const minYear64 = (targetYear - ageOffset) - 64;
+  let minYear = minYear64;
   let maxYear = 0;
   parsedEmps.forEach(emp => {
     if (!grouped[emp.bYear]) grouped[emp.bYear] = [];
@@ -1526,11 +1537,14 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     if (emp.bYear > maxYear) maxYear = emp.bYear;
   });
 
-  if (minYear === 9999) return; // No data
+  if (maxYear === 0) return; // No data
 
-  // Sort each group
+  // Sort each group (退職者は同一生年グループの下部に配置)
   Object.values(grouped).forEach(arr => {
     arr.sort((a, b) => {
+      const isRetA = isNextYear && (a.departmentId === 'retired' || (deptMap.get(a.departmentId)?.name || '').includes('退職'));
+      const isRetB = isNextYear && (b.departmentId === 'retired' || (deptMap.get(b.departmentId)?.name || '').includes('退職'));
+      if (isRetA !== isRetB) return isRetA ? 1 : -1;
       if (a.hireDate !== b.hireDate) return (a.hireDate || '') > (b.hireDate || '') ? 1 : -1;
       return (a.birthDate || '') > (b.birthDate || '') ? 1 : -1;
     });
@@ -1562,6 +1576,9 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   const legendLabels = [
     '部長級', '次長級', '所属長級', '課長級', '補佐級III(補佐兼班長)', '補佐級II(班長)', '補佐級I(主任)', '係長級(主査)'
   ];
+  if (isNextYear) {
+    legendLabels.push('退職');
+  }
   let legendCol = 42 - (legendLabels.length * 2);
   
   // "凡例" text
@@ -1583,7 +1600,9 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     const cell = ws.getCell(2, legendCol);
     cell.value = legendLabels[i];
     cell.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
-    const colorHex = getPromotedBgColorCode(legendLabels[i])?.replace('#', '')?.toUpperCase() || 'FFFFFF';
+    const colorHex = legendLabels[i] === '退職'
+      ? 'D9D9D9'
+      : (getPromotedBgColorCode(legendLabels[i])?.replace('#', '')?.toUpperCase() || 'FFFFFF');
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + colorHex } };
     cell.alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: true };
     ws.mergeCells(2, legendCol, 2, legendCol + 1);
@@ -1676,7 +1695,10 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
           const ageOffset = isNextYear ? 1 : 2;
           const age = (targetYear - ageOffset) - y;
           let bgRaw = null;
-          if (isNextYear && age >= 60) {
+          const isEmpRetired = isNextYear && (emp.departmentId === 'retired' || (deptMap.get(emp.departmentId)?.name || '').includes('退職'));
+          if (isEmpRetired) {
+            bgRaw = '#D9D9D9';
+          } else if (isNextYear && age >= 60) {
             // 来年度60歳以上になる人は役職定年などで級が外れるため色なし
             bgRaw = ''; 
           } else {
