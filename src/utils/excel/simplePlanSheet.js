@@ -10,37 +10,19 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   });
   const historyYears = Array.from(allHistoryYears).sort((a, b) => a - b);
 
-  const getEraSuffixLocal = (yearStr) => {
-    return (yearStr >= 2019) ? 'R' : 'H';
-  };
-  const formatPromoDateWithEra = (dateStr) => {
-    if (!dateStr || String(dateStr).trim() === '') return '';
-    const match = String(dateStr).match(/^(\d{4})[-/]/);
-    if (!match) return dateStr;
-    const year = parseInt(match[1], 10);
-    const m = dateStr.length >= 7 ? parseInt(dateStr.substring(5,7), 10) : 4;
-    const isEarly = m >= 1 && m <= 3;
-    const fiscalYear = isEarly ? year - 1 : year;
-    let era = getEraSuffixLocal(fiscalYear);
-    let ey = fiscalYear >= 2019 ? fiscalYear - 2018 : (fiscalYear >= 1989 ? fiscalYear - 1988 : fiscalYear - 1925);
-    let eraStr = era + ey;
-    if (era === 'R' && ey === 1) eraStr = 'R元';
-    if (era === 'H' && ey === 1) eraStr = 'H元';
-    return eraStr + '(' + year + ')';
-  };
   const formatWithEra = (dateStr, birthDateStr = null) => {
+    if (!dateStr) return '';
     let res = formatPromoDateWithEra(String(dateStr));
     if (birthDateStr && dateStr) {
       const match = String(dateStr).match(/^(\d{4})[-/]/);
       if (match) {
          const year = parseInt(match[1], 10);
-         const ageDiff = year - parseInt(String(birthDateStr).substring(0,4));
-         res += '(' + ageDiff + '歳)';
+         const ag = calculateAge(birthDateStr, year);
+         if (ag) res += '(' + ag + '歳)';
       }
     }
     return res;
   };
-  const formatDateForDisplay = formatPromoDateWithEra;
 
   const ws = workbook.addWorksheet(sheetName, {
     views: [{ state: 'frozen', xSplit: 9, ySplit: 5, showGridLines: false }],
