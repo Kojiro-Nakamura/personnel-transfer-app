@@ -1,4 +1,4 @@
-import { isPromotedGrade, calcNextSkills } from './helpers.js';
+import { isPromotedGrade, calcNextSkills, calculateAge } from './helpers.js';
 import { GRADE_TO_PROMO_KEY } from '../constants/config.js';
 
 export const validateEmployees = (employees, targetYear, departments) => {
@@ -7,8 +7,25 @@ export const validateEmployees = (employees, targetYear, departments) => {
   const PROMO_KEYS = ['promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
 
   employees.forEach(emp => {
-    // Skip unassigned/retired
-    if (emp.departmentId === 'unassigned' || emp.departmentId === 'retired') return;
+    if (emp.isArchived) return;
+
+    // 0. 今年度在籍していて来年度が未配置（配置待ち）のままの職員チェック
+    if (!emp.departmentId || emp.departmentId === 'unassigned') {
+      if (emp.currentDeptId && emp.currentDeptId !== 'unassigned' && emp.currentDeptId !== 'retired') {
+        const currDept = departments ? departments.find(d => d.id === emp.currentDeptId) : null;
+        const currDeptName = currDept ? currDept.name : '今年度所属';
+        warnings.push({
+          empId: emp.id,
+          empName: emp.name,
+          type: '来年度未配置',
+          message: `今年度「**${currDeptName}**」に在籍していますが、来年度の配置先が「**配置待ち（未配置）**」のままになっています。`
+        });
+      }
+      return;
+    }
+
+    // Skip retired
+    if (emp.departmentId === 'retired') return;
 
     const isPromoted = isPromotedGrade(emp.currentGrade, emp.nextGrade);
     const activePromoKey = isPromoted ? GRADE_TO_PROMO_KEY[emp.nextGrade] : null;
@@ -167,6 +184,41 @@ export const validateEmployees = (employees, targetYear, departments) => {
           type: 'ポストと職名の不整合',
           message: `来年度の配置先ポスト名（**${postName}**）と、本人の職名（**${emp.nextTitle || 'なし'}**）が異なります。`
         });
+      }
+    }
+
+    // 5. 年齢に応じた役職定年・再任用・定年退職のチェック
+    const nextAgeRaw = calculateAge(emp.birthDate, targetYear);
+    const nextAge = (nextAgeRaw !== '' && nextAgeRaw !== null && !isNaN(nextAgeRaw)) ? Number(nextAgeRaw) : null;
+    const isTemp = /臨任|臨時/.test(emp.currentEmploymentType || '') || /臨任|臨時/.test(emp.nextEmploymentType || '') || /臨任|臨時/.test(emp.note || '');
+
+    if (nextAge !== null && !isTemp) {
+      if (nextAge >= 65) {
+        const placeName = locationStr || (dept ? dept.name : '通常部署');
+        warnings.push({
+          empId: emp.id,
+          empName: placeName ? `${emp.name}（${placeName}）` : emp.name,
+          type: '定年退職の確認',
+          message: `来年度 **${nextAge}歳** になりますが、退職・転出ではなく「**${placeName}**」に配置されています。定年退職の設定漏れでないか確認してください。`
+        });
+      } else if (nextAge >= 60) {
+        if (emp.nextGrade && emp.nextGrade.trim() !== '') {
+          warnings.push({
+            empId: emp.id,
+            empName: locationStr ? `${emp.name}（${locationStr}）` : emp.name,
+            type: '役職定年・級の解除漏れ',
+            message: `来年度 **${nextAge}歳** になりますが、来年度の級「**${emp.nextGrade}**」が設定されたままになっています（役職定年等による級の解除漏れの可能性があります）。`
+          });
+        }
+        const nextRemark = String(emp.nextEmploymentType || '').trim();
+        if (!/役職定年|再任用|再フル|再短|定年前|時短/.test(nextRemark)) {
+          warnings.push({
+            empId: emp.id,
+            empName: locationStr ? `${emp.name}（${locationStr}）` : emp.name,
+            type: '60歳以上・備考未設定',
+            message: `来年度 **${nextAge}歳** になりますが、来年度の備考に「**役職定年**」や「**再任用**」などの区分が入力されていません。`
+          });
+        }
       }
     }
   });

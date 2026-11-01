@@ -18,7 +18,7 @@ export const ValidationModal = ({ isOpen, onClose, employees, departments, targe
       setHasAutoFixed(false);
       setFixes([]);
     }
-  }, [isOpen, hasAutoFixed, employees, targetYear, onAutoFix]);
+  }, [isOpen, hasAutoFixed, employees, targetYear, departments, onAutoFix]);
 
   if (!isOpen) return null;
 

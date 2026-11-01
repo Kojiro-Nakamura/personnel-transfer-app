@@ -222,8 +222,8 @@ export const AppContent = () => {
               <button onClick={redo} disabled={!canRedo} className="p-1.5 bg-white/10 hover:bg-white/20 text-white disabled:bg-white/5 active:scale-95 transition-all disabled:opacity-50 rounded" title="取り消した操作をやり直す"><Redo className="w-4 h-4"/></button>
             </div>
             <button onClick={() => {
-                const { fixes } = autoFixEmployees(employees, targetYear);
-                const warnings = validateEmployees(employees, targetYear);
+                const { fixes } = autoFixEmployees(employees, targetYear, departments);
+                const warnings = validateEmployees(employees, targetYear, departments);
                 if (fixes.length === 0 && warnings.length === 0) {
                   alert('矛盾チェックを実行しましたが、自動修正が必要な箇所や警告は見つかりませんでした。\n全てのデータは正常です。');
                 } else {
