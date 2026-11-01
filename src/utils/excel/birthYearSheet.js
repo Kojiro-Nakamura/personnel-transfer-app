@@ -41,7 +41,12 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     const dept = deptMap.get(dId);
     const isShinkokyoku = dept ? (dept.name || '').includes('振興局') : false;
     return { ...emp, bYear, hYearShort, isShinkokyoku };
-  }).filter(emp => emp.bYear !== null);
+  }).filter(emp => {
+    if (emp.bYear === null) return false;
+    const age = (targetYear - ageOffset) - emp.bYear;
+    if (age > 64) return false;
+    return true;
+  });
 
   // Group by bYear (筆頭を64歳にする: 64歳相当年度または最年長者の年度)
   const grouped = {};
@@ -62,7 +67,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     arr.sort((a, b) => {
       const isRetA = isNextYear && (a.departmentId === 'retired' || (deptMap.get(a.departmentId)?.name || '').includes('退職'));
       const isRetB = isNextYear && (b.departmentId === 'retired' || (deptMap.get(b.departmentId)?.name || '').includes('退職'));
-      if (isRetA !== isRetB) return isRetA ? 1 : -1;
+      // Keep natural hireDate / birthDate sort order
       if (a.hireDate !== b.hireDate) return (a.hireDate || '') > (b.hireDate || '') ? 1 : -1;
       return (a.birthDate || '') > (b.birthDate || '') ? 1 : -1;
     });
@@ -82,7 +87,7 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
   const boldFont = { name: 'BIZ UDPゴシック', size: 9, bold: true };
   const titleFont = { name: 'BIZ UDPゴシック', size: 14, bold: true };
 
-  const yearsPerBlock = 20;
+  const yearsPerBlock = 15;
   let currentRowIndex = 1;
 
   
@@ -95,9 +100,9 @@ export const addBirthYearSheet = (workbook, sheetName, targetYear, employees, de
     '部長級', '次長級', '所属長級', '課長級', '補佐級III(補佐兼班長)', '補佐級II(班長)', '補佐級I(主任)', '係長級(主査)'
   ];
   if (isNextYear) {
-    legendLabels.push('退職');
+    // 凡例位置を今年度・来年度ともCol 14〜31（58歳〜50歳の上）に統一
   }
-  let legendCol = 42 - (legendLabels.length * 2);
+  let legendCol = (2 + yearsPerBlock * 2) - (legendLabels.length * 2);
   
   // "凡例" text
   const hanreiCol = legendCol - 2;
