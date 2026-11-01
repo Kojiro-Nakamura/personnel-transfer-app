@@ -28,9 +28,14 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   const nextEra = `R${targetYear - 2018}`;
 
   // 1. 人事異動案（シンプル）：全件、課長級以上、補佐級II(班長)以上
-  addSimplePlanSheet(workbook, '簡(全)', baseTitle, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelAll, showCount);
-  addSimplePlanSheet(workbook, '簡(課長)', `${baseTitle}（課長級以上）`, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelSecHead, showCount);
+  const wsSimpleAll = addSimplePlanSheet(workbook, '簡(全)', baseTitle, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelAll, showCount);
+  const wsSimpleSec = addSimplePlanSheet(workbook, '簡(課長)', `${baseTitle}（課長級以上）`, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelSecHead, showCount);
   addSimplePlanSheet(workbook, '簡(班長)', `${baseTitle}（補佐級II(班長)以上）`, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelAssistant2, showCount);
+
+  // 簡(全)シートのD職名(4)〜L備考(12)の列幅を簡(課長)と同じにする
+  for (let c = 4; c <= 12; c++) {
+    wsSimpleAll.getColumn(c).width = wsSimpleSec.getColumn(c).width;
+  }
 
   // 2. 人事異動案：全件、課長級以上、補佐級II(班長)以上
   addPlanSheet(workbook, '案(全)', baseTitle, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelAll, showCount);
