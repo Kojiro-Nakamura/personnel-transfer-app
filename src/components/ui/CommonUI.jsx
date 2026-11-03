@@ -11,7 +11,7 @@ import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
 
-export const CommentButton = ({ targetId, theme = 'light', tooltipPos = 'right', hoverClass = 'group-hover/row:opacity-100' }) => {
+export const CommentButton = ({ targetId, theme = 'light', tooltipPos = 'right', hoverClass = 'group-hover/row:opacity-100', isHovered = false }) => {
   const { notes, openModal } = useApp();
   const note = notes.find(n => n.targetId === targetId);
   const hasNote = !!(note && note.text);
@@ -21,7 +21,7 @@ export const CommentButton = ({ targetId, theme = 'light', tooltipPos = 'right',
     : (hasNote ? "text-sky-500 hover:text-sky-600" : "text-slate-300 hover:text-slate-500");
 
   return (
-    <div className={cx("flex items-center group/tooltip relative", !hasNote && `opacity-0 transition-opacity ${hoverClass}`)}>
+    <div className={cx("flex items-center group/tooltip relative transition-opacity", !hasNote && (isHovered ? "opacity-100" : `opacity-0 ${hoverClass}`))}>
       <button 
         onClick={(e) => { e.stopPropagation(); openModal('note', { targetId, text: note?.text || '' }); }}
         className={cx("p-1 transition-colors rounded", btnClass)}
@@ -152,4 +152,3 @@ export const PlacementSelector = ({ deptId, postId, groupId, groupPostId, depart
     </div>
   );
 };
-

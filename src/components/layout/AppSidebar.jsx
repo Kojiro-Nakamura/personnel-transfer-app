@@ -45,7 +45,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
       </div>
       <div className="flex items-center gap-1 shrink-0 z-20">
         {!isPickingMode && (
-          <div className="opacity-0 group-hover/side:opacity-100 flex gap-0.5 bg-slate-400/80 p-0.5 rounded-lg shadow mr-1 transition-opacity">
+          <div className={cx("flex gap-0.5 bg-slate-400/80 p-0.5 rounded-lg shadow mr-1 transition-opacity", emp.id === hoveredEmpId ? "opacity-100" : "opacity-0 pointer-events-none")}>
             <button 
               onClick={(e) => { if (onMoveUp) { e.stopPropagation(); onMoveUp(); } }} 
               className={cx("p-0.5 rounded text-white transition-colors", onMoveUp ? "hover:bg-slate-500/70" : "invisible")} 
@@ -82,7 +82,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
           {currentAge !== '' ? `${currentAge}歳` : ''}
         </span>
         <div onClick={e => e.stopPropagation()}>
-          <CommentButton targetId={`side-${emp.id}`} tooltipPos="bottom-right" hoverClass="group-hover/side:opacity-100" />
+          <CommentButton targetId={`side-${emp.id}`} tooltipPos="bottom-right" hoverClass="group-hover/side:opacity-100" isHovered={emp.id === hoveredEmpId} />
         </div>
       </div>
     </div>
@@ -147,5 +147,3 @@ export const AppSidebar = () => {
     </div>
   );
 };
-
-
