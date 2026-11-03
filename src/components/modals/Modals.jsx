@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, FileCode, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear, sortEmployeeList } from '../../utils/helpers.js';
+import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, recalcNextYearsAndSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear, sortEmployeeList } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -1279,7 +1279,16 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
             <tbody>
               {sortedEmps.map((emp, empIdx) => {
                 const isS = selectedIds.has(emp.id);
-                const handleChange = (id, key, val) => setLocalEmps(prev => prev.map(e => e.id === id ? { ...e, [key]: val } : e));
+                const handleChange = (id, key, val) => setLocalEmps(prev => prev.map(e => {
+                  if (e.id !== id) return e;
+                  const updated = { ...e, [key]: val };
+                  if (['currentGrade', 'nextGrade', 'currentYears', 'currentSkillsStr'].includes(key)) {
+                    const { nextYears, nextSkills } = recalcNextYearsAndSkills(updated);
+                    updated.nextYears = nextYears;
+                    updated.nextSkillsStr = nextSkills.join('、');
+                  }
+                  return updated;
+                }));
                 const handleHistoryChange = (id, year, val) => {
                     setLocalEmps(prev => prev.map(e => {
                         if (e.id !== id) return e;
@@ -1423,7 +1432,12 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                         className="h-[26px] gap-1" 
                         deptId={emp.currentDeptId} postId={emp.currentPostId} groupId={emp.currentGroupId} groupPostId={emp.currentGroupPostId} 
                         departments={localDepts} isNext={false} 
-                        onChange={v => setLocalEmps(prev => prev.map(e => e.id === emp.id ? { ...e, currentDeptId: v.deptId, currentPostId: v.postId, currentGroupId: v.groupId, currentGroupPostId: v.groupPostId } : e))} 
+                        onChange={v => setLocalEmps(prev => prev.map(e => {
+                          if (e.id !== emp.id) return e;
+                          const updated = { ...e, currentDeptId: v.deptId, currentPostId: v.postId, currentGroupId: v.groupId, currentGroupPostId: v.groupPostId };
+                          const { nextYears, nextSkills } = recalcNextYearsAndSkills(updated);
+                          return { ...updated, nextYears, nextSkillsStr: nextSkills.join('、') };
+                        }))} 
                       />
                     </td>
                     <td className="bg-slate-50/30"><input type="text" value={emp.currentTitle||''} onChange={e => handleChange(emp.id,'currentTitle',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>
@@ -1441,7 +1455,12 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                         className="h-[26px] gap-1" 
                         deptId={emp.departmentId} postId={emp.postId} groupId={emp.groupId} groupPostId={emp.groupPostId} 
                         departments={localDepts} isNext={true} 
-                        onChange={v => setLocalEmps(prev => prev.map(e => e.id === emp.id ? { ...e, departmentId: v.deptId, postId: v.postId, groupId: v.groupId, groupPostId: v.groupPostId } : e))} 
+                        onChange={v => setLocalEmps(prev => prev.map(e => {
+                          if (e.id !== emp.id) return e;
+                          const updated = { ...e, departmentId: v.deptId, postId: v.postId, groupId: v.groupId, groupPostId: v.groupPostId };
+                          const { nextYears, nextSkills } = recalcNextYearsAndSkills(updated);
+                          return { ...updated, nextYears, nextSkillsStr: nextSkills.join('、') };
+                        }))} 
                       />
                     </td>
                     <td className="bg-blue-50/30"><input type="text" value={emp.nextTitle||''} onChange={e => handleChange(emp.id,'nextTitle',e.target.value)} className={cx(inputCls, 'text-center px-1')} /></td>

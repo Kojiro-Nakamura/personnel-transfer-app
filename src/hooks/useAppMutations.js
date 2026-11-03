@@ -1,5 +1,6 @@
 import { useMemo, useCallback } from 'react';
-import { calcNextSkills, calcOrder, clearPlacement } from '../utils/helpers.js';
+import { calcOrder, clearPlacement, recalcNextYearsAndSkills } from '../utils/helpers.js';
+
 export function useAppMutations(setEmployees, setDepartments, setNotes, commit) {
   const updateEmps = useCallback((updater) => { commit(); setEmployees(updater); }, [commit, setEmployees]);
   const updateDepts = useCallback((updater) => { commit(); setDepartments(updater); }, [commit, setDepartments]);
@@ -26,10 +27,11 @@ export function useAppMutations(setEmployees, setDepartments, setNotes, commit) 
     }),
     unassignEmployee: (id, isSource) => updateEmps(prev => prev.map(emp => { 
       if (emp.id !== id) return emp; 
-      if (isSource) {
-        return { ...emp, currentDeptId: 'unassigned', currentPostId: null, currentGroupId: null, currentGroupPostId: null }; 
-      }
-      return { ...emp, departmentId: 'unassigned', postId: null, groupId: null, groupPostId: null }; 
+      const updated = isSource
+        ? { ...emp, currentDeptId: 'unassigned', currentPostId: null, currentGroupId: null, currentGroupPostId: null }
+        : { ...emp, departmentId: 'unassigned', postId: null, groupId: null, groupPostId: null };
+      const { nextYears, nextSkills } = recalcNextYearsAndSkills(updated);
+      return { ...updated, nextYears, nextSkills };
     })),
     assignSlot: (empId, placement) => updateEmps(prev => {
       const idx = prev.findIndex(e => e.id === empId);
@@ -43,16 +45,9 @@ export function useAppMutations(setEmployees, setDepartments, setNotes, commit) 
       nE.groupId = gId; 
       nE.groupPostId = gpId;
       
-      const isSameDepartment = dId !== 'unassigned' && dId !== 'retired' && dId === nE.currentDeptId;
-      const isSamePost = pId && nE.currentPostId === pId;
-      const isSameGroupGeneral = gId && !gpId && nE.currentGroupId === gId && !nE.currentGroupPostId;
-      const isSameGroupPost = gId && gpId && nE.currentGroupId === gId && nE.currentGroupPostId === gpId;
-      const isSameDeptGeneral = !pId && !gId && !nE.currentPostId && !nE.currentGroupId;
-
-      const isSameSlot = isSameDepartment && (isSamePost || isSameGroupGeneral || isSameGroupPost || isSameDeptGeneral);
-      
-      nE.nextYears = isSameSlot ? (nE.currentYears || 0) + 1 : 1; 
-      nE.nextSkills = (dId === 'unassigned' || dId === 'retired') ? [] : calcNextSkills(nE.currentSkills, nE.currentYears, isSameSlot, isSameDepartment);
+      const { nextYears, nextSkills } = recalcNextYearsAndSkills(nE);
+      nE.nextYears = nextYears;
+      nE.nextSkills = nextSkills;
       
       const sg = prev.filter(e => 
         e.id !== empId && 

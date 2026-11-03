@@ -265,6 +265,61 @@ export const calcNextSkills = (skills, years, isSameSlot, isSameDepartment) => {
   return [detailStr]; 
 };
 
+export const recalcNextYearsAndSkills = (emp) => {
+  const dId = emp.departmentId;
+  if (!dId || dId === 'unassigned' || dId === 'retired') {
+    return { nextYears: 1, nextSkills: [] };
+  }
+
+  const isPromoted = isPromotedGrade(emp.currentGrade, emp.nextGrade);
+  const isSameDept = Boolean(
+    emp.currentDeptId &&
+    emp.currentDeptId !== 'unassigned' &&
+    emp.currentDeptId !== 'retired' &&
+    emp.currentDeptId === dId
+  );
+  const isSamePost = Boolean(
+    isSameDept &&
+    (emp.currentPostId || null) === (emp.postId || null) &&
+    (emp.currentGroupId || null) === (emp.groupId || null) &&
+    (emp.currentGroupPostId || null) === (emp.groupPostId || null)
+  );
+
+  const currentYearsNum = Number(emp.currentYears) || 0;
+  const nextYears = isSameDept ? currentYearsNum + 1 : 1;
+
+  const currentSkillsArr = (emp.currentSkillsStr !== undefined)
+    ? String(emp.currentSkillsStr || '').split(/[,、]/).map(s => s.trim()).filter(Boolean)
+    : (Array.isArray(emp.currentSkills) ? emp.currentSkills : []);
+
+  let nextSkills = [];
+  if (isPromoted) {
+    if (isSamePost) {
+      // Pattern E: same post, promoted -> keep history
+      nextSkills = [...currentSkillsArr];
+    } else if (isSameDept) {
+      // Pattern D: same dept, different post, promoted
+      nextSkills = calcNextSkills(currentSkillsArr, currentYearsNum, false, true);
+    } else {
+      // Pattern A: different dept, promoted
+      nextSkills = ['1'];
+    }
+  } else {
+    if (!isSameDept) {
+      // Pattern A: different dept
+      nextSkills = ['1'];
+    } else if (!isSamePost) {
+      // Pattern B: same dept, different post
+      nextSkills = calcNextSkills(currentSkillsArr, currentYearsNum, false, true);
+    } else {
+      // Pattern C: same dept, same post
+      nextSkills = calcNextSkills(currentSkillsArr, currentYearsNum, true, true);
+    }
+  }
+
+  return { nextYears, nextSkills };
+};
+
 export const calcOrder = (array, index, position, key) => { 
   if (array.length === 0) return 1000; 
   if (index === -1) return (array[array.length - 1][key] || 0) + 1000; 
@@ -305,6 +360,9 @@ export const clearPlacement = (emp, targetId, type) => {
     if (emp.currentGroupPostId === targetId) updated.currentGroupPostId = null; 
     if (emp.groupPostId === targetId) updated.groupPostId = null; 
   } 
+  const { nextYears, nextSkills } = recalcNextYearsAndSkills(updated);
+  updated.nextYears = nextYears;
+  updated.nextSkills = nextSkills;
   return updated; 
 };
 

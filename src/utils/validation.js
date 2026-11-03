@@ -1,4 +1,4 @@
-import { isPromotedGrade, calcNextSkills, calculateAge } from './helpers.js';
+import { isPromotedGrade, calcNextSkills, calculateAge, recalcNextYearsAndSkills } from './helpers.js';
 import { GRADE_TO_PROMO_KEY } from '../constants/config.js';
 
 export const validateEmployees = (employees, targetYear, departments) => {
@@ -64,20 +64,9 @@ export const validateEmployees = (employees, targetYear, departments) => {
       }
     }
 
-    // 2. 経過年数の矛盾
-    const isSameDept = emp.currentDeptId === emp.departmentId;
-    let expectedNextYears = emp.nextYears;
-    let isYearsMismatch = false;
-
-    if (isSameDept) {
-      expectedNextYears = (Number(emp.currentYears) || 0) + 1;
-    } else {
-      expectedNextYears = 1;
-    }
-
-    if (Number(emp.nextYears) !== Number(expectedNextYears)) {
-      isYearsMismatch = true;
-    }
+    // 2. 経過年数・詳細年数の矛盾
+    const { nextYears: expectedNextYears, nextSkills: expectedNextSkills } = recalcNextYearsAndSkills(emp);
+    const isYearsMismatch = Number(emp.nextYears) !== Number(expectedNextYears);
 
     if (isYearsMismatch) {
       warnings.push({
@@ -85,6 +74,17 @@ export const validateEmployees = (employees, targetYear, departments) => {
         empName: emp.name,
         type: '経過年数矛盾',
         message: `配置変更ルールに基づくと経過年数は「**${expectedNextYears}年**」になるはずですが、現在「**${emp.nextYears}年**」になっています。`
+      });
+    }
+
+    const currentSkillsStr = (emp.nextSkills || []).join('、');
+    const expectedSkillsStr = expectedNextSkills.join('、');
+    if (currentSkillsStr !== expectedSkillsStr) {
+      warnings.push({
+        empId: emp.id,
+        empName: emp.name,
+        type: '詳細年数矛盾',
+        message: `配置変更ルールに基づくと年数詳細は「**${expectedSkillsStr || '(空欄)'}**」になるはずですが、現在「**${currentSkillsStr || '(空欄)'}**」になっています。`
       });
     }
 
@@ -310,38 +310,7 @@ export const autoFixEmployees = (employees, targetYear, departments) => {
     });
 
     // 2. Years and Skills Fixes
-    let expectedNextYears = emp.nextYears;
-    let expectedNextSkills = [...(emp.nextSkills || [])];
-
-    if (isSameDept) {
-      expectedNextYears = (Number(emp.currentYears) || 0) + 1;
-    } else {
-      expectedNextYears = 1;
-    }
-
-    if (isPromoted) {
-      if (isSamePost) {
-        // Pattern E: same post, promoted -> keep history
-        expectedNextSkills = [...(emp.currentSkills || [])];
-      } else if (isSameDept) {
-        // Pattern D: same dept, different post, promoted
-        expectedNextSkills = calcNextSkills(emp.currentSkills, emp.currentYears, false, true);
-      } else {
-        // Pattern A: different dept, promoted
-        expectedNextSkills = ['1'];
-      }
-    } else {
-      if (!isSameDept) {
-        // Pattern A: different dept
-        expectedNextSkills = ['1'];
-      } else if (!isSamePost) {
-        // Pattern B: same dept, different post
-        expectedNextSkills = calcNextSkills(emp.currentSkills, emp.currentYears, false, true);
-      } else {
-        // Pattern C: same dept, same post
-        expectedNextSkills = calcNextSkills(emp.currentSkills, emp.currentYears, true, true);
-      }
-    }
+    const { nextYears: expectedNextYears, nextSkills: expectedNextSkills } = recalcNextYearsAndSkills(emp);
 
     if (Number(emp.nextYears) !== Number(expectedNextYears)) {
       emp.nextYears = expectedNextYears;

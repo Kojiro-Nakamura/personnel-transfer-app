@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, recalcNextYearsAndSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 import { autoFixEmployees } from '../../utils/validation.js';
@@ -293,7 +293,6 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
   const handleGradeChange = (v) => {
     let updates = { [`${p}Grade`]: v };
     if (!isCurrent && isPromotedGrade(fd.currentGrade, v)) {
-      updates.nextYears = 1;
       const gradeToPromoKey = {
         "係長級(主査)": "promoYearChief",
         "補佐級I(主任)": "promoYearAssistant1",
@@ -306,10 +305,12 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
       };
       const promoKey = gradeToPromoKey[v];
       if (promoKey) {
-        updates[promoKey] = String(targetYear);
+        updates[promoKey] = `${targetYear}-04-01`;
       }
     }
-    setFd({ ...fd, ...updates });
+    const nextFd = { ...fd, ...updates };
+    const { nextYears, nextSkills } = recalcNextYearsAndSkills(nextFd);
+    setFd({ ...nextFd, nextYears, nextSkillsStr: nextSkills.join('、') });
   };
 
   return (
@@ -328,15 +329,35 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
         <div className="space-y-1">
           <div>
             <label className="block text-xs mb-1">配置先</label>
-            <PlacementSelector disabled={disabled} deptId={fd[pd]} postId={fd[pp]} groupId={fd[pg]} groupPostId={fd[pgp]} departments={departments} isNext={!isCurrent} onChange={v => setFd({...fd, [pd]: v.deptId, [pp]: v.postId, [pg]: v.groupId, [pgp]: v.groupPostId})} />
+            <PlacementSelector disabled={disabled} deptId={fd[pd]} postId={fd[pp]} groupId={fd[pg]} groupPostId={fd[pgp]} departments={departments} isNext={!isCurrent} onChange={v => {
+              const nextFd = { ...fd, [pd]: v.deptId, [pp]: v.postId, [pg]: v.groupId, [pgp]: v.groupPostId };
+              const { nextYears, nextSkills } = recalcNextYearsAndSkills(nextFd);
+              setFd({ ...nextFd, nextYears, nextSkillsStr: nextSkills.join('、') });
+            }} />
           </div>
           <div className="flex gap-1">
             <FormInput label="職名" disabled={disabled} value={fd[`${p}Title`]} onChange={v => setFd({...fd, [`${p}Title`]: v})} className="flex-1" />
             <FormSelect label="級" disabled={disabled} value={fd[`${p}Grade`]} onChange={handleGradeChange} options={GRADE_OPTIONS} className="w-[140px]" selectClassName={promoBg} />
           </div>
           <div className="flex gap-1">
-            <FormInput label="年数" type="number" disabled={disabled} value={fd[`${p}Years`]} onChange={v => setFd({...fd, [`${p}Years`]: v})} className="w-16" />
-            <FormInput label="年数詳細" disabled={disabled} placeholder="派1+治1、1+1など" value={fd[`${p}SkillsStr`]} onChange={v => setFd({...fd, [`${p}SkillsStr`]: v})} className="flex-1" />
+            <FormInput label="年数" type="number" disabled={disabled} value={fd[`${p}Years`]} onChange={v => {
+              const nextFd = { ...fd, [`${p}Years`]: v };
+              if (isCurrent) {
+                const { nextYears, nextSkills } = recalcNextYearsAndSkills(nextFd);
+                nextFd.nextYears = nextYears;
+                nextFd.nextSkillsStr = nextSkills.join('、');
+              }
+              setFd(nextFd);
+            }} className="w-16" />
+            <FormInput label="年数詳細" disabled={disabled} placeholder="派1+治1、1+1など" value={fd[`${p}SkillsStr`]} onChange={v => {
+              const nextFd = { ...fd, [`${p}SkillsStr`]: v };
+              if (isCurrent) {
+                const { nextYears, nextSkills } = recalcNextYearsAndSkills(nextFd);
+                nextFd.nextYears = nextYears;
+                nextFd.nextSkillsStr = nextSkills.join('、');
+              }
+              setFd(nextFd);
+            }} className="flex-1" />
           </div>
           <div className="flex gap-1">
             <FormInput label="備考" disabled={disabled} placeholder="育代No.1：横山など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} className="flex-1" />
