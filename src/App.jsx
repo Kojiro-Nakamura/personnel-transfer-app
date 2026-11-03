@@ -9,7 +9,7 @@ import {
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { exportListToExcel, exportUnifiedExcel } from './utils/exportExcel.js';
 import { useApp, AppProvider } from './contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, getRemarkBgClass, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear } from './utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from './constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from './constants/initialData.js';
 import { APP_VERSION } from './constants/version.js';
@@ -422,7 +422,7 @@ export const AppContent = () => {
                   <span className="w-28 shrink-0 truncate" title={selEmp.currentGrade || ''}>{selEmp.currentGrade || ''}</span>
                   <span className={cx("w-20 shrink-0 text-right font-medium", ys >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "")} title={yd}>{yd}</span>
                   <span className="w-10 shrink-0 text-right" title={dispAge !== '' ? `${dispAge}歳` : ''}>{dispAge !== '' ? `${dispAge}歳` : ''}</span>
-                  <span className="w-32 shrink-0 truncate ml-1" title={selEmp.currentEmploymentType || ''}>{selEmp.currentEmploymentType || ''}</span>
+                  <span className="w-32 shrink-0 truncate ml-1" title={selEmp.currentEmploymentType || ''}><span className={cx(getRemarkBgClass(selEmp.currentEmploymentType) ? `${getRemarkBgClass(selEmp.currentEmploymentType)} text-black px-1 rounded` : "")}>{selEmp.currentEmploymentType || ''}</span></span>
                 </div>
                 <div className="flex gap-2 items-center text-blue-700">
                   <span className="w-10 shrink-0 font-bold">来年度:</span>
@@ -441,7 +441,7 @@ export const AppContent = () => {
                       <span className="w-28 shrink-0 truncate"></span>
                       <span className="w-20 shrink-0 text-right font-medium"></span>
                       <span className="w-10 shrink-0 text-right" title={nextAge !== '' ? `${nextAge}歳` : ''}>{nextAge !== '' ? `${nextAge}歳` : ''}</span>
-                      <span className="w-32 shrink-0 truncate ml-1" title={selEmp.nextEmploymentType || ''}>{selEmp.nextEmploymentType || ''}</span>
+                      <span className="w-32 shrink-0 truncate ml-1" title={selEmp.nextEmploymentType || ''}><span className={cx(getRemarkBgClass(selEmp.nextEmploymentType) ? `${getRemarkBgClass(selEmp.nextEmploymentType)} text-black px-1 rounded` : "")}>{selEmp.nextEmploymentType || ''}</span></span>
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
@@ -449,7 +449,7 @@ export const AppContent = () => {
                       <span className="w-28 shrink-0 truncate" title={selEmp.nextGrade || ''}>{selEmp.nextGrade || ''}</span>
                       <span className={cx("w-20 shrink-0 text-right font-medium", nextYs >= 3 ? "text-rose-700 bg-rose-100 px-1 rounded" : "")} title={nextYd}>{nextYd}</span>
                       <span className="w-10 shrink-0 text-right" title={nextAge !== '' ? `${nextAge}歳` : ''}>{nextAge !== '' ? `${nextAge}歳` : ''}</span>
-                      <span className="w-32 shrink-0 truncate ml-1" title={selEmp.nextEmploymentType || ''}>{selEmp.nextEmploymentType || ''}</span>
+                      <span className="w-32 shrink-0 truncate ml-1" title={selEmp.nextEmploymentType || ''}><span className={cx(getRemarkBgClass(selEmp.nextEmploymentType) ? `${getRemarkBgClass(selEmp.nextEmploymentType)} text-black px-1 rounded` : "")}>{selEmp.nextEmploymentType || ''}</span></span>
                     </React.Fragment>
                   )}
                 </div>

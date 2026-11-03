@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, recalcNextYearsAndSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, getRemarkBgClass, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, recalcNextYearsAndSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 import { autoFixEmployees } from '../../utils/validation.js';
@@ -49,6 +49,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const age = calculateAge(emp.birthDate, isNext ? targetYear : targetYear - 1);
   const showUnassign = emp && emp.departmentId !== 'unassigned';
   const noteText = isNext ? emp.nextEmploymentType : emp.currentEmploymentType;
+  const remarkBg = getRemarkBgClass(noteText);
 
   const isFutureUnassigned = !isNext && emp.departmentId === 'unassigned';
   const isFutureRetired = !isNext && emp.departmentId === 'retired';
@@ -118,7 +119,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       </div>
       
       <div className="w-24 text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center">
-        <span className="truncate w-full block">{noteText}</span>
+        <span className={cx("truncate max-w-full inline-block", remarkBg ? `${remarkBg} px-1 rounded` : "w-full block")}>{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
             {noteText}
@@ -360,7 +361,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
             }} className="flex-1" />
           </div>
           <div className="flex gap-1">
-            <FormInput label="備考" disabled={disabled} placeholder="育代No.1：横山など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} className="flex-1" />
+            <FormInput label="備考" disabled={disabled} placeholder="育代No.1：横山など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} className="flex-1" inputClassName={getRemarkBgClass(fd[`${p}EmploymentType`])} />
             <FormInputWithList label="カウント除外" disabled={disabled} placeholder="事務職など" value={fd[`${p}Exclude`]} onChange={v => setFd({...fd, [`${p}Exclude`]: v})} options={["事務職", "技術職", "短時間"]} listId={`exclude-list-${p}`} className="w-24" />
           </div>
         </div>
