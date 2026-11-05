@@ -332,6 +332,13 @@ const addModalListSheet = (workbook, sheetName, targetYear, moves, movesByToPost
     ]);
     row.eachCell((cell, colNumber) => {
       cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: colNumber === 7 ? {style:'medium'} : {style:'thin'} };
+      if ((colNumber === 3 || colNumber === 8) && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+        const num = Number(cell.value);
+        if (!isNaN(num)) {
+          cell.value = num;
+          cell.numFmt = '[$-411]000000';
+        }
+      }
       if ([3, 5, 7, 8, 10, 11].includes(colNumber)) {
         cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       } else {

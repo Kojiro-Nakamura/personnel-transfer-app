@@ -355,6 +355,13 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const alignStr = isNoShrink ? 'left' : 'center';
           cell.alignment = { vertical: 'middle', horizontal: alignStr, shrinkToFit: !isNoShrink, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
+          if (c === 22 && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+            const num = Number(cell.value);
+            if (!isNaN(num)) {
+              cell.value = num;
+              cell.numFmt = '[$-411]000000';
+            }
+          }
         }
         currentRowIndex++;
         return;
@@ -583,6 +590,13 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const alignStr = isNoShrink ? 'left' : 'center';
           cell.alignment = { vertical: 'middle', horizontal: alignStr, shrinkToFit: !isNoShrink, wrapText: false };
           cell.font = { name: 'BIZ UDPゴシック', size: 9 };
+          if (c === 22 && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+            const num = Number(cell.value);
+            if (!isNaN(num)) {
+              cell.value = num;
+              cell.numFmt = '[$-411]000000';
+            }
+          }
           
           if (c === 5) {
              cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
@@ -914,6 +928,13 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
           const alignStr = isNoShrink ? 'left' : 'center';
           cell.alignment = { vertical: 'middle', horizontal: alignStr, shrinkToFit: !isNoShrink, wrapText: false };
         cell.font = { name: 'BIZ UDPゴシック', size: 9 };
+        if (c === 22 && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+          const num = Number(cell.value);
+          if (!isNaN(num)) {
+            cell.value = num;
+            cell.numFmt = '[$-411]000000';
+          }
+        }
         if (c === 5) cell.font = { name: 'BIZ UDPゴシック', size: 10, bold: true };
         if (c === 7 || c === 8 || c === 10 || c === 15 || c === 16) cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
         if (c === 10) cell.font = { name: 'BIZ UDPゴシック', size: 9, bold: true };

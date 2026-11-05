@@ -504,6 +504,13 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const shouldShrink = (c !== 2 && c !== 3 && !(c >= 22 && c <= 24));
       cell.alignment = { vertical: 'middle', horizontal: isLeft ? 'left' : 'center', shrinkToFit: shouldShrink, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
+      if (c === 17 && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+        const num = Number(cell.value);
+        if (!isNaN(num)) {
+          cell.value = num;
+          cell.numFmt = '[$-411]000000';
+        }
+      }
       
       let topStyle = 'hair';
       if (rowIndex === 6) topStyle = 'medium';
