@@ -24,11 +24,25 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     return res;
   };
 
+  const getShortGrade = (grade) => {
+    if (!grade) return '';
+    const g = String(grade);
+    if (g.includes('部長級')) return '部';
+    if (g.includes('次長級')) return '次';
+    if (g.includes('所属長級')) return '所';
+    if (g.includes('課長級')) return '課';
+    if (g.includes('補佐級III') || g.includes('補佐級Ⅲ')) return 'Ⅲ';
+    if (g.includes('補佐級II') || g.includes('補佐級Ⅱ')) return 'Ⅱ';
+    if (g.includes('補佐級I') || g.includes('補佐級Ⅰ')) return 'Ⅰ';
+    if (g.includes('係長級')) return '係';
+    return '';
+  };
+
   const ws = workbook.addWorksheet(sheetName, {
-    views: [{ state: 'frozen', xSplit: 9, ySplit: 5, showGridLines: false }],
+    views: [{ state: 'frozen', xSplit: 11, ySplit: 6, showGridLines: false }],
     pageSetup: { paperSize: 8, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5, header: 0.1, footer: 0.1 } }
   });
-  ws.pageSetup.printTitlesRow = '1:5';
+  ws.pageSetup.printTitlesRow = '1:6';
 
   const fillSlate = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
   const fillAmber = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE68A' } };
@@ -45,17 +59,22 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummary}`];
   ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
-  ws.mergeCells('A2:L2');
+  ws.getRow(4).values = ['級凡例：部：部長級　次：次長級　所：所属長級　課：課長級　Ⅲ：補佐級Ⅲ（補佐兼班長）　Ⅱ：補佐級Ⅱ（班長）　Ⅰ：補佐級Ⅰ（主任）　係：係長級（主査）'];
+  ws.getRow(4).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF1E293B' } };
+
+  ws.mergeCells('A2:N2');
   ws.getCell('A2').alignment = { shrinkToFit: true, vertical: 'middle' };
-  ws.mergeCells('A3:L3');
+  ws.mergeCells('A3:N3');
   ws.getCell('A3').alignment = { shrinkToFit: true, vertical: 'middle' };
+  ws.mergeCells('A4:N4');
+  ws.getCell('A4').alignment = { shrinkToFit: true, vertical: 'middle' };
 
 
-  ws.getRow(3).getCell(14).value = '＜参考＞';
-  ws.getRow(3).getCell(14).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
+  ws.getRow(4).getCell(16).value = '＜参考＞';
+  ws.getRow(4).getCell(16).font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF000000' } };
 
   const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
-  const legendEndCol = 34 + targetYearIndex;
+  const legendEndCol = 36 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -82,48 +101,48 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     }
   }
 
-  const r4 = ws.getRow(4);
-  const r4Vals = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', ''];
-  const currentEraShort = `R${targetYear - 2019}`;
-  r4Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '');
-  historyYears.forEach((y, i) => {
-    if (i === 0) r4Vals.push('履歴');
-    else r4Vals.push('');
-  });
-  r4.values = r4Vals;
-  r4.height = 20;
-
   const r5 = ws.getRow(5);
-  const r5Vals = ['', '', '', '職名', '氏名', '在籍', '年齢', '職名', '氏名', '在籍', '年齢', '備考', ''];
-  r5Vals.push('氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
-  historyYears.forEach(y => r5Vals.push(`R${y-2018}(${y})`));
+  const r5Vals = ['部署名', '配属希望', '特殊事情', `今年度（${targetYear - 1}(R${targetYear - 2019})）`, '', '', '', '', `来年度（${targetYear}(R${targetYear - 2018})）`, '', '', '', '', '', ''];
+  const currentEraShort = `R${targetYear - 2019}`;
+  r5Vals.push('氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', '');
+  historyYears.forEach((y, i) => {
+    if (i === 0) r5Vals.push('履歴');
+    else r5Vals.push('');
+  });
   r5.values = r5Vals;
   r5.height = 20;
 
-  ws.mergeCells('A4:A5');
-  ws.mergeCells('B4:B5');
-  ws.mergeCells('C4:C5');
-  ws.mergeCells('D4:G4');
-  ws.mergeCells('H4:L4');
+  const r6 = ws.getRow(6);
+  const r6Vals = ['', '', '', '職名', '氏名', '級', '在籍', '年齢', '職名', '氏名', '級', '在籍', '年齢', '備考', ''];
+  r6Vals.push('氏名', '年齢', 'フリガナ', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度');
+  historyYears.forEach(y => r6Vals.push(`R${y-2018}(${y})`));
+  r6.values = r6Vals;
+  r6.height = 20;
+
+  ws.mergeCells('A5:A6');
+  ws.mergeCells('B5:B6');
+  ws.mergeCells('C5:C6');
+  ws.mergeCells('D5:H5');
+  ws.mergeCells('I5:N5');
   
-  ws.mergeCells('N4:N5');
-  ws.mergeCells('O4:O5');
-  ws.mergeCells('P4:P5');
-  ws.mergeCells('Q4:X4');
-  ws.mergeCells('Y4:AH4');
+  ws.mergeCells('P5:P6');
+  ws.mergeCells('Q5:Q6');
+  ws.mergeCells('R5:R6');
+  ws.mergeCells('S5:Z5');
+  ws.mergeCells('AA5:AJ5');
   
   if (historyYears.length > 0) {
-    const endColCode = ws.getColumn(34 + historyYears.length).letter;
-    const startColCode = ws.getColumn(35).letter;
-    ws.mergeCells(`${startColCode}4:${endColCode}4`);
+    const endColCode = ws.getColumn(36 + historyYears.length).letter;
+    const startColCode = ws.getColumn(37).letter;
+    ws.mergeCells(`${startColCode}5:${endColCode}5`);
   }
 
 
-  const totalCols = 34 + historyYears.length;
-  for (let rn = 4; rn <= 5; rn++) {
+  const totalCols = 36 + historyYears.length;
+  for (let rn = 5; rn <= 6; rn++) {
     const row = ws.getRow(rn);
     for (let c = 1; c <= totalCols; c++) {
-      if (c === 13) continue;
+      if (c === 15) continue;
       const cell = row.getCell(c);
       cell.font = { name: 'BIZ UDPゴシック', size: (c === 2 || c === 3) ? 8 : 9, bold: true };
       cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true };
@@ -131,51 +150,51 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         cell.alignment = { ...cell.alignment, textRotation: 'vertical' };
       }
       
-      let topStyle = rn === 4 ? 'medium' : 'hair';
-      let bottomStyle = rn === 5 ? 'medium' : 'hair';
-      let leftStyle = (c === 1 || c === 2 || c === 8) ? 'medium' : 'thin';
-      let rightStyle = (c === 12 || c === 1 || c === 7) ? 'medium' : 'thin';
+      let topStyle = rn === 5 ? 'medium' : 'hair';
+      let bottomStyle = rn === 6 ? 'medium' : 'hair';
+      let leftStyle = (c === 1 || c === 2 || c === 9) ? 'medium' : 'thin';
+      let rightStyle = (c === 14 || c === 1 || c === 8) ? 'medium' : 'thin';
       
-      // 縦にセル結合されている列(1, 2, 3)は、5行目の処理で上罫線が細線で上書きされるのを防ぐため、明示的に上下を太線にする
+      // 縦にセル結合されている列(1, 2, 3)は、6行目の処理で上罫線が細線で上書きされるのを防ぐため、明示的に上下を太線にする
       if (c === 1 || c === 2 || c === 3) {
          topStyle = 'medium';
          bottomStyle = 'medium';
       }
       
 
-      if (c >= 14) {
+      if (c >= 16) {
         let argb = 'FFCBD5E1';
-        if (c >= 14 && c <= 16) argb = 'FFCBD5E1'; 
-        if (c >= 17 && c <= 24) argb = 'FFBFDBFE'; 
-        if (c >= 25 && c <= 34) {
+        if (c >= 16 && c <= 18) argb = 'FFCBD5E1'; 
+        if (c >= 19 && c <= 26) argb = 'FFBFDBFE'; 
+        if (c >= 27 && c <= 36) {
            const promoColors = {
-              26: getPromotedBgColorCode('係長級(主査)'),
-              27: getPromotedBgColorCode('補佐級I(主任)'),
-              28: getPromotedBgColorCode('補佐級II(班長)'),
-              29: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
-              30: getPromotedBgColorCode('課長級'),
-              31: getPromotedBgColorCode('所属長級'),
-              32: getPromotedBgColorCode('次長級'),
-              33: getPromotedBgColorCode('部長級'),
+              28: getPromotedBgColorCode('係長級(主査)'),
+              29: getPromotedBgColorCode('補佐級I(主任)'),
+              30: getPromotedBgColorCode('補佐級II(班長)'),
+              31: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
+              32: getPromotedBgColorCode('課長級'),
+              33: getPromotedBgColorCode('所属長級'),
+              34: getPromotedBgColorCode('次長級'),
+              35: getPromotedBgColorCode('部長級'),
            };
-           if (rn === 5 && promoColors[c]) {
+           if (rn === 6 && promoColors[c]) {
               argb = 'FF' + promoColors[c].replace('#', '').toUpperCase();
            } else {
               argb = 'FFF5D0FE'; 
            }
         }
-        if (c >= 35) argb = 'FFA7F3D0'; 
+        if (c >= 37) argb = 'FFA7F3D0'; 
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       }
 
-      if (c >= 14) {
-        let topB = rn === 4 ? 'thick' : false;
-        if (rn === 5 && [14, 15, 16].includes(c)) topB = 'thick';
-        let bottomB = rn === 5 ? 'thick' : false;
-        if (rn === 4) bottomB = true; 
+      if (c >= 16) {
+        let topB = rn === 5 ? 'thick' : false;
+        if (rn === 6 && [16, 17, 18].includes(c)) topB = 'thick';
+        let bottomB = rn === 6 ? 'thick' : false;
+        if (rn === 5) bottomB = true; 
         
-        const leftB = [14, 17, 25, 35].includes(c) ? 'thick' : true;
-        const rightB = [16, 24, 34, totalCols].includes(c) ? 'thick' : true;
+        const leftB = [16, 19, 27, 37].includes(c) ? 'thick' : true;
+        const rightB = [18, 26, 36, totalCols].includes(c) ? 'thick' : true;
         
         const newBorder = getCellBorders(topB, bottomB, leftB, rightB);
         cell.border = newBorder;
@@ -188,11 +207,11 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         };
       }
 
-      if (c <= 12) {
+      if (c <= 14) {
         let argb = 'FFCBD5E1';
         if (c === 2 || c === 3) argb = 'FFFDBA74'; // Orange 300
-        else if (c >= 4 && c <= 7) argb = 'FFFEF3C7'; // Amber 100
-        else if (c >= 8 && c <= 12) argb = 'FFDBEAFE'; // Blue 100
+        else if (c >= 4 && c <= 8) argb = 'FFFEF3C7'; // Amber 100
+        else if (c >= 9 && c <= 14) argb = 'FFDBEAFE'; // Blue 100
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
       }
     }
@@ -202,12 +221,12 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   ws.getColumn(2).width = 1.98;
   ws.getColumn(3).width = 1.98;
   ws.getColumn(4).width = 12;
-  ws.getColumn(8).width = 12;
-  ws.getColumn(22).width = 20;
-  ws.getColumn(23).width = 20;
+  ws.getColumn(9).width = 12;
   ws.getColumn(24).width = 20;
+  ws.getColumn(25).width = 20;
+  ws.getColumn(26).width = 20;
 
-  let rowIndex = 6;
+  let rowIndex = 7;
   let lastDept = null;
   let lastGroup = null;
 
@@ -281,45 +300,47 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
 
     let rowVals = [
       displayDeptStr || displayGroupStr,
-      '', '', '', '', '', '', '', '', '', '', ''
+      '', '', '', '', '', '', '', '', '', '', '', '', ''
     ];
 
     if (currEmp) {
       rowVals[3] = currEmp.currentTitle || '';
       rowVals[4] = getFormattedNameForPlan(currEmp, false) || '';
-      rowVals[5] = cYearsStr;
-      rowVals[6] = cAgeVal !== '' ? Number(cAgeVal) : '';
+      rowVals[5] = getShortGrade(currEmp.currentGrade);
+      rowVals[6] = cYearsStr;
+      rowVals[7] = cAgeVal !== '' ? Number(cAgeVal) : '';
       rowVals[1] = currEmp.desiredAssignment ? '〇' + currEmp.desiredAssignment : '';
       rowVals[2] = currEmp.specialCircumstances ? '●' + currEmp.specialCircumstances : '';
     }
     
     if (nextEmp) {
-      rowVals[7] = nextEmp.nextTitle || '';
-      rowVals[8] = getFormattedNameForPlan(nextEmp, true) || '';
-      rowVals[9] = nYearsStr;
-      rowVals[10] = nAgeVal !== '' ? Number(nAgeVal) : '';
+      rowVals[8] = nextEmp.nextTitle || '';
+      rowVals[9] = getFormattedNameForPlan(nextEmp, true) || '';
+      rowVals[10] = getShortGrade(nextEmp.nextGrade);
+      rowVals[11] = nYearsStr;
+      rowVals[12] = nAgeVal !== '' ? Number(nAgeVal) : '';
     }
 
     const isRetained = currEmp && nextEmp && currEmp.id === nextEmp.id;
     if (post && post.isAbolished) {
-      rowVals[7] = ''; rowVals[8] = '後任なし'; rowVals[9] = ''; rowVals[10] = '';
+      rowVals[8] = ''; rowVals[9] = '後任なし'; rowVals[10] = ''; rowVals[11] = ''; rowVals[12] = '';
     }
     
     const extEmp = nextEmp;
     let curPromoColors = {};
     if (extEmp) {
-      rowVals[12] = '';
-      rowVals[13] = getFormattedNameForPlan(extEmp, true);
-      rowVals[14] = (extEmp.birthDate && calculateAge(extEmp.birthDate, targetYear - 1) !== '') ? Number(calculateAge(extEmp.birthDate, targetYear - 1)) : '';
-      rowVals[15] = extEmp.furigana || '';
-      rowVals[16] = extEmp.employeeNumber || '';
-      rowVals[17] = extEmp.gender || '';
-      rowVals[18] = formatWithEra(extEmp.birthDate);
-      rowVals[19] = extEmp.education || '';
-      rowVals[20] = formatWithEra(extEmp.hireDate, extEmp.birthDate);
-      rowVals[21] = extEmp.note || '';
-      rowVals[22] = extEmp.desiredAssignment ? '〇' + extEmp.desiredAssignment : '';
-      rowVals[23] = extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '';
+      rowVals[14] = '';
+      rowVals[15] = getFormattedNameForPlan(extEmp, true);
+      rowVals[16] = (extEmp.birthDate && calculateAge(extEmp.birthDate, targetYear - 1) !== '') ? Number(calculateAge(extEmp.birthDate, targetYear - 1)) : '';
+      rowVals[17] = extEmp.furigana || '';
+      rowVals[18] = extEmp.employeeNumber || '';
+      rowVals[19] = extEmp.gender || '';
+      rowVals[20] = formatWithEra(extEmp.birthDate);
+      rowVals[21] = extEmp.education || '';
+      rowVals[22] = formatWithEra(extEmp.hireDate, extEmp.birthDate);
+      rowVals[23] = extEmp.note || '';
+      rowVals[24] = extEmp.desiredAssignment ? '〇' + extEmp.desiredAssignment : '';
+      rowVals[25] = extEmp.specialCircumstances ? '●' + extEmp.specialCircumstances : '';
       
       let hireStr = '';
       if (extEmp.hireDate) {
@@ -330,7 +351,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
            if (ag) hireStr += `(${ag}歳)`;
         }
       }
-      rowVals[24] = hireStr;
+      rowVals[26] = hireStr;
       
       const pKeys = ['promoYearHire', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
       const gradeToPromoKey = { '係長級(主査)': 'promoYearChief', '補佐級I(主任)': 'promoYearAssistant1', '補佐級II(班長)': 'promoYearAssistant2', '補佐級III(補佐兼班長)': 'promoYearAssistant3', '課長級': 'promoYearSecHead', '所属長級': 'promoYearDivHead', '次長級': 'promoYearDeputyHead', '部長級': 'promoYearDeptHead' };
@@ -380,18 +401,18 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
               if (ag) cellStr += `(${ag}歳)`;
            }
         }
-        rowVals[24 + idx] = cellStr;
+        rowVals[26 + idx] = cellStr;
         if (isNextPromo) {
-           curPromoColors[24 + idx + 1] = getPromotedBgColorCode(extEmp.nextGrade); // +1 because rowVals is 0-indexed, excel columns are 1-indexed
+           curPromoColors[26 + idx + 1] = getPromotedBgColorCode(extEmp.nextGrade); // +1 because rowVals is 0-indexed, excel columns are 1-indexed
         }
       }
       
       if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade)) {
          const c = getPromotedBgColorCode(extEmp.nextGrade);
          if (c) {
-             curPromoColors[14] = c; // 氏名
-             curPromoColors[15] = c; // 年齢
-             curPromoColors[34] = c; // 来年度
+             curPromoColors[16] = c; // 氏名
+             curPromoColors[17] = c; // 年齢
+             curPromoColors[36] = c; // 来年度
          }
       }
       
@@ -411,7 +432,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         const ag = calculateAge(extEmp.birthDate, targetYear);
         if (ag) nYearStr += `(${ag}歳)`;
       }
-      rowVals[33] = nYearStr;
+      rowVals[35] = nYearStr;
       
       historyYears.forEach((y, i) => {
         let historyStr = '';
@@ -451,13 +472,13 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
               historyStr = `${historyStr} (${histAge}歳)`;
            }
         }
-        rowVals[34 + i] = historyStr;
+        rowVals[36 + i] = historyStr;
         if (getGradeLevel(extEmp.nextGrade) > getGradeLevel(extEmp.currentGrade) && y === targetYear) {
            const c = getPromotedBgColorCode(extEmp.nextGrade);
-           if (c) curPromoColors[34 + i + 1] = c;
+           if (c) curPromoColors[36 + i + 1] = c;
         } else if (promoYearMap[y]) {
            const c = getPromotedBgColorCode(promoYearMap[y]);
-           if (c) curPromoColors[34 + i + 1] = c;
+           if (c) curPromoColors[36 + i + 1] = c;
         }
       });
 
@@ -493,18 +514,18 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         remarkStr += rowNote.text;
       }
     }
-    rowVals[11] = remarkStr;
+    rowVals[13] = remarkStr;
 
     const tr = ws.addRow(rowVals);
 
     for (let c = 1; c <= totalCols; c++) {
-      if (c === 13) continue;
+      if (c === 15) continue;
       const cell = tr.getCell(c);
-      const isLeft = (c === 1 || c === 12 || c === 2 || c === 3 || (c >= 22 && c <= 24) || c >= 35);
-      const shouldShrink = (c !== 2 && c !== 3 && !(c >= 22 && c <= 24));
+      const isLeft = (c === 1 || c === 14 || c === 2 || c === 3 || (c >= 24 && c <= 26) || c >= 37);
+      const shouldShrink = (c !== 2 && c !== 3 && !(c >= 24 && c <= 26));
       cell.alignment = { vertical: 'middle', horizontal: isLeft ? 'left' : 'center', shrinkToFit: shouldShrink, wrapText: false };
       cell.font = { name: 'BIZ UDPゴシック', size: 9 };
-      if (c === 17 && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+      if (c === 19 && cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
         const num = Number(cell.value);
         if (!isNaN(num)) {
           cell.value = num;
@@ -513,14 +534,14 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
       
       let topStyle = 'hair';
-      if (rowIndex === 6) topStyle = 'medium';
+      if (rowIndex === 7) topStyle = 'medium';
       else if (isNewDept) topStyle = 'medium';
       else if (isNewGroup) topStyle = 'mediumDashed';
       
-      const leftStyle = (c === 1 || c === 2 || c === 8) ? 'medium' : 'thin';
-      const rightStyle = (c === 12 || c === 1 || c === 7) ? 'medium' : 'thin';
+      const leftStyle = (c === 1 || c === 2 || c === 9) ? 'medium' : 'thin';
+      const rightStyle = (c === 14 || c === 1 || c === 8) ? 'medium' : 'thin';
       
-      if (c >= 14) {
+      if (c >= 16) {
         let topBorder = false;
         let bottomBorder = false;
         if (isNewDept) topBorder = 'thick';
@@ -528,13 +549,13 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         
         if (extEmp) bottomBorder = true;
         
-        const isLeftEdge = [14, 17, 25, 35].includes(c);
-        const isRightEdge = [16, 24, 34, totalCols].includes(c);
+        const isLeftEdge = [16, 19, 27, 37].includes(c);
+        const isRightEdge = [18, 26, 36, totalCols].includes(c);
         
         cell.border = getCellBorders(topBorder, bottomBorder, isLeftEdge ? 'thick' : true, isRightEdge ? 'thick' : true);
       } else if (c === 1) {
         let c1Top = undefined;
-        if (rowIndex === 6) c1Top = 'medium';
+        if (rowIndex === 7) c1Top = 'medium';
         else if (isNewDept) c1Top = 'medium';
         else if (isNewGroup && rowVals[0] !== '') c1Top = 'mediumDashed';
 
@@ -555,14 +576,14 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       const isCurrRetiring = currEmp && currEmp.departmentId === 'retired';
       if (dept && dept.name === '【退職】') {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
-      } else if (currEmp && isCurrTransferred && c >= 4 && c <= 7) {
+      } else if (currEmp && isCurrTransferred && c >= 4 && c <= 8) {
         if (isCurrRetiring) {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
         } else {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
         }
       }
-      if (nextEmp && c >= 8 && c <= 11) {
+      if (nextEmp && c >= 9 && c <= 13) {
         if (getGradeLevel(nextEmp.nextGrade) > getGradeLevel(nextEmp.currentGrade)) {
           const rawColor = getPromotedBgColorCode(nextEmp.nextGrade);
           if (rawColor) {
@@ -587,9 +608,9 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
   });
 
   const lastRow = rowIndex - 1;
-  if (lastRow >= 6) {
+  if (lastRow >= 7) {
     const row = ws.getRow(lastRow);
-    for (let c = 1; c <= 12; c++) {
+    for (let c = 1; c <= 14; c++) {
       const cell = row.getCell(c);
       cell.border = {
         ...cell.border,
@@ -598,15 +619,15 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
     }
   }
 
-  const fitCols = [5, 6, 7, 9, 10, 11, 12];
-  for (let c = 14; c <= totalCols; c++) {
-    if (c !== 22 && c !== 23 && c !== 24) fitCols.push(c);
+  const fitCols = [5, 6, 7, 8, 10, 11, 12, 13, 14];
+  for (let c = 16; c <= totalCols; c++) {
+    if (c !== 24 && c !== 25 && c !== 26) fitCols.push(c);
   }
   fitCols.forEach(colIndex => {
     let maxLength = 0;
     const col = ws.getColumn(colIndex);
     col.eachCell({ includeEmpty: true }, cell => {
-      if (cell.row <= 4) return;
+      if (cell.row <= 5) return;
       const v = cell.value ? cell.value.toString() : '';
       if (v) {
         const lines = v.split('\n');
@@ -620,13 +641,13 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
       }
     });
     if (maxLength > 0) {
-      if (colIndex === 12 && maxLength > 40) maxLength = 40;
+      if (colIndex === 14 && maxLength > 40) maxLength = 40;
       col.width = maxLength + 1.5;
     }
   });
 
-  const lastRowToPrint = rowIndex > 6 ? rowIndex - 1 : 6;
-  ws.pageSetup.printArea = `A1:L${lastRowToPrint}`;
+  const lastRowToPrint = rowIndex > 7 ? rowIndex - 1 : 7;
+  ws.pageSetup.printArea = `A1:N${lastRowToPrint}`;
   ws.pageSetup.paperSize = 9; // A4
   ws.pageSetup.orientation = 'portrait';
   ws.pageSetup.fitToPage = true;
