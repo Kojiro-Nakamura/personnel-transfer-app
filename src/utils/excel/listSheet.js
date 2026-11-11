@@ -79,11 +79,12 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   const listHeaderFont = { name: 'BIZ UDPゴシック', size: 8, bold: true };
 
   const ws = workbook.addWorksheet(sheetName, {
-    views: [{ state: 'frozen', xSplit: 2, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }], // 氏名・年齢まで固定
+    views: [{ state: 'frozen', xSplit: 3, ySplit: 5, showGridLines: false, style: 'normal', zoomScale: 100 }], // No.・氏名・年齢まで固定
     pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 } }
   });
 
   const columns = [
+    { width: 6 },  // No.
     { width: 16 }, // 氏名
     { width: 8 }, // 年齢
     { width: 16 }, // フリガナ
@@ -139,7 +140,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   r2.height = 13;
 
   const targetYearIndex = Math.max(0, historyYears.indexOf(targetYear));
-  const legendEndCol = 33 + targetYearIndex;
+  const legendEndCol = 34 + targetYearIndex;
   const legendLabels = ["凡例", "係長級(主査)", "補佐級I(主任)", "補佐級II(班長)", "補佐級III(補佐兼班長)", "課長級", "所属長級", "次長級", "部長級"];
   const legendStartCol = legendEndCol - 8;
 
@@ -172,7 +173,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
   const r4 = ws.getRow(4);
   r4.height = 13;
-  const headersR4 = ['氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', ''];
+  const headersR4 = ['No.', '氏名', `${currentEraShort}年齢`, 'フリガナ', '基本情報', '', '', '', '', '', '', '', `今年度（現行）${getEraFormattedYear(targetYear - 1)}`, '', '', '', '', '', '', `来年度（新組織）${getEraFormattedYear(targetYear)}`, '', '', '', '', '', '', '昇級年度', '', '', '', '', '', '', '', '', ''];
   historyYears.forEach((y, i) => {
     if (i === 0) headersR4.push('履歴');
     else headersR4.push('');
@@ -181,20 +182,21 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度'];
+  const headersR5 = ['', '', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度'];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 
   ws.mergeCells('A4:A5');
   ws.mergeCells('B4:B5');
   ws.mergeCells('C4:C5');
-  ws.mergeCells('D4:K4');
-  ws.mergeCells('L4:R4');
-  ws.mergeCells('S4:Y4');
-  ws.mergeCells('Z4:AI4');
+  ws.mergeCells('D4:D5');
+  ws.mergeCells('E4:L4');
+  ws.mergeCells('M4:S4');
+  ws.mergeCells('T4:Z4');
+  ws.mergeCells('AA4:AJ4');
   if (historyYears.length > 0) {
-    const endColCode = ws.getColumn(35 + historyYears.length).letter;
-    ws.mergeCells(`AJ4:${endColCode}4`);
+    const endColCode = ws.getColumn(36 + historyYears.length).letter;
+    ws.mergeCells(`AK4:${endColCode}4`);
   }
 
   // Header coloring
@@ -206,14 +208,14 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   
   // Specific promo headers colors
   const promoColors = {
-    25: getPromotedBgColorCode('係長級(主査)'),
-    26: getPromotedBgColorCode('補佐級I(主任)'),
-    27: getPromotedBgColorCode('補佐級II(班長)'),
-    28: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
-    29: getPromotedBgColorCode('課長級'),
-    30: getPromotedBgColorCode('所属長級'),
-    31: getPromotedBgColorCode('次長級'),
-    32: getPromotedBgColorCode('部長級'),
+    26: getPromotedBgColorCode('係長級(主査)'),
+    27: getPromotedBgColorCode('補佐級I(主任)'),
+    28: getPromotedBgColorCode('補佐級II(班長)'),
+    29: getPromotedBgColorCode('補佐級III(補佐兼班長)'),
+    30: getPromotedBgColorCode('課長級'),
+    31: getPromotedBgColorCode('所属長級'),
+    32: getPromotedBgColorCode('次長級'),
+    33: getPromotedBgColorCode('部長級'),
   };
 
   [4, 5].forEach(rn => {
@@ -221,15 +223,15 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.font = listHeaderFont;
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-      if (colNumber >= 34) { // 履歴列
+      if (colNumber >= 35) { // 履歴列
          cell.alignment = { vertical: 'middle', horizontal: 'center', shrinkToFit: true, wrapText: false };
       }
       cell.border = getCellBorders(true, true, true, true, true);
       
-      if (colNumber <= 11) cell.fill = fillSlate;
-      else if (colNumber <= 18) cell.fill = fillAmber;
-      else if (colNumber <= 25) cell.fill = fillBlue;
-      else if (colNumber <= 35) {
+      if (colNumber <= 12) cell.fill = fillSlate;
+      else if (colNumber <= 19) cell.fill = fillAmber;
+      else if (colNumber <= 26) cell.fill = fillBlue;
+      else if (colNumber <= 36) {
         if (rn === 5 && promoColors[colNumber]) {
            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + promoColors[colNumber].replace('#', '').toUpperCase() } };
         } else {
@@ -244,7 +246,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   const sortedEmployees = sortEmployeeList(employees, targetYear);
 
   let rowIndex = 6;
-  sortedEmployees.forEach(emp => {
+  sortedEmployees.forEach((emp, empIndex) => {
     const getDeptName = (deptId, postId, groupId, groupPostId, isNext) => {
       if (!deptId || deptId === 'unassigned' || deptId === 'retired') return '';
       const dept = dMap.get(deptId);
@@ -274,6 +276,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     const valYears = getEmpCurrentYears(emp, targetYear, true);
 
     const vals = [
+      empIndex + 1,
       emp.name || '',
       (() => {
         if (!emp.birthDate) return '';
@@ -434,12 +437,12 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
         }
       }
       cell.font = currentFont;
-      const isNoShrink = (colNumber >= 9 && colNumber <= 11);
+      const isNoShrink = (colNumber >= 10 && colNumber <= 12);
       const align = isNoShrink ? 'left' : 'center';
       cell.alignment = { vertical: 'middle', horizontal: align, shrinkToFit: !isNoShrink, wrapText: false };
       cell.border = getCellBorders(true, true, true, true, true);
       
-      if (colNumber === 4 && cell.value && cell.value.toString().trim() !== '') {
+      if (colNumber === 5 && cell.value && cell.value.toString().trim() !== '') {
         const num = Number(cell.value);
         if (!isNaN(num)) {
           cell.value = num;
@@ -448,18 +451,18 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       }
 
       let argb = 'FFFFFFFF'; 
-      if (colNumber <= 2) {
+      if (colNumber <= 3) {
          argb = 'FFE2E8F0';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 18) argb = 'FFF8FAFC';
-      else if (colNumber <= 25) {
+      else if (colNumber <= 19) argb = 'FFF8FAFC';
+      else if (colNumber <= 26) {
          argb = 'FFEFF6FF';
          if (nextPromoColor) argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
       }
-      else if (colNumber <= 35) {
+      else if (colNumber <= 36) {
          argb = 'FFFDF4FF';
-         if (colNumber === 35 && nextPromoColor) {
+         if (colNumber === 36 && nextPromoColor) {
              argb = 'FF' + nextPromoColor.replace('#', '').toUpperCase();
          }
       }
@@ -468,8 +471,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       }
       
       // 昇進ハイライト (昇級年度の枠)
-      if (colNumber >= 27 && colNumber <= 34) {
-         const pKeysOffset = colNumber - 26;
+      if (colNumber >= 28 && colNumber <= 35) {
+         const pKeysOffset = colNumber - 27;
          const key = pKeys[pKeysOffset];
          if (getGradeLevel(emp.nextGrade) > getGradeLevel(emp.currentGrade) && gradeToPromoKey[emp.nextGrade] === key) {
              const pc = getPromotedBgColorCode(emp.nextGrade);
@@ -478,8 +481,8 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
       }
 
       // 履歴セルの着色と変更検知
-      if (colNumber > 35) {
-         const hcOffset = colNumber - 36;
+      if (colNumber > 36) {
+         const hcOffset = colNumber - 37;
          const hc = histBgColors[hcOffset];
          if (hc) {
             argb = 'FF' + hc.replace('#', '').toUpperCase();
@@ -499,10 +502,10 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   ws.autoFilter = `A5:${lastColLetter}${rowIndex - 1}`;
 
   ws.columns.forEach((col, i) => {
-    const isHistory = i >= 35;
+    const isHistory = i >= 36;
     let maxLength = 0;
     col.eachCell({ includeEmpty: true }, cell => {
-      if (cell.row <= 4) return; 
+      if (cell.row <= 3 || (cell.row === 4 && i > 0)) return; 
       const v = cell.value ? cell.value.toString() : '';
       if (v) {
         const lines = v.split('\n');
@@ -522,9 +525,9 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     if (maxLength > 40) maxLength = 40; // cap maximum width
     if (maxLength > 0) {
        let padding = 1.5;
-       if (i === 4 || i === 6 || (i >= 24 && i <= 32)) {
+       if (i === 5 || i === 7 || (i >= 25 && i <= 33)) {
            padding = 4.0;
-       } else if (i === 12 || i === 19) { // 詳細列
+       } else if (i === 13 || i === 20) { // 詳細列
            padding = 5.0;
        }
        if (isHistory) padding = 0.5;
