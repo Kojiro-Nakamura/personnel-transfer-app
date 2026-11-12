@@ -26,6 +26,8 @@ import { PartialImportConfirmModal } from './components/modals/PartialImportConf
 import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
 import { NewWindowPortal } from './components/common/NewWindowPortal.jsx';
 import { ContextMenu } from './components/ui/ContextMenu.jsx';
+import { useSingleInstance } from './hooks/useSingleInstance.js';
+import { DuplicateTabBlocker } from './components/common/DuplicateTabBlocker.jsx';
 export const AppContent = () => {
   const app = useApp();
   const { 
@@ -567,6 +569,30 @@ export const AppContent = () => {
 };
 
 export default function App() { 
+  const { status, isPrimaryClosed, claimInstance } = useSingleInstance();
+
+  if (status === 'checking') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-white text-sm font-semibold tracking-wide">
+            起動確認中...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'blocked') {
+    return (
+      <DuplicateTabBlocker 
+        isPrimaryClosed={isPrimaryClosed} 
+        onClaim={claimInstance} 
+      />
+    );
+  }
+
   return (
     <AppProvider>
       <AppContent />
