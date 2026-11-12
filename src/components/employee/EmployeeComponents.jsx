@@ -13,6 +13,7 @@ import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialD
 import { autoFixEmployees } from '../../utils/validation.js';
 
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
+import { RemarkInput } from '../ui/RemarkInput.jsx';
 export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer, isIncreased }) => {
   const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp, showContextMenu } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
@@ -361,7 +362,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
             }} className="flex-1" />
           </div>
           <div className="flex gap-1">
-            <FormInput label="備考" disabled={disabled} placeholder="育代No.1：横山など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} className="flex-1" inputClassName={getRemarkBgClass(fd[`${p}EmploymentType`])} />
+            <RemarkInput label="備考" disabled={disabled} placeholder="新採No.1、育代No.1など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} listId={`remark-list-${p}`} className="flex-1" inputClassName={getRemarkBgClass(fd[`${p}EmploymentType`])} />
             <FormInputWithList label="カウント除外" disabled={disabled} placeholder="事務職など" value={fd[`${p}Exclude`]} onChange={v => setFd({...fd, [`${p}Exclude`]: v})} options={["事務職", "技術職", "短時間"]} listId={`exclude-list-${p}`} className="w-24" />
           </div>
         </div>

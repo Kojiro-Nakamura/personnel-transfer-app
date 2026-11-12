@@ -35,3 +35,15 @@ export const GRADE_TO_PROMO_KEY = {
   "補佐級I(主任)": "promoYearAssistant1",
   "係長級(主査)": "promoYearChief"
 };
+
+// 備考の選択肢候補リスト（今後項目が増える場合はこの配列に追加してください）
+export const REMARK_CANDIDATES = [
+  "新採No.",
+  "臨任No.",
+  "役職定年No.",
+  "再任用No.",
+  "定年前再任時短No.",
+  "育代No.",
+  "休職中No."
+];
+

@@ -7,11 +7,12 @@ import {
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { cx, getGradeLevel, parseJapaneseDate, parseCSVRow, calcOrder, isPromotedGrade, calcNextSkills, recalcNextYearsAndSkills, getEraSuffix, getEmpCurrentYears, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, calculateAge, parsePromoDate, getEraFormattedYear, sortEmployeeList } from '../../utils/helpers.js';
-import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
+import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS, REMARK_CANDIDATES } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
 
 import { FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
+import { RemarkCellInput } from '../ui/RemarkInput.jsx';
 import { EmployeeFormSection, EmployeeRow, EmployeeCell } from '../employee/EmployeeComponents.jsx';
 export const NoteEditModal = ({ isOpen, onClose, onSave, data }) => {
   const [text, setText] = useState('');
@@ -1448,7 +1449,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                     </td>
                     <td className="bg-slate-50/30"><div className="text-center px-1 text-slate-600 font-medium text-xs">{getEmpCurrentYears(emp, targetYear - 1, false)}</div></td>
                     <td className="bg-slate-50/30"><input type="text" value={emp.currentSkillsStr||''} onChange={e => handleChange(emp.id,'currentSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={cx(inputCls, 'text-center px-1')} /></td>
-                    <td className="bg-slate-50/30"><input type="text" value={emp.currentEmploymentType||''} onChange={e => handleChange(emp.id,'currentEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-slate-50/30">
+                      <RemarkCellInput 
+                        value={emp.currentEmploymentType||''} 
+                        onChange={v => handleChange(emp.id,'currentEmploymentType', v)} 
+                        placeholder="新採No.1など" 
+                        className={cx(inputCls, 'text-center px-1')} 
+                        listId="remark-list-bulk"
+                      />
+                    </td>
                     <td className="bg-slate-50/30 border-r"><input type="text" list="exclude-list-bulk" value={emp.currentExclude||''} onChange={e => handleChange(emp.id,'currentExclude',e.target.value)} placeholder="事務職など" className={cx(inputCls, 'text-center px-1')} /></td>
                     <td className="bg-blue-50/30 p-1">
                       <PlacementSelector 
@@ -1471,7 +1480,15 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                     </td>
                     <td className="bg-blue-50/30"><div className="text-center px-1 text-slate-600 font-medium text-xs">{getEmpCurrentYears(emp, targetYear, true)}</div></td>
                     <td className="bg-blue-50/30"><input type="text" value={emp.nextSkillsStr||''} onChange={e => handleChange(emp.id,'nextSkillsStr',e.target.value)} placeholder="派1+治1、1+1など" className={cx(inputCls, 'text-center px-1')} /></td>
-                    <td className="bg-blue-50/30"><input type="text" value={emp.nextEmploymentType||''} onChange={e => handleChange(emp.id,'nextEmploymentType',e.target.value)} placeholder="育代No.1：横山など" className={cx(inputCls, 'text-center px-1')} /></td>
+                    <td className="bg-blue-50/30">
+                      <RemarkCellInput 
+                        value={emp.nextEmploymentType||''} 
+                        onChange={v => handleChange(emp.id,'nextEmploymentType', v)} 
+                        placeholder="新採No.1など" 
+                        className={cx(inputCls, 'text-center px-1')} 
+                        listId="remark-list-bulk"
+                      />
+                    </td>
                     <td className="bg-blue-50/30"><input type="text" list="exclude-list-bulk" value={emp.nextExclude||''} onChange={e => handleChange(emp.id,'nextExclude',e.target.value)} placeholder="事務職など" className={cx(inputCls, 'text-center px-1')} /></td>
 
                     <td className="bg-fuchsia-50/30 p-1 align-middle border-l border-r">
@@ -1547,6 +1564,9 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
           </table>
           <datalist id="exclude-list-bulk">
             {["事務職", "技術職", "短時間"].map(o => <option key={o} value={o} />)}
+          </datalist>
+          <datalist id="remark-list-bulk">
+            {REMARK_CANDIDATES.map(o => <option key={o} value={o} />)}
           </datalist>
         </div>
         

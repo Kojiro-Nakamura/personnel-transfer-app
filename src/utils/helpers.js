@@ -56,6 +56,7 @@ export const getPromotedBgColorCode = (grade) => {
 export const getRemarkBgClass = (remark) => {
   if (!remark) return '';
   const str = String(remark);
+  if (str.includes('休職')) return 'bg-rose-300';
   if (str.includes('定年前再任短時') || str.includes('定年前') || str.includes('再任短') || str.includes('再短')) return 'bg-violet-300';
   if (str.includes('役職定年')) return 'bg-amber-300';
   if (str.includes('再任用') || str.includes('再フル')) return 'bg-orange-300';
