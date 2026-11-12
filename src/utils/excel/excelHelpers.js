@@ -19,7 +19,24 @@ export const getCellBorders = (top = false, bottom = false, left = false, right 
   return b;
 };
 
+// 空文字列('')や空白のみの文字列が入ったセルは、見た目は空欄でも
+// Excelのステータスバーの「データの個数」で1個とカウントされてしまうため、
+// 保存前に本当の空セル(null)に置き換える（書式・罫線・塗りつぶしは保持される）
+export const clearEmptyStringCells = (workbook) => {
+  workbook.eachSheet(ws => {
+    ws.eachRow({ includeEmpty: true }, row => {
+      row.eachCell({ includeEmpty: false }, cell => {
+        const v = cell.value;
+        if (typeof v === 'string' && v.trim() === '') {
+          cell.value = null;
+        }
+      });
+    });
+  });
+};
+
 export const saveWorkbook = async (workbook, fileName) => {
+  clearEmptyStringCells(workbook);
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = URL.createObjectURL(blob);
