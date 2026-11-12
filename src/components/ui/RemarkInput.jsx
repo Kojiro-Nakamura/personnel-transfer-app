@@ -12,7 +12,7 @@ export const RemarkInput = ({
   value = "",
   onChange,
   disabled = false,
-  placeholder = "新採No.1、育代No.1など",
+  placeholder = "臨任No.1、役職定年No.1など",
   listId = "remark-options-list",
   className = "",
   inputClassName = "",

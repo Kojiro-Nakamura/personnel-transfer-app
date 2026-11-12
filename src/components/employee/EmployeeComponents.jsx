@@ -362,7 +362,7 @@ export const EmployeeFormSection = ({ title, isCurrent, disabled, fd, setFd, dep
             }} className="flex-1" />
           </div>
           <div className="flex gap-1">
-            <RemarkInput label="備考" disabled={disabled} placeholder="新採No.1、育代No.1など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} listId={`remark-list-${p}`} className="flex-1" inputClassName={getRemarkBgClass(fd[`${p}EmploymentType`])} />
+            <RemarkInput label="備考" disabled={disabled} placeholder="臨任No.1、役職定年No.1など" value={fd[`${p}EmploymentType`]} onChange={v => setFd({...fd, [`${p}EmploymentType`]: v})} listId={`remark-list-${p}`} className="flex-1" inputClassName={getRemarkBgClass(fd[`${p}EmploymentType`])} />
             <FormInputWithList label="カウント除外" disabled={disabled} placeholder="事務職など" value={fd[`${p}Exclude`]} onChange={v => setFd({...fd, [`${p}Exclude`]: v})} options={["事務職", "技術職", "短時間"]} listId={`exclude-list-${p}`} className="w-24" />
           </div>
         </div>

@@ -1453,7 +1453,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                       <RemarkCellInput 
                         value={emp.currentEmploymentType||''} 
                         onChange={v => handleChange(emp.id,'currentEmploymentType', v)} 
-                        placeholder="新採No.1など" 
+                        placeholder="臨任No.1など" 
                         className={cx(inputCls, 'text-center px-1')} 
                         listId="remark-list-bulk"
                       />
@@ -1484,7 +1484,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                       <RemarkCellInput 
                         value={emp.nextEmploymentType||''} 
                         onChange={v => handleChange(emp.id,'nextEmploymentType', v)} 
-                        placeholder="新採No.1など" 
+                        placeholder="臨任No.1など" 
                         className={cx(inputCls, 'text-center px-1')} 
                         listId="remark-list-bulk"
                       />

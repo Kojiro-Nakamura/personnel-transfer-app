@@ -195,11 +195,41 @@ export const generateGradeSummary = (emps, isNext) => {
   const counts = {};
   let total = 0;
   let excludeCount = 0;
+
+  const remarkCounts = {
+    "臨任": 0,
+    "役職定年": 0,
+    "再任用": 0,
+    "定年前再任時短": 0,
+    "新採": 0,
+    "育代": 0,
+    "休職中": 0,
+  };
   
   emps.forEach(emp => {
     const deptId = isNext ? emp.departmentId : emp.currentDeptId;
     if (deptId === 'unassigned' || deptId === 'retired') return;
     
+    // 備考項目の集計
+    const r = String((isNext ? emp.nextEmploymentType : emp.currentEmploymentType) || '').trim();
+    if (r) {
+      if (r.includes('臨任') || r.includes('臨時')) {
+        remarkCounts["臨任"]++;
+      } else if (r.includes('役職定年')) {
+        remarkCounts["役職定年"]++;
+      } else if (r.includes('定年前再任短') || r.includes('定年前') || r.includes('再任短') || r.includes('再短') || (r.includes('短時間') && r.includes('再任'))) {
+        remarkCounts["定年前再任時短"]++;
+      } else if (r.includes('再任用') || r.includes('再フル')) {
+        remarkCounts["再任用"]++;
+      } else if (r.includes('新採')) {
+        remarkCounts["新採"]++;
+      } else if (r.includes('育代')) {
+        remarkCounts["育代"]++;
+      } else if (r.includes('休職')) {
+        remarkCounts["休職中"]++;
+      }
+    }
+
     const excludeVal = isNext ? emp.nextExclude : emp.currentExclude;
     if (excludeVal && excludeVal.trim() !== '') {
       excludeCount++;
@@ -236,6 +266,10 @@ export const generateGradeSummary = (emps, isNext) => {
   if (excludeCount > 0) {
     res += `（その他${excludeCount}人）`;
   }
+
+  const remarkSummary = `【臨任${remarkCounts["臨任"]}人　役職定年${remarkCounts["役職定年"]}人　再任用${remarkCounts["再任用"]}人　定年前再任時短${remarkCounts["定年前再任時短"]}人　新採${remarkCounts["新採"]}人　育代${remarkCounts["育代"]}人　休職中${remarkCounts["休職中"]}人】`;
+  res += `　${remarkSummary}`;
+
   return res;
 };
 
