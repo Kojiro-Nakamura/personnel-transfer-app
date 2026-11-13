@@ -6,7 +6,7 @@ import {
   ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, isDeptVisible, isGroupVisible } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBgColorCode, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, formatCountTransition, generateGradeSummary, filterDirects, calcNextSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, isDeptVisible, isGroupVisible } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 
@@ -97,7 +97,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             {dept.nextName && dept.nextName !== dept.name ? `${dept.name} / ${dept.nextName}` : dept.name}
           </span>
           <span className="text-[10px] bg-white/20 border-none px-2 py-0.5 rounded text-white ml-2 shadow-sm pointer-events-none">
-            今年度: {formatCountText(cCounts)} / 来年度: {formatCountText(nCounts)}
+            {formatCountTransition(cCounts, nCounts)}
           </span>
           
           {(onMoveUp || onMoveDown) && (
@@ -237,7 +237,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
                       <Layers className="w-3.5 h-3.5 text-slate-600 ml-2" />
                       {grp.nextName && grp.nextName !== grp.name ? `${grp.name} / ${grp.nextName}` : grp.name}
                       <span className="text-[9px] bg-white/50 px-1.5 py-0.5 rounded text-slate-900 ml-1 font-normal select-none pointer-events-none border border-white/50 shadow-sm">
-                        今年度: {formatCountText(gCCounts)} / 来年度: {formatCountText(gNCounts)}
+                        {formatCountTransition(gCCounts, gNCounts)}
                       </span>
                       
                       {(gIdx > 0 || gIdx < dept.groups.length - 1) && (
