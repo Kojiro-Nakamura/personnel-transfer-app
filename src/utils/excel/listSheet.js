@@ -135,7 +135,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     r1.height = 13;
 
   const r2 = ws.getRow(2);
-  r2.getCell(1).value = `【今年度 ${targetYear - 1}(R${targetYear - 2019})】 ${currSummaryStr}`;
+  r2.getCell(1).value = `【${targetYear - 1}(R${targetYear - 2019})】 ${currSummaryStr}`;
   r2.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r2.height = 13;
 
@@ -163,7 +163,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
   }
 
   const r3 = ws.getRow(3);
-  r3.values = [`【来年度 ${targetYear}(R${targetYear - 2018})】 ${nextSummaryStr}`];
+  r3.values = [`【${targetYear}(R${targetYear - 2018})】 ${nextSummaryStr}`];
   r3.font = { name: 'BIZ UDPゴシック', size: 8, bold: true, color: { argb: 'FF0369A1' } };
   r3.height = 13;
 

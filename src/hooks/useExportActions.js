@@ -206,8 +206,8 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
     const nextSummaryStr = generateGradeSummary(employees, true);
     const summaryHtml = `
       <div style="margin-bottom:16px;font-family:sans-serif;font-size:12px;background:#f8fafc;padding:12px;border:1px solid #e2e8f0;border-radius:6px;">
-        <div style="margin-bottom:8px;"><strong>【今年度 ${targetYear - 1}(R${targetYear - 2019})】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(currSummaryStr)}</span></div>
-        <div><strong>【来年度 ${targetYear}(R${targetYear - 2018})】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(nextSummaryStr)}</span></div>
+        <div style="margin-bottom:8px;"><strong>【${targetYear - 1}(R${targetYear - 2019})】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(currSummaryStr)}</span></div>
+        <div><strong>【${targetYear}(R${targetYear - 2018})】</strong> <span style="color:#0369a1;font-weight:600;">${escapeHtml(nextSummaryStr)}</span></div>
       </div>`;
 
     const gradeLevelsHtml = JSON.stringify(GRADE_LEVELS);

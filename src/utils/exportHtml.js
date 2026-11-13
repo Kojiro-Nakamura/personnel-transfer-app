@@ -67,8 +67,8 @@ export const generateAndDownloadHTML = (employees, departments, targetYear, file
   const nextSummaryStr = generateGradeSummary(employees, true);
 
   const summaryHtml = `
-    <div style="font-weight:bold; margin-bottom: 2px; font-size:12px; color:#0369A1;">【今年度 ${targetYear - 1}(R${targetYear - 2019})】 ${currSummaryStr}</div>
-    <div style="font-weight:bold; margin-bottom: 4px; font-size:12px; color:#0369A1;">【来年度 ${targetYear}(R${targetYear - 2018})】 ${nextSummaryStr}</div>
+    <div style="font-weight:bold; margin-bottom: 2px; font-size:12px; color:#0369A1;">【${targetYear - 1}(R${targetYear - 2019})】 ${currSummaryStr}</div>
+    <div style="font-weight:bold; margin-bottom: 4px; font-size:12px; color:#0369A1;">【${targetYear}(R${targetYear - 2018})】 ${nextSummaryStr}</div>
   `;
 
   const scriptStr = `

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useApp, AppProvider } from '../../contexts/AppContext.jsx';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, getRemarkBgClass, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, recalcNextYearsAndSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
+import { cx, getGradeLevel, isPromotedGrade, getPromotedBgClass, getPromotedBorderClass, getPromotedBgColorCode, getRemarkBgClass, isTempRemark, calculateAge, parseJapaneseDate, parseCSVRow, getPairs, getCounts, formatCountText, generateGradeSummary, filterDirects, calcNextSkills, recalcNextYearsAndSkills, calcOrder, clearPlacement, createMoveProps, downloadFile, traverseOrgTree, getPlacementName, getEraFormattedYear, calculateServiceYears, getEraSuffix, parsePromoDate, formatServiceYearsText } from '../../utils/helpers.js';
 import { GRADE_OPTIONS, STORAGE_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { INITIAL_DEPARTMENTS, INITIAL_EMPLOYEES } from '../../constants/initialData.js';
 import { autoFixEmployees } from '../../utils/validation.js';
@@ -66,13 +66,16 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         ? "border-[3px] border-dotted border-black" 
         : `border-r ${defaultBorder}`;
         
+  const isTemp = isTempRemark(noteText);
   const bgClass = isConflict 
     ? "bg-rose-50" 
     : isFutureUnassigned 
       ? "bg-orange-50" 
       : isFutureRetired 
         ? "bg-slate-100" 
-        : defaultBg;
+        : isTemp
+          ? "bg-slate-200"
+          : defaultBg;
 
   const isPromoted = isNext && emp && isPromotedGrade(emp.currentGrade, emp.nextGrade);
   const promoBg = isPromoted ? getPromotedBgClass(emp.nextGrade) : "";
