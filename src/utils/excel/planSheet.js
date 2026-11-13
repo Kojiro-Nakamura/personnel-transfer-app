@@ -674,9 +674,9 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
           argb = 'FF' + promoColor.replace('#', '').toUpperCase();
         }
       }
-      if (colNumber === 9 && currEmp && isTempRemark(currEmp.currentEmploymentType)) {
+      if ((colNumber === 5 || colNumber === 9) && currEmp && isTempRemark(currEmp.currentEmploymentType)) {
         argb = 'FFCBD5E1';
-      } else if (colNumber === 15 && nextEmp && isTempRemark(nextEmp.nextEmploymentType)) {
+      } else if ((colNumber === 11 || colNumber === 15) && nextEmp && isTempRemark(nextEmp.nextEmploymentType)) {
         argb = 'FFCBD5E1';
       }
       

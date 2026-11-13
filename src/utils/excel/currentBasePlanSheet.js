@@ -640,7 +640,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  }
              }
           }
-          if (c === 9 && isTempRemark(emp.currentEmploymentType)) {
+          if ((c === 5 || c === 9) && isTempRemark(emp.currentEmploymentType)) {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
           }
           if (c === 17 && !isRetired && !isUnassigned && isTempRemark(emp.nextEmploymentType)) {
@@ -976,7 +976,7 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                }
            }
         }
-        if (c === 9 && isTempRemark(emp.currentEmploymentType)) {
+        if ((c === 5 || c === 9) && isTempRemark(emp.currentEmploymentType)) {
           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
         }
         if (c === 17 && !isRetired && !isUnassigned && isTempRemark(emp.nextEmploymentType)) {

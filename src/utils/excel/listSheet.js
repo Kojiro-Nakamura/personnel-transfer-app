@@ -492,7 +492,9 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
          }
       }
 
-      if (colNumber === 18 && isTempRemark(emp.currentEmploymentType)) {
+      if (colNumber === 2 && (isTempRemark(emp.currentEmploymentType) || (!isNextRetired && isTempRemark(emp.nextEmploymentType)))) {
+        argb = 'FFCBD5E1';
+      } else if (colNumber === 18 && isTempRemark(emp.currentEmploymentType)) {
         argb = 'FFCBD5E1';
       } else if (colNumber === 25 && !isNextRetired && isTempRemark(emp.nextEmploymentType)) {
         argb = 'FFCBD5E1';

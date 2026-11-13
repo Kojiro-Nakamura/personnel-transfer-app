@@ -592,7 +592,13 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
           }
         }
       }
-      if (c === 14 && nextEmp && isTempRemark(nextEmp.nextEmploymentType)) {
+      if (c === 5 && currEmp && isTempRemark(currEmp.currentEmploymentType)) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
+      }
+      if ((c === 10 || c === 14) && nextEmp && isTempRemark(nextEmp.nextEmploymentType)) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
+      }
+      if (c === 16 && extEmp && isTempRemark(extEmp.nextEmploymentType)) {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
       }
     }
