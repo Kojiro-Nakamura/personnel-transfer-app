@@ -19,7 +19,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
   
   const isTemp = isTempRemark(emp.nextEmploymentType || emp.currentEmploymentType);
   const defaultBorder = isRetired ? "border-[3px] border-dotted border-slate-800" : "border-[3px] border-dashed border-orange-400";
-  const defaultBg = isTemp ? "bg-slate-300" : (isRetired ? "bg-slate-50" : "bg-orange-50/50");
+  const defaultBg = isRetired ? "bg-slate-50" : "bg-orange-50/50";
 
   const currentAge = calculateAge(emp.birthDate, targetYear - 1);
 
@@ -37,7 +37,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
       title={emp.name}
     >
       <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
-        <span className={cx("font-bold text-[11.5px] truncate shrink-0 max-w-[75%]", isRetired ? "text-slate-900" : "text-[#320A6B]")} title={emp.name}>
+        <span className={cx("font-bold text-[11.5px] truncate shrink-0 max-w-[75%]", isRetired ? "text-slate-900" : "text-[#320A6B]", isTemp && "bg-slate-300 px-1 rounded-sm")} title={emp.name}>
           {emp.name}
         </span>
         <span className="text-[9px] text-black truncate flex-1 min-w-0" title={emp.currentTitle || '新採'}>

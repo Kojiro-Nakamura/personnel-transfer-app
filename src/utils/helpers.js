@@ -61,7 +61,7 @@ export const getRemarkBgClass = (remark) => {
   if (str.includes('役職定年')) return 'bg-amber-300';
   if (str.includes('再任用') || str.includes('再フル')) return 'bg-orange-300';
   if (str.includes('育代')) return 'bg-fuchsia-300';
-  if (str.includes('臨任')) return 'bg-emerald-300';
+  if (str.includes('臨任') || str.includes('臨時')) return 'bg-slate-300';
   if (str.includes('新採')) return 'bg-cyan-300';
   return '';
 };

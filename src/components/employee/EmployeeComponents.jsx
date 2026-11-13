@@ -71,11 +71,9 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
     ? "bg-rose-50" 
     : isFutureUnassigned 
       ? "bg-orange-50" 
-      : isTemp
-        ? "bg-slate-300"
-        : isFutureRetired 
-          ? "bg-slate-100" 
-          : defaultBg;
+      : isFutureRetired 
+        ? "bg-slate-100" 
+        : defaultBg;
 
   const isPromoted = isNext && emp && isPromotedGrade(emp.currentGrade, emp.nextGrade);
   const promoBg = isPromoted ? getPromotedBgClass(emp.nextGrade) : "";
@@ -107,7 +105,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : (isTemp ? "bg-slate-300 px-1 rounded-sm" : ""))} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
