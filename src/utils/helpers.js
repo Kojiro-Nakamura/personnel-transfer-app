@@ -183,30 +183,48 @@ export const getCounts = (emps, isNext) => {
   return emps.reduce((acc, emp) => {
     if (!emp) return acc;
     const excludeVal = isNext ? emp.nextExclude : emp.currentExclude;
-    if (excludeVal && excludeVal.trim() !== '') {
+    const isExcluded = !!(excludeVal && excludeVal.trim() !== '');
+    if (isExcluded) {
       acc.other++;
     } else {
       acc.main++;
     }
-    if (isTempRemark(isNext ? emp.nextEmploymentType : emp.currentEmploymentType)) {
+    const isTemp = isTempRemark(isNext ? emp.nextEmploymentType : emp.currentEmploymentType);
+    if (isTemp) {
       acc.temp++;
+    } else if (isExcluded) {
+      acc.otherNonTemp++;
     }
     return acc;
-  }, { main: 0, other: 0, temp: 0 });
+  }, { main: 0, other: 0, temp: 0, otherNonTemp: 0 });
 };
 
 export const formatCountText = ({ main, other }) => {
   return other > 0 ? `${main}人（その他${other}人）` : `${main}人`;
 };
 
-// 「16臨2→15臨0」形式（両年度とも臨任0人の場合は「16→15」）
+// 「16うち臨2+他1→15うち臨2+他0」形式
+// ・総数 = 配置人数全体（臨任・カウント除外を含む）
+// ・臨 = 備考に臨任/臨時がある人、他 = カウント除外の人（臨任を除く）
+// ・両年度とも0人の項目は省略（両方とも0なら「16→15」）
 export const formatCountTransition = (cCounts, nCounts) => {
-  const cTemp = cCounts.temp || 0;
-  const nTemp = nCounts.temp || 0;
-  const showTemp = cTemp > 0 || nTemp > 0;
-  const cStr = `${cCounts.main || 0}${showTemp ? `臨${cTemp}` : ''}`;
-  const nStr = `${nCounts.main || 0}${showTemp ? `臨${nTemp}` : ''}`;
-  return `${cStr}→${nStr}`;
+  const breakdown = (c) => {
+    const temp = c.temp || 0;
+    const other = c.otherNonTemp ?? (c.other || 0);
+    const total = (c.main || 0) + (c.other || 0);
+    return { total, temp, other };
+  };
+  const cb = breakdown(cCounts);
+  const nb = breakdown(nCounts);
+  const showTemp = cb.temp > 0 || nb.temp > 0;
+  const showOther = cb.other > 0 || nb.other > 0;
+  const fmt = (b) => {
+    const parts = [];
+    if (showTemp) parts.push(`臨${b.temp}`);
+    if (showOther) parts.push(`他${b.other}`);
+    return parts.length > 0 ? `${b.total}うち${parts.join('+')}` : `${b.total}`;
+  };
+  return `${fmt(cb)}→${fmt(nb)}`;
 };
 
 export const generateGradeSummary = (emps, isNext) => {
