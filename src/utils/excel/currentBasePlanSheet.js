@@ -92,11 +92,11 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
   ws.getRow(1).font = { name: 'BIZ UDPゴシック', bold: true, size: 12, color: { argb: 'FF1E293B' } };
 
   const curSummary = generateGradeSummary(employees, false);
-  ws.getRow(2).values = [`【全体集計（今年度 ${targetYear - 1}(R${targetYear - 2019})）】 ${curSummary}`];
+  ws.getRow(2).values = [`【今年度 ${targetYear - 1}(R${targetYear - 2019})】 ${curSummary}`];
   ws.getRow(2).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
   const nextSummary = generateGradeSummary(employees, true);
-  ws.getRow(3).values = [`【全体集計（来年度 ${targetYear}(R${targetYear - 2018})）】 ${nextSummary}`];
+  ws.getRow(3).values = [`【来年度 ${targetYear}(R${targetYear - 2018})】 ${nextSummary}`];
   ws.getRow(3).font = { name: 'BIZ UDPゴシック', size: 9, color: { argb: 'FF0284C7' } };
 
   // Changed merge from endTitleCol to Q2 so legend can be placed
