@@ -27,9 +27,9 @@ export const clearEmptyStringCells = (workbook) => {
     const isSimpleSheet = ws.name.startsWith('簡(');
     ws.eachRow({ includeEmpty: true }, (row, rowNumber) => {
       row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
-        // 簡(全)・簡(課長)・簡(班長)の特殊事情列（3列目・26列目）のデータ行は
+        // 簡(全)・簡(課長)・簡(班長)の特殊事情列（3列目：C列）のデータ行は
         // 左隣の配属希望の文字がはみ出して表示されるのを防ぐため空文字列('')を維持する
-        if (isSimpleSheet && rowNumber >= 7 && (colNumber === 3 || colNumber === 26)) {
+        if (isSimpleSheet && rowNumber >= 7 && colNumber === 3) {
           return;
         }
         const v = cell.value;
