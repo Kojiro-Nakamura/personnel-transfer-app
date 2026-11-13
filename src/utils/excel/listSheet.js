@@ -100,14 +100,14 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
     { width: 8 },  // 年数
     { width: 14 }, // 詳細
     { width: 12 }, // 備考
-    { width: 12 }, // カウント除外
+    { width: 12 }, // 他カウント除外
     { width: 20 }, // [来年度] 配置先
     { width: 12 }, // 職名
     { width: 16 }, // 級
     { width: 8 },  // 年数
     { width: 14 }, // 詳細
     { width: 12 }, // 備考
-    { width: 12 }, // カウント除外
+    { width: 12 }, // 他カウント除外
     { width: 8 },  // 採用
     { width: 12 }, // 係長級
     { width: 12 }, // 補佐I
@@ -182,7 +182,7 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
 
   const r5 = ws.getRow(5);
   r5.height = 13;
-  const headersR5 = ['', '', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', 'カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度'];
+  const headersR5 = ['', '', '', '', '職員番号', '性別', '生年月日', '最終学歴', '採用年月日', '特記事項', '〇配属希望', '●特殊事情', '配置先', '職名', '級', '年数', '詳細', '備考', '他カウント除外', '配置先', '職名', '級', '年数', '詳細', '備考', '他カウント除外', '採用', '係長級(主査)', '補佐級I(主任)', '補佐級II(班長)', '補佐級III(補佐兼班長)', '課長級', '所属長級', '次長級', '部長級', '来年度'];
   historyYears.forEach(y => headersR5.push(getEraFormattedYear(y)));
   r5.values = headersR5;
 

@@ -381,14 +381,14 @@ ${summaryHtml}
       <th onclick="sortTable(14)" class="bg-amber">年数</th>
       <th onclick="sortTable(15)" class="bg-amber">詳細</th>
       <th onclick="sortTable(16)" class="bg-amber">備考</th>
-      <th onclick="sortTable(17)" class="bg-amber">カウント除外</th>
+      <th onclick="sortTable(17)" class="bg-amber">他カウント除外</th>
       <th onclick="sortTable(18)" class="bg-blue">配置先</th>
       <th onclick="sortTable(19)" class="bg-blue">職名</th>
       <th onclick="sortTable(20)" class="bg-blue">級</th>
       <th onclick="sortTable(21)" class="bg-blue">年数</th>
       <th onclick="sortTable(22)" class="bg-blue">詳細</th>
       <th onclick="sortTable(23)" class="bg-blue">備考</th>
-      <th onclick="sortTable(24)" class="bg-blue">カウント除外</th>
+      <th onclick="sortTable(24)" class="bg-blue">他カウント除外</th>
       <th onclick="sortTable(25)" class="bg-fuchsia" style="width: 56px;">採用</th>
       <th onclick="sortTable(26)" style="width: 80px; background-color: ${getPromotedBgColorCode('係長級(主査)')};">係長級(主査)</th>
       <th onclick="sortTable(27)" style="width: 80px; background-color: ${getPromotedBgColorCode('補佐級I(主任)')};">補佐級I(主任)</th>

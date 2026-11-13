@@ -188,15 +188,13 @@ export const getCounts = (emps, isNext) => {
       acc.other++;
     } else {
       acc.main++;
-    }
-    const isTemp = isTempRemark(isNext ? emp.nextEmploymentType : emp.currentEmploymentType);
-    if (isTemp) {
-      acc.temp++;
-    } else if (isExcluded) {
-      acc.otherNonTemp++;
+      // 臨任は合計（他カウント除外を除く）の内数として数える
+      if (isTempRemark(isNext ? emp.nextEmploymentType : emp.currentEmploymentType)) {
+        acc.temp++;
+      }
     }
     return acc;
-  }, { main: 0, other: 0, temp: 0, otherNonTemp: 0 });
+  }, { main: 0, other: 0, temp: 0 });
 };
 
 export const formatCountText = ({ main, other }) => {
@@ -204,27 +202,32 @@ export const formatCountText = ({ main, other }) => {
 };
 
 // 「16うち臨2+他1→15うち臨2+他0」形式
-// ・総数 = 配置人数全体（臨任・カウント除外を含む）
-// ・臨 = 備考に臨任/臨時がある人、他 = カウント除外の人（臨任を除く）
+// ・先頭の数 = 他カウント除外を除いた人数
+// ・うち臨 = 先頭の数のうち備考に臨任/臨時がある人
+// ・+他 = 他カウント除外の人（先頭の数には含まない）
 // ・両年度とも0人の項目は省略（両方とも0なら「16→15」）
 export const formatCountTransition = (cCounts, nCounts) => {
-  const breakdown = (c) => {
-    const temp = c.temp || 0;
-    const other = c.otherNonTemp ?? (c.other || 0);
-    const total = (c.main || 0) + (c.other || 0);
-    return { total, temp, other };
+  const showTemp = (cCounts.temp || 0) > 0 || (nCounts.temp || 0) > 0;
+  const showOther = (cCounts.other || 0) > 0 || (nCounts.other || 0) > 0;
+  const fmt = (c) => {
+    let s = `${c.main || 0}`;
+    if (showTemp) s += `うち臨${c.temp || 0}`;
+    if (showOther) s += `+他${c.other || 0}`;
+    return s;
   };
-  const cb = breakdown(cCounts);
-  const nb = breakdown(nCounts);
-  const showTemp = cb.temp > 0 || nb.temp > 0;
-  const showOther = cb.other > 0 || nb.other > 0;
-  const fmt = (b) => {
-    const parts = [];
-    if (showTemp) parts.push(`臨${b.temp}`);
-    if (showOther) parts.push(`他${b.other}`);
-    return parts.length > 0 ? `${b.total}うち${parts.join('+')}` : `${b.total}`;
-  };
-  return `${fmt(cb)}→${fmt(nb)}`;
+  return `${fmt(cCounts)}→${fmt(nCounts)}`;
+};
+
+const GRADE_SHORT_LABELS = {
+  "部長級": "部",
+  "次長級": "次",
+  "所属長級": "所",
+  "課長級": "課",
+  "補佐級III(補佐兼班長)": "Ⅲ",
+  "補佐級II(班長)": "Ⅱ",
+  "補佐級I(主任)": "Ⅰ",
+  "係長級(主査)": "係",
+  "一般": "一般",
 };
 
 export const generateGradeSummary = (emps, isNext) => {
@@ -277,30 +280,35 @@ export const generateGradeSummary = (emps, isNext) => {
     total++;
   });
 
-  let upperSubtotal = 0;
-  const upperGrades = ["部長級", "次長級", "所属長級", "課長級"];
-  upperGrades.forEach(g => {
-    if (counts[g]) upperSubtotal += counts[g];
-  });
+  const sumOf = (grades) => grades.reduce((s, g) => s + (counts[g] || 0), 0);
+  const upperSubtotal = sumOf(["部長級", "次長級", "所属長級", "課長級"]);
+  const leaderSubtotal = upperSubtotal + sumOf(["補佐級III(補佐兼班長)", "補佐級II(班長)"]);
 
+  // 例：「次4 所7 課14 (課以上25) Ⅲ9 Ⅱ11 (班長以上45) Ⅰ49 係14 一般71 合計179(他1)」
   const summaryParts = [];
   const order = ["部長級", "次長級", "所属長級", "課長級", "補佐級III(補佐兼班長)", "補佐級II(班長)", "補佐級I(主任)", "係長級(主査)", "一般"];
   order.forEach(grade => {
+    const label = GRADE_SHORT_LABELS[grade];
     if (grade === "課長級") {
       if (counts[grade] || upperSubtotal > 0) {
-        summaryParts.push(`${grade}${counts[grade] || 0}人（課長級以上小計${upperSubtotal}人）`);
+        summaryParts.push(`${label}${counts[grade] || 0}`);
+        summaryParts.push(`(課以上${upperSubtotal})`);
       }
+    } else if (grade === "補佐級II(班長)") {
+      if (counts[grade]) summaryParts.push(`${label}${counts[grade]}`);
+      if (leaderSubtotal > 0) summaryParts.push(`(班長以上${leaderSubtotal})`);
     } else {
-      if (counts[grade]) summaryParts.push(`${grade}${counts[grade]}人`);
+      if (counts[grade]) summaryParts.push(`${label}${counts[grade]}`);
     }
   });
   Object.keys(counts).forEach(k => {
-    if (!order.includes(k)) summaryParts.push(`${k}${counts[k]}人`);
+    if (!order.includes(k)) summaryParts.push(`${k}${counts[k]}`);
   });
 
-  let res = summaryParts.length > 0 ? `${summaryParts.join('　')}　合計${total}人` : `合計0人`;
+  summaryParts.push(`合計${total}`);
+  let res = summaryParts.join(' ');
   if (excludeCount > 0) {
-    res += `（その他${excludeCount}人）`;
+    res += `(他${excludeCount})`;
   }
 
   const remarkSummary = `【臨任${remarkCounts["臨任"]}人　役職定年${remarkCounts["役職定年"]}人　再任用${remarkCounts["再任用"]}人　定年前再任時短${remarkCounts["定年前再任時短"]}人　新採${remarkCounts["新採"]}人　育代${remarkCounts["育代"]}人　休職中${remarkCounts["休職中"]}人】`;

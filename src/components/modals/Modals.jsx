@@ -550,8 +550,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
   const handleDownloadTemplate = () => {
     const headers = [
       "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", "配属希望", "特殊事情", 
-      "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
-      "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
+      "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】他カウント除外",
+      "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】他カウント除外",
       "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
       ...historyYears.map(y => getEraFormattedYear(y))
     ].join(',');
@@ -563,8 +563,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
   const handleExportCSV = () => {
     const headers = [
       "職員番号", "性別", "氏名", "フリガナ", "生年月日", "最終学歴", "採用年月日", "特記事項", "配属希望", "特殊事情", 
-      "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】カウント除外",
-      "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】カウント除外",
+      "【今年度】部署名", "【今年度】ポスト・班名", "【今年度】班内ポスト名", "【今年度】職名", "【今年度】級", "【今年度】年数", "【今年度】詳細", "【今年度】備考", "【今年度】他カウント除外",
+      "【来年度】部署名", "【来年度】ポスト・班名", "【来年度】班内ポスト名", "【来年度】職名", "【来年度】級", "【来年度】年数", "【来年度】詳細", "【来年度】備考", "【来年度】他カウント除外",
       "【昇進年度】係長級(主査)", "【昇進年度】補佐級I(主任)", "【昇進年度】補佐級II(班長)", "【昇進年度】補佐級III", "【昇進年度】課長級", "【昇進年度】所属長級", "【昇進年度】次長級", "【昇進年度】部長級",
       ...historyYears.map(y => getEraFormattedYear(y))
     ];
@@ -888,7 +888,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
           const cYsStr = getVal('【今年度】年数');
           const cSkStr = getVal('【今年度】詳細');
           const cNote = getVal('【今年度】備考');
-          const cExclude = getVal('【今年度】カウント除外');
+          const cExclude = (getVal('【今年度】他カウント除外') ?? getVal('【今年度】カウント除外'));
 
           let currP = { dId: 'unassigned', pId: null, gId: null, gpId: null };
           if (cDName !== undefined || cPName !== undefined || cGPName !== undefined) {
@@ -906,7 +906,7 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
           const nYsStr = getVal('【来年度】年数');
           const nSkStr = getVal('【来年度】詳細');
           const nNote = getVal('【来年度】備考');
-          const nExclude = getVal('【来年度】カウント除外');
+          const nExclude = (getVal('【来年度】他カウント除外') ?? getVal('【来年度】カウント除外'));
 
           let nextP = { dId: 'unassigned', pId: null, gId: null, gpId: null };
           if (nDName !== undefined || nPName !== undefined || nGPName !== undefined) {
@@ -1252,14 +1252,14 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
                 <Th label="年数" sortKey="currentYears" className="bg-slate-100 border-r" />
                 <Th label="詳細" sortKey="currentSkillsStr" className="bg-slate-100 border-r" />
                 <Th label="備考" sortKey="currentEmploymentType" className="bg-slate-100 border-r" />
-                <Th label="カウント除外" sortKey="currentExclude" className="bg-slate-100 border-r" />
+                <Th label="他カウント除外" sortKey="currentExclude" className="bg-slate-100 border-r" />
                 <Th label="配置先" sortKey="departmentId" className="bg-blue-50/50 border-r" />
                 <Th label="職名" sortKey="nextTitle" className="bg-blue-50/50 border-r" />
                 <Th label="級" sortKey="nextGrade" className="bg-blue-50/50 border-r" />
                 <Th label="年数" sortKey="nextYears" className="bg-blue-50/50 border-r" />
                 <Th label="詳細" sortKey="nextSkillsStr" className="bg-blue-50/50 border-r" />
                 <Th label="備考" sortKey="nextEmploymentType" className="bg-blue-50/50 border-r" />
-                <Th label="カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
+                <Th label="他カウント除外" sortKey="nextExclude" className="bg-blue-50/50 border-r" />
 
                 <Th label="採用" sortKey="hireDate" className="bg-fuchsia-50/50 border-l border-r w-[56px] min-w-[56px] whitespace-normal leading-tight" />
                 <Th label="係長級(主査)" sortKey="promoYearChief" className="bg-fuchsia-50/50 border-r w-[80px] min-w-[80px] whitespace-normal leading-tight" />
