@@ -206,7 +206,7 @@ export const formatCountText = ({ main, other }) => {
 // ・うち臨 = 先頭の数のうち備考に臨任/臨時がある人
 // ・+他 = 他カウント除外の人（先頭の数には含まない）
 // ・両年度とも0人の項目は省略（両方とも0なら「16→15」）
-export const formatCountTransition = (cCounts, nCounts) => {
+export const formatCountTransition = (cCounts, nCounts, withYearLabels = false) => {
   const showTemp = (cCounts.temp || 0) > 0 || (nCounts.temp || 0) > 0;
   const showOther = (cCounts.other || 0) > 0 || (nCounts.other || 0) > 0;
   const fmt = (c) => {
@@ -215,6 +215,9 @@ export const formatCountTransition = (cCounts, nCounts) => {
     if (showOther) s += `+他${c.other || 0}`;
     return s;
   };
+  if (withYearLabels) {
+    return `今年度：${fmt(cCounts)}　→　来年度：${fmt(nCounts)}`;
+  }
   return `${fmt(cCounts)}→${fmt(nCounts)}`;
 };
 
