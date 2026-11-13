@@ -270,9 +270,16 @@ export const AppContent = () => {
                 style={filterLevel > 0 && filterName ? { backgroundColor: getPromotedBgColorCode(filterName) } : {}}
                 title="表示する職員の条件を切り替える"
               >
-                <option value={0} className="text-black">全件表示</option>
+                <option value={0} className="text-black" style={{ backgroundColor: '#ffffff' }}>全件表示</option>
                 {GRADE_OPTIONS.filter(g => g !== "").map(g => (
-                  <option key={g} value={GRADE_LEVELS[g]} className="text-black">{g}以上</option>
+                  <option
+                    key={g}
+                    value={GRADE_LEVELS[g]}
+                    className="text-black"
+                    style={{ backgroundColor: getPromotedBgColorCode(g) || '#ffffff' }}
+                  >
+                    {g}以上
+                  </option>
                 ))}
               </select>
             </div>
