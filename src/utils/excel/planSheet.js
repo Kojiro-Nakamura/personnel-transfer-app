@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, formatCountTransition, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, formatCountTransition, generateGradeSummary, isPromotedGrade, isTempRemark, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../../constants/config.js';
 import { defaultFont, headerFont, borderStyle, thickBorderStyle, grayBorderStyle, grayThickBorderStyle, getCellBorders, getBirthFiscalYear, getHireFiscalYearShort, getEraYearOnly } from './excelHelpers.js';
 
@@ -673,6 +673,11 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         if (promoColor && (colNumber >= 10 && colNumber <= 15)) {
           argb = 'FF' + promoColor.replace('#', '').toUpperCase();
         }
+      }
+      if (colNumber === 9 && currEmp && isTempRemark(currEmp.currentEmploymentType)) {
+        argb = 'FFCBD5E1';
+      } else if (colNumber === 15 && nextEmp && isTempRemark(nextEmp.nextEmploymentType)) {
+        argb = 'FFCBD5E1';
       }
       
       if (colNumber === 16 && noteStr) cell.font = { ...defaultFont, color: { argb: 'FF0369A1' } };

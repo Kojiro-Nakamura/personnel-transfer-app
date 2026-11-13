@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, isTempRemark, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../../constants/config.js';
 import { defaultFont, headerFont, borderStyle, thickBorderStyle, grayBorderStyle, grayThickBorderStyle, getCellBorders, getBirthFiscalYear, getHireFiscalYearShort, getEraYearOnly } from './excelHelpers.js';
 
@@ -490,6 +490,12 @@ export const addListSheet = (workbook, sheetName, fileName, targetYear, employee
          if (histIsChange[hcOffset]) {
             cell.font = { ...listDefaultFont, bold: true, italic: true };
          }
+      }
+
+      if (colNumber === 18 && isTempRemark(emp.currentEmploymentType)) {
+        argb = 'FFCBD5E1';
+      } else if (colNumber === 25 && !isNextRetired && isTempRemark(emp.nextEmploymentType)) {
+        argb = 'FFCBD5E1';
       }
 
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };

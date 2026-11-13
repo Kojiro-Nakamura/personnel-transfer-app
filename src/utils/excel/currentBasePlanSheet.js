@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, isTempRemark, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../../constants/config.js';
 import { defaultFont, headerFont, borderStyle, thickBorderStyle, grayBorderStyle, grayThickBorderStyle, getCellBorders, getBirthFiscalYear, getHireFiscalYearShort, getEraYearOnly } from './excelHelpers.js';
 
@@ -640,6 +640,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                  }
              }
           }
+          if (c === 9 && isTempRemark(emp.currentEmploymentType)) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
+          }
+          if (c === 17 && !isRetired && !isUnassigned && isTempRemark(emp.nextEmploymentType)) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
+          }
         }
         
         currentRowIndex++;
@@ -969,6 +975,12 @@ export const addCurrentBasePlanSheet = (workbook, sheetName, fileName, targetYea
                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + nextPromoColor.replace('#', '').toUpperCase() } };
                }
            }
+        }
+        if (c === 9 && isTempRemark(emp.currentEmploymentType)) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
+        }
+        if (c === 17 && !isRetired && !isUnassigned && isTempRemark(emp.nextEmploymentType)) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCBD5E1' } };
         }
       }
       currentRowIndex++;

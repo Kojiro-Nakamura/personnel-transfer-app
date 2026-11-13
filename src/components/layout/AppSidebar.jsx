@@ -19,7 +19,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
   
   const isTemp = isTempRemark(emp.nextEmploymentType || emp.currentEmploymentType);
   const defaultBorder = isRetired ? "border-[3px] border-dotted border-slate-800" : "border-[3px] border-dashed border-orange-400";
-  const defaultBg = isTemp ? "bg-slate-200" : (isRetired ? "bg-slate-50" : "bg-orange-50/50");
+  const defaultBg = isTemp ? "bg-slate-300" : (isRetired ? "bg-slate-50" : "bg-orange-50/50");
 
   const currentAge = calculateAge(emp.birthDate, targetYear - 1);
 

@@ -74,7 +74,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       : isFutureRetired 
         ? "bg-slate-100" 
         : isTemp
-          ? "bg-slate-200"
+          ? "bg-slate-300"
           : defaultBg;
 
   const isPromoted = isNext && emp && isPromotedGrade(emp.currentGrade, emp.nextGrade);
