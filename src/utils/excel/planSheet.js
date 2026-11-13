@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, formatCountTransition, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../../constants/config.js';
 import { defaultFont, headerFont, borderStyle, thickBorderStyle, grayBorderStyle, grayThickBorderStyle, getCellBorders, getBirthFiscalYear, getHireFiscalYearShort, getEraYearOnly } from './excelHelpers.js';
 
@@ -307,7 +307,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         const cCounts = getCounts(deptCurrEmps, false);
         const nCounts = getCounts(deptNextEmps, true);
         if (showCount) {
-          displayDeptStr = `${deptName} （${formatCountText(cCounts)}→${formatCountText(nCounts)}）`;
+          displayDeptStr = `${deptName} ${formatCountTransition(cCounts, nCounts)}`;
         } else {
           displayDeptStr = deptName;
         }
@@ -326,7 +326,7 @@ export const addPlanSheet = (workbook, sheetName, fileName, targetYear, departme
         const gCCounts = getCounts(grpCurrEmps, false);
         const gNCounts = getCounts(grpNextEmps, true);
         if (showCount) {
-          displayGroupStr = `${groupName} （${formatCountText(gCCounts)}→${formatCountText(gNCounts)}）`;
+          displayGroupStr = `${groupName} ${formatCountTransition(gCCounts, gNCounts)}`;
         } else {
           displayGroupStr = groupName;
         }

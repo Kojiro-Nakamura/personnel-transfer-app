@@ -1,4 +1,4 @@
-import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
+import { getGradeLevel, getEraFormattedYear, calculateAge, getPromotedBgColorCode, traverseOrgTree, getCounts, formatCountText, formatCountTransition, generateGradeSummary, isPromotedGrade, getEmpCurrentYears, calculateServiceYears, formatPromoDateWithEra, getEraSuffix, getEraSuffixForDate, formatServiceYearsText, formatDateForDisplay, getFormattedNameForPlan, shouldOmitEmployeeNumber, sortEmployeeList } from '../helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../../constants/config.js';
 import { defaultFont, headerFont, borderStyle, thickBorderStyle, grayBorderStyle, grayThickBorderStyle, getCellBorders, getBirthFiscalYear, getHireFiscalYearShort, getEraYearOnly } from './excelHelpers.js';
 
@@ -268,7 +268,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         const cCounts = getCounts(deptCurrEmps, false);
         const nCounts = getCounts(deptNextEmps, true);
         if (showCount) {
-          displayDeptStr = `${deptName} ${cCounts.main || 0}→${nCounts.main || 0}`;
+          displayDeptStr = `${deptName} ${formatCountTransition(cCounts, nCounts)}`;
         } else {
           displayDeptStr = deptName;
         }
@@ -285,7 +285,7 @@ export const addSimplePlanSheet = (workbook, sheetName, fileName, targetYear, de
         const gCCounts = getCounts(grpCurrEmps, false);
         const gNCounts = getCounts(grpNextEmps, true);
         if (showCount) {
-          displayGroupStr = `${groupName} ${gCCounts.main || 0}→${gNCounts.main || 0}`;
+          displayGroupStr = `${groupName} ${formatCountTransition(gCCounts, gNCounts)}`;
         } else {
           displayGroupStr = groupName;
         }

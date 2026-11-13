@@ -174,6 +174,11 @@ export const getPairs = (curr = [], next = []) => {
   return Array.from({ length }).map((_, i) => [curr[i], next[i], i]);
 };
 
+export const isTempRemark = (remark) => {
+  const r = String(remark || '');
+  return r.includes('臨任') || r.includes('臨時');
+};
+
 export const getCounts = (emps, isNext) => {
   return emps.reduce((acc, emp) => {
     if (!emp) return acc;
@@ -183,12 +188,25 @@ export const getCounts = (emps, isNext) => {
     } else {
       acc.main++;
     }
+    if (isTempRemark(isNext ? emp.nextEmploymentType : emp.currentEmploymentType)) {
+      acc.temp++;
+    }
     return acc;
-  }, { main: 0, other: 0 });
+  }, { main: 0, other: 0, temp: 0 });
 };
 
 export const formatCountText = ({ main, other }) => {
   return other > 0 ? `${main}人（その他${other}人）` : `${main}人`;
+};
+
+// 「16臨2→15臨0」形式（両年度とも臨任0人の場合は「16→15」）
+export const formatCountTransition = (cCounts, nCounts) => {
+  const cTemp = cCounts.temp || 0;
+  const nTemp = nCounts.temp || 0;
+  const showTemp = cTemp > 0 || nTemp > 0;
+  const cStr = `${cCounts.main || 0}${showTemp ? `臨${cTemp}` : ''}`;
+  const nStr = `${nCounts.main || 0}${showTemp ? `臨${nTemp}` : ''}`;
+  return `${cStr}→${nStr}`;
 };
 
 export const generateGradeSummary = (emps, isNext) => {
