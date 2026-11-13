@@ -311,8 +311,8 @@ export const generateGradeSummary = (emps, isNext) => {
     res += `(他${excludeCount})`;
   }
 
-  const remarkSummary = `【臨任${remarkCounts["臨任"]}人　役職定年${remarkCounts["役職定年"]}人　再任用${remarkCounts["再任用"]}人　定年前再任時短${remarkCounts["定年前再任時短"]}人　新採${remarkCounts["新採"]}人　育代${remarkCounts["育代"]}人　休職中${remarkCounts["休職中"]}人】`;
-  res += `　${remarkSummary}`;
+  const remarkSummary = `【臨任${remarkCounts["臨任"]} 役職定年${remarkCounts["役職定年"]} 再任用${remarkCounts["再任用"]} 定年前再任時短${remarkCounts["定年前再任時短"]} 新採${remarkCounts["新採"]} 育代${remarkCounts["育代"]} 休職中${remarkCounts["休職中"]}】`;
+  res += ` ${remarkSummary}`;
 
   return res;
 };
