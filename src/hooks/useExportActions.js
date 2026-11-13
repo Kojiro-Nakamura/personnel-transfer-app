@@ -1,6 +1,6 @@
 import { saveSnapshot } from '../utils/indexedDB.js';
 import { useCallback } from 'react';
-import { downloadFile, traverseOrgTree, getCounts, formatCountText, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
+import { downloadFile, traverseOrgTree, getCounts, formatCountText, formatCountTransition, calculateAge, isPromotedGrade, getPromotedBgColorCode, generateGradeSummary, getMaxDeptLevel, getMaxGroupLevel } from '../utils/helpers.js';
 import { GRADE_LEVELS, GRADE_OPTIONS } from '../constants/config.js';
 import { exportPlanToExcel, exportUnifiedExcel } from '../utils/exportExcel.js';
 import { exportModalExcel } from '../utils/exportModalExcel.js';
@@ -106,7 +106,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const cCounts = getCounts(deptCurrEmps, false);
             const nCounts = getCounts(deptNextEmps, true);
           if (showCount) {
-            displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（${formatCountText(cCounts)}→${formatCountText(nCounts)}）</span>`;
+            displayDeptHtml = `${escapeHtml(deptName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">${formatCountTransition(cCounts, nCounts)}</span>`;
           } else {
             displayDeptHtml = escapeHtml(deptName);
           }
@@ -132,7 +132,7 @@ export function useExportActions({ targetYear, activePlanId, plans, employees, d
             const gCCounts = getCounts(grpCurrEmps, false);
             const gNCounts = getCounts(grpNextEmps, true);
             if (showCount) {
-              displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">（${formatCountText(gCCounts)}→${formatCountText(gNCounts)}）</span>`;
+              displayGroupHtml = `${escapeHtml(groupName)} <span style="font-size:10px;font-weight:normal;color:#64748b;margin-left:4px;">${formatCountTransition(gCCounts, gNCounts)}</span>`;
             } else {
               displayGroupHtml = escapeHtml(groupName);
             }
