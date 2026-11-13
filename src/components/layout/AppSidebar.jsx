@@ -37,7 +37,7 @@ export const SidebarCard = ({ emp, isRetired, onClick, onMoveUp, onMoveDown }) =
       title={emp.name}
     >
       <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
-        <span className={cx("font-bold text-[11.5px] truncate shrink-0 max-w-[75%]", isRetired ? "text-slate-900" : "text-[#320A6B]", isTemp && "bg-slate-300 px-1 rounded-sm")} title={emp.name}>
+        <span className={cx("font-bold text-[11.5px] truncate shrink-0 max-w-[75%]", isRetired ? "text-slate-900" : "text-[#320A6B]", isTemp && "bg-slate-300 px-1 -my-1 py-1")} title={emp.name}>
           {emp.name}
         </span>
         <span className="text-[9px] text-black truncate flex-1 min-w-0" title={emp.currentTitle || '新採'}>

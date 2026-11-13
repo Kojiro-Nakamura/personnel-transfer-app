@@ -105,7 +105,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : (isTemp ? "bg-slate-300 px-1 rounded-sm" : ""))} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-0 text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : (isTemp ? "bg-slate-300 px-1.5 -my-1 py-1 self-stretch" : ""))} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
@@ -120,8 +120,8 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
         {yd}
       </div>
       
-      <div className="w-24 text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center">
-        <span className={cx("truncate max-w-full inline-block", remarkBg ? `${remarkBg} px-1 rounded` : "w-full block")}>{noteText}</span>
+      <div className={cx("w-24 text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center", isTemp && "bg-slate-300 px-1.5 -my-1 py-1 self-stretch")}>
+        <span className={cx("truncate max-w-full inline-block", (!isTemp && remarkBg) ? `${remarkBg} px-1 rounded` : "w-full block")}>{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
             {noteText}
