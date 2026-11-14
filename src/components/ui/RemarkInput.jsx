@@ -13,10 +13,10 @@ export const RemarkInput = ({
   onChange,
   disabled = false,
   placeholder = "臨任No.1、役職定年No.1など",
-  listId = "remark-options-list",
   className = "",
   inputClassName = "",
-  candidates = REMARK_CANDIDATES
+  candidates = REMARK_CANDIDATES,
+  menuTitle = "備考の候補"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -91,9 +91,9 @@ export const RemarkInput = ({
 
       {/* ドロップダウンメニュー */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-xl z-50 py-1 max-h-56 overflow-y-auto text-xs animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute top-full left-0 right-0 min-w-[140px] mt-1 bg-white border border-slate-300 rounded-lg shadow-xl z-50 py-1 max-h-56 overflow-y-auto text-xs animate-in fade-in zoom-in-95 duration-100">
           <div className="px-2 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 flex justify-between items-center">
-            <span>備考の候補</span>
+            <span>{menuTitle}</span>
             {value && (
               <button
                 type="button"
