@@ -38,17 +38,17 @@ const FILL_YELLOW = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF
 const FILL_GREEN = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92D050' } };
 const FILL_BLUE = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF5B9BD5' } };
 
-const FONT_BASE = { name: 'ＭＳ Ｐゴシック', size: 10, color: { argb: 'FF000000' } };
-const FONT_RED = { name: 'ＭＳ Ｐゴシック', size: 10, color: { argb: 'FFFF0000' } };
-const FONT_TITLE = { name: 'ＭＳ Ｐゴシック', size: 14, bold: true, color: { argb: 'FF000000' } };
-const FONT_HEADER = { name: 'ＭＳ Ｐゴシック', size: 10, color: { argb: 'FF000000' } };
-const FONT_SMALL_BOX = { name: 'ＭＳ Ｐゴシック', size: 7, color: { argb: 'FF000000' } };
-const FONT_REMARK = { name: 'ＭＳ Ｐゴシック', size: 8.5, color: { argb: 'FF000000' } };
-const FONT_FOOTER_MAIN = { name: 'ＭＳ Ｐゴシック', size: 9.5, color: { argb: 'FF000000' } };
-const FONT_FOOTER_RED = { name: 'ＭＳ Ｐゴシック', size: 9.5, color: { argb: 'FFFF0000' } };
-const FONT_FOOTER_SMALL = { name: 'ＭＳ Ｐゴシック', size: 8.5, color: { argb: 'FF000000' } };
-const FONT_FOOTER_TINY = { name: 'ＭＳ Ｐゴシック', size: 7.5, color: { argb: 'FF000000' } };
-const FONT_SUBTITLE = { name: 'ＭＳ Ｐゴシック', size: 10.5, color: { argb: 'FF000000' } };
+const FONT_BASE = { name: 'BIZ UDPゴシック', size: 10, color: { argb: 'FF000000' } };
+const FONT_RED = { name: 'BIZ UDPゴシック', size: 10, color: { argb: 'FFFF0000' } };
+const FONT_TITLE = { name: 'BIZ UDPゴシック', size: 14, bold: true, color: { argb: 'FF000000' } };
+const FONT_HEADER = { name: 'BIZ UDPゴシック', size: 10, color: { argb: 'FF000000' } };
+const FONT_SMALL_BOX = { name: 'BIZ UDPゴシック', size: 7, color: { argb: 'FF000000' } };
+const FONT_REMARK = { name: 'BIZ UDPゴシック', size: 8.5, color: { argb: 'FF000000' } };
+const FONT_FOOTER_MAIN = { name: 'BIZ UDPゴシック', size: 9.5, color: { argb: 'FF000000' } };
+const FONT_FOOTER_RED = { name: 'BIZ UDPゴシック', size: 9.5, color: { argb: 'FFFF0000' } };
+const FONT_FOOTER_SMALL = { name: 'BIZ UDPゴシック', size: 8.5, color: { argb: 'FF000000' } };
+const FONT_FOOTER_TINY = { name: 'BIZ UDPゴシック', size: 7.5, color: { argb: 'FF000000' } };
+const FONT_SUBTITLE = { name: 'BIZ UDPゴシック', size: 10.5, color: { argb: 'FF000000' } };
 
 const NUM_FMT_DIFF = '#,##0;"▲ "#,##0;0';
 const NUM_FMT_COUNT = '#,##0';
@@ -165,7 +165,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   });
 
   const ws = workbook.addWorksheet(sheetName, {
-    views: [{ showGridLines: true }],
+    views: [{ showGridLines: false }],
     pageSetup: {
       paperSize: 9, // A4
       orientation: 'portrait',
