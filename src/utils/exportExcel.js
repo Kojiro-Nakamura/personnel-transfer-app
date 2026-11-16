@@ -8,6 +8,7 @@ import { addCurrentBasePlanSheet } from './excel/currentBasePlanSheet.js';
 import { addListSheet } from './excel/listSheet.js';
 import { addBirthYearSheet } from './excel/birthYearSheet.js';
 import { addNextYearAllocationSheet } from './excel/nextYearAllocationSheet.js';
+import { addDeptAllocationSheet } from './excel/deptAllocationSheet.js';
 
 export {
   saveWorkbook,
@@ -16,7 +17,8 @@ export {
   addCurrentBasePlanSheet,
   addListSheet,
   addBirthYearSheet,
-  addNextYearAllocationSheet
+  addNextYearAllocationSheet,
+  addDeptAllocationSheet
 };
 
 export const exportPlanToExcel = async (fileName, targetYear, departments, deptMap, currMap, nextMap, employees, notes, filterLevel, showCount = true) => {
@@ -44,12 +46,13 @@ export const exportPlanToExcel = async (fileName, targetYear, departments, deptM
   addPlanSheet(workbook, '案(課長)', `${baseTitle}（課長級以上）`, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelSecHead, showCount);
   addPlanSheet(workbook, '案(班長)', `${baseTitle}（補佐級II(班長)以上）`, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelAssistant2, showCount);
 
-  // 3. 今年度ベース・職員一覧・生年別一覧（今年度・来年度）・次年度配置案
+  // 3. 今年度ベース・職員一覧・生年別一覧（今年度・来年度）・次年度配置案・所属配置
   addCurrentBasePlanSheet(workbook, `${currEra}→${nextEra}`, baseTitle, targetYear, departments, deptMap, currMap, nextMap, employees, notes, levelAll, showCount);
   addListSheet(workbook, '職員一覧', baseTitle, targetYear, employees, departments);
   addBirthYearSheet(workbook, `生年(${currEra})`, targetYear, employees, departments, false);
   addBirthYearSheet(workbook, `生年(${nextEra})`, targetYear, employees, departments, true);
   addNextYearAllocationSheet(workbook, '次年度配置案', targetYear, departments, employees);
+  addDeptAllocationSheet(workbook, '所属配置', targetYear, departments, employees, notes);
 
   await saveWorkbook(workbook, fileName);
 };
