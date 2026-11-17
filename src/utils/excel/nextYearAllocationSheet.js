@@ -117,8 +117,8 @@ export const addNextYearAllocationSheet = (workbook, sheetName, targetYear, depa
       showRuler: true,
       showRowColHeaders: true,
       showGridLines: false,
-      zoomScale: 120,
-      zoomScaleNormal: 70,
+      zoomScale: 100,
+      zoomScaleNormal: 100,
       activeCell: `M${totalRowIdx}`,
       style: 'pageBreakPreview'
     }],
@@ -361,11 +361,12 @@ export const addNextYearAllocationSheet = (workbook, sheetName, targetYear, depa
         }
       });
 
-      // 来年度人数集計
+      // 来年度人数集計（「担当」には臨任職員も含める）
       activeEmps.forEach(emp => {
         if (!idSet.has(emp.departmentId)) return;
         if (emp.nextExclude && emp.nextExclude.trim() !== '') return;
         if (isTempRemark(emp.nextEmploymentType)) {
+          nextTantou++;
           return;
         }
         if (getGradeLevel(emp.nextGrade) >= designatedMinLevel) {
