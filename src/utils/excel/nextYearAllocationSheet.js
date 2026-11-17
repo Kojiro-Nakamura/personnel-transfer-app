@@ -150,6 +150,8 @@ export const addNextYearAllocationSheet = (workbook, sheetName, targetYear, depa
       scale: 53,
       fitToWidth: 1,
       fitToHeight: 1,
+      horizontalCentered: true,
+      verticalCentered: true,
       firstPageNumber: 1,
       useFirstPageNumber: false,
       usePrinterDefaults: false,
