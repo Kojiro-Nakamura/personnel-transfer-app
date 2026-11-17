@@ -273,6 +273,7 @@ export const addNextYearAllocationSheet = (workbook, sheetName, targetYear, depa
   for (let r = 2; r <= 4; r++) {
     for (let c = 1; c <= 28; c++) {
       const cell = ws.getCell(r, c);
+      cell.style = { ...cell.style };
       cell.fill = c >= 22 ? HEADER_ORANGE_FILL : HEADER_BLUE_FILL;
 
       if (c === 5) {
@@ -445,6 +446,7 @@ export const addNextYearAllocationSheet = (workbook, sheetName, targetYear, depa
 
     for (let c = 1; c <= 28; c++) {
       const cell = row.getCell(c);
+      cell.style = { ...cell.style };
 
       if (c === 1) {
         cell.font = FONT_DEPT_NAME;

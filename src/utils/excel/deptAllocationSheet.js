@@ -178,15 +178,19 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   });
 
   // 列幅設定 (A〜G)
+  // C〜F列はExcel表示幅 10.00 (117ピクセル) = 10.6328125
   ws.columns = [
-    { width: 22 }, // A: 部局名
-    { width: 23 }, // B: 所属（課室・振興局）
-    { width: 9.5 }, // C: 今年度（臨任除く）
-    { width: 9.5 }, // D: 今年度（臨任含む）
-    { width: 9.5 }, // E: 来年度（臨任含む）
-    { width: 8.5 }, // F: 増減
-    { width: 46 }  // G: 備考
+    { width: 22 },          // A: 部局名
+    { width: 23 },          // B: 所属（課室・振興局）
+    { width: 10.6328125 },  // C: 今年度（臨任除く）
+    { width: 10.6328125 },  // D: 今年度（臨任含む）
+    { width: 10.6328125 },  // E: 来年度（臨任含む）
+    { width: 10.6328125 },  // F: 増減
+    { width: 46 }           // G: 備考
   ];
+
+  const BORDER_THIN = { style: 'thin', color: { argb: 'FF000000' } };
+  const BORDER_THICK = { style: 'medium', color: { argb: 'FF000000' } };
 
   // --- 行1〜3: タイトルと「臨任職員を除く/含む」注記枠 ---
   ws.getRow(1).height = 10;
@@ -203,28 +207,34 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   ws.getCell('G2').font = FONT_BASE;
   ws.getCell('G2').alignment = { vertical: 'middle', horizontal: 'right' };
 
-  // C2:C3 (臨任職員を除く↓ 赤枠), D2:D3 (臨任職員を含む↓ 灰枠), E2:E3 (臨任職員を含む↓ 赤枠)
+  // C2:C3 (臨任職員を除く↓), D2:D3 (臨任職員を含む↓), E2:E3 (臨任職員を含む↓)
   const topBoxes = [
-    { col: 3, text: '臨任職員を除く\n↓', borderColor: 'FFFF0000', borderStyle: 'medium' },
-    { col: 4, text: '臨任職員を含む\n↓', borderColor: 'FF808080', borderStyle: 'thin' },
-    { col: 5, text: '臨任職員を含む\n↓', borderColor: 'FFFF0000', borderStyle: 'medium' }
+    { col: 3, text: '臨任職員を除く\n↓' },
+    { col: 4, text: '臨任職員を含む\n↓' },
+    { col: 5, text: '臨任職員を含む\n↓' }
   ];
-  topBoxes.forEach(({ col, text, borderColor, borderStyle }) => {
+  topBoxes.forEach(({ col, text }) => {
     ws.mergeCells(2, col, 3, col);
     const cellTop = ws.getCell(2, col);
     const cellBottom = ws.getCell(3, col);
     cellTop.value = text;
     cellTop.font = FONT_SMALL_BOX;
     cellTop.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-    cellTop.border = {
-      top: { style: borderStyle, color: { argb: borderColor } },
-      left: { style: borderStyle, color: { argb: borderColor } },
-      right: { style: borderStyle, color: { argb: borderColor } }
+    cellTop.style = {
+      ...cellTop.style,
+      border: {
+        top: BORDER_THIN,
+        left: BORDER_THIN,
+        right: BORDER_THIN
+      }
     };
-    cellBottom.border = {
-      bottom: { style: borderStyle, color: { argb: borderColor } },
-      left: { style: borderStyle, color: { argb: borderColor } },
-      right: { style: borderStyle, color: { argb: borderColor } }
+    cellBottom.style = {
+      ...cellTop.style,
+      border: {
+        bottom: BORDER_THICK,
+        left: BORDER_THIN,
+        right: BORDER_THIN
+      }
     };
   });
 
@@ -242,13 +252,14 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
 
   for (let c = 1; c <= 7; c++) {
     const cell = ws.getCell(headerRowIdx, c);
+    cell.style = { ...cell.style };
     cell.font = FONT_HEADER;
     cell.alignment = { horizontal: 'center', vertical: 'middle' };
     cell.border = {
-      top: { style: 'thin', color: { argb: 'FF000000' } },
-      bottom: { style: 'double', color: { argb: 'FF000000' } },
-      left: c === 1 ? { style: 'thin', color: { argb: 'FF000000' } } : (c === 2 ? undefined : { style: 'hair', color: { argb: 'FF000000' } }),
-      right: c === 7 ? { style: 'thin', color: { argb: 'FF000000' } } : (c === 1 ? undefined : { style: 'hair', color: { argb: 'FF000000' } })
+      top: BORDER_THICK,
+      bottom: BORDER_THIN,
+      left: c === 1 ? BORDER_THICK : BORDER_THIN,
+      right: c === 7 ? BORDER_THICK : BORDER_THIN
     };
   }
 
@@ -367,16 +378,13 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
       }
     }
 
-    // 罫線設定（部局ブロック境界は実線thin、ブロック内は点線hair）
-    const topStyle = idx === 0 ? 'double' : (rowDef.isGroupStart ? 'thin' : 'hair');
-    const bottomStyle = rowDef.isGroupEnd ? 'thin' : 'hair';
-
+    // 罫線設定（すべて黒のシングル実線、一番外側のみ太線）
     for (let c = 1; c <= 7; c++) {
       row.getCell(c).border = {
-        top: { style: topStyle, color: { argb: 'FF000000' } },
-        bottom: { style: bottomStyle, color: { argb: 'FF000000' } },
-        left: c === 1 ? { style: 'thin', color: { argb: 'FF000000' } } : { style: 'hair', color: { argb: 'FF000000' } },
-        right: c === 7 ? { style: 'thin', color: { argb: 'FF000000' } } : { style: 'hair', color: { argb: 'FF000000' } }
+        top: BORDER_THIN,
+        bottom: BORDER_THIN,
+        left: c === 1 ? BORDER_THICK : BORDER_THIN,
+        right: c === 7 ? BORDER_THICK : BORDER_THIN
       };
     }
   });
@@ -408,11 +416,13 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   }
 
   for (let c = 1; c <= 7; c++) {
-    totalRow.getCell(c).border = {
-      top: { style: 'double', color: { argb: 'FF000000' } },
-      bottom: { style: 'thin', color: { argb: 'FF000000' } },
-      left: c === 1 ? { style: 'thin', color: { argb: 'FF000000' } } : (c === 2 ? undefined : { style: 'hair', color: { argb: 'FF000000' } }),
-      right: c === 7 ? { style: 'thin', color: { argb: 'FF000000' } } : (c === 1 ? undefined : { style: 'hair', color: { argb: 'FF000000' } })
+    const cell = totalRow.getCell(c);
+    cell.style = { ...cell.style };
+    cell.border = {
+      top: BORDER_THIN,
+      bottom: BORDER_THICK,
+      left: c === 1 ? BORDER_THICK : BORDER_THIN,
+      right: c === 7 ? BORDER_THICK : BORDER_THIN
     };
   }
 
