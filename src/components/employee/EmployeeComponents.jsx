@@ -439,11 +439,14 @@ const DateInput = ({ label, value, onChange, bgClass, borderClass, targetYear, b
   );
 };
 
-export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, departments }) => {
+export const EmployeeModal = ({ isOpen, onClose, onSave, onDelete, initialData, departments }) => {
   const def = { employeeNumber: '', name: '', birthDate: '', education: '', hireDate: '', note: '', currentDeptId: 'unassigned', currentPostId: null, currentGroupId: null, currentGroupPostId: null, currentTitle: '', currentGrade: '', currentYears: 0, currentSkillsStr: '', currentEmploymentType: '', currentExclude: '', departmentId: 'unassigned', postId: null, groupId: null, groupPostId: null, nextTitle: '', nextGrade: '', nextYears: 1, nextSkillsStr: '', nextEmploymentType: '', nextExclude: '', promoYearDeptHead: '', promoYearDeputyHead: '', promoYearDivHead: '', promoYearSecHead: '', promoYearAssistant3: '', promoYearAssistant2: '', promoYearAssistant1: '', promoYearChief: '' };
   const { targetYear } = useApp();
   const [fd, setFd] = useState(def); 
+  const [baseSnapshot, setBaseSnapshot] = useState(null);
   const [editCurrent, setEditCurrent] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
   
   const getEraStr = (dateStr) => {
     if (!dateStr) return '';
@@ -454,25 +457,37 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     const eraMatch = eraFormatted.match(/\((.*?)\)/);
     return eraMatch ? `(${eraMatch[1]})` : '';
   };
+
+  const normalizeData = useCallback((obj) => {
+    const ps = (s) => (s || '').split(',').reduce((a, x) => a.concat(x.split('、')), []).map(x => x.trim()).filter(Boolean);
+    const d = { 
+      ...def,
+      ...obj, 
+      currentYears: Number(obj.currentYears || 0), 
+      nextYears: Number(obj.nextYears || 0), 
+      currentSkills: ps(obj.currentSkillsStr), 
+      nextSkills: ps(obj.nextSkillsStr) 
+    }; 
+    delete d.currentSkillsStr; 
+    delete d.nextSkillsStr; 
+    return d;
+  }, []);
   
   useEffect(() => { 
     if (isOpen) { 
-      setFd(initialData ? { 
+      const initFd = initialData ? { 
+        ...def,
         ...initialData, 
         currentSkillsStr: (initialData.currentSkills || []).join('、'), 
         nextSkillsStr: (initialData.nextSkills || []).join('、') 
-      } : def); 
+      } : def;
+      setFd(initFd); 
+      setBaseSnapshot(JSON.stringify(normalizeData(initFd)));
       setEditCurrent(!initialData); 
+      setConfirmDeleteOpen(false);
+      setConfirmSaveOpen(false);
     } 
-  }, [isOpen, initialData]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isOpen) onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, initialData, normalizeData]);
 
   const isPromoted = isPromotedGrade(fd.currentGrade, fd.nextGrade);
   const promoBg = isPromoted ? getPromotedBgClass(fd.nextGrade) : "";
@@ -503,6 +518,74 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
       setFd(prev => ({ ...prev, ...updates }));
     }
   }, [isOpen, isPromoted, activePromoKey, targetYear, fd]);
+
+  const applyDateParsing = useCallback((obj) => {
+    const next = { ...obj };
+    const dateKeys = ['birthDate', 'hireDate', 'promoYearChief', 'promoYearAssistant1', 'promoYearAssistant2', 'promoYearAssistant3', 'promoYearSecHead', 'promoYearDivHead', 'promoYearDeputyHead', 'promoYearDeptHead'];
+    dateKeys.forEach(k => {
+      if (next[k]) {
+        const parsed = parsePromoDate(next[k]);
+        if (parsed) next[k] = parsed;
+      }
+    });
+    return next;
+  }, []);
+
+  const save = useCallback((overrideFd) => { 
+    const rawFd = (overrideFd && overrideFd.name !== undefined) ? overrideFd : fd;
+    const targetFd = applyDateParsing(rawFd);
+    const d = normalizeData(targetFd);
+    onSave(d); 
+    onClose(); 
+  }, [fd, applyDateParsing, normalizeData, onSave, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.nativeEvent?.isComposing || e.isComposing || e.keyCode === 229) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirmDeleteOpen) {
+          setConfirmDeleteOpen(false);
+        } else if (confirmSaveOpen) {
+          setConfirmSaveOpen(false);
+        } else {
+          onClose();
+        }
+        return;
+      }
+      if (e.key === 'Enter') {
+        if (confirmDeleteOpen) return;
+        if (confirmSaveOpen) {
+          e.preventDefault();
+          e.stopPropagation();
+          save();
+          return;
+        }
+        const tag = e.target?.tagName?.toLowerCase();
+        if (tag === 'button' || tag === 'textarea') return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Sync active input and apply date formatting if needed before comparing
+        const currentFd = applyDateParsing(fd);
+        setFd(currentFd);
+        if (tag === 'input' && typeof e.target.blur === 'function') {
+          e.target.blur();
+        }
+        const currSnapshot = JSON.stringify(normalizeData(currentFd));
+        const hasChanges = baseSnapshot !== null && currSnapshot !== baseSnapshot;
+        if (hasChanges) {
+          setConfirmSaveOpen(true);
+        } else {
+          save(currentFd);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose, confirmDeleteOpen, confirmSaveOpen, fd, baseSnapshot, applyDateParsing, normalizeData, save]);
   
   if (!isOpen) return null;
 
@@ -544,21 +627,6 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
     });
 
     alert(alertMsg.trim());
-  };
-
-  const save = () => { 
-    const ps = (s) => (s || '').split(',').reduce((a, x) => a.concat(x.split('、')), []).map(x => x.trim()).filter(Boolean); 
-    const d = { 
-      ...fd, 
-      currentYears: Number(fd.currentYears), 
-      nextYears: Number(fd.nextYears), 
-      currentSkills: ps(fd.currentSkillsStr), 
-      nextSkills: ps(fd.nextSkillsStr) 
-    }; 
-    delete d.currentSkillsStr; 
-    delete d.nextSkillsStr; 
-    onSave(d); 
-    onClose(); 
   };
 
 
@@ -830,10 +898,99 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, initialData, department
             </div>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t flex justify-end gap-3">
-          <button onClick={onClose} className="px-5 py-2 border rounded" title="変更を破棄して閉じる">キャンセル</button>
-          <button onClick={save} className="px-6 py-2 bg-[#065084] text-white rounded font-bold" title="職員情報を保存する">保存</button>
+        <div className="mt-3 pt-3 border-t flex justify-between items-center">
+          <div>
+            {initialData && onDelete && (
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteOpen(true)}
+                className="px-4 py-2 border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded font-bold text-sm flex items-center gap-1.5 transition-colors"
+                title="この職員を削除する"
+              >
+                <Trash2 className="w-4 h-4" />
+                職員を削除
+              </button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button type="button" onClick={onClose} className="px-5 py-2 border rounded hover:bg-slate-50 transition-colors" title="変更を破棄して閉じる">キャンセル</button>
+            <button type="button" onClick={() => save()} className="px-6 py-2 bg-[#065084] hover:bg-[#05406a] text-white rounded font-bold transition-colors" title="職員情報を保存する">保存</button>
+          </div>
         </div>
+
+        {/* 職員削除の確認ダイアログ */}
+        {confirmDeleteOpen && (
+          <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-2xl border-t-4 border-rose-600 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center gap-2 mb-3 text-rose-600">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+                <h4 className="text-lg font-bold">職員削除の確認</h4>
+              </div>
+              <p className="text-slate-700 text-sm mb-2 leading-relaxed">
+                「<span className="font-bold text-slate-900">{fd.name || initialData?.name || '(氏名未入力)'}</span>」さんの職員データを完全に削除しますか？
+              </p>
+              <p className="text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded p-2.5 mb-5">
+                ※削除すると、今年度・来年度の配置および履歴データから除外されます。
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteOpen(false)}
+                  className="px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                  autoFocus
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmDeleteOpen(false);
+                    onDelete(initialData.id);
+                    onClose();
+                  }}
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded text-sm font-bold transition-colors shadow"
+                >
+                  削除する
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* エンターキー押下時の変更保存確認ダイアログ */}
+        {confirmSaveOpen && (
+          <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-2xl border-t-4 border-[#065084] animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center gap-2 mb-3 text-[#065084]">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+                <h4 className="text-lg font-bold">変更の保存確認</h4>
+              </div>
+              <p className="text-slate-700 text-sm mb-6 leading-relaxed">
+                職員情報に変更があります。変更内容を保存しますか？
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setConfirmSaveOpen(false)}
+                  className="px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  編集に戻る
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmSaveOpen(false);
+                    save();
+                  }}
+                  className="px-5 py-2 bg-[#065084] hover:bg-[#05406a] text-white rounded text-sm font-bold transition-colors shadow"
+                  autoFocus
+                >
+                  保存する (Enter)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         </ErrorBoundary>
       </div>
     </div>

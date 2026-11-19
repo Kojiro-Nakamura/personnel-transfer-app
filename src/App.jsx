@@ -472,7 +472,7 @@ export const AppContent = () => {
       <NoteEditModal isOpen={modals.note.isOpen} onClose={() => closeModal('note')} onSave={text => mutations.setNote(modals.note.data?.targetId, text)} data={modals.note.data} />
       <EmployeeSelectModal isOpen={modals.empSelect.isOpen} onClose={() => closeModal('empSelect')} onSelect={(empId, placement) => handleAssign(empId, placement)} targetPlacement={modals.empSelect.data} employees={employees} departments={departments} />
       <TitleChangeConfirmModal isOpen={modals.titleChangeConfirm.isOpen} onClose={() => closeModal('titleChangeConfirm')} onConfirm={(empId, newTitle) => mutations.updateEmployee(empId, { nextTitle: newTitle })} data={modals.titleChangeConfirm.data} />
-      <EmployeeModal isOpen={modals.emp.isOpen} initialData={modals.emp.data} departments={departments} onClose={() => closeModal('emp')} onSave={modals.emp.data ? d => mutations.updateEmployee(modals.emp.data.id, d) : mutations.addEmployee} />
+      <EmployeeModal isOpen={modals.emp.isOpen} initialData={modals.emp.data} departments={departments} onClose={() => closeModal('emp')} onSave={modals.emp.data ? d => mutations.updateEmployee(modals.emp.data.id, d) : mutations.addEmployee} onDelete={modals.emp.data ? (id) => { mutations.deleteEmployee(id); if (selectedEmp?.id === id) cancelSelection(); } : undefined} />
       <BulkEditModal 
         isOpen={modals.bulkEdit.isOpen} 
         onClose={() => closeModal('bulkEdit')} 
@@ -487,7 +487,7 @@ export const AppContent = () => {
       <NameEditModal isOpen={modals.group.isOpen} title="班編集" data={modals.group.data?.group} onClose={() => closeModal('group')} onSave={d => modals.group.data?.group ? mutations.updateGroup(modals.group.data.deptId, modals.group.data.group.id, d) : mutations.addGroup(modals.group.data.deptId, d)} />
       <NameEditModal isOpen={modals.groupPost.isOpen} title="班内ポスト編集" data={modals.groupPost.data?.post} onClose={() => closeModal('groupPost')} onSave={d => modals.groupPost.data?.post ? mutations.updateGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, modals.groupPost.data.post.id, d) : mutations.addGroupPost(modals.groupPost.data.deptId, modals.groupPost.data.groupId, d)} />
       <NameEditModal isOpen={modals.planName.isOpen} title="名前変更" data={{ name: modals.planName.data }} onClose={() => closeModal('planName')} onSave={d => updatePlanName(activePlanId, d.name)} />
-      <DeleteConfirmModal isOpen={modals.delConfirm.isOpen} data={modals.delConfirm.data} onClose={() => closeModal('delConfirm')} onConfirm={d => { if (d.type === 'dept') mutations.deleteDepartment(d.id); else if (d.type === 'post') mutations.deletePost(d.deptId, d.id); else if (d.type === 'group') mutations.deleteGroup(d.deptId, d.id); else if (d.type === 'groupPost') mutations.deleteGroupPost(d.deptId, d.groupId, d.id); else if (d.type === 'emp') mutations.deleteEmployee(d.id); }} />
+      <DeleteConfirmModal isOpen={modals.delConfirm.isOpen} data={modals.delConfirm.data} onClose={() => closeModal('delConfirm')} onConfirm={d => { if (d.type === 'dept') mutations.deleteDepartment(d.id); else if (d.type === 'post') mutations.deletePost(d.deptId, d.id); else if (d.type === 'group') mutations.deleteGroup(d.deptId, d.id); else if (d.type === 'groupPost') mutations.deleteGroupPost(d.deptId, d.groupId, d.id); else if (d.type === 'emp') { mutations.deleteEmployee(d.id); if (selectedEmp?.id === d.id) cancelSelection(); } }} />
       <FileOpenModal
         isOpen={modals.openFile.isOpen}
         onClose={() => closeModal('openFile')}
