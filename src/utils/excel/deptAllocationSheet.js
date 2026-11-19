@@ -34,21 +34,24 @@ const DEPT_ALLOCATION_ROWS = [
   { groupName: '', subName: '東牟婁', matchDepts: ['東牟婁農林水産振興部', '東牟婁振興局'] }
 ];
 
-const FILL_YELLOW = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
-const FILL_GREEN = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92D050' } };
-const FILL_BLUE = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF5B9BD5' } };
+const FILL_GRAY = {
+  type: 'pattern',
+  pattern: 'solid',
+  fgColor: { theme: 0, tint: -0.1499984740745262 },
+  bgColor: { indexed: 64 }
+};
 
-const FONT_BASE = { name: 'BIZ UDPゴシック', size: 10, color: { argb: 'FF000000' } };
-const FONT_RED = { name: 'BIZ UDPゴシック', size: 10, color: { argb: 'FFFF0000' } };
-const FONT_TITLE = { name: 'BIZ UDPゴシック', size: 14, bold: true, color: { argb: 'FF000000' } };
-const FONT_HEADER = { name: 'BIZ UDPゴシック', size: 10, color: { argb: 'FF000000' } };
-const FONT_SMALL_BOX = { name: 'BIZ UDPゴシック', size: 7, color: { argb: 'FF000000' } };
-const FONT_REMARK = { name: 'BIZ UDPゴシック', size: 8.5, color: { argb: 'FF000000' } };
-const FONT_FOOTER_MAIN = { name: 'BIZ UDPゴシック', size: 9.5, color: { argb: 'FF000000' } };
-const FONT_FOOTER_RED = { name: 'BIZ UDPゴシック', size: 9.5, color: { argb: 'FFFF0000' } };
-const FONT_FOOTER_SMALL = { name: 'BIZ UDPゴシック', size: 8.5, color: { argb: 'FF000000' } };
-const FONT_FOOTER_TINY = { name: 'BIZ UDPゴシック', size: 7.5, color: { argb: 'FF000000' } };
-const FONT_SUBTITLE = { name: 'BIZ UDPゴシック', size: 10.5, color: { argb: 'FF000000' } };
+const FONT_BASE = { name: 'BIZ UDPゴシック', size: 10, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_NUMBER = { name: 'BIZ UDPゴシック', size: 10, family: 3, charset: 128 };
+const FONT_TITLE = { name: 'BIZ UDPゴシック', size: 14, bold: true, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_HEADER = { name: 'BIZ UDPゴシック', size: 10, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_SMALL_BOX = { name: 'BIZ UDPゴシック', size: 7, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_REMARK = { name: 'BIZ UDPゴシック', size: 8.5, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_FOOTER_MAIN = { name: 'BIZ UDPゴシック', size: 9.5, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_FOOTER_COUNT = { name: 'BIZ UDPゴシック', size: 9.5, family: 3, charset: 128 };
+const FONT_FOOTER_SMALL = { name: 'BIZ UDPゴシック', size: 8.5, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_FOOTER_TINY = { name: 'BIZ UDPゴシック', size: 7.5, family: 3, charset: 128, color: { argb: 'FF000000' } };
+const FONT_SUBTITLE = { name: 'BIZ UDPゴシック', size: 10.5, family: 3, charset: 128, color: { argb: 'FF000000' } };
 
 const NUM_FMT_DIFF = '#,##0;"▲ "#,##0;0';
 const NUM_FMT_COUNT = '#,##0';
@@ -150,7 +153,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
     }
   });
 
-  // 各行のブロック境界（groupNameがある行が新しい部局ブロックの開始）を特定
+  // 各行のブロック境界（森林林業局ブロックの末尾・振興局の直前・データ末尾は下太線）を特定
   let currentGroup = '';
   tableRows.forEach((row, idx) => {
     if (row.groupName) {
@@ -162,9 +165,14 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
     row.effectiveGroup = currentGroup;
     const nextRow = tableRows[idx + 1];
     row.isGroupEnd = !nextRow || Boolean(nextRow.groupName);
+    row.hasThickBottom =
+      !nextRow ||
+      (row.effectiveGroup === '森林林業局' && nextRow.groupName) ||
+      nextRow.groupName === '振興局';
   });
 
   const ws = workbook.addWorksheet(sheetName, {
+    properties: { defaultRowHeight: 18 },
     views: [{ showGridLines: false }],
     pageSetup: {
       paperSize: 9, // A4
@@ -174,20 +182,26 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
       fitToHeight: 1,
       horizontalCentered: true,
       verticalCentered: true,
-      margins: { left: 0.4, right: 0.4, top: 0.4, bottom: 0.4, header: 0.2, footer: 0.2 }
+      margins: {
+        left: 0.7086614173228347,
+        right: 0.31496062992125984,
+        top: 0.7480314960629921,
+        bottom: 0.7480314960629921,
+        header: 0.31496062992125984,
+        footer: 0.31496062992125984
+      }
     }
   });
 
   // 列幅設定 (A〜G)
-  // C〜F列はExcel表示幅 10.00 (117ピクセル) = 10.6328125
   ws.columns = [
-    { width: 22 },          // A: 部局名
-    { width: 23 },          // B: 所属（課室・振興局）
-    { width: 10.6328125 },  // C: 今年度（臨任除く）
-    { width: 10.6328125 },  // D: 今年度（臨任含む）
-    { width: 10.6328125 },  // E: 来年度（臨任含む）
-    { width: 10.6328125 },  // F: 増減
-    { width: 46 }           // G: 備考
+    { width: 20.1640625 }, // A: 部局名
+    { width: 21.08203125 }, // B: 所属（課室・振興局）
+    { width: 9.75 },       // C: 今年度（臨任除く）
+    { width: 9.75 },       // D: 今年度（臨任含む）
+    { width: 9.75 },       // E: 来年度（臨任含む）
+    { width: 9.75 },       // F: 増減
+    { width: 42.1640625 }  // G: 備考
   ];
 
   const BORDER_THIN = { style: 'thin', color: { argb: 'FF000000' } };
@@ -242,7 +256,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   // --- 行4: テーブルヘッダー ---
   const headerRowIdx = 4;
   const headerRow = ws.getRow(headerRowIdx);
-  headerRow.height = 20;
+  headerRow.height = 24;
   ws.mergeCells(headerRowIdx, 1, headerRowIdx, 2);
   ws.getCell(headerRowIdx, 1).value = '所属';
   ws.getCell(headerRowIdx, 3).value = `R${currEraNum}`;
@@ -255,10 +269,11 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
     const cell = ws.getCell(headerRowIdx, c);
     cell.style = { ...cell.style };
     cell.font = FONT_HEADER;
+    cell.fill = FILL_GRAY;
     cell.alignment = { horizontal: 'center', vertical: 'middle' };
     cell.border = {
       top: BORDER_THICK,
-      bottom: BORDER_THIN,
+      bottom: BORDER_THICK,
       left: c === 1 ? BORDER_THICK : BORDER_THIN,
       right: c === 7 ? BORDER_THICK : BORDER_THIN
     };
@@ -273,7 +288,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   tableRows.forEach((rowDef, idx) => {
     const r = firstDataRow + idx;
     const row = ws.getRow(r);
-    row.height = 19;
+    row.height = 24;
 
     const deptIdSet = new Set(rowDef.deptObjs.map(d => d.id));
     const deptMapById = new Map(rowDef.deptObjs.map(d => [d.id, d]));
@@ -352,7 +367,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
 
     for (let c = 3; c <= 6; c++) {
       const cell = row.getCell(c);
-      cell.font = FONT_BASE;
+      cell.font = FONT_NUMBER;
       cell.alignment = { horizontal: 'right', vertical: 'middle' };
       cell.numFmt = c === 6 ? NUM_FMT_DIFF : NUM_FMT_COUNT;
     }
@@ -360,30 +375,15 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
     row.getCell(7).font = FONT_REMARK;
     row.getCell(7).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
 
-    // 背景色と赤字ルール
-    const hasCurrTemp = currExcl < currIncl;
-    if (hasCurrTemp) {
-      row.getCell(3).fill = FILL_YELLOW;
-      row.getCell(4).fill = FILL_YELLOW;
-      row.getCell(3).font = FONT_RED;
-    }
+    // 罫線設定（外枠・ヘッダー下・主要ブロック境界下はmedium、その他はthin）
+    const prevRow = idx > 0 ? tableRows[idx - 1] : null;
+    const topBorder = (idx === 0 || (prevRow && prevRow.hasThickBottom)) ? BORDER_THICK : BORDER_THIN;
+    const bottomBorder = rowDef.hasThickBottom ? BORDER_THICK : BORDER_THIN;
 
-    if (nextIncl !== currIncl) {
-      // D列（今年度・臨任含む）とE列（来年度・臨任含む）で人数が増減した行は「緑」
-      row.getCell(5).fill = FILL_GREEN;
-    } else if (hasCurrTemp && currIncl === nextIncl) {
-      // 今年度臨任がいて来年度も同数維持または補充された行は「青」＋増減赤字
-      row.getCell(5).fill = FILL_BLUE;
-      if (diff !== 0) {
-        row.getCell(6).font = FONT_RED;
-      }
-    }
-
-    // 罫線設定（すべて黒のシングル実線、一番外側のみ太線）
     for (let c = 1; c <= 7; c++) {
       row.getCell(c).border = {
-        top: BORDER_THIN,
-        bottom: BORDER_THIN,
+        top: topBorder,
+        bottom: bottomBorder,
         left: c === 1 ? BORDER_THICK : BORDER_THIN,
         right: c === 7 ? BORDER_THICK : BORDER_THIN
       };
@@ -394,7 +394,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   const lastDataRow = firstDataRow + tableRows.length - 1;
   const totalRowIdx = lastDataRow + 1;
   const totalRow = ws.getRow(totalRowIdx);
-  totalRow.height = 22;
+  totalRow.height = 24;
 
   ws.mergeCells(totalRowIdx, 1, totalRowIdx, 2);
   totalRow.getCell(1).value = '計';
@@ -410,17 +410,15 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
     const cell = totalRow.getCell(c);
     cell.alignment = { horizontal: 'right', vertical: 'middle' };
     cell.numFmt = c === 6 ? NUM_FMT_DIFF : NUM_FMT_COUNT;
-    cell.font = (c === 3 || c === 6) ? FONT_RED : FONT_BASE;
-    if (c <= 5) {
-      cell.fill = FILL_YELLOW;
-    }
+    cell.font = FONT_NUMBER;
   }
 
   for (let c = 1; c <= 7; c++) {
     const cell = totalRow.getCell(c);
     cell.style = { ...cell.style };
+    cell.fill = FILL_GRAY;
     cell.border = {
-      top: BORDER_THIN,
+      top: BORDER_THICK,
       bottom: BORDER_THICK,
       left: c === 1 ? BORDER_THICK : BORDER_THIN,
       right: c === 7 ? BORDER_THICK : BORDER_THIN
@@ -540,14 +538,14 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
 
   // 1. ○R8.4林学職員数
   const rCurrSummary = ws.getRow(curRow++);
-  rCurrSummary.height = 17;
+  rCurrSummary.height = 24;
   rCurrSummary.getCell(1).value = `○R${currEraNum}.4林学職員数　${currNonTempTotal}名【正規職員${currRegularEmps.length}名、役職定年${currYakushokuEmps.length}名、再任用フルタイム${currSaininyoEmps.length}名含む】`;
   rCurrSummary.getCell(1).font = FONT_FOOTER_MAIN;
   rCurrSummary.getCell(1).alignment = { vertical: 'middle' };
 
   // 2. 【※R8内訳：...】
   const rCurrDetail = ws.getRow(curRow++);
-  rCurrDetail.height = 16;
+  rCurrDetail.height = 24;
   const currYakushokuNames = currYakushokuEmps.map(formatShortName).join('、');
   const currSaininyoNames = currSaininyoEmps.map(formatShortName).join('、');
   rCurrDetail.getCell(1).value = `　　【※R${currEraNum}内訳：現役${currRegularEmps.length}名＋役職定年${currYakushokuEmps.length}名（${currYakushokuNames}）＋再任用フル${currSaininyoEmps.length}名（${currSaininyoNames}）】`;
@@ -556,17 +554,17 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
 
   // 3. ○R9.4林学職員数（新規採用職員含まない）
   const rNextWithoutNew = ws.getRow(curRow++);
-  rNextWithoutNew.height = 18;
+  rNextWithoutNew.height = 24;
   rNextWithoutNew.getCell(1).value = `○R${nextEraNum}.4林学職員数（新規採用職員含まない）`;
   rNextWithoutNew.getCell(1).font = FONT_FOOTER_MAIN;
   rNextWithoutNew.getCell(1).alignment = { vertical: 'middle' };
   rNextWithoutNew.getCell(3).value = `${nextWithoutNewHireTotal}名`;
-  rNextWithoutNew.getCell(3).font = FONT_FOOTER_RED;
+  rNextWithoutNew.getCell(3).font = FONT_FOOTER_COUNT;
   rNextWithoutNew.getCell(3).alignment = { horizontal: 'left', vertical: 'middle' };
 
   // 4. （詳細）
   const rNextDetail = ws.getRow(curRow++);
-  rNextDetail.height = 16;
+  rNextDetail.height = 24;
   rNextDetail.getCell(1).value = '　（詳細）';
   rNextDetail.getCell(1).font = FONT_FOOTER_MAIN;
   rNextDetail.getCell(1).alignment = { vertical: 'middle' };
@@ -576,7 +574,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
 
   // 5. 令和9年度林学職員 見出し
   const rNextHeader = ws.getRow(curRow++);
-  rNextHeader.height = 19;
+  rNextHeader.height = 24;
   rNextHeader.getCell(1).value = `令和${nextEraNum}年度林学職員`;
   rNextHeader.getCell(1).font = FONT_SUBTITLE;
   rNextHeader.getCell(1).alignment = { vertical: 'middle' };
@@ -609,7 +607,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   breakdownItems.forEach((item, idx) => {
     const rIdx = curRow++;
     const row = ws.getRow(rIdx);
-    row.height = 18;
+    row.height = 24;
     row.getCell(1).value = item.label;
     row.getCell(1).font = FONT_SUBTITLE;
     row.getCell(1).alignment = { vertical: 'middle' };
@@ -635,7 +633,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   // 7. 計
   const subTotalRowIdx = curRow++;
   const rSubTotal = ws.getRow(subTotalRowIdx);
-  rSubTotal.height = 19;
+  rSubTotal.height = 24;
   rSubTotal.getCell(1).value = '　　　　計';
   rSubTotal.getCell(1).font = FONT_SUBTITLE;
   rSubTotal.getCell(1).alignment = { vertical: 'middle' };
@@ -650,7 +648,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   // 8. 令和9年度配置案(人数)
   const planCountRowIdx = curRow++;
   const rPlanCount = ws.getRow(planCountRowIdx);
-  rPlanCount.height = 19;
+  rPlanCount.height = 24;
   rPlanCount.getCell(1).value = `令和${nextEraNum}年度配置案(人数)`;
   rPlanCount.getCell(1).font = FONT_SUBTITLE;
   rPlanCount.getCell(1).alignment = { vertical: 'middle' };
@@ -665,7 +663,7 @@ export const addDeptAllocationSheet = (workbook, sheetName, targetYear, departme
   // 9. 臨時的任用職員
   const tempShortageRowIdx = curRow++;
   const rTempShortage = ws.getRow(tempShortageRowIdx);
-  rTempShortage.height = 19;
+  rTempShortage.height = 24;
   rTempShortage.getCell(1).value = '臨時的任用職員';
   rTempShortage.getCell(1).font = FONT_SUBTITLE;
   rTempShortage.getCell(1).alignment = { vertical: 'middle' };
