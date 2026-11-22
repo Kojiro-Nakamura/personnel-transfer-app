@@ -295,7 +295,7 @@ export const AppContent = () => {
       <div id="app-main" className="flex-1 overflow-hidden relative w-full">
         <main className="absolute top-0 left-0 p-2 flex" style={{ transform: actZoom !== 1 ? `scale(${actZoom})` : 'none', transformOrigin: 'top left', width: `${100/actZoom}%`, height: `${100/actZoom}%` }}>
           <div className="flex flex-col md:flex-row gap-2 w-full h-full">
-            <div className="flex-1 w-full bg-white rounded shadow-sm border border-slate-400 flex flex-col h-full overflow-hidden">
+            <div className="flex-1 w-full bg-white rounded shadow-sm border border-slate-400 flex flex-col h-full overflow-hidden @container">
             <div className={cx("overflow-y-auto flex-1 transition-[padding]", selectedEmp ? "pb-36" : "pb-4")}>
               <div className="flex bg-slate-100 border-b-2 border-slate-400 font-bold text-xs sticky top-0 z-30 shrink-0 shadow-sm">
                 <div className="w-[140px] p-2 border-r flex items-center justify-center text-slate-600">配置先</div>
