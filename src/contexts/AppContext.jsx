@@ -47,6 +47,7 @@ export function AppProvider({ children }) {
   
   const [zoom, setZoom] = useState(1);
   const [hoveredEmpId, setHoveredEmpId] = useState(null); 
+  const [lastAssignedEmpId, setLastAssignedEmpId] = useState(null);
   const [collapsedDepts, setCollapsedDepts] = useState({});
   const [filterLevel, setFilterLevel] = useState(0);
 
@@ -209,6 +210,10 @@ export function AppProvider({ children }) {
     }
 
     mutations.assignSlot(empId, placement);
+    setLastAssignedEmpId(empId);
+    setTimeout(() => {
+      setLastAssignedEmpId(prev => prev === empId ? null : prev);
+    }, 650);
 
     if (targetPostName) {
       const currentTitle = emp.currentTitle || '';
@@ -426,7 +431,7 @@ export function AppProvider({ children }) {
   const value = { 
     ...history,
     deptMap, nextMap, currMap,
-    zoom, setZoom, hoveredEmpId, setHoveredEmpId, collapsedDepts, toggleDept,
+    zoom, setZoom, hoveredEmpId, setHoveredEmpId, lastAssignedEmpId, collapsedDepts, toggleDept,
     filterLevel, setFilterLevel, modals, openModal, closeModal,
     contextMenu, showContextMenu, closeContextMenu,
     isPickingMode: !!history.selectedEmp, 

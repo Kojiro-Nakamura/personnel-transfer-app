@@ -15,8 +15,9 @@ import { autoFixEmployees } from '../../utils/validation.js';
 import { CommentButton, FormInput, FormInputWithList, FormSelect, PlacementSelector } from '../ui/CommonUI.jsx';
 import { RemarkInput } from '../ui/RemarkInput.jsx';
 export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps, isConflict, hasPeer, isIncreased }) => {
-  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, selectedEmp, showContextMenu } = useApp();
+  const { filterLevel, isPickingMode, targetYear, openModal, mutations, hoveredEmpId, setHoveredEmpId, lastAssignedEmpId, selectedEmp, showContextMenu } = useApp();
   const isSelected = !!(selectedEmp && emp && selectedEmp.id === emp.id);
+  const isJustPlaced = !!(isNext && emp && lastAssignedEmpId === emp.id);
   
   if (isEmpty || !emp) {
     const emptyBgClass = isNext 
@@ -27,7 +28,7 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       <div 
         onClick={isNext ? onClick : undefined} 
         className={cx(
-          "flex-1 flex items-center justify-center px-2 py-0 font-bold text-[11px] transition-all border-dashed overflow-hidden relative",
+          "flex-1 flex items-center justify-center px-2 py-0 font-bold text-[11px] transition-all duration-150 border-dashed overflow-hidden relative",
           (isPost && filterLevel === 0) && !isNext ? "border-r border-sky-400" : "border-r",
           emptyBgClass,
           isNext ? "cursor-pointer" : "",
@@ -79,12 +80,13 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
   const promoBg = isPromoted ? getPromotedBgClass(emp.nextGrade) : "";
 
   const cellClasses = cx(
-    "flex-1 flex items-center px-2 py-1 gap-2 relative group/emp cursor-pointer",
+    "flex-1 flex items-center px-2 py-1 gap-2 relative group/emp cursor-pointer transition-[background-color,box-shadow] duration-150 ease-out",
     borderClass,
     isSelected ? "ring-2 ring-inset ring-[#0F828C] bg-[#0F828C]/10 z-10" : 
     isPickingMode && isNext ? "hover:ring-2 hover:ring-inset hover:ring-amber-500 bg-amber-50 z-10" : 
     emp.id === hoveredEmpId ? "bg-yellow-200 z-20 shadow-md" : 
     bgClass,
+    isJustPlaced && "animate-slot-placed",
     isNext && isIncreased && "border-b-[3px] !border-b-blue-600"
   );
 
@@ -708,8 +710,8 @@ export const EmployeeModal = ({ isOpen, onClose, onSave, onDelete, initialData, 
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-5 max-w-4xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] flex items-center justify-center z-[200] p-4 animate-in">
+      <div className="bg-white rounded-lg p-5 max-w-4xl w-full shadow-xl border-t-4 border-[#065084] max-h-[90vh] flex flex-col animate-in zoom-in-95">
         <ErrorBoundary>
           <div className="flex justify-between items-center mb-4 border-b pb-2">
           <div>

@@ -240,8 +240,8 @@ export const FileSaveModal = ({ isOpen, onClose, onSave, defaultName, extension,
   const currentExt = options ? options.find(o => o.value === selectedFormat)?.ext : extension;
   
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl border-t-4 border-[#0F828C]">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] flex items-center justify-center z-[200] p-4 animate-in">
+      <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl border-t-4 border-[#0F828C] animate-in zoom-in-95">
         <h3 className="text-lg font-bold text-[#320A6B] mb-4">保存ファイル名の設定</h3>
         <div className="space-y-4">
           {options && (
@@ -321,8 +321,8 @@ export const NameEditModal = ({ isOpen, onClose, onSave, title, data }) => {
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl border-t-4 border-[#0F828C]">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] flex items-center justify-center z-[200] p-4 animate-in">
+      <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl border-t-4 border-[#0F828C] animate-in zoom-in-95">
         <h3 className="text-lg font-bold text-[#320A6B] mb-4">{title}</h3>
         <div className="space-y-4">
           <FormInput label="今年度の名称" value={name} onChange={setName} autoFocus />
@@ -364,8 +364,8 @@ export const NameEditModal = ({ isOpen, onClose, onSave, title, data }) => {
 export const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, data }) => {
   if (!isOpen || !data) return null;
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl border-t-4 border-rose-500">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] flex items-center justify-center z-[200] p-4 animate-in">
+      <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl border-t-4 border-rose-500 animate-in zoom-in-95">
         <div className="flex items-center gap-2 mb-4 text-rose-600">
           <AlertCircle className="w-6 h-6" />
           <h3 className="text-lg font-bold">削除の確認</h3>
@@ -1067,8 +1067,8 @@ export const BulkEditModal = ({ isOpen, onClose, onSave, onExportList, employees
   );
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-lg p-4 max-w-[98vw] w-full shadow-xl border-t-4 border-[#0F828C] max-h-[98vh] flex flex-col relative overflow-hidden">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] flex items-center justify-center z-[200] p-4 animate-in">
+      <div className="bg-white rounded-lg p-4 max-w-[98vw] w-full shadow-xl border-t-4 border-[#0F828C] max-h-[98vh] flex flex-col relative overflow-hidden animate-in zoom-in-95">
         
         {/* エラーメッセージ */}
         {alertMessage && (
@@ -1612,8 +1612,8 @@ export const FileOpenModal = ({ isOpen, onClose, onLoadFile, onLoadData, onListS
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl border-t-4 border-[#0F828C] flex flex-col max-h-[80vh]">
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4 backdrop-blur-sm animate-in">
+      <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl border-t-4 border-[#0F828C] flex flex-col max-h-[80vh] animate-in zoom-in-95">
         <h3 className="text-lg font-bold text-[#320A6B] mb-4 flex items-center gap-2">
           <FolderOpen className="w-5 h-5 text-[#0F828C]" />
           ファイルを開く

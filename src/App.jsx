@@ -395,7 +395,7 @@ export const AppContent = () => {
 
         
         return (
-          <div id="app-floating-bar" className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#0F828C] text-white px-6 py-4 rounded-xl shadow-2xl z-[150] flex flex-col gap-3 border-2 border-white min-w-[480px]">
+          <div id="app-floating-bar" className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#0F828C] text-white px-6 py-4 rounded-xl shadow-2xl z-[150] flex flex-col gap-3 border-2 border-white min-w-[480px] animate-floating-bar">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-amber-200" />
@@ -540,8 +540,8 @@ export const AppContent = () => {
       )}
 
       {modals.rollOver.isOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full border-t-4 border-orange-500">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] flex items-center justify-center z-[200] p-4 animate-in">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full border-t-4 border-orange-500 shadow-xl animate-in zoom-in-95">
             <h3 className="text-lg font-bold mb-4">移行確認</h3>
             <p className="text-sm mb-4">来年度案を今年度として確定し、新年度へ移行します。</p>
             <div className="flex gap-3">

@@ -85,7 +85,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             onClick={() => toggleDept(dept.id)} 
             title={isCollapsed ? "展開する" : "折りたたむ"}
           >
-            <ChevronDown className="w-4 h-4 text-white" />
+            <ChevronDown className={cx("w-4 h-4 text-white transition-transform duration-150 ease-out", isCollapsed && "-rotate-90")} />
           </div>
           <Building2 className="w-4 h-4 text-blue-100" />
           <span 
@@ -158,7 +158,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
       </div>
       
       {!isCollapsed && (
-        <React.Fragment>
+        <div className="animate-in">
           {/* ポスト一覧 */}
           {dept.posts.map((post, pIdx) => {
             const currentArr = dm.posts[post.id].current;
@@ -398,7 +398,7 @@ export const DepartmentBlock = ({ dept, onMoveUp, onMoveDown }) => {
             anchorId={`addSlot-${dept.id}-direct`} 
             onClickNext={() => handleCellClick(null, false, dept.id, null, null, null)} 
           />
-        </React.Fragment>
+        </div>
       )}
     </div>
   );

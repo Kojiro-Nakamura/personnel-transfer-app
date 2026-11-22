@@ -58,3 +58,73 @@
        1px  0px 0 #ffffff;
   }
 }
+
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ui-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes ui-floating-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ui-slot-highlight {
+  0% {
+    box-shadow: inset 0 0 0 2px #0f828c;
+    background-color: rgba(15, 130, 140, 0.14);
+  }
+  100% {
+    box-shadow: inset 0 0 0 0px transparent;
+  }
+}
+
+.animate-in {
+  animation: ui-fade-in 0.14s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-in.zoom-in,
+.animate-in.zoom-in-95 {
+  animation: ui-modal-in 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-floating-bar {
+  animation: ui-floating-up 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slot-placed {
+  animation: ui-slot-highlight 0.55s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .animate-in.zoom-in,
+  .animate-in.zoom-in-95,
+  .animate-floating-bar,
+  .animate-slot-placed {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

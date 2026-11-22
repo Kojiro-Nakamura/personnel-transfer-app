@@ -6,8 +6,8 @@ export const PartialImportConfirmModal = ({ isOpen, onClose, onConfirm, updates 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-lg p-6 w-full max-w-5xl shadow-xl border-t-4 border-[#0F828C] flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[200] p-4 backdrop-blur-sm animate-in">
+      <div className="bg-white rounded-lg p-6 w-full max-w-5xl shadow-xl border-t-4 border-[#0F828C] flex flex-col max-h-[90vh] animate-in zoom-in-95">
         <h3 className="text-xl font-bold text-[#320A6B] mb-4 flex items-center gap-2">
           一部インポートの確認
         </h3>
