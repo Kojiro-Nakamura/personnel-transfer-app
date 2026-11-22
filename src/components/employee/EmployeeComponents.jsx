@@ -103,26 +103,26 @@ export const EmployeeCell = ({ emp, isNext, isEmpty, onClick, isPost, moveProps,
       className={cellClasses} 
       title={isPickingMode && isNext ? "選択中の職員をここに配置します" : ""}
     >
-      <div className={cx("w-14 shrink-0 truncate text-[11px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
+      <div className={cx("w-14 @[1150px]:w-[4.75rem] @[1350px]:w-[5.5rem] shrink-0 truncate text-[11px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextTitle : emp.currentTitle}>
         {isNext ? emp.nextTitle : emp.currentTitle}
       </div>
       
-      <div className={cx("flex-1 flex items-center gap-1 min-w-[5.5rem] @[1280px]:max-w-[9.5rem] @[1500px]:max-w-[11rem] text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : (isTemp ? "bg-slate-300 px-1.5 -my-1 py-1 self-stretch" : ""))} title={emp.name}>
+      <div className={cx("flex-1 flex items-center gap-1 min-w-[5.25rem] @[1150px]:max-w-[8.5rem] @[1400px]:max-w-[9.5rem] @[1600px]:max-w-[11rem] text-[14px] font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : (isTemp ? "bg-slate-300 px-1.5 -my-1 py-1 self-stretch" : ""))} title={emp.name}>
         {isConflict && <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="この枠に定員を超えて配置されています" />}
         <span className="truncate">{emp.name}</span>
       </div>
       
-      <div className={cx("w-20 @[1450px]:w-28 shrink-0 truncate text-[11px] text-center font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
+      <div className={cx("w-20 @[1150px]:w-[7.25rem] @[1350px]:w-[8.25rem] shrink-0 truncate text-[11px] text-center font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={isNext ? emp.nextGrade : emp.currentGrade}>
         {isNext ? emp.nextGrade : emp.currentGrade}
       </div>
       
       <div className={cx("w-10 text-[12px] text-right shrink-0 font-bold", isConflict ? "text-rose-700" : "text-black", promoBg ? `${promoBg} px-1 rounded-sm` : "")} title={`${age}歳`}>{age !== '' ? `${age}歳` : ''}</div>
       
-      <div className={cx("w-20 @[1280px]:flex-1 @[1280px]:min-w-[5.5rem] text-[12px] text-right font-bold truncate shrink-0 text-black", ys >= 3 ? "bg-rose-300 px-1 rounded" : "")} title={yd}>
+      <div className={cx("w-20 @[1150px]:flex-1 @[1150px]:min-w-[5.5rem] text-[12px] text-right font-bold truncate shrink-0 text-black", ys >= 3 ? "bg-rose-300 px-1 rounded" : "")} title={yd}>
         {yd}
       </div>
       
-      <div className={cx("w-24 @[1280px]:flex-[1.3] @[1280px]:min-w-[6.5rem] text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center", isTemp && "bg-slate-300 px-1.5 -my-1 py-1 self-stretch")}>
+      <div className={cx("w-24 @[1150px]:flex-[1.3] @[1150px]:min-w-[6.5rem] text-[11px] text-black font-bold text-left shrink-0 ml-1 relative group/note flex items-center", isTemp && "bg-slate-300 px-1.5 -my-1 py-1 self-stretch")}>
         <span className={cx("truncate max-w-full inline-block", (!isTemp && remarkBg) ? `${remarkBg} px-1 rounded` : "w-full block")}>{noteText}</span>
         {noteText && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg opacity-0 group-hover/note:opacity-100 pointer-events-none transition-opacity z-[100] whitespace-pre-wrap break-words">
