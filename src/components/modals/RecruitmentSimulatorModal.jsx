@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { X, TrendingUp, Download, Play, Pause, RotateCcw } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useCallback, useRef, useId } from 'react';
+import { X, TrendingUp, Download, Play, Pause, RotateCcw, Printer, ExternalLink } from 'lucide-react';
+import { NewWindowPortal } from '../common/NewWindowPortal.jsx';
 import {
   extractSimBaseline,
   runRecruitmentSimulation,
@@ -7,11 +8,12 @@ import {
   exportSimulationCsv
 } from '../../utils/recruitmentSimulator.js';
 
-// CUD (Okabe-Ito) 色覚多様性配慮パレット（ライト背景用）
+// CUD (Okabe-Ito) 色覚多様性配慮パレット（ライト・印刷背景用）
 const CUD = {
   blue: '#0072B2',
   navy: '#005A9C',
   sky: '#56B4E9',
+  skyLight: '#BAE6FD',
   vermilion: '#D55E00',
   vermilionStripe: '#FFAD75',
   vermilionText: '#C2410C',
@@ -20,16 +22,7 @@ const CUD = {
   yellowText: '#926000',
   blueText: '#0066A6',
   refLine: '#0F172A',
-  refHalo: '#FFFFFF',
-  segDivider: '#FFFFFF'
-};
-
-const SWATCH_VERMILION_STYLE = {
-  background: 'repeating-linear-gradient(-45deg, #D55E00, #D55E00 3px, #FFAD75 3px, #FFAD75 5px)'
-};
-
-const SWATCH_SKY_STYLE = {
-  background: 'repeating-linear-gradient(-45deg, #56B4E9, #56B4E9 3px, #BAE6FD 3px, #BAE6FD 5px)'
+  refHalo: '#FFFFFF'
 };
 
 const HALO_CARD_STYLE = {
@@ -58,6 +51,56 @@ function fmtCompactInt(v) {
   return String(Math.round(v));
 }
 
+/**
+ * ブラウザ印刷設定で「背景のグラフィック」がOFFでも確実に色・斜線が出力されるベクターSVG凡例スウォッチ
+ */
+const SvgSwatch = ({ variant }) => {
+  const rawId = useId().replace(/:/g, '');
+  const patId = `sw-${variant}-${rawId}`;
+
+  if (variant === 'vermilionStripe') {
+    return (
+      <svg width="14" height="14" viewBox="0 0 14 14" className="inline-block shrink-0 align-middle">
+        <defs>
+          <pattern id={patId} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="5" height="5" fill={CUD.vermilion} />
+            <line x1="0" y1="0" x2="0" y2="5" stroke={CUD.vermilionStripe} strokeWidth="2" />
+          </pattern>
+        </defs>
+        <rect x="0.5" y="0.5" width="13" height="13" rx="2" fill={`url(#${patId})`} stroke="#9A3412" strokeWidth="1" />
+      </svg>
+    );
+  }
+
+  if (variant === 'skyStripe') {
+    return (
+      <svg width="14" height="14" viewBox="0 0 14 14" className="inline-block shrink-0 align-middle">
+        <defs>
+          <pattern id={patId} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="5" height="5" fill={CUD.sky} />
+            <line x1="0" y1="0" x2="0" y2="5" stroke={CUD.skyLight} strokeWidth="2" />
+          </pattern>
+        </defs>
+        <rect x="0.5" y="0.5" width="13" height="13" rx="2" fill={`url(#${patId})`} stroke="#0284C7" strokeWidth="1" />
+      </svg>
+    );
+  }
+
+  const map = {
+    yellow: { fill: CUD.yellow, stroke: CUD.yellowStroke },
+    blue: { fill: CUD.blue, stroke: CUD.blue },
+    navy: { fill: CUD.navy, stroke: CUD.navy },
+    sky: { fill: CUD.sky, stroke: '#0284C7' }
+  };
+  const cfg = map[variant] || map.blue;
+
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" className="inline-block shrink-0 align-middle">
+      <rect x="0.5" y="0.5" width="13" height="13" rx="2" fill={cfg.fill} stroke={cfg.stroke} strokeWidth="1" />
+    </svg>
+  );
+};
+
 export const RecruitmentSimulatorModal = ({
   isOpen,
   onClose,
@@ -65,8 +108,14 @@ export const RecruitmentSimulatorModal = ({
   departments,
   targetYear,
   planName = '基本案',
-  currentFileName = ''
+  activePlanId = '',
+  currentFileName = '',
+  targetWindow = null
 }) => {
+  const rootRef = useRef(null);
+  const [manualWindow, setManualWindow] = useState(null);
+  const [portalBlocked, setPortalBlocked] = useState(false);
+
   const [baseMode, setBaseMode] = useState('next'); // 'next' | 'current'
   const [activeTab, setActiveTab] = useState('trend'); // 'trend' | 'posts' | 'pyramid' | 'table'
   const [selectedHorizon, setSelectedHorizon] = useState(15);
@@ -88,10 +137,24 @@ export const RecruitmentSimulatorModal = ({
   const [customHiresByYear, setCustomHiresByYear] = useState({});
 
   const [pyramidIdx, setPyramidIdx] = useState(0);
+  const [pyramidViewMode, setPyramidViewMode] = useState('single'); // 'single' | 'compare3'
   const [isPlaying, setIsPlaying] = useState(false);
   const [tooltip, setTooltip] = useState(null);
 
-  // モーダル起動時または基準時点変更時に現在の案の人数と推奨採用数を初期反映
+  // 印刷向けオプション
+  const [printScope, setPrintScope] = useState('all'); // 'all' | 'current'
+  const [showNamesInTable, setShowNamesInTable] = useState(false);
+  const [printIncludeNames, setPrintIncludeNames] = useState(true);
+
+  const activeWinProp = manualWindow && !manualWindow.closed ? manualWindow : targetWindow;
+
+  useEffect(() => {
+    if (activeWinProp && !activeWinProp.closed) {
+      setPortalBlocked(false);
+    }
+  }, [activeWinProp]);
+
+  // 起動時・案切替時・基準時点変更時に現在の案の人数と推奨採用数を初期反映
   const resetToCurrentPlan = useCallback((nextBase) => {
     const cnt = Math.max(1, nextBase.totalPlacedCount || 1);
     setStartHeadcount(cnt);
@@ -121,7 +184,7 @@ export const RecruitmentSimulatorModal = ({
       setPyramidIdx(0);
       setIsPlaying(false);
     }
-  }, [isOpen, baseMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, baseMode, activePlanId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sim = useMemo(
     () =>
@@ -164,15 +227,16 @@ export const RecruitmentSimulatorModal = ({
     return () => clearInterval(id);
   }, [isPlaying, sim.horizon]);
 
-  // Escキーで閉じる
+  // 表示中のウィンドウ側のEscキーでのみ閉じる（親ウィンドウでの作業中のEsc誤閉鎖を防止）
   useEffect(() => {
     if (!isOpen) return undefined;
+    const win = rootRef.current?.ownerDocument?.defaultView || window;
     const onKey = (e) => {
       if (e.key === 'Escape') onClose();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+    win.addEventListener('keydown', onKey);
+    return () => win.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose, portalBlocked]);
 
   const handleApplyRecommended = () => {
     setCustomHiresByYear({});
@@ -203,13 +267,42 @@ export const RecruitmentSimulatorModal = ({
     setPostGoalAnnualHire(Math.min(35, Math.max(0, Math.round(nextSim.postGoalRecommendedHire))));
   };
 
+  const handlePrint = (e) => {
+    setIsPlaying(false);
+    setTooltip(null);
+    const win = e?.currentTarget?.ownerDocument?.defaultView || rootRef.current?.ownerDocument?.defaultView || window;
+    win.focus();
+    setTimeout(() => {
+      win.print();
+    }, 60);
+  };
+
+  const handlePopOutManually = () => {
+    const win = window.open('', '_blank', 'width=1440,height=920,left=60,top=40');
+    if (win) {
+      setManualWindow(win);
+      setPortalBlocked(false);
+    } else {
+      alert('ポップアップがブロックされました。ブラウザのアドレスバー右端からポップアップを許可してください。');
+    }
+  };
+
+  const handleFullClose = () => {
+    if (manualWindow && !manualWindow.closed) {
+      manualWindow.close();
+    }
+    setManualWindow(null);
+    onClose();
+  };
+
   const showFloatingTip = (e, content) => {
+    const win = e?.currentTarget?.ownerDocument?.defaultView || window;
     const pad = 14;
     const maxW = 340;
     let x = e.clientX + pad;
     let y = e.clientY + pad;
-    if (x + maxW > window.innerWidth - 12) x = e.clientX - maxW - pad;
-    if (y + 180 > window.innerHeight - 12) y = Math.max(12, e.clientY - 170);
+    if (x + maxW > win.innerWidth - 12) x = e.clientX - maxW - pad;
+    if (y + 180 > win.innerHeight - 12) y = Math.max(12, e.clientY - 170);
     setTooltip({ x: Math.max(12, x), y: Math.max(12, y), content });
   };
 
@@ -221,7 +314,10 @@ export const RecruitmentSimulatorModal = ({
   const isReplaceTemp = sim.tempMode === 'replace_temp';
   const futureYears = sim.yearly.slice(1);
   const sumRetire = futureYears.reduce((s, r) => s + r.retire65Count, 0);
-  const maxRetireRow = futureYears.reduce((m, r) => (r.retire65Count > m.retire65Count ? r : m), futureYears[0] || { year: base.baseYear + 1, retire65Count: 0 });
+  const maxRetireRow = futureYears.reduce(
+    (m, r) => (r.retire65Count > m.retire65Count ? r : m),
+    futureYears[0] || { year: base.baseYear + 1, retire65Count: 0 }
+  );
   const sumYakushoku = futureYears.reduce((s, r) => s + r.yakushoku60Count, 0);
   const goalYearNum = base.baseYear + sim.goalYears;
   const totalDelta = sim.goalHeadcount - sim.startHeadcount;
@@ -230,8 +326,15 @@ export const RecruitmentSimulatorModal = ({
   const highH = Math.ceil(sim.recommendedAnnualHire);
   const hasCustomHires = Object.keys(customHiresByYear).length > 0;
 
-  // ====== Tab 1: Bar & Line Chart Geometries ======
-  const renderTrendTab = () => {
+  const todayStr = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+  })();
+
+  const windowTitle = `採用計画シミュレーター_${formatSimEraYear(targetYear)}_${planName}`;
+
+  // ====== Tab 1: Bar & Line Chart ======
+  const renderTrendSection = (idSuffix = 'main') => {
     const rows = futureYears;
     const W = Math.max(760, rows.length * 60 + 74);
     const H = 246;
@@ -245,8 +348,8 @@ export const RecruitmentSimulatorModal = ({
     const stepW = plotW / Math.max(1, rows.length);
     const barW = Math.min(15, Math.max(10.5, (stepW - 14) / 3));
     const barGap = barW * 1.15;
+    const barPatId = `sim-bar-verm-${idSuffix}`;
 
-    // Line chart geometry
     const allRows = sim.yearly;
     const LW = Math.max(760, allRows.length * 52 + 86);
     const LH = 282;
@@ -288,31 +391,35 @@ export const RecruitmentSimulatorModal = ({
     const minHireRow = rows.reduce((m, r) => (r.hires < m.hires ? r : m), y1);
 
     return (
-      <div className="space-y-5">
+      <div className="space-y-4 sim-print-tight-space">
         {/* Upper Bar Chart */}
-        <div className="space-y-2">
+        <div className="space-y-1.5 sim-avoid-break">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="font-bold text-slate-800">年度別イベント人数（65歳定年退職等・60歳役職定年・正職員採用数）</div>
+            <div className="font-bold text-slate-800">①-1 年度別イベント人数（65歳定年退職等・60歳役職定年・正職員採用数）</div>
             <div className="flex flex-wrap items-center gap-4">
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#9A3412]" style={SWATCH_VERMILION_STYLE} />
+                <SvgSwatch variant="vermilionStripe" />
                 65歳定年退職等（斜線）
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#8A6500]" style={{ backgroundColor: CUD.yellow }} />
+                <SvgSwatch variant="yellow" />
                 60歳役職定年（黄）
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-sm inline-block" style={{ backgroundColor: CUD.blue }} />
+                <SvgSwatch variant="blue" />
                 計画採用数（青）
               </span>
             </div>
           </div>
 
-          <div className="w-full overflow-x-auto">
-            <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', minWidth: `${W}px`, maxHeight: '256px' }}>
+          <div className="w-full overflow-x-auto sim-chart-scroll">
+            <svg
+              viewBox={`0 0 ${W} ${H}`}
+              className="sim-chart-svg sim-trend-bar-svg"
+              style={{ width: '100%', minWidth: `${W}px`, maxHeight: '256px' }}
+            >
               <defs>
-                <pattern id="modal-bar-stripe-verm" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <pattern id={barPatId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                   <rect width="6" height="6" fill={CUD.vermilion} />
                   <line x1="0" y1="0" x2="0" y2="6" stroke={CUD.vermilionStripe} strokeWidth="2.2" />
                 </pattern>
@@ -373,7 +480,7 @@ export const RecruitmentSimulatorModal = ({
                     onMouseLeave={hideFloatingTip}
                   >
                     <rect x={cx - stepW / 2} y={padT - 16} width={stepW} height={plotH + 16} fill="transparent" />
-                    <rect x={cxRet - barW / 2} y={yTopRet} width={barW} height={hRet} rx="1.5" fill="url(#modal-bar-stripe-verm)" stroke={CUD.vermilion} strokeWidth="0.8" />
+                    <rect x={cxRet - barW / 2} y={yTopRet} width={barW} height={hRet} rx="1.5" fill={`url(#${barPatId})`} stroke={CUD.vermilion} strokeWidth="0.8" />
                     <rect x={cxYak - barW / 2} y={yTopYak} width={barW} height={hYak} rx="1.5" fill={CUD.yellow} stroke={CUD.yellowStroke} strokeWidth="0.9" />
                     <rect x={cxHir - barW / 2} y={yTopHir} width={barW} height={hHir} rx="1.5" fill={CUD.blue} />
                     <text x={cxRet} y={yTopRet - 4} textAnchor="middle" fontSize="10.5" fontFamily="monospace" fontWeight={r.retire65Count > 0 ? '700' : '400'} fill={r.retire65Count > 0 ? CUD.vermilionText : '#64748b'} style={HALO_CARD_STYLE}>{r.retire65Count}</text>
@@ -390,20 +497,28 @@ export const RecruitmentSimulatorModal = ({
         </div>
 
         {/* Lower Line Chart + Bottom Margin Hire Strip */}
-        <div className="border-t border-slate-200 pt-4 space-y-2">
+        <div className="border-t border-slate-200 pt-3 space-y-1.5 sim-avoid-break">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="font-bold text-slate-800">正職員充足数（育代含）と「59歳以下・現役役職担い手層」の推移</div>
+            <div className="font-bold text-slate-800">①-2 正職員充足数（育代含）と「59歳以下・現役役職担い手層」の推移</div>
             <div className="flex flex-wrap items-center gap-4">
               <span className="inline-flex items-center gap-1">
-                <span className="font-bold" style={{ color: CUD.blue }}>●―</span>
+                <svg width="20" height="12" viewBox="0 0 20 12" className="inline-block shrink-0">
+                  <line x1="1" y1="6" x2="19" y2="6" stroke={CUD.blue} strokeWidth="2.4" />
+                  <circle cx="10" cy="6" r="3.5" fill={CUD.blue} />
+                </svg>
                 <span>{isReplaceTemp ? '正職員在籍数（育代含・臨任除く）' : '在籍総数（臨任・育代含）'}</span>
               </span>
               <span className="inline-flex items-center gap-1">
-                <span className="font-bold" style={{ color: CUD.vermilion }}>◆--</span>
+                <svg width="20" height="12" viewBox="0 0 20 12" className="inline-block shrink-0">
+                  <line x1="1" y1="6" x2="19" y2="6" stroke={CUD.vermilion} strokeWidth="2.2" strokeDasharray="3,2" />
+                  <polygon points="10,2 14,6 10,10 6,6" fill={CUD.vermilion} />
+                </svg>
                 <span>59歳以下（役職担い手・若手層）</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-4 border-t-2 border-dashed border-slate-500 inline-block" />
+                <svg width="18" height="12" viewBox="0 0 18 12" className="inline-block shrink-0">
+                  <line x1="1" y1="6" x2="17" y2="6" stroke="#64748b" strokeWidth="2" strokeDasharray="4,3" />
+                </svg>
                 <span>
                   {sim.startHeadcount === sim.goalHeadcount
                     ? `目標人員（${sim.goalHeadcount}名維持）`
@@ -413,8 +528,12 @@ export const RecruitmentSimulatorModal = ({
             </div>
           </div>
 
-          <div className="w-full overflow-x-auto">
-            <svg viewBox={`0 0 ${LW} ${LH}`} style={{ width: '100%', minWidth: `${LW}px`, maxHeight: '292px' }}>
+          <div className="w-full overflow-x-auto sim-chart-scroll">
+            <svg
+              viewBox={`0 0 ${LW} ${LH}`}
+              className="sim-chart-svg sim-trend-line-svg"
+              style={{ width: '100%', minWidth: `${LW}px`, maxHeight: '292px' }}
+            >
               {[0, 1, 2, 3, 4].map(g => {
                 const val = Math.round(minY + ((maxY - minY) / 4) * g);
                 const y = yScale(val);
@@ -427,7 +546,7 @@ export const RecruitmentSimulatorModal = ({
               })}
 
               {/* 欄外下部：各年度の採用人数ストリップ */}
-              <rect x="4" y={hireStripY} width={LW - 8} height={hireStripH} rx="4" fill="#f1f5f9" stroke="#e2e8f0" strokeWidth="1" />
+              <rect x="4" y={hireStripY} width={LW - 8} height={hireStripH} rx="4" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="1" />
               <text x={lPadL - 8} y={hireStripY + 16} textAnchor="end" fontSize="10" fontWeight="700" fill={CUD.blueText}>採用数</text>
 
               {/* 目標到達年縦ガイドと段階目標ライン */}
@@ -504,17 +623,14 @@ export const RecruitmentSimulatorModal = ({
           </div>
 
           {/* Diagnostic Box */}
-          <div className="text-xs p-3 rounded-lg bg-slate-100 border border-slate-200 space-y-1 text-slate-700">
+          <div className="text-xs p-2.5 rounded-lg bg-slate-100 border border-slate-300 space-y-0.5 text-slate-700 sim-avoid-break sim-diag-box">
             {sim.strategy === 'replace' ? (
               <>
                 <div className="font-bold text-slate-900">
-                  💡 シミュレーション診断ポイント（単年度欠員補充：現状{sim.startHeadcount}名 → {sim.goalYears}年後{sim.goalHeadcount}名）
+                  💡 診断ポイント（単年度欠員補充：現状{sim.startHeadcount}名 → {sim.goalYears}年後{sim.goalHeadcount}名）
                 </div>
                 <div>
-                  ・段階目標ライン（現状{sim.startHeadcount}名 → <b>{formatSimEraYear(goalRow.year)}年度に{sim.goalHeadcount}名</b>）に沿って、臨任を使わず毎年必要数全員を正職員で採用します（初年度採用: <b>{y1.hires}名</b>）。
-                </div>
-                <div>
-                  ・期間中の年間正職員採用数は <b>最小 {minHireRow.hires}名（{formatSimEraYear(minHireRow.year)}）〜 最大 {maxHireRow.hires}名（{formatSimEraYear(maxHireRow.year)}）</b> となります。
+                  ・段階目標ライン（現状{sim.startHeadcount}名 → <b>{formatSimEraYear(goalRow.year)}年度に{sim.goalHeadcount}名</b>）に沿って、臨任を使わず毎年必要数全員を正職員で採用します（初年度採用: <b>{y1.hires}名</b> ／ 期間中最小 <b>{minHireRow.hires}名［{formatSimEraYear(minHireRow.year)}］</b> 〜 最大 <b>{maxHireRow.hires}名［{formatSimEraYear(maxHireRow.year)}］</b>）。
                 </div>
                 <div>
                   ・60〜64歳（役職定年層）は <b>{formatSimEraYear(peak60Row.year)}年度</b> に最大 <b>{Math.round(peak60Row.age60to64)}名</b>、59歳以下現役層は <b>{formatSimEraYear(minUnder60Row.year)}年度に最小 {Math.round(minUnder60Row.under60)}名</b> となります。
@@ -523,7 +639,7 @@ export const RecruitmentSimulatorModal = ({
             ) : (
               <>
                 <div className="font-bold text-slate-900">
-                  💡 シミュレーション診断ポイント（平準化採用：現状{sim.startHeadcount}名 → {sim.goalYears}年後{sim.goalHeadcount}名）
+                  💡 診断ポイント（平準化採用：現状{sim.startHeadcount}名 → {sim.goalYears}年後{sim.goalHeadcount}名）
                 </div>
                 <div>
                   ・目標年である <b>{sim.goalYears}年後（{formatSimEraYear(goalRow.year)}年度★）</b> 時点の正職員数は <b>{Math.round(goalRow.total)}名</b>（目標{sim.goalHeadcount}名に対し <b>{goalDiff >= 0 ? `+${goalDiff}` : goalDiff}名</b>）、最終年度（{formatSimEraYear(endRow.year)}）は <b>{Math.round(endRow.total)}名</b>（目標比 {endDiff >= 0 ? `+${endDiff}` : endDiff}名）です。
@@ -540,7 +656,7 @@ export const RecruitmentSimulatorModal = ({
   };
 
   // ====== Tab 2: Managerial Post Supply / Demand ======
-  const renderPostsTab = () => {
+  const renderPostsSection = (idSuffix = 'main') => {
     const leaderPosts = Math.max(1, base.leaderPosts || 1);
     const ratios = sim.yearly.map(r => ({ year: r.year, ratio: r.age45to59 / leaderPosts }));
     const minRatioObj = ratios.reduce((m, x) => (x.ratio < m.ratio ? x : m), ratios[0]);
@@ -559,21 +675,22 @@ export const RecruitmentSimulatorModal = ({
     const stepW = plotW / Math.max(1, rows.length);
     const barW = Math.min(25, Math.max(15, stepW * 0.54));
     const leaderY = yScale(base.leaderPosts);
+    const postPatId = `sim-post-verm-${idSuffix}`;
 
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 rounded-lg bg-slate-100 border border-slate-200">
+      <div className="space-y-4 sim-avoid-break">
+        <div className="grid grid-cols-3 gap-3 text-xs">
+          <div className="p-3 rounded-lg bg-slate-100 border border-slate-300 sim-compact-card">
             <div className="text-slate-500">現在の課長級以上ポスト数</div>
             <div className="text-lg font-bold font-mono text-slate-900 mt-0.5">{base.upperPosts}枠</div>
             <div className="text-slate-500 mt-0.5">部長・次長・所属長・課長級</div>
           </div>
-          <div className="p-3 rounded-lg bg-slate-100 border border-slate-200">
+          <div className="p-3 rounded-lg bg-slate-100 border border-slate-300 sim-compact-card">
             <div className="text-slate-500">現在の班長級以上ポスト総数</div>
             <div className="text-lg font-bold font-mono text-slate-900 mt-0.5">{base.leaderPosts}枠</div>
             <div className="text-slate-500 mt-0.5">課長級以上＋補佐級III・II</div>
           </div>
-          <div className="p-3 rounded-lg bg-slate-100 border border-slate-200">
+          <div className="p-3 rounded-lg bg-slate-100 border border-slate-300 sim-compact-card">
             <div className="text-slate-500">期間中の最低「管理監督職カバー倍率」</div>
             <div className="text-lg font-bold font-mono text-slate-900 mt-0.5">
               {minRatioObj.ratio.toFixed(2)}倍 ({formatSimEraYear(minRatioObj.year)})
@@ -583,27 +700,31 @@ export const RecruitmentSimulatorModal = ({
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="font-bold text-slate-800">世代別構成の推移 vs 班長級以上ポスト枠（下から積上げ）</div>
+          <div className="font-bold text-slate-800">② 世代別構成の推移 vs 班長級以上ポスト枠（下から積上げ）</div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-1">
-              <span className="w-3.5 h-3.5 rounded-sm inline-block" style={{ backgroundColor: CUD.navy }} />45-59歳(濃青)
+              <SvgSwatch variant="navy" />45-59歳(濃青)
             </span>
             <span className="inline-flex items-center gap-1">
-              <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#0284C7]" style={{ backgroundColor: CUD.sky }} />35-44歳(水色)
+              <SvgSwatch variant="sky" />35-44歳(水色)
             </span>
             <span className="inline-flex items-center gap-1">
-              <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#8A6500]" style={{ backgroundColor: CUD.yellow }} />34歳以下(黄)
+              <SvgSwatch variant="yellow" />34歳以下(黄)
             </span>
             <span className="inline-flex items-center gap-1">
-              <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#9A3412]" style={SWATCH_VERMILION_STYLE} />60-64歳(朱斜線)
+              <SvgSwatch variant="vermilionStripe" />60-64歳(朱斜線)
             </span>
           </div>
         </div>
 
-        <div className="w-full overflow-x-auto">
-          <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', minWidth: `${W}px`, maxHeight: '296px' }}>
+        <div className="w-full overflow-x-auto sim-chart-scroll">
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            className="sim-chart-svg sim-posts-svg"
+            style={{ width: '100%', minWidth: `${W}px`, maxHeight: '310px' }}
+          >
             <defs>
-              <pattern id="modal-post-stripe-verm" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <pattern id={postPatId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <rect width="6" height="6" fill={CUD.vermilion} />
                 <line x1="0" y1="0" x2="0" y2="6" stroke={CUD.vermilionStripe} strokeWidth="2.2" />
               </pattern>
@@ -626,7 +747,7 @@ export const RecruitmentSimulatorModal = ({
                 { key: '45-59', val: r.age45to59, fill: CUD.navy, stroke: '#ffffff', txtFill: '#FFFFFF', halo: HALO_DARK_STYLE },
                 { key: '35-44', val: r.age35to44, fill: CUD.sky, stroke: '#ffffff', txtFill: '#0F172A', halo: HALO_LIGHT_STYLE },
                 { key: 'u35', val: r.under35, fill: CUD.yellow, stroke: '#ffffff', txtFill: '#0F172A', halo: HALO_LIGHT_STYLE },
-                { key: '60-64', val: r.age60to64, fill: 'url(#modal-post-stripe-verm)', stroke: CUD.vermilion, txtFill: '#0F172A', halo: HALO_LIGHT_STYLE }
+                { key: '60-64', val: r.age60to64, fill: `url(#${postPatId})`, stroke: CUD.vermilion, txtFill: '#0F172A', halo: HALO_LIGHT_STYLE }
               ];
 
               let acc = 0;
@@ -714,7 +835,7 @@ export const RecruitmentSimulatorModal = ({
           </svg>
         </div>
 
-        <div className="text-xs p-3 rounded-lg bg-slate-100 border border-slate-200 text-slate-700">
+        <div className="text-xs p-2.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 sim-diag-box">
           {minRatioObj.ratio < 1.15 ? (
             <span>
               ⚠️ <b>{formatSimEraYear(minRatioObj.year)}年度前後</b>に「45〜59歳（管理監督職の主たる担い手層：濃青バー）」が班長級以上ポスト数（{base.leaderPosts}枠）に対して <b>{minRatioObj.ratio.toFixed(2)}倍</b> まで逼迫します。30代後半〜40代前半からの早期登用やポスト再編の検討が必要です。
@@ -729,259 +850,517 @@ export const RecruitmentSimulatorModal = ({
     );
   };
 
-  // ====== Tab 3: Age Pyramid ======
-  const renderPyramidTab = () => {
+  // ====== Vector SVG Age Pyramid Column Renderer (Print-Color-Safe) ======
+  const renderPyramidSvgColumn = (snap, scaleMax, colTitle, idKey, compact = false) => {
+    const ages = [];
+    for (let a = 64; a >= 22; a--) ages.push(a);
+
+    const rowH = compact ? 11.2 : 14.5;
+    const topPad = 6;
+    const svgW = compact ? 310 : 680;
+    const labelW = 34;
+    const rightPad = compact ? 58 : 86;
+    const barMaxW = svgW - labelW - rightPad;
+    const svgH = topPad + ages.length * rowH + 6;
+    const vermPat = `pyr-verm-${idKey}`;
+    const skyPat = `pyr-sky-${idKey}`;
+
+    return (
+      <div className="border border-slate-300 rounded-lg p-2.5 bg-white sim-avoid-break">
+        <div className="flex flex-wrap items-baseline justify-between gap-1 border-b border-slate-200 pb-1.5 mb-1.5">
+          <span className="font-bold text-xs text-slate-900">{colTitle}</span>
+          <span className="font-mono text-[11px] text-slate-600">
+            計<b>{Math.round(snap.total)}</b>名 (59以下:{Math.round(snap.under60)} / 60-64:{Math.round(snap.age60to64)})
+          </span>
+        </div>
+        <svg viewBox={`0 0 ${svgW} ${svgH}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
+          <defs>
+            <pattern id={vermPat} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="5" height="5" fill={CUD.vermilion} />
+              <line x1="0" y1="0" x2="0" y2="5" stroke={CUD.vermilionStripe} strokeWidth="2" />
+            </pattern>
+            <pattern id={skyPat} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="5" height="5" fill={CUD.sky} />
+              <line x1="0" y1="0" x2="0" y2="5" stroke={CUD.skyLight} strokeWidth="2" />
+            </pattern>
+          </defs>
+
+          {ages.map((age, idx) => {
+            const y = topPad + idx * rowH;
+            const barH = rowH - 2.2;
+            const bin = snap.ageBins[age] || { existing: 0, hired: 0 };
+            const exW = Math.max(0, (bin.existing / scaleMax) * barMaxW);
+            const hiW = Math.max(0, (bin.hired / scaleMax) * barMaxW);
+            const tot = bin.existing + bin.hired;
+            const hasBoth = bin.existing >= 0.05 && bin.hired >= 0.05;
+
+            let tipText = fmtCompactInt(tot);
+            if (hasBoth && (exW < 18 || hiW < 18)) {
+              tipText = `${fmtCompactInt(tot)}(現${fmtCompactInt(bin.existing)}+新${fmtCompactInt(bin.hired)})`;
+            }
+
+            return (
+              <g key={age}>
+                {age === 59 && (
+                  <line
+                    x1={0}
+                    y1={y - 1.1}
+                    x2={svgW}
+                    y2={y - 1.1}
+                    stroke={CUD.vermilion}
+                    strokeWidth="1.2"
+                    strokeDasharray="4,3"
+                  />
+                )}
+                <text
+                  x={labelW - 5}
+                  y={y + barH - 1.5}
+                  textAnchor="end"
+                  fontSize={compact ? '8.5' : '10'}
+                  fontFamily="monospace"
+                  fill="#64748b"
+                >
+                  {age}歳
+                </text>
+                <rect x={labelW} y={y} width={barMaxW} height={barH} rx="1.5" fill="#f1f5f9" />
+                {exW > 0.2 && (
+                  <rect
+                    x={labelW}
+                    y={y}
+                    width={exW}
+                    height={barH}
+                    rx="1"
+                    fill={age >= 60 ? `url(#${vermPat})` : CUD.navy}
+                    stroke={age >= 60 ? CUD.vermilion : 'none'}
+                    strokeWidth={age >= 60 ? '0.6' : '0'}
+                  />
+                )}
+                {hiW > 0.2 && (
+                  <rect
+                    x={labelW + exW}
+                    y={y}
+                    width={hiW}
+                    height={barH}
+                    rx="1"
+                    fill={`url(#${skyPat})`}
+                    stroke="#0284C7"
+                    strokeWidth="0.5"
+                  />
+                )}
+                {hasBoth && exW >= 18 && (
+                  <text
+                    x={labelW + exW / 2}
+                    y={y + barH - 1.8}
+                    textAnchor="middle"
+                    fontSize={compact ? '7.5' : '8.5'}
+                    fontFamily="monospace"
+                    fontWeight="700"
+                    fill={age >= 60 ? '#0F172A' : '#FFFFFF'}
+                    style={age >= 60 ? HALO_LIGHT_STYLE : HALO_DARK_STYLE}
+                  >
+                    {fmtCompactInt(bin.existing)}
+                  </text>
+                )}
+                {hasBoth && hiW >= 18 && (
+                  <text
+                    x={labelW + exW + hiW / 2}
+                    y={y + barH - 1.8}
+                    textAnchor="middle"
+                    fontSize={compact ? '7.5' : '8.5'}
+                    fontFamily="monospace"
+                    fontWeight="700"
+                    fill="#0F172A"
+                    style={HALO_LIGHT_STYLE}
+                  >
+                    {fmtCompactInt(bin.hired)}
+                  </text>
+                )}
+                <text
+                  x={labelW + exW + hiW + 4}
+                  y={y + barH - 1.5}
+                  textAnchor="start"
+                  fontSize={compact ? '8.2' : '9.5'}
+                  fontFamily="monospace"
+                  fontWeight={tot >= 0.05 ? '700' : '400'}
+                  fill={tot >= 0.05 ? '#0f172a' : '#94a3b8'}
+                >
+                  {tipText}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    );
+  };
+
+  // ====== Tab 3: Age Pyramid Section ======
+  const renderPyramidSection = (forceCompare3 = false, idSuffix = 'main') => {
     const safeIdx = Math.min(sim.yearly.length - 1, pyramidIdx);
     const snap = sim.yearly[safeIdx];
     const maxBin = Math.max(8, ...sim.yearly.flatMap(yr => Object.values(yr.ageBins).map(b => b.existing + b.hired)));
     const scaleMax = maxBin * 1.16;
 
-    const ages = [];
-    for (let a = 64; a >= 22; a--) ages.push(a);
+    const lastIdx = sim.yearly.length - 1;
+    const midIdx =
+      sim.goalYears > 0 && sim.goalYears < lastIdx
+        ? sim.goalYears
+        : Math.max(1, Math.floor(lastIdx / 2));
+    const compareIndices = Array.from(new Set([0, midIdx, lastIdx]));
+
+    const showCompare = forceCompare3 || pyramidViewMode === 'compare3';
 
     return (
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4 p-3 rounded-lg bg-slate-100 border border-slate-200 text-xs">
-          <div className="flex items-center gap-3 flex-1 min-w-[240px]">
-            <button
-              type="button"
-              onClick={() => setIsPlaying(p => !p)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-white font-bold text-xs cursor-pointer"
-              style={{ backgroundColor: CUD.blue }}
-            >
-              {isPlaying ? <><Pause className="w-3.5 h-3.5" /> 停止</> : <><Play className="w-3.5 h-3.5" /> 再生</>}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max={sim.horizon}
-              value={safeIdx}
-              onChange={(e) => setPyramidIdx(Number(e.target.value))}
-              className="flex-1 accent-[#0072B2]"
-            />
+      <div className="space-y-3 sim-avoid-break">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="font-bold text-slate-800">
+            ③ 将来年齢ピラミッド推移
+            {showCompare ? '（基準年・中間/目標年・最終年 比較）' : `（${formatSimEraYear(snap.year)}年度）`}
           </div>
-          <div className="flex items-center gap-3 font-mono">
-            <span className="font-bold text-sm text-slate-900">{formatSimEraYear(snap.year)}年度</span>
-            <span className="text-slate-600">
-              正職員 {Math.round(snap.total)}名（59歳以下 {Math.round(snap.under60)}名 / 60-64歳 {Math.round(snap.age60to64)}名）
-              {snap.isBase && isReplaceTemp && base.tempCount > 0 ? ` ＋ 現臨任${base.tempCount}名（計${base.totalPlacedCount}名）` : ''}
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="inline-flex items-center gap-1.5">
+              <SvgSwatch variant="navy" />
+              現職（59歳以下・濃青）
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <SvgSwatch variant="skyStripe" />
+              今後の新規採用累積（水色斜線）
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <SvgSwatch variant="vermilionStripe" />
+              60〜64歳 役職定年層（朱斜線）
             </span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-sm inline-block" style={{ backgroundColor: CUD.navy }} />
-            現職コーホート（59歳以下・濃青）
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#0284C7]" style={SWATCH_SKY_STYLE} />
-            今後の新規採用累積（水色斜線）
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-sm inline-block border border-[#9A3412]" style={SWATCH_VERMILION_STYLE} />
-            60〜64歳 役職定年層（朱斜線）
-          </span>
-        </div>
-
-        <div className="space-y-0.5">
-          {ages.map(age => {
-            const bin = snap.ageBins[age] || { existing: 0, hired: 0 };
-            const exPct = (bin.existing / scaleMax) * 100;
-            const hiPct = (bin.hired / scaleMax) * 100;
-            const tot = bin.existing + bin.hired;
-            const hasBoth = bin.existing >= 0.05 && bin.hired >= 0.05;
-
-            let tipText = fmtCompactInt(tot);
-            if (hasBoth && (exPct < 5.5 || hiPct < 5.5)) {
-              tipText = `${fmtCompactInt(tot)} (現${fmtCompactInt(bin.existing)}+新${fmtCompactInt(bin.hired)})`;
-            }
-
-            return (
-              <div
-                key={age}
-                className="flex items-center gap-2"
-                style={age === 59 ? { borderTop: `2px dashed ${CUD.vermilion}`, paddingTop: '4px', marginTop: '4px' } : undefined}
+        {!forceCompare3 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-lg bg-slate-100 border border-slate-200 text-xs sim-no-print">
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setPyramidViewMode('single')}
+                className={`px-2.5 py-1 rounded font-bold cursor-pointer border ${
+                  pyramidViewMode === 'single'
+                    ? 'bg-[#0072B2] text-white border-[#0072B2]'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                }`}
               >
-                <div className="w-10 text-right text-slate-500 font-mono text-[11px] leading-none">{age}歳</div>
-                <div className="flex-1 h-3.5 bg-slate-100 rounded overflow-hidden flex items-center">
-                  <div
-                    className="h-full flex items-center justify-center overflow-hidden"
-                    style={
-                      age >= 60
-                        ? { width: `${exPct}%`, border: `1px solid ${CUD.vermilion}`, ...SWATCH_VERMILION_STYLE }
-                        : { width: `${exPct}%`, backgroundColor: CUD.navy }
-                    }
-                  >
-                    {hasBoth && exPct >= 5.5 && (
-                      <span
-                        className="font-mono font-bold leading-none"
-                        style={{
-                          fontSize: '8.5px',
-                          color: age >= 60 ? '#0F172A' : '#FFFFFF',
-                          textShadow: age >= 60 ? '0 0 3px #fff' : '0 0 2px #002b4d'
-                        }}
-                      >
-                        {fmtCompactInt(bin.existing)}
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    className="h-full flex items-center justify-center overflow-hidden"
-                    style={{
-                      width: `${hiPct}%`,
-                      ...(hiPct > 0 ? SWATCH_SKY_STYLE : {}),
-                      ...(hiPct > 0 && exPct > 0 ? { borderLeft: '1px solid #ffffff' } : {})
-                    }}
-                  >
-                    {hasBoth && hiPct >= 5.5 && (
-                      <span
-                        className="font-mono font-bold leading-none text-slate-900"
-                        style={{ fontSize: '8.5px', textShadow: '0 0 3px #fff' }}
-                      >
-                        {fmtCompactInt(bin.hired)}
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className="ml-1.5 font-mono leading-none whitespace-nowrap"
-                    style={{
-                      fontSize: '9.5px',
-                      fontWeight: tot >= 0.05 ? 700 : 400,
-                      color: tot >= 0.05 ? '#0f172a' : '#94a3b8'
-                    }}
-                  >
-                    {tipText}
-                  </span>
-                </div>
+                単年度スライダー再生
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsPlaying(false);
+                  setPyramidViewMode('compare3');
+                }}
+                className={`px-2.5 py-1 rounded font-bold cursor-pointer border ${
+                  pyramidViewMode === 'compare3'
+                    ? 'bg-[#0072B2] text-white border-[#0072B2]'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                3時点並べて比較（印刷向き）
+              </button>
+            </div>
+
+            {pyramidViewMode === 'single' && (
+              <div className="flex items-center gap-3 flex-1 min-w-[260px]">
+                <button
+                  type="button"
+                  onClick={() => setIsPlaying(p => !p)}
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-white font-bold text-xs cursor-pointer"
+                  style={{ backgroundColor: CUD.blue }}
+                >
+                  {isPlaying ? <><Pause className="w-3.5 h-3.5" /> 停止</> : <><Play className="w-3.5 h-3.5" /> 再生</>}
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max={sim.horizon}
+                  value={safeIdx}
+                  onChange={(e) => setPyramidIdx(Number(e.target.value))}
+                  className="flex-1 accent-[#0072B2]"
+                />
+                <span className="font-mono font-bold text-slate-900">
+                  {formatSimEraYear(snap.year)}年度（{Math.round(snap.total)}名）
+                </span>
               </div>
-            );
-          })}
-        </div>
+            )}
+          </div>
+        )}
+
+        {showCompare ? (
+          <div className={`grid grid-cols-1 ${compareIndices.length === 3 ? 'md:grid-cols-3 sim-print-grid-3' : 'md:grid-cols-2'} gap-3`}>
+            {compareIndices.map(idx => {
+              const s = sim.yearly[idx];
+              const tag = s.isBase
+                ? '基準年度'
+                : s.isGoalYear
+                  ? `★目標到達年(${idx}年後)`
+                  : idx === lastIdx
+                    ? `最終年度(${idx}年後)`
+                    : `${idx}年後`;
+              return (
+                <React.Fragment key={s.year}>
+                  {renderPyramidSvgColumn(s, scaleMax, `${formatSimEraYear(s.year)}年度［${tag}］`, `${idSuffix}-c${idx}`, true)}
+                </React.Fragment>
+              );
+            })}
+          </div>
+        ) : (
+          renderPyramidSvgColumn(
+            snap,
+            scaleMax,
+            `${formatSimEraYear(snap.year)}年度${snap.isBase && isReplaceTemp && base.tempCount > 0 ? `（正職員${Math.round(snap.total)}名＋現臨任${base.tempCount}名）` : ''}`,
+            `${idSuffix}-single`,
+            false
+          )
+        )}
       </div>
     );
   };
 
   // ====== Tab 4: Detailed Table ======
-  const renderTableTab = () => (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <p className="text-slate-500">
-          各年度の「計画採用数」を直接変更して個別計画を試算できます。退職・役職定年欄にカーソルを合わせると対象者氏名を表示します。
-        </p>
-        <button
-          type="button"
-          onClick={() => exportSimulationCsv(sim, planName)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white font-bold text-xs cursor-pointer hover:opacity-90"
-          style={{ backgroundColor: CUD.blue }}
-        >
-          <Download className="w-3.5 h-3.5" /> CSVダウンロード
-        </button>
+  const renderTableSection = (isForAllPrint = false) => {
+    const showNameColsScreen = showNamesInTable;
+    const nameColClass = isForAllPrint
+      ? printIncludeNames
+        ? ''
+        : 'hidden'
+      : showNameColsScreen
+        ? ''
+        : printIncludeNames
+          ? 'hidden sim-print-table-cell'
+          : 'hidden';
+
+    return (
+      <div className="space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="font-bold text-slate-800">
+            ④ 年度別採用計画・人員推移一覧表
+            {hasCustomHires && <span className="ml-2 text-[#0066A6] font-normal">（※ *印は手動調整値）</span>}
+          </div>
+          {!isForAllPrint && (
+            <div className="flex flex-wrap items-center gap-3 sim-no-print">
+              <label className="inline-flex items-center gap-1.5 cursor-pointer select-none text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={showNamesInTable}
+                  onChange={(e) => setShowNamesInTable(e.target.checked)}
+                  className="accent-[#0072B2]"
+                />
+                <span>画面にも退職・役職定年対象者の氏名列を表示</span>
+              </label>
+              <label className="inline-flex items-center gap-1.5 cursor-pointer select-none text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={printIncludeNames}
+                  onChange={(e) => setPrintIncludeNames(e.target.checked)}
+                  className="accent-[#0072B2]"
+                />
+                <span>印刷時に氏名列を含める</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => exportSimulationCsv(sim, planName)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white font-bold text-xs cursor-pointer hover:opacity-90"
+                style={{ backgroundColor: CUD.blue }}
+              >
+                <Download className="w-3.5 h-3.5" /> CSVダウンロード
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="overflow-x-auto border border-slate-300 rounded-lg sim-chart-scroll">
+          <table className="w-full text-xs border-collapse bg-white sim-plan-table">
+            <thead>
+              <tr className="bg-slate-100 border-b border-slate-300 text-slate-700">
+                <th className="py-2 px-2 text-left font-bold whitespace-nowrap">年度</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap">前年度末</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap" style={{ color: CUD.vermilionText }}>65歳退職等</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap" style={{ color: CUD.yellowText }}>60歳役職定年</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap">時短・中途減</th>
+                <th className="py-2 px-2 text-center font-bold whitespace-nowrap">計画採用数</th>
+                <th className="py-2 px-2 text-right font-bold text-slate-900 whitespace-nowrap">
+                  {isReplaceTemp ? '正職員数(育代含)' : '在籍総数(臨・育含)'}
+                </th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap">59歳以下</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap">60-64歳</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap">年度目標</th>
+                <th className="py-2 px-2 text-right font-bold whitespace-nowrap">
+                  {sim.strategy === 'replace' ? '目標比過不足' : '過不足(▲要臨任)'}
+                </th>
+                <th className={`py-2 px-2 text-left font-bold ${nameColClass}`} style={{ color: CUD.vermilionText }}>
+                  65歳定年退職等 対象者
+                </th>
+                <th className={`py-2 px-2 text-left font-bold ${nameColClass}`} style={{ color: CUD.yellowText }}>
+                  60歳役職定年 対象者
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {sim.yearly.map(r => {
+                const diff = Math.round(r.total) - r.yearTarget;
+                const diffColor = diff < -1 ? CUD.vermilionText : diff > 2 ? CUD.yellowText : CUD.blueText;
+                const diffDisp =
+                  r.isBase && isReplaceTemp && diff < 0
+                    ? `▲${Math.abs(diff)} (現臨任)`
+                    : diff < 0
+                      ? `▲${Math.abs(diff)}`
+                      : diff > 0
+                        ? `+${diff}`
+                        : '0';
+
+                return (
+                  <tr key={r.year} className={r.isGoalYear ? 'bg-sky-50/70' : ''}>
+                    <td className="py-1.5 px-2 font-semibold text-slate-800 whitespace-nowrap">
+                      {formatSimEraYear(r.year)}
+                      {r.isBase && <span className="text-slate-500 font-normal ml-1">(基準)</span>}
+                      {r.isGoalYear && <span className="font-bold ml-1" style={{ color: CUD.blueText }}>★目標</span>}
+                    </td>
+                    <td className="py-1.5 px-2 text-right font-mono">{r.isBase ? '-' : Math.round(r.prevTotal)}</td>
+                    <td
+                      className="py-1.5 px-2 text-right font-mono cursor-help"
+                      style={{ color: CUD.vermilionText }}
+                      title={r.retire65Names.length ? `65歳定年退職等: ${r.retire65Names.join('、')}` : undefined}
+                    >
+                      {r.isBase ? '-' : r.retire65Count > 0 ? `▲${r.retire65Count}` : '0'}
+                    </td>
+                    <td
+                      className="py-1.5 px-2 text-right font-mono cursor-help"
+                      style={{ color: CUD.yellowText }}
+                      title={r.yakushoku60Names.length ? `60歳役職定年: ${r.yakushoku60Names.join('、')}` : undefined}
+                    >
+                      {r.yakushoku60Count}
+                    </td>
+                    <td className="py-1.5 px-2 text-right font-mono text-slate-600">
+                      {r.isBase ? '-' : r.attritionLoss > 0 ? `▲${Math.round(r.attritionLoss)}` : '0'}
+                    </td>
+                    <td className="py-1 px-2 text-center font-mono">
+                      {r.isBase ? (
+                        <span className="text-slate-400">{r.hires}</span>
+                      ) : isForAllPrint ? (
+                        <span className="font-bold text-slate-900">
+                          {r.hires}{r.isCustomHire ? '*' : ''}
+                        </span>
+                      ) : (
+                        <>
+                          <input
+                            type="number"
+                            min="0"
+                            max="80"
+                            value={r.hires}
+                            onChange={(e) => {
+                              const v = Math.max(0, Number(e.target.value) || 0);
+                              setCustomHiresByYear(prev => ({ ...prev, [r.year]: v }));
+                            }}
+                            className="w-16 text-center rounded border px-1.5 py-0.5 font-mono bg-white sim-no-print"
+                            style={r.isCustomHire ? { borderColor: CUD.blue, fontWeight: 700 } : { borderColor: '#cbd5e1' }}
+                          />
+                          <span className="hidden sim-print-inline font-bold text-slate-900">
+                            {r.hires}{r.isCustomHire ? '*' : ''}
+                          </span>
+                        </>
+                      )}
+                    </td>
+                    <td className="py-1.5 px-2 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
+                      {Math.round(r.total)}
+                      {r.isBase && isReplaceTemp && base.tempCount > 0 && (
+                        <span className="font-normal text-slate-500 ml-1">(臨含{base.totalPlacedCount})</span>
+                      )}
+                    </td>
+                    <td className="py-1.5 px-2 text-right font-mono">{Math.round(r.under60)}</td>
+                    <td className="py-1.5 px-2 text-right font-mono">{Math.round(r.age60to64)}</td>
+                    <td className="py-1.5 px-2 text-right font-mono text-slate-600">{r.yearTarget}</td>
+                    <td className="py-1.5 px-2 text-right font-mono font-bold whitespace-nowrap" style={{ color: diffColor }}>
+                      {diffDisp}
+                    </td>
+                    <td className={`py-1.5 px-2 text-left text-[10.5px] leading-snug text-slate-700 ${nameColClass}`}>
+                      {r.isBase ? '-' : r.retire65Names.length > 0 ? r.retire65Names.join('、') : '-'}
+                    </td>
+                    <td className={`py-1.5 px-2 text-left text-[10.5px] leading-snug text-slate-700 ${nameColClass}`}>
+                      {r.yakushoku60Names.length > 0 ? r.yakushoku60Names.join('、') : '-'}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
+    );
+  };
 
-      <div className="overflow-x-auto border border-slate-300 rounded-lg">
-        <table className="w-full text-xs border-collapse bg-white">
-          <thead>
-            <tr className="bg-slate-100 border-b border-slate-300 text-slate-600">
-              <th className="py-2 px-2.5 text-left font-bold">年度</th>
-              <th className="py-2 px-2.5 text-right font-bold">前年度末</th>
-              <th className="py-2 px-2.5 text-right font-bold" style={{ color: CUD.vermilionText }}>65歳退職等</th>
-              <th className="py-2 px-2.5 text-right font-bold" style={{ color: CUD.yellowText }}>60歳役職定年</th>
-              <th className="py-2 px-2.5 text-right font-bold">時短・中途減</th>
-              <th className="py-2 px-2.5 text-center font-bold">計画採用数(正職員)</th>
-              <th className="py-2 px-2.5 text-right font-bold text-slate-900">
-                {isReplaceTemp ? '正職員数(育代含)' : '在籍総数(臨任・育代含)'}
-              </th>
-              <th className="py-2 px-2.5 text-right font-bold">うち59歳以下</th>
-              <th className="py-2 px-2.5 text-right font-bold">うち60-64歳</th>
-              <th className="py-2 px-2.5 text-right font-bold">年度目標</th>
-              <th className="py-2 px-2.5 text-right font-bold">
-                {sim.strategy === 'replace' ? '目標比過不足(臨任なし)' : '目標比過不足(▲要臨任)'}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {sim.yearly.map(r => {
-              const diff = Math.round(r.total) - r.yearTarget;
-              const diffColor = diff < -1 ? CUD.vermilionText : diff > 2 ? CUD.yellowText : CUD.blueText;
-              const diffDisp =
-                r.isBase && isReplaceTemp && diff < 0
-                  ? `▲${Math.abs(diff)} (現臨任)`
-                  : diff < 0
-                    ? `▲${Math.abs(diff)}`
-                    : diff > 0
-                      ? `+${diff}`
-                      : '0';
+  // ====== Print-Only Report Header & Assumptions Summary ======
+  const renderPrintReportHeader = () => {
+    const modeLabel = isLevel
+      ? `平準化採用（1〜${sim.goalYears}年目:${baseAnnualHire}名/年${sim.horizon > sim.goalYears ? `、到達後:${postGoalAnnualHire}名/年` : ''}${hasCustomHires ? '・個別年度手動調整あり' : ''}）`
+      : '単年度欠員補充（臨任なし・毎年必要数全員を正職員採用）';
+    const tempLabel = isLevel
+      ? isReplaceTemp
+        ? '採用で正規職員へ置換'
+        : 'そのまま継続在籍とみなす'
+      : '臨任不使用（初年度正職員化）';
 
-              return (
-                <tr key={r.year} className={r.isGoalYear ? 'bg-sky-50/70 hover:bg-sky-100/70' : 'hover:bg-slate-50'}>
-                  <td className="py-2 px-2.5 font-semibold text-slate-800">
-                    {formatSimEraYear(r.year)}
-                    {r.isBase && <span className="text-slate-400 font-normal ml-1">(基準)</span>}
-                    {r.isGoalYear && <span className="font-bold ml-1" style={{ color: CUD.blueText }}>★目標年</span>}
-                  </td>
-                  <td className="py-2 px-2.5 text-right font-mono">{r.isBase ? '-' : Math.round(r.prevTotal)}</td>
-                  <td
-                    className="py-2 px-2.5 text-right font-mono cursor-help"
-                    style={{ color: CUD.vermilionText }}
-                    title={r.retire65Names.length ? `65歳定年退職等: ${r.retire65Names.join('、')}` : undefined}
-                  >
-                    {r.isBase ? '-' : r.retire65Count > 0 ? `▲${r.retire65Count}` : '0'}
-                  </td>
-                  <td
-                    className="py-2 px-2.5 text-right font-mono cursor-help"
-                    style={{ color: CUD.yellowText }}
-                    title={r.yakushoku60Names.length ? `60歳役職定年: ${r.yakushoku60Names.join('、')}` : undefined}
-                  >
-                    {r.yakushoku60Count}
-                  </td>
-                  <td className="py-2 px-2.5 text-right font-mono text-slate-500">
-                    {r.isBase ? '-' : r.attritionLoss > 0 ? `▲${Math.round(r.attritionLoss)}` : '0'}
-                  </td>
-                  <td className="py-1.5 px-2.5 text-center">
-                    {r.isBase ? (
-                      <span className="text-slate-400 font-mono">{r.hires}</span>
-                    ) : (
-                      <input
-                        type="number"
-                        min="0"
-                        max="80"
-                        value={r.hires}
-                        onChange={(e) => {
-                          const v = Math.max(0, Number(e.target.value) || 0);
-                          setCustomHiresByYear(prev => ({ ...prev, [r.year]: v }));
-                        }}
-                        className="w-16 text-center rounded border px-1.5 py-0.5 font-mono bg-white"
-                        style={r.isCustomHire ? { borderColor: CUD.blue, fontWeight: 700 } : { borderColor: '#cbd5e1' }}
-                      />
-                    )}
-                  </td>
-                  <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-900">
-                    {Math.round(r.total)}
-                    {r.isBase && isReplaceTemp && base.tempCount > 0 && (
-                      <span className="font-normal text-slate-400 ml-1">(臨含{base.totalPlacedCount})</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-2.5 text-right font-mono">{Math.round(r.under60)}</td>
-                  <td className="py-2 px-2.5 text-right font-mono">{Math.round(r.age60to64)}</td>
-                  <td className="py-2 px-2.5 text-right font-mono text-slate-500">{r.yearTarget}</td>
-                  <td className="py-2 px-2.5 text-right font-mono font-bold" style={{ color: diffColor }}>
-                    {diffDisp}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+    return (
+      <div className="hidden sim-print-block border-b-2 border-slate-800 pb-2 mb-2.5">
+        <div className="flex items-baseline justify-between gap-4">
+          <div>
+            <h1 className="text-base font-bold text-slate-900">
+              採用計画・人員構成シミュレーション結果報告書（{formatSimEraYear(targetYear)}年度人事異動案：{planName}）
+            </h1>
+          </div>
+          <div className="text-[10.5px] text-slate-600 font-mono whitespace-nowrap">
+            基準: {baseMode === 'next' ? `来年度(R${targetYear - 2018})配置案` : `今年度(R${targetYear - 2019})現況`}
+            {currentFileName ? ` ／ ファイル: ${currentFileName}` : ''} ／ 出力日: {todayStr}
+          </div>
+        </div>
+
+        <div className="mt-1.5 grid grid-cols-4 gap-2 text-[10.5px] bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5">
+          <div>
+            <span className="text-slate-500">人員計画目標: </span>
+            <b className="text-slate-900">
+              現状{sim.startHeadcount}人 → {sim.goalYears}年後({formatSimEraYear(goalYearNum)})に{sim.goalHeadcount}人
+            </b>
+            <span className="ml-1 font-mono">
+              ({totalDelta > 0 ? `+${totalDelta}` : totalDelta < 0 ? `▲${Math.abs(totalDelta)}` : '±0'}人)
+            </span>
+          </div>
+          <div className="col-span-2">
+            <span className="text-slate-500">採用方式: </span>
+            <b className="text-slate-900">{modeLabel}</b>
+            <span className="text-slate-600"> ［臨任扱い: {tempLabel}］</span>
+          </div>
+          <div>
+            <span className="text-slate-500">分析期間・減率(四捨五入): </span>
+            <b className="text-slate-900">
+              {sim.horizon}年間 ／ 60歳減{age60DropPct}%・中途減{midAttritionPct.toFixed(1)}%
+            </b>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200">
-      <div className="bg-slate-50 rounded-xl shadow-2xl w-[98vw] h-[96vh] max-w-[1800px] flex flex-col font-sans text-slate-900 overflow-hidden animate-in zoom-in-95 duration-200">
-        {/* Modal Header */}
-        <header className="bg-white border-b border-slate-300 shadow-sm shrink-0 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+  const mainUI = (
+    <div
+      ref={rootRef}
+      className={
+        portalBlocked
+          ? 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center sim-root-wrapper'
+          : 'min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 sim-root-wrapper'
+      }
+    >
+      <div
+        className={
+          portalBlocked
+            ? 'bg-slate-50 rounded-xl shadow-2xl w-[98vw] h-[96vh] max-w-[1840px] flex flex-col font-sans text-slate-900 overflow-hidden sim-inner-shell'
+            : 'flex-1 flex flex-col w-full max-w-[1840px] mx-auto sim-inner-shell'
+        }
+      >
+        {/* Screen Header */}
+        <header className="bg-white border-b border-slate-300 shadow-sm shrink-0 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2.5 sim-no-print">
           <div className="flex items-center gap-2.5 flex-wrap">
             <TrendingUp className="w-5 h-5 text-[#0072B2]" />
             <h2 className="text-base sm:text-lg font-bold text-slate-800">
@@ -991,38 +1370,69 @@ export const RecruitmentSimulatorModal = ({
               対象案: {planName}
             </span>
             {currentFileName && (
-              <span className="text-xs text-slate-500 hidden md:inline">({currentFileName})</span>
+              <span className="text-xs text-slate-500 hidden xl:inline">({currentFileName})</span>
             )}
-            <span className="text-xs px-2 py-0.5 rounded border border-slate-200 bg-slate-100 text-slate-600">
+            <span className="text-xs px-2 py-0.5 rounded border border-slate-200 bg-slate-100 text-slate-600 hidden lg:inline">
               60歳役職定年・65歳定年 ／ 臨任・育代含（他除外除く）
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <label className="flex items-center gap-1.5 text-xs">
-              <span className="text-slate-500 font-medium">基準時点:</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <label className="flex items-center gap-1 text-xs">
+              <span className="text-slate-500 font-medium">基準:</span>
               <select
                 value={baseMode}
                 onChange={(e) => setBaseMode(e.target.value)}
                 className="bg-white border border-slate-300 rounded-md px-2 py-1 text-xs font-semibold text-slate-800"
               >
-                <option value="next">来年度(R{targetYear - 2018})配置案ベース</option>
-                <option value="current">今年度(R{targetYear - 2019})現況ベース</option>
+                <option value="next">来年度(R{targetYear - 2018})配置案</option>
+                <option value="current">今年度(R{targetYear - 2019})現況</option>
               </select>
             </label>
+
+            <div className="flex items-center bg-slate-100 border border-slate-300 rounded-md p-0.5 gap-1">
+              <select
+                value={printScope}
+                onChange={(e) => setPrintScope(e.target.value)}
+                className="bg-white border border-slate-200 rounded px-2 py-1 text-xs font-semibold text-slate-800"
+                title="印刷する範囲を選択します（A4横推奨）"
+              >
+                <option value="all">全項目レポート一括（①〜④）</option>
+                <option value="current">表示中のタブのみ</option>
+              </select>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-white px-3 py-1 rounded text-xs font-bold transition-colors cursor-pointer"
+                title="A4横レイアウトで印刷またはPDF保存します"
+              >
+                <Printer className="w-3.5 h-3.5" /> 印刷 / PDF化
+              </button>
+            </div>
 
             <button
               type="button"
               onClick={() => exportSimulationCsv(sim, planName)}
-              className="flex items-center gap-1 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-opacity hover:opacity-90 cursor-pointer"
+              className="flex items-center gap-1 text-white px-2.5 py-1.5 rounded-md text-xs font-bold transition-opacity hover:opacity-90 cursor-pointer"
               style={{ backgroundColor: CUD.blue }}
             >
               <Download className="w-3.5 h-3.5" /> CSV出力
             </button>
 
+            {portalBlocked && (
+              <button
+                type="button"
+                onClick={handlePopOutManually}
+                className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer"
+                title="独立した別ウィンドウで開き直します"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> 別ウィンドウで開く
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleFullClose}
               className="flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors shadow-sm cursor-pointer"
             >
               <X className="w-4 h-4" /> 閉じる
@@ -1030,50 +1440,53 @@ export const RecruitmentSimulatorModal = ({
           </div>
         </header>
 
-        {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sim-main-scroll">
+          {/* Print-Dedicated Header */}
+          {renderPrintReportHeader()}
+
           {/* KPI Summary Strip */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sim-kpi-grid sim-avoid-break">
+            <div className="bg-white border border-slate-300 rounded-xl p-3.5 shadow-sm sim-compact-card">
               <div className="text-xs text-slate-500">
                 {formatSimEraYear(base.baseYear)} 正規在籍人員（臨任・育代含）
               </div>
-              <div className="text-xl font-bold font-mono tabular-nums mt-1 text-slate-900">
+              <div className="text-xl font-bold font-mono tabular-nums mt-0.5 text-slate-900 sim-kpi-num">
                 {base.totalPlacedCount}名
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-slate-500 mt-0.5 sim-kpi-sub">
                 実正規(育代{base.ikudaiCount}含) {base.nonTempCount}名 ＋ 臨任 {base.tempCount}名 ※他除外{base.excludedCount}名除く
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
+            <div className="bg-white border border-slate-300 rounded-xl p-3.5 shadow-sm sim-compact-card">
               <div className="text-xs text-slate-500">今後{sim.horizon}年間の65歳定年退職等</div>
-              <div className="text-xl font-bold font-mono tabular-nums mt-1" style={{ color: CUD.vermilionText }}>
+              <div className="text-xl font-bold font-mono tabular-nums mt-0.5 sim-kpi-num" style={{ color: CUD.vermilionText }}>
                 計 {sumRetire}名
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-slate-500 mt-0.5 sim-kpi-sub">
                 年平均 {(sumRetire / sim.horizon).toFixed(1)}名（最大 {formatSimEraYear(maxRetireRow.year)} {maxRetireRow.retire65Count}名）
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
+            <div className="bg-white border border-slate-300 rounded-xl p-3.5 shadow-sm sim-compact-card">
               <div className="text-xs text-slate-500">今後{sim.horizon}年間の60歳役職定年</div>
-              <div className="text-xl font-bold font-mono tabular-nums mt-1" style={{ color: CUD.yellowText }}>
+              <div className="text-xl font-bold font-mono tabular-nums mt-0.5 sim-kpi-num" style={{ color: CUD.yellowText }}>
                 計 {sumYakushoku}名
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-slate-500 mt-0.5 sim-kpi-sub">
                 年平均 {(sumYakushoku / sim.horizon).toFixed(1)}名が役職ポストから離脱
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
+            <div className="bg-white border border-slate-300 rounded-xl p-3.5 shadow-sm sim-compact-card">
               <div className="text-xs text-slate-500">
                 {sim.goalYears}年後(R{goalYearNum - 2018}) {sim.goalHeadcount}名達成の理論平準化採用数
               </div>
-              <div className="text-xl font-bold font-mono tabular-nums mt-1" style={{ color: CUD.blueText }}>
+              <div className="text-xl font-bold font-mono tabular-nums mt-0.5 sim-kpi-num" style={{ color: CUD.blueText }}>
                 {sim.recommendedAnnualHire.toFixed(1)}名/年
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-slate-500 mt-0.5 sim-kpi-sub">
                 1〜{sim.goalYears}年目目安: {lowH === highH ? lowH : `${lowH}〜${highH}`}名/年
                 {sim.horizon > sim.goalYears
                   ? ` ／ 到達後維持: 約${sim.postGoalRecommendedHire.toFixed(1)}名/年`
@@ -1084,8 +1497,8 @@ export const RecruitmentSimulatorModal = ({
             </div>
           </div>
 
-          {/* Simulation Parameters */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+          {/* Interactive Simulation Parameters (Hidden on Print because Assumptions Summary is printed in Header) */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3 sim-no-print">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
               <span className="text-xs font-bold text-slate-800">シミュレーション条件設定</span>
               {hasCustomHires && (
@@ -1297,9 +1710,13 @@ export const RecruitmentSimulatorModal = ({
             </div>
           </div>
 
-          {/* Main Tabs Card */}
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="flex flex-wrap border-b border-slate-200 bg-slate-100 px-3 gap-1">
+          {/* Interactive Tabs Card (Screen View + 'current' Print Mode) */}
+          <div
+            className={`bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden sim-tab-card ${
+              printScope === 'all' ? 'sim-no-print' : ''
+            }`}
+          >
+            <div className="flex flex-wrap border-b border-slate-200 bg-slate-100 px-3 gap-1 sim-no-print">
               {[
                 { id: 'trend', label: '① 退職・役職定年と人員推移' },
                 { id: 'posts', label: '② 役職ポスト需給・担い手分析' },
@@ -1321,25 +1738,194 @@ export const RecruitmentSimulatorModal = ({
               ))}
             </div>
 
-            <div className="p-4">
-              {activeTab === 'trend' && renderTrendTab()}
-              {activeTab === 'posts' && renderPostsTab()}
-              {activeTab === 'pyramid' && renderPyramidTab()}
-              {activeTab === 'table' && renderTableTab()}
+            <div className="p-4 sim-tab-body">
+              {activeTab === 'trend' && renderTrendSection('screen')}
+              {activeTab === 'posts' && renderPostsSection('screen')}
+              {activeTab === 'pyramid' && renderPyramidSection(false, 'screen')}
+              {activeTab === 'table' && renderTableSection(false)}
             </div>
           </div>
+
+          {/* All-in-One Structured Multi-Page Print Report (Rendered only on Print when printScope === 'all') */}
+          {printScope === 'all' && (
+            <div className="hidden sim-print-block space-y-4">
+              {/* Page 1 Continuation: Trend Bar & Line Charts */}
+              <div>{renderTrendSection('print')}</div>
+
+              {/* Page 2: Post Supply & Demand */}
+              <div className="sim-page-break pt-1">
+                {renderPostsSection('print')}
+              </div>
+
+              {/* Page 3: 3-Point Side-by-Side Age Pyramid Comparison */}
+              <div className="sim-page-break pt-1">
+                {renderPyramidSection(true, 'print')}
+              </div>
+
+              {/* Page 4+: Detailed Annual Plan Table with Retiree / Yakushoku Names */}
+              <div className="sim-page-break pt-1">
+                {renderTableSection(true)}
+              </div>
+            </div>
+          )}
         </main>
 
         {/* Floating Tooltip */}
         {tooltip && (
           <div
-            className="fixed pointer-events-none z-[100] max-w-[340px] p-2.5 rounded-lg bg-white border border-slate-300 shadow-xl text-xs text-slate-800"
+            className="fixed pointer-events-none z-[100] max-w-[340px] p-2.5 rounded-lg bg-white border border-slate-300 shadow-xl text-xs text-slate-800 sim-no-print"
             style={{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }}
           >
             {tooltip.content}
           </div>
         )}
+
+        {/* Print Stylesheet (Works identically in Separate Window AND Inline Fallback) */}
+        <style>{`
+          @media print {
+            @page {
+              size: A4 landscape;
+              margin: 8mm 10mm;
+            }
+            html, body {
+              background: #ffffff !important;
+              color: #0f172a !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              overflow: visible !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            /* 万一インライン表示から印刷した場合も親アプリUIを非表示化 */
+            #app-header, #app-main, #app-floating-bar {
+              display: none !important;
+            }
+            .sim-no-print {
+              display: none !important;
+            }
+            .sim-print-block {
+              display: block !important;
+            }
+            .sim-print-inline {
+              display: inline !important;
+            }
+            .sim-print-table-cell {
+              display: table-cell !important;
+            }
+            .sim-print-grid-3 {
+              display: grid !important;
+              grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+              gap: 10px !important;
+            }
+            .sim-root-wrapper,
+            .sim-inner-shell,
+            .sim-main-scroll {
+              position: static !important;
+              width: 100% !important;
+              max-width: none !important;
+              height: auto !important;
+              max-height: none !important;
+              overflow: visible !important;
+              background: #ffffff !important;
+              box-shadow: none !important;
+              border: none !important;
+              border-radius: 0 !important;
+              padding: 0 !important;
+              margin: 0 !important;
+            }
+            .sim-kpi-grid {
+              display: grid !important;
+              grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+              gap: 8px !important;
+              margin-bottom: 8px !important;
+            }
+            .sim-compact-card {
+              padding: 6px 10px !important;
+              box-shadow: none !important;
+              border-radius: 6px !important;
+            }
+            .sim-kpi-num {
+              font-size: 16px !important;
+              line-height: 1.2 !important;
+            }
+            .sim-kpi-sub {
+              font-size: 10px !important;
+              line-height: 1.25 !important;
+            }
+            .sim-tab-card {
+              border: none !important;
+              box-shadow: none !important;
+              border-radius: 0 !important;
+            }
+            .sim-tab-body {
+              padding: 4px 0 0 0 !important;
+            }
+            .sim-chart-scroll {
+              overflow: visible !important;
+            }
+            .sim-chart-svg {
+              min-width: 0 !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              height: auto !important;
+            }
+            .sim-trend-bar-svg {
+              max-height: 186px !important;
+            }
+            .sim-trend-line-svg {
+              max-height: 214px !important;
+            }
+            .sim-posts-svg {
+              max-height: 340px !important;
+            }
+            .sim-diag-box {
+              padding: 6px 10px !important;
+              font-size: 10.5px !important;
+              line-height: 1.35 !important;
+            }
+            .sim-print-tight-space > * + * {
+              margin-top: 8px !important;
+            }
+            .sim-avoid-break {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+            .sim-page-break {
+              break-before: page;
+              page-break-before: always;
+            }
+            .sim-plan-table {
+              font-size: 10px !important;
+            }
+            .sim-plan-table thead {
+              display: table-header-group !important;
+            }
+            .sim-plan-table tr {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+            .sim-plan-table th,
+            .sim-plan-table td {
+              padding: 3.5px 5px !important;
+            }
+          }
+        `}</style>
       </div>
     </div>
+  );
+
+  if (portalBlocked) {
+    return mainUI;
+  }
+
+  return (
+    <NewWindowPortal
+      title={windowTitle}
+      targetWindow={activeWinProp}
+      onClose={handleFullClose}
+      onBlocked={() => setPortalBlocked(true)}
+    >
+      {mainUI}
+    </NewWindowPortal>
   );
 };

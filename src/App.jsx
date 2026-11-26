@@ -40,6 +40,17 @@ export const AppContent = () => {
   } = app;
   
   const partialImportInputRef = useRef(null);
+  const simWindowRef = useRef(null);
+
+  const handleOpenRecruitmentSim = useCallback(() => {
+    if (modals.recruitmentSim?.isOpen && simWindowRef.current && !simWindowRef.current.closed) {
+      simWindowRef.current.focus();
+      return;
+    }
+    const win = window.open('', '_blank', 'width=1440,height=920,left=60,top=40');
+    simWindowRef.current = win;
+    openModal('recruitmentSim', { targetWindow: win });
+  }, [modals.recruitmentSim?.isOpen, openModal]);
 
   const handlePartialImport = async (e) => {
     let file = null;
@@ -234,7 +245,7 @@ export const AppContent = () => {
                 }
             }} className="bg-yellow-500/30 hover:bg-yellow-500/50 border border-yellow-300 text-yellow-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="職員データの矛盾（昇進年度や経過年数など）をチェックする"><AlertTriangle className="w-4 h-4 mr-1" />矛盾チェック</button>
             <button onClick={() => openModal('chainTransfer')} className="bg-fuchsia-500/30 hover:bg-fuchsia-500/50 border border-fuchsia-300 text-fuchsia-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="玉突き異動表（つなぎ表）を表示する"><GitMerge className="w-4 h-4 mr-1" />つなぎ表</button>
-            <button onClick={() => openModal('recruitmentSim')} className="bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-300 text-indigo-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在表示中の案をもとに中長期採用計画・人員構成シミュレーターを表示する"><TrendingUp className="w-4 h-4 mr-1" />採用計画</button>
+            <button onClick={handleOpenRecruitmentSim} className="bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-300 text-indigo-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在表示中の案をもとに中長期採用計画・人員構成シミュレーターを別ウィンドウで開く"><TrendingUp className="w-4 h-4 mr-1" />採用計画</button>
             <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }], showCountToggle: true, defaultShowCount: true })} className="bg-emerald-500/30 hover:emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <button onClick={() => openModal('openFile')} className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="保存したデータを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く</button>
@@ -544,12 +555,20 @@ export const AppContent = () => {
       {modals.recruitmentSim?.isOpen && (
         <RecruitmentSimulatorModal
           isOpen={true}
-          onClose={() => closeModal('recruitmentSim')}
+          onClose={() => {
+            if (simWindowRef.current && !simWindowRef.current.closed) {
+              simWindowRef.current.close();
+            }
+            simWindowRef.current = null;
+            closeModal('recruitmentSim');
+          }}
           employees={employees}
           departments={departments}
           targetYear={targetYear}
           planName={plans.find(p => p.id === activePlanId)?.name || '基本案'}
+          activePlanId={activePlanId}
           currentFileName={currentFileName}
+          targetWindow={modals.recruitmentSim.data?.targetWindow || null}
         />
       )}
 

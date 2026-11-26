@@ -1,55 +1,102 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-export const NewWindowPortal = ({ children, title, onClose }) => {
+export const NewWindowPortal = ({ children, title, targetWindow = null, onClose, onBlocked }) => {
   const [container, setContainer] = useState(null);
-  const newWindow = useRef(null);
+  const winRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  const onBlockedRef = useRef(onBlocked);
 
   useEffect(() => {
-    // Open a new browser window
-    newWindow.current = window.open('', '_blank', 'width=1400,height=900,left=100,top=100');
-    
-    if (!newWindow.current) {
-      alert("ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。");
-      onClose();
-      return;
+    onCloseRef.current = onClose;
+    onBlockedRef.current = onBlocked;
+  }, [onClose, onBlocked]);
+
+  useEffect(() => {
+    const win =
+      targetWindow && !targetWindow.closed
+        ? targetWindow
+        : window.open('', '_blank', 'width=1440,height=920,left=60,top=40');
+
+    if (!win) {
+      if (onBlockedRef.current) {
+        onBlockedRef.current();
+      } else if (onCloseRef.current) {
+        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+        onCloseRef.current();
+      }
+      return undefined;
     }
-    
-    newWindow.current.document.title = title;
-    
-    // Set base URI so relative assets (CSS, images) load correctly in about:blank
-    const base = newWindow.current.document.createElement('base');
-    base.href = window.location.origin + window.location.pathname;
-    newWindow.current.document.head.appendChild(base);
-    
-    // Copy all style sheets and style tags from the main window
-    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'));
-    styles.forEach(style => {
-      newWindow.current.document.head.appendChild(style.cloneNode(true));
+
+    winRef.current = win;
+    const doc = win.document;
+    doc.title = title || '採用計画シミュレーター';
+
+    // Reset head/body cleanly if freshly opened about:blank
+    doc.body.innerHTML = '';
+    doc.body.style.margin = '0';
+    doc.body.style.backgroundColor = '#f8fafc';
+
+    // Sync stylesheets & style tags from parent document (resolving href to full URLs for production builds)
+    const syncStyles = () => {
+      doc.head.querySelectorAll('[data-synced-style="1"]').forEach(el => el.remove());
+      const nodes = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'));
+      nodes.forEach(node => {
+        if (node.tagName === 'LINK') {
+          const link = doc.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = node.href;
+          link.setAttribute('data-synced-style', '1');
+          doc.head.appendChild(link);
+        } else {
+          const style = doc.createElement('style');
+          style.textContent = node.textContent;
+          style.setAttribute('data-synced-style', '1');
+          doc.head.appendChild(style);
+        }
+      });
+    };
+    syncStyles();
+
+    const observer = new MutationObserver(() => {
+      if (!win.closed) syncStyles();
     });
+    observer.observe(document.head, { childList: true, subtree: true, characterData: true });
 
-    // Copy body and html classes for Tailwind/global styles
-    newWindow.current.document.body.className = document.body.className;
-    newWindow.current.document.documentElement.className = document.documentElement.className;
+    doc.body.className = document.body.className;
+    doc.documentElement.className = document.documentElement.className;
 
-    // Create a container div for the React Portal
-    const div = newWindow.current.document.createElement('div');
-    newWindow.current.document.body.appendChild(div);
-    setContainer(div);
+    const mountNode = doc.createElement('div');
+    mountNode.id = 'portal-sim-root';
+    doc.body.appendChild(mountNode);
+    setContainer(mountNode);
 
-    // Watch for window close event to sync state
-    newWindow.current.addEventListener('beforeunload', () => {
-      onClose();
-    });
+    let closedNotified = false;
+    const handleWindowClose = () => {
+      if (closedNotified) return;
+      closedNotified = true;
+      if (onCloseRef.current) onCloseRef.current();
+    };
+    win.addEventListener('beforeunload', handleWindowClose);
+    win.addEventListener('pagehide', handleWindowClose);
+    win.focus();
 
-    // Cleanup when component unmounts (main window closes or modal state changes)
     return () => {
-      if (newWindow.current && !newWindow.current.closed) {
-        newWindow.current.close();
+      closedNotified = true;
+      observer.disconnect();
+      win.removeEventListener('beforeunload', handleWindowClose);
+      win.removeEventListener('pagehide', handleWindowClose);
+      if (winRef.current && !winRef.current.closed) {
+        winRef.current.close();
       }
     };
-  }, []);
+  }, [targetWindow]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Render children into the new window's container using a portal
+  useEffect(() => {
+    if (winRef.current && !winRef.current.closed && title) {
+      winRef.current.document.title = title;
+    }
+  }, [title]);
+
   return container ? createPortal(children, container) : null;
 };
