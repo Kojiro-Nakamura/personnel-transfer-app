@@ -4,7 +4,7 @@ import {
   Users, Building2, UserPlus, CornerDownRight, Layers, Award, AlertCircle, AlertTriangle,
   UserMinus, Edit2, Trash2, X, Plus, FolderPlus, Undo, Redo, 
   FolderOpen, Download, ChevronsRight, Copy, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ChevronUp,
-  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge, Maximize
+  ChevronsUp, ChevronsDown, Filter, Table, List, FileText, DownloadCloud, MessageSquare, MessageSquareText, FileCode, GitMerge, Maximize, TrendingUp
 } from 'lucide-react';
 import { generateAndDownloadHTML } from './utils/exportHtml.js';
 import { exportListToExcel, exportUnifiedExcel } from './utils/exportExcel.js';
@@ -24,6 +24,7 @@ import { NoteEditModal, EmployeeSelectModal, FileSaveModal, FileOpenModal, NameE
 import { ValidationModal } from './components/modals/ValidationModal.jsx';
 import { PartialImportConfirmModal } from './components/modals/PartialImportConfirmModal.jsx';
 import { ChainTransferModal } from './components/modals/ChainTransferModal.jsx';
+import { RecruitmentSimulatorModal } from './components/modals/RecruitmentSimulatorModal.jsx';
 import { NewWindowPortal } from './components/common/NewWindowPortal.jsx';
 import { ContextMenu } from './components/ui/ContextMenu.jsx';
 import { useSingleInstance } from './hooks/useSingleInstance.js';
@@ -233,6 +234,7 @@ export const AppContent = () => {
                 }
             }} className="bg-yellow-500/30 hover:bg-yellow-500/50 border border-yellow-300 text-yellow-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="職員データの矛盾（昇進年度や経過年数など）をチェックする"><AlertTriangle className="w-4 h-4 mr-1" />矛盾チェック</button>
             <button onClick={() => openModal('chainTransfer')} className="bg-fuchsia-500/30 hover:bg-fuchsia-500/50 border border-fuchsia-300 text-fuchsia-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="玉突き異動表（つなぎ表）を表示する"><GitMerge className="w-4 h-4 mr-1" />つなぎ表</button>
+            <button onClick={() => openModal('recruitmentSim')} className="bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-300 text-indigo-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在表示中の案をもとに中長期採用計画・人員構成シミュレーターを表示する"><TrendingUp className="w-4 h-4 mr-1" />採用計画</button>
             <button onClick={() => openModal('saveFile', { type: 'org', defaultName: currentFileName ? currentFileName.replace('.json', '') + '_人事異動案' + filterSuffix : baseFileName + '_人事異動案' + filterSuffix, options: [{ label: 'Excel (.xlsx)', value: 'excel', ext: '.xlsx' }, { label: 'HTML (.html)', value: 'html', ext: '.html' }], showCountToggle: true, defaultShowCount: true })} className="bg-emerald-500/30 hover:emerald-500/50 border border-emerald-300 text-emerald-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在の人事異動案をファイルとして保存する"><Table className="w-4 h-4 mr-1" />人事異動案</button>
             <button onClick={() => openModal('saveFile', { type: 'json', defaultName: currentFileName ? currentFileName.replace('.json', '') : baseFileName })} className="bg-cyan-500/30 hover:bg-cyan-500/50 border border-cyan-300 text-cyan-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold" title="現在のデータをJSONファイルとして保存する"><DownloadCloud className="w-4 h-4 mr-1" />保存</button>
             <button onClick={() => openModal('openFile')} className="bg-slate-400/30 hover:bg-slate-400/50 border border-slate-300 text-slate-50 active:scale-95 transition-all px-3 py-1.5 rounded flex items-center justify-center text-xs font-bold shadow-sm" title="保存したデータを読み込む"><FolderOpen className="w-4 h-4 mr-1" />開く</button>
@@ -536,6 +538,18 @@ export const AppContent = () => {
           onExportExcel={() => exportModalExcelBtn(
             currentFileName ? currentFileName.replace(/\.[^/.]+$/, "") + '_つなぎ表.xlsx' : '人事異動案_つなぎ表.xlsx'
           )} 
+        />
+      )}
+
+      {modals.recruitmentSim?.isOpen && (
+        <RecruitmentSimulatorModal
+          isOpen={true}
+          onClose={() => closeModal('recruitmentSim')}
+          employees={employees}
+          departments={departments}
+          targetYear={targetYear}
+          planName={plans.find(p => p.id === activePlanId)?.name || '基本案'}
+          currentFileName={currentFileName}
         />
       )}
 

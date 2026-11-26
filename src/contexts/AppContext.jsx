@@ -67,7 +67,8 @@ export function AppProvider({ children }) {
     empSelect: { isOpen: false, data: null },
     titleChangeConfirm: { isOpen: false, data: null },
     note: { isOpen: false, data: null },
-    chainTransfer: { isOpen: false, data: null }
+    chainTransfer: { isOpen: false, data: null },
+    recruitmentSim: { isOpen: false, data: null }
   });
 
   const [contextMenu, setContextMenu] = useState(null);
