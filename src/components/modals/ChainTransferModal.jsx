@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Printer, AlertCircle, TrendingUp } from 'lucide-react';
+import { X, GitMerge, List, Award, ArrowLeftRight, RotateCcw, Calculator, FileSpreadsheet, Printer, AlertCircle, TrendingUp } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
+import { generateDesignatedChangeStats } from '../../utils/designatedChangeUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
 import { getEmpCurrentYears, getEmpTitleYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
 
@@ -114,6 +115,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
 
   const tabs = [
     { id: 'designated', icon: <Award className="w-4 h-4" />, label: '指定職人事異動' },
+    { id: 'designated_change', icon: <ArrowLeftRight className="w-4 h-4" />, label: '指定職の増減' },
     { id: 'list', icon: <List className="w-4 h-4" />, label: '異動案リスト' },
     { id: 'reason', icon: <Calculator className="w-4 h-4" />, label: '増減理由' },
     { id: 'short_tenure', icon: <AlertCircle className="w-4 h-4" />, label: '3年未満特記' },
@@ -689,6 +691,136 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     );
   };
 
+  const renderDesignatedChangeTable = () => {
+    const gradeStats = generateDesignatedChangeStats(departments, employees);
+    const targetYearR = toReiwa(targetYear);
+    const prevYearR = targetYearR - 1;
+
+    return (
+      <div className="overflow-auto max-h-[calc(100vh-220px)] print:max-h-none print:overflow-visible w-full text-sm bg-white">
+        <div className="max-w-[1300px] mx-auto space-y-6 pb-4">
+          <div className="flex justify-between items-baseline">
+            <div className="text-lg font-bold tracking-widest">■指定職の増減様式</div>
+          </div>
+
+          {gradeStats.map(block => {
+            const slotCount = Math.max(block.abolishedItems.length, block.createdItems.length, 3);
+            const rowIndices = Array.from({ length: slotCount }, (_, i) => i);
+
+            return (
+              <div
+                key={block.grade}
+                className="border border-gray-300 rounded p-4 bg-white shadow-xs print:shadow-none print:border-gray-400 print-break-inside-avoid"
+              >
+                {/* 上部：今年度指定職数（A）と格付 */}
+                <div className="flex flex-wrap justify-between items-end gap-4 mb-2.5">
+                  <div className="flex items-center">
+                    <div className="border border-black bg-gray-50 px-3 py-1 font-bold text-xs">
+                      令和{prevYearR}年度 指定職数　（Ａ）
+                    </div>
+                    <div className="border-t border-r border-b border-black px-5 py-1 font-bold text-sm text-center min-w-[4rem] bg-white">
+                      {block.currCount}
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-1 text-sm">
+                    <span className="font-bold text-gray-700">格付：</span>
+                    <span className="font-bold text-base border-b-2 border-black px-4 pb-0.5 text-center min-w-[6rem]">
+                      {block.grade}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 中央：廃止・新設テーブル */}
+                <div className="border-2 border-black">
+                  <table className="w-full border-collapse bg-white text-xs table-fixed">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th colSpan="3" className="border-r-[3px] border-b border-black py-1.5 font-bold text-center tracking-[0.5em]">
+                          廃　　止
+                        </th>
+                        <th colSpan="3" className="border-b border-black py-1.5 font-bold text-center tracking-[0.5em]">
+                          新　　設
+                        </th>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <th className="border-r border-b border-black py-1.5 px-2 font-bold text-center w-[18%]">所　属　・　職　名</th>
+                        <th className="border-r border-b border-black py-1.5 px-2 font-bold text-center w-[27%]">理　　　由</th>
+                        <th className="border-r-[3px] border-b border-black py-1.5 px-1 font-bold text-center w-[5%]">人数</th>
+                        <th className="border-r border-b border-black py-1.5 px-2 font-bold text-center w-[18%]">所　属　・　職　名</th>
+                        <th className="border-r border-b border-black py-1.5 px-2 font-bold text-center w-[27%]">理　　　由</th>
+                        <th className="border-b border-black py-1.5 px-1 font-bold text-center w-[5%]">人数</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rowIndices.map(idx => {
+                        const ab = block.abolishedItems[idx];
+                        const cr = block.createdItems[idx];
+                        return (
+                          <tr key={idx} className="border-b border-black">
+                            <td className="border-r border-black p-2 align-middle whitespace-pre-line break-words min-h-[2.75rem] h-11">
+                              {ab ? ab.postLabel : ''}
+                            </td>
+                            <td className="border-r border-black p-2 align-top bg-yellow-50/20"></td>
+                            <td className="border-r-[3px] border-black p-2 text-center align-middle font-medium">
+                              {ab ? ab.count : ''}
+                            </td>
+                            <td className="border-r border-black p-2 align-middle whitespace-pre-line break-words min-h-[2.75rem] h-11">
+                              {cr ? cr.postLabel : ''}
+                            </td>
+                            <td className="border-r border-black p-2 align-top bg-yellow-50/20"></td>
+                            <td className="p-2 text-center align-middle font-medium">
+                              {cr ? cr.count : ''}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      <tr className="bg-gray-50 font-bold border-t-2 border-black">
+                        <td colSpan="2" className="border-r border-black py-1.5 px-2 text-center">
+                          合　　　計　　（Ｂ）
+                        </td>
+                        <td className="border-r-[3px] border-black py-1.5 px-1 text-center">
+                          {block.abolishedTotal}
+                        </td>
+                        <td colSpan="2" className="border-r border-black py-1.5 px-2 text-center">
+                          合　　　計　　（Ｃ）
+                        </td>
+                        <td className="py-1.5 px-1 text-center">
+                          {block.createdTotal}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 下部：来年度指定職数（A - B + C） */}
+                <div className="flex justify-end mt-2">
+                  <div className="flex items-center border-2 border-black">
+                    <div className="bg-gray-50 px-4 py-1.5 font-bold text-xs border-r border-black">
+                      令和{targetYearR}年度 指定職数（Ａ－Ｂ＋Ｃ）
+                    </div>
+                    <div className="px-5 py-1.5 font-bold text-sm text-center min-w-[4rem] bg-white">
+                      {block.nextCount}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* 記載上の留意事項 */}
+          <div className="text-xs text-gray-600 space-y-1 border p-3 bg-gray-50 rounded">
+            <p>１　《格付》欄は、「部長級・次長級・所属長級・課長級・班長級」の別を記載してください。</p>
+            <p className="pl-6">なお、次長級の所属長職は、「次長級」に分類してください。</p>
+            <p className="pl-6">課長補佐級は、本庁班長、出先課長ポスト以上について記載してください。</p>
+            <p>２　職種変更の場合も記載してください。</p>
+            <p className="pl-6">また、格付変更の場合は、各々の格付の「廃止」「新設」欄に記載してください。</p>
+            <p>３　理由欄は、その必要性が分かるよう詳細に記載してください（必要に応じて資料を添付してください。）。</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const reasonStats = useMemo(() => {
     return generateReasonStats(departments, employees, notes);
   }, [departments, employees, notes]);
@@ -1019,12 +1151,12 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       <main className="flex-1 overflow-auto p-4 sm:p-8 w-full print:p-0 print:overflow-visible">
         {/* Tabs */}
         <div className="flex justify-between items-end border-b-2 border-gray-300 mb-4 no-print">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 flex-wrap">
             {tabs.map(t => (
               <button 
                 key={t.id}
                 onClick={() => setCurrentTab(t.id)} 
-                className={`px-5 py-2.5 text-sm font-bold rounded-t-lg transition-colors flex items-center gap-1.5 ${currentTab === t.id ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                className={`px-4 py-2.5 text-sm font-bold rounded-t-lg transition-colors flex items-center gap-1.5 whitespace-nowrap ${currentTab === t.id ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
               >
                 {t.icon} {t.label}
               </button>
@@ -1033,7 +1165,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
           <button 
             onClick={handleResetSort} 
             disabled={!hasSort} 
-            className={`flex items-center gap-1.5 text-xs transition-colors px-2.5 py-1.5 rounded border mb-1.5 mr-1 ${hasSort ? 'text-gray-700 hover:text-black bg-white hover:bg-gray-100 border-gray-300 cursor-pointer shadow-sm' : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed opacity-70'}`}
+            className={`flex items-center gap-1.5 text-xs transition-colors px-2.5 py-1.5 rounded border mb-1.5 mr-1 shrink-0 ${hasSort ? 'text-gray-700 hover:text-black bg-white hover:bg-gray-100 border-gray-300 cursor-pointer shadow-sm' : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed opacity-70'}`}
           >
             <RotateCcw className="w-3.5 h-3.5" />並べ替えリセット
           </button>
@@ -1047,6 +1179,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         {currentTab === 'long_tenure' && renderLongTenureTable()}
         {currentTab === 'promotion' && renderPromotionTable()}
         {currentTab === 'designated' && renderDesignatedTable()}
+        {currentTab === 'designated_change' && renderDesignatedChangeTable()}
       </main>
 
       {/* Print Style Injections */}

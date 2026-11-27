@@ -4,6 +4,7 @@ import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
 import { getEmpCurrentYears, getEmpTitleYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
+import { generateDesignatedChangeStats } from './designatedChangeUtils.js';
 
 // Utils
 const isDesignated = (grade, title) => {
@@ -224,6 +225,217 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     { width: 10 }, { width: 26 }, { width: 15 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 8 },
     { width: 10 }, { width: 15 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 26 }, { width: 18 }
   ];
+};
+
+// 1-2. 指定職の増減
+const addModalDesignatedChangeSheet = (workbook, sheetName, targetYear, departments, employees) => {
+  const sheet = workbook.addWorksheet(sheetName, {
+    views: [{ showGridLines: true }],
+    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
+  });
+
+  const gradeStats = generateDesignatedChangeStats(departments, employees);
+  const targetYearR = toReiwa(targetYear);
+  const prevYearR = targetYearR - 1;
+
+  sheet.columns = [
+    { width: 28 }, // A: [廃止] 所属・職名 / 令和8年度 指定職数（A）ラベル
+    { width: 10 }, // B: [廃止] 理由(左) / （A）数値
+    { width: 26 }, // C: [廃止] 理由(右)
+    { width: 8 },  // D: [廃止] 人数
+    { width: 28 }, // E: [新設] 所属・職名
+    { width: 12 }, // F: [新設] 理由(左) / 格付ラベル
+    { width: 24 }, // G: [新設] 理由(右)
+    { width: 8 }   // H: [新設] 人数 / （A-B+C）数値
+  ];
+
+  const grayFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+
+  // タイトル行
+  sheet.getCell('A1').value = '■指定職の増減様式';
+  sheet.getCell('A1').font = { bold: true, size: 13 };
+  sheet.getRow(1).height = 26;
+
+  let curRow = 3;
+
+  gradeStats.forEach(block => {
+    const slotCount = Math.max(block.abolishedItems.length, block.createdItems.length, 3);
+
+    // 1. 上部行：令和8年度 指定職数（A） / 格付
+    const rInfo = curRow;
+    sheet.getRow(rInfo).height = 22;
+
+    const cellALabel = sheet.getCell(rInfo, 1);
+    cellALabel.value = `令和${prevYearR}年度 指定職数　（Ａ）`;
+    cellALabel.font = { bold: true };
+    cellALabel.fill = grayFill;
+    cellALabel.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellALabel.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+    const cellAVal = sheet.getCell(rInfo, 2);
+    cellAVal.value = block.currCount;
+    cellAVal.font = { bold: true };
+    cellAVal.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellAVal.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+
+    const cellGradeLbl = sheet.getCell(rInfo, 6);
+    cellGradeLbl.value = '格付：';
+    cellGradeLbl.font = { bold: true };
+    cellGradeLbl.alignment = { vertical: 'middle', horizontal: 'right' };
+
+    sheet.mergeCells(rInfo, 7, rInfo, 8);
+    const cellGradeVal = sheet.getCell(rInfo, 7);
+    cellGradeVal.value = block.grade;
+    cellGradeVal.font = { bold: true, size: 11 };
+    cellGradeVal.alignment = { vertical: 'middle', horizontal: 'center' };
+    sheet.getCell(rInfo, 7).border = { bottom: { style: 'medium' } };
+    sheet.getCell(rInfo, 8).border = { bottom: { style: 'medium' } };
+
+    // 2. テーブルヘッダー1段目：廃止 / 新設
+    const rHdr1 = curRow + 1;
+    sheet.getRow(rHdr1).height = 20;
+    sheet.mergeCells(rHdr1, 1, rHdr1, 4);
+    sheet.mergeCells(rHdr1, 5, rHdr1, 8);
+    sheet.getCell(rHdr1, 1).value = '廃　　　　　止';
+    sheet.getCell(rHdr1, 5).value = '新　　　　　設';
+
+    for (let c = 1; c <= 8; c++) {
+      const cell = sheet.getCell(rHdr1, c);
+      cell.font = { bold: true };
+      cell.fill = grayFill;
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'medium' },
+        bottom: { style: 'thin' },
+        left: { style: c === 1 || c === 5 ? 'medium' : 'thin' },
+        right: { style: c === 4 || c === 8 ? 'medium' : 'thin' }
+      };
+    }
+
+    // 3. テーブルヘッダー2段目：所属・職名 / 理由 / 人数
+    const rHdr2 = curRow + 2;
+    sheet.getRow(rHdr2).height = 20;
+    sheet.mergeCells(rHdr2, 2, rHdr2, 3);
+    sheet.mergeCells(rHdr2, 6, rHdr2, 7);
+    sheet.getCell(rHdr2, 1).value = '所　属　・　職　名';
+    sheet.getCell(rHdr2, 2).value = '理　　　由';
+    sheet.getCell(rHdr2, 4).value = '人数';
+    sheet.getCell(rHdr2, 5).value = '所　属　・　職　名';
+    sheet.getCell(rHdr2, 6).value = '理　　　由';
+    sheet.getCell(rHdr2, 8).value = '人数';
+
+    for (let c = 1; c <= 8; c++) {
+      const cell = sheet.getCell(rHdr2, c);
+      cell.font = { bold: true };
+      cell.fill = grayFill;
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        bottom: { style: 'medium' },
+        left: { style: c === 1 || c === 5 ? 'medium' : 'thin' },
+        right: { style: c === 4 || c === 8 ? 'medium' : 'thin' }
+      };
+    }
+
+    // 4. 明細行
+    const rDataStart = curRow + 3;
+    const rDataEnd = rDataStart + slotCount - 1;
+
+    for (let idx = 0; idx < slotCount; idx++) {
+      const r = rDataStart + idx;
+      sheet.getRow(r).height = 36;
+      sheet.mergeCells(r, 2, r, 3);
+      sheet.mergeCells(r, 6, r, 7);
+
+      const ab = block.abolishedItems[idx];
+      const cr = block.createdItems[idx];
+
+      sheet.getCell(r, 1).value = ab ? ab.postLabel : '';
+      sheet.getCell(r, 2).value = '';
+      sheet.getCell(r, 4).value = ab ? ab.count : null;
+      sheet.getCell(r, 5).value = cr ? cr.postLabel : '';
+      sheet.getCell(r, 6).value = '';
+      sheet.getCell(r, 8).value = cr ? cr.count : null;
+
+      for (let c = 1; c <= 8; c++) {
+        const cell = sheet.getCell(r, c);
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: (c === 4 || c === 8) ? 'center' : 'left',
+          wrapText: true
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: c === 1 || c === 5 ? 'medium' : 'thin' },
+          right: { style: c === 4 || c === 8 ? 'medium' : 'thin' }
+        };
+      }
+    }
+
+    // 5. 合計行（B / C）
+    const rTotal = rDataEnd + 1;
+    sheet.getRow(rTotal).height = 22;
+    sheet.mergeCells(rTotal, 1, rTotal, 3);
+    sheet.mergeCells(rTotal, 5, rTotal, 7);
+
+    sheet.getCell(rTotal, 1).value = '合　　　計　　（Ｂ）';
+    sheet.getCell(rTotal, 4).value = { formula: `SUM(D${rDataStart}:D${rDataEnd})`, result: block.abolishedTotal };
+    sheet.getCell(rTotal, 5).value = '合　　　計　　（Ｃ）';
+    sheet.getCell(rTotal, 8).value = { formula: `SUM(H${rDataStart}:H${rDataEnd})`, result: block.createdTotal };
+
+    for (let c = 1; c <= 8; c++) {
+      const cell = sheet.getCell(rTotal, c);
+      cell.font = { bold: true };
+      cell.fill = grayFill;
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'medium' },
+        bottom: { style: 'medium' },
+        left: { style: c === 1 || c === 5 ? 'medium' : 'thin' },
+        right: { style: c === 4 || c === 8 ? 'medium' : 'thin' }
+      };
+    }
+
+    // 6. 来年度 指定職数（A - B + C）
+    const rNext = rTotal + 1;
+    sheet.getRow(rNext).height = 24;
+    sheet.mergeCells(rNext, 5, rNext, 7);
+
+    sheet.getCell(rNext, 5).value = `令和${targetYearR}年度 指定職数（Ａ－Ｂ＋Ｃ）`;
+    sheet.getCell(rNext, 8).value = { formula: `B${rInfo}-D${rTotal}+H${rTotal}`, result: block.nextCount };
+
+    for (let c = 5; c <= 8; c++) {
+      const cell = sheet.getCell(rNext, c);
+      cell.font = { bold: true };
+      if (c < 8) cell.fill = grayFill;
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'medium' },
+        bottom: { style: 'medium' },
+        left: { style: c === 5 ? 'medium' : 'thin' },
+        right: { style: c === 8 ? 'medium' : 'thin' }
+      };
+    }
+
+    curRow = rNext + 2;
+  });
+
+  // 記載上の留意事項
+  const notesLines = [
+    '１　《格付》欄は、「部長級・次長級・所属長級・課長級・班長級」の別を記載してください。',
+    '　　なお、次長級の所属長職は、「次長級」に分類してください。',
+    '　　課長補佐級は、本庁班長、出先課長ポスト以上について記載してください。',
+    '２　職種変更の場合も記載してください。',
+    '　　また、格付変更の場合は、各々の格付の「廃止」「新設」欄に記載してください。',
+    '３　理由欄は、その必要性が分かるよう詳細に記載してください（必要に応じて資料を添付してください。）。'
+  ];
+  notesLines.forEach((line, idx) => {
+    const r = curRow + idx;
+    sheet.getCell(r, 1).value = line;
+    sheet.getCell(r, 1).font = { size: 9.5 };
+    sheet.getRow(r).height = 18;
+  });
 };
 
 // 2. 異動案リスト
@@ -602,6 +814,7 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   const { chains, movesByToPost, movesByFromPost, moves, retentions } = data;
 
   addModalDesignatedSheet(workbook, '指定職人事異動', targetYear, moves, retentions, movesByToPost);
+  addModalDesignatedChangeSheet(workbook, '指定職の増減', targetYear, departments, employees);
   addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments, retentions, employees);
   
   // NOTE: addReasonSheet needs deptMap, currMap, nextMap. We will just pass empty objects or build them.
