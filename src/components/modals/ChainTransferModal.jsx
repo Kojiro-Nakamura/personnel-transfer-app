@@ -4,8 +4,8 @@ import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../uti
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { generateDesignatedChangeStats } from '../../utils/designatedChangeUtils.js';
 import { extractDesignatedPromoLists } from '../../utils/promotionUtils.js';
-import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, getEmpTitleYears, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
+import { buildDesignatedTransferRows } from '../../utils/designatedTransferUtils.js';
+import { getEmpCurrentYears, getFormattedNameWithPrefix, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -17,7 +17,7 @@ const COLORS = {
 
 const getReasonColorClass = (reason) => {
   if (!reason) return '';
-  if (reason.includes('退職')) return COLORS.RETIRING;
+  if (reason.includes('退職') || reason.includes('廃止')) return COLORS.RETIRING;
   if (reason.includes('留任')) return COLORS.RETAINING;
   if (reason.includes('新設')) return COLORS.NEW;
   if (reason.includes('新採')) return COLORS.NEW_HIRE;
@@ -103,15 +103,6 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     // Print the window where the event occurred (useful if rendered in a Portal/new window)
     const targetWindow = e?.currentTarget?.ownerDocument?.defaultView || window;
     targetWindow.print();
-  };
-
-  const isDesignated = (grade, title) => {
-    const g = String(grade || ''), t = String(title || '');
-    const isHosa1 = g.includes('補佐級I(') || g.includes('補佐級Ⅰ') || g.includes('主任');
-    if (g.includes('補佐級') && !isHosa1) return true;
-    if (g.includes('課長級') || g.includes('所属長級') || g.includes('次長級') || g.includes('部長級') || g.includes('指定職')) return true;
-    if (['局長', '次長', '課長', '参事', '部長', '場長', '班長', '専門技術員', '企画員', '主幹'].some(k => t.includes(k))) return true;
-    return false;
   };
 
   const tabs = [
@@ -475,151 +466,12 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   const renderDesignatedTable = () => {
-    let desigRows = [];
-    const usedToMoves = new Set();
-    
-    const getDisplayGrade = (gradeStr) => {
-      const g = String(gradeStr || '');
-      if (g.includes('補佐級II') || g.includes('補佐級III')) return '班長級';
-      if (g.includes('補佐級I(') || g.includes('係長級') || g.includes('主任') || g.includes('主査')) return '';
-      return g;
-    };
-    
-    moves.forEach(move => {
-      if (move.fromPost.type === 'unassigned' || move.fromPost.type === 'retired') return;
-      const isFromDesig = isDesignated(move.emp.currentGrade, move.fromPost.title);
-      
-      const incomingMoves = (movesByToPost[move.fromPostId] || []).filter(m => !usedToMoves.has(m));
-      let successor = null;
-      if (incomingMoves.length > 0) {
-        successor = incomingMoves[0];
-        usedToMoves.add(successor);
-      }
-      const isToDesig = successor ? isDesignated(successor.emp.nextGrade, successor.toPost.title) : false;
-
-      if (isFromDesig || isToDesig) {
-         desigRows.push({
-           postLabel: (move.fromPost.fullDept || move.fromPost.dept) + ' ' + (move.fromPost.title || ''),
-           gradeLabel: getDisplayGrade(move.emp.currentGrade),
-           predecessor: move, successor
-         });
-      }
-    });
-
-    moves.forEach(move => {
-      if (!usedToMoves.has(move)) {
-        if (move.toPost.type === 'retired' || move.toPost.type === 'unassigned') return;
-        if (isDesignated(move.emp.nextGrade, move.toPost.title)) {
-          desigRows.push({
-            postLabel: (move.toPost.fullDept || move.toPost.dept) + ' ' + (move.toPost.title || ''),
-            gradeLabel: getDisplayGrade(move.emp.nextGrade),
-            predecessor: null, successor: move
-          });
-        }
-      }
-    });
-
-    retentions.forEach(move => {
-      if (isDesignated(move.emp.currentGrade, move.fromPost.title) || isDesignated(move.emp.nextGrade, move.toPost.title)) {
-         desigRows.push({
-           postLabel: (move.fromPost.fullDept || move.fromPost.dept) + ' ' + (move.fromPost.title || ''),
-           gradeLabel: getDisplayGrade(move.emp.currentGrade),
-           predecessor: move, successor: move, isRetention: true
-         });
-      }
-    });
-
-    desigRows = desigRows.map(row => {
-      const isRetention = row.isRetention;
-      const pred = row.predecessor?.emp || {};
-      const succ = row.successor?.emp || {};
-      const succPost = row.successor?.fromPost || {};
-      
-      const getEmpNo = (emp) => {
-        const no = emp.employeeNumber || emp.employeeId || emp['職員番号'] || emp.id || '';
-        const str = String(no).trim();
-        return /[a-zA-Z_\-]/.test(str) ? '' : str;
-      };
-
-      const predEmpNo = getEmpNo(pred);
-      const succEmpNo = getEmpNo(succ);
-      
-      let predReason = isRetention ? '留任' : (row.predecessor ? (row.predecessor.toPost.type === 'retired' ? '退職' : '転任') : '（新設）');
-      
-      let succRemark = '';
-      if (row.successor) {
-        const cGrade = row.successor.emp.currentGrade || '';
-        const nGrade = row.successor.emp.nextGrade || '';
-        const promoStr = getPromoRemark(cGrade, nGrade);
-        
-        if (promoStr) {
-           succRemark = promoStr;
-        }
-      }
-      
-      const sMid = succ ? getMidYearPromoRemark(succ) : '';
-      if (sMid) {
-        succRemark = succRemark ? `${succRemark}\n(${sMid})` : `(${sMid})`;
-      }
-
-      let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccTitleYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
-
-      if (!isRetention) {
-         displaySuccName = succ.name || (row.predecessor && !row.successor ? '後任なし' : '');
-         displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
-         displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : ''; 
-         displaySuccTitleYears = row.successor ? getEmpTitleYears(succ) : '';
-         displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
-         displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
-      }
-
-      return {
-        postLabel: row.postLabel,
-        gradeLabel: row.gradeLabel,
-        predName: pred.name || '',
-        predAge: pred.ageNextYear ?? pred.age ?? '',
-        predBirthDate: pred.birthDate || '',
-        predCurrentYears: row.predecessor ? (getEmpCurrentYears(pred, targetYear - 1, false) || '') : '',
-        predTitleYears: row.predecessor ? getEmpTitleYears(pred) : '',
-        predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
-        predReason: predReason,
-        succName: displaySuccName,
-        succAge: displaySuccAge,
-        succCurrentYears: displaySuccCurrentYears,
-        succTitleYears: displaySuccTitleYears,
-        succGradeYears: displaySuccGradeYears,
-        succPostLabel: displaySuccPostLabel,
-        succRemark: succRemark
-      };
-    });
-
-    const desigGradeOrder = { '部長級': 10, '次長級': 9, '所属長級': 8, '課長級': 7, '班長級': 5 };
-    desigRows.sort((a, b) => {
-      const levelA = desigGradeOrder[a.gradeLabel] ?? GRADE_LEVELS[a.gradeLabel] ?? 0;
-      const levelB = desigGradeOrder[b.gradeLabel] ?? GRADE_LEVELS[b.gradeLabel] ?? 0;
-      if (levelA !== levelB) {
-        return levelB - levelA;
-      }
-
-      const hasAgeA = a.predAge !== '' && a.predAge != null && !isNaN(Number(a.predAge));
-      const hasAgeB = b.predAge !== '' && b.predAge != null && !isNaN(Number(b.predAge));
-      if (hasAgeA && !hasAgeB) return -1;
-      if (!hasAgeA && hasAgeB) return 1;
-      if (hasAgeA && hasAgeB) {
-        const ageDiff = Number(b.predAge) - Number(a.predAge);
-        if (ageDiff !== 0) return ageDiff;
-        if (a.predBirthDate && b.predBirthDate && a.predBirthDate !== b.predBirthDate) {
-          return a.predBirthDate < b.predBirthDate ? -1 : 1;
-        }
-      }
-
-      const gyA = Number(a.predGradeYears) || 0;
-      const gyB = Number(b.predGradeYears) || 0;
-      if (gyB !== gyA) return gyB - gyA;
-
-      const sAgeA = Number(a.succAge) || 0;
-      const sAgeB = Number(b.succAge) || 0;
-      return sAgeB - sAgeA;
+    let desigRows = buildDesignatedTransferRows({
+      moves,
+      retentions,
+      movesByToPost,
+      targetYear,
+      currentFileName
     });
 
     desigRows = sortData(desigRows, designatedSortKey, designatedSortOrder);
@@ -677,7 +529,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <tbody>
               {desigRows.map((r, i) => {
                 const reasonColor = getReasonColorClass(r.predReason);
-                const succNameClass = r.succName === '後任なし' ? `${COLORS.RETIRING} font-bold` : '';
+                const isParenStatus = r.succName === '（廃止）' || (r.succName.startsWith('（') && r.succName.endsWith('）'));
+                const succNameClass = isParenStatus ? `${COLORS.RETIRING} font-bold text-center` : '';
                 const nextRow = desigRows[i + 1];
                 const isGradeChanged = nextRow && nextRow.gradeLabel !== r.gradeLabel;
                 const borderClass = isGradeChanged ? 'border-b-[3px] border-black' : 'border-b border-gray-400';
@@ -701,7 +554,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                       {r.succGradeYears}
                     </td>
                     <td className="border-r border-black p-1.5 break-words">{r.succPostLabel}</td>
-                    <td className={`p-1.5 break-words ${COLORS.RETIRING} font-bold`}>{r.succRemark}</td>
+                    <td className={`p-1.5 break-words whitespace-pre-line ${COLORS.RETIRING} font-bold`}>{r.succRemark}</td>
                   </tr>
                 );
               })}
