@@ -122,6 +122,7 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       gradeLabel: row.gradeLabel,
       predName: pred.name || '',
       predAge: pred.ageNextYear ?? pred.age ?? '',
+      predBirthDate: pred.birthDate || '',
       predCurrentYears: row.predecessor ? (getEmpCurrentYears(pred, targetYear - 1, false) || '') : '',
       predTitleYears: row.predecessor ? getEmpTitleYears(pred) : '',
       predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
@@ -136,15 +137,33 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
     };
   });
 
+  const desigGradeOrder = { '部長級': 10, '次長級': 9, '所属長級': 8, '課長級': 7, '班長級': 5 };
   desigRows.sort((a, b) => {
-    const levelA = GRADE_LEVELS[a.gradeLabel] || 0;
-    const levelB = GRADE_LEVELS[b.gradeLabel] || 0;
+    const levelA = desigGradeOrder[a.gradeLabel] ?? GRADE_LEVELS[a.gradeLabel] ?? 0;
+    const levelB = desigGradeOrder[b.gradeLabel] ?? GRADE_LEVELS[b.gradeLabel] ?? 0;
     if (levelA !== levelB) {
       return levelB - levelA;
     }
+
+    const hasAgeA = a.predAge !== '' && a.predAge != null && !isNaN(Number(a.predAge));
+    const hasAgeB = b.predAge !== '' && b.predAge != null && !isNaN(Number(b.predAge));
+    if (hasAgeA && !hasAgeB) return -1;
+    if (!hasAgeA && hasAgeB) return 1;
+    if (hasAgeA && hasAgeB) {
+      const ageDiff = Number(b.predAge) - Number(a.predAge);
+      if (ageDiff !== 0) return ageDiff;
+      if (a.predBirthDate && b.predBirthDate && a.predBirthDate !== b.predBirthDate) {
+        return a.predBirthDate < b.predBirthDate ? -1 : 1;
+      }
+    }
+
     const gyA = Number(a.predGradeYears) || 0;
     const gyB = Number(b.predGradeYears) || 0;
-    return gyB - gyA;
+    if (gyB !== gyA) return gyB - gyA;
+
+    const sAgeA = Number(a.succAge) || 0;
+    const sAgeB = Number(b.succAge) || 0;
+    return sAgeB - sAgeA;
   });
 
   const targetYearR = toReiwa(targetYear);
