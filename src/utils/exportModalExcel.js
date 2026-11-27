@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
+import { getEmpCurrentYears, getEmpTitleYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 
@@ -105,12 +105,12 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       succRemark = succRemark ? `${succRemark}\n(${sMid})` : `(${sMid})`;
     }
 
-    let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
+    let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccTitleYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
     if (!isRetention) {
        displaySuccName = succ.name || (row.predecessor && !row.successor ? '後任なし' : '');
        displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
        displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : '';
-       
+       displaySuccTitleYears = row.successor ? getEmpTitleYears(succ) : '';
        displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
        displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
     }
@@ -120,12 +120,14 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
       gradeLabel: row.gradeLabel,
       predName: pred.name || '',
       predAge: pred.ageNextYear ?? pred.age ?? '',
-      predCurrentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
+      predCurrentYears: row.predecessor ? (getEmpCurrentYears(pred, targetYear - 1, false) || '') : '',
+      predTitleYears: row.predecessor ? getEmpTitleYears(pred) : '',
       predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
       predReason: predReason,
       succName: displaySuccName,
       succAge: displaySuccAge,
       succCurrentYears: displaySuccCurrentYears,
+      succTitleYears: displaySuccTitleYears,
       succGradeYears: displaySuccGradeYears,
       succPostLabel: displaySuccPostLabel,
       succRemark: succRemark
@@ -153,30 +155,44 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   sheet.mergeCells('B1:B2');
   sheet.getCell('B1').value = '所属・職名';
   
-  sheet.mergeCells('C1:G1');
+  sheet.mergeCells('C1:H1');
   sheet.getCell('C1').value = currentConfigTitle;
   
-  sheet.mergeCells('H1:M1');
-  sheet.getCell('H1').value = `令和${targetYearR}年度配置（案）`;
+  sheet.mergeCells('I1:O1');
+  sheet.getCell('I1').value = `令和${targetYearR}年度配置（案）`;
 
   const headersBottom = [
-    '氏名', `年齢\nR${targetYearR}.4.1時点`, `現職年数\nR${targetYearR}.3.31時点`, `現格付年数\nR${targetYearR}.3.31時点`, '異動案',
-    '氏名', `年齢\nR${targetYearR}.4.1時点`, `現職年数\nR${targetYearR}.3.31時点`, `現格付年数\nR${targetYearR}.3.31時点`, `R${prevYearR}年度\n所属・職名`, '備考'
+    '氏　名',
+    `年齢\nR${targetYearR}.4.1\n時点`,
+    `現所属\n年数\nR${targetYearR}.3.31\n時点`,
+    `在職\n年数\nR${targetYearR}.3.31\n時点`,
+    `現格付\n年数\nR${targetYearR}.3.31\n時点`,
+    '異動案',
+    '氏名',
+    `年齢\nR${targetYearR}.4.1\n時点`,
+    `現所属\n年数\nR${targetYearR}.3.31\n時点`,
+    `在職\n年数\nR${targetYearR}.3.31\n時点`,
+    `現格付\n年数\nR${targetYearR}.3.31\n時点`,
+    `R${prevYearR}年度 所属・職名`,
+    '備　考'
   ];
   
   headersBottom.forEach((h, i) => {
     sheet.getCell(2, i + 3).value = h;
   });
 
+  sheet.getRow(1).height = 23.25;
+  sheet.getRow(2).height = 57;
+
   for (let r = 1; r <= 2; r++) {
-    for (let c = 1; c <= 13; c++) {
+    for (let c = 1; c <= 15; c++) {
       const cell = sheet.getCell(r, c);
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.font = { bold: true };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
       
       let bottomStyle = r === 2 ? 'medium' : 'thin';
-      let rightStyle = [1, 2, 7].includes(c) ? 'medium' : 'thin';
+      let rightStyle = [1, 2, 8].includes(c) ? 'medium' : 'thin';
       
       cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style: bottomStyle}, right: {style: rightStyle} };
     }
@@ -184,19 +200,19 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
 
   desigRows.forEach((r, i) => {
     const row = sheet.addRow([
-      r.gradeLabel, r.postLabel, r.predName, r.predAge, r.predCurrentYears, r.predGradeYears,
+      r.gradeLabel, r.postLabel, r.predName, r.predAge, r.predCurrentYears, r.predTitleYears, r.predGradeYears,
       r.predReason,
-      r.succName, r.succAge, r.succCurrentYears, r.succGradeYears, r.succPostLabel, r.succRemark
+      r.succName, r.succAge, r.succCurrentYears, r.succTitleYears, r.succGradeYears, r.succPostLabel, r.succRemark
     ]);
     
     const nextRow = desigRows[i + 1];
     const isGradeChanged = nextRow && nextRow.gradeLabel !== r.gradeLabel;
     const borderBottomStyle = isGradeChanged ? 'medium' : 'thin';
 
-    row.eachCell((cell, colNumber) => {
-      let rightStyle = [1, 2, 7].includes(colNumber) ? 'medium' : 'thin';
+    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      let rightStyle = [1, 2, 8].includes(colNumber) ? 'medium' : 'thin';
       cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style: borderBottomStyle}, right: {style: rightStyle} };
-      if ([1, 4, 5, 6, 7, 9, 10, 11].includes(colNumber)) {
+      if ([1, 4, 5, 6, 7, 8, 10, 11, 12, 13].includes(colNumber)) {
         cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       } else {
         cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
@@ -205,8 +221,8 @@ const addModalDesignatedSheet = (workbook, sheetName, targetYear, moves, retenti
   });
 
   sheet.columns = [
-    { width: 10 }, { width: 25 }, { width: 15 }, { width: 8 }, { width: 10 }, { width: 10 },
-    { width: 10 }, { width: 15 }, { width: 8 }, { width: 10 }, { width: 10 }, { width: 25 }, { width: 15 }
+    { width: 10 }, { width: 26 }, { width: 15 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 8 },
+    { width: 10 }, { width: 15 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 26 }, { width: 18 }
   ];
 };
 

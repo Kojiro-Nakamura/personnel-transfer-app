@@ -3,7 +3,7 @@ import { X, GitMerge, List, Award, RotateCcw, Calculator, FileSpreadsheet, Print
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
+import { getEmpCurrentYears, getEmpTitleYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -558,12 +558,13 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         succRemark = succRemark ? `${succRemark}\n(${sMid})` : `(${sMid})`;
       }
 
-      let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
+      let displaySuccName = '', displaySuccAge = '', displaySuccCurrentYears = '', displaySuccTitleYears = '', displaySuccGradeYears = '', displaySuccPostLabel = '';
 
       if (!isRetention) {
          displaySuccName = succ.name || (row.predecessor && !row.successor ? '後任なし' : '');
          displaySuccAge = succ.ageNextYear ?? succ.age ?? '';
          displaySuccCurrentYears = row.successor ? (succ.currentYears || '') : ''; 
+         displaySuccTitleYears = row.successor ? getEmpTitleYears(succ) : '';
          displaySuccGradeYears = succ ? calculateGradeYears(succ, targetYear) : '';
          displaySuccPostLabel = succPost.type === 'unassigned' ? '' : ((succPost.fullDept || succPost.dept || '') + ' ' + (succPost.title || ''));
       }
@@ -573,12 +574,14 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         gradeLabel: row.gradeLabel,
         predName: pred.name || '',
         predAge: pred.ageNextYear ?? pred.age ?? '',
-        predCurrentYears: getEmpCurrentYears(pred, targetYear - 1, false) || '',
+        predCurrentYears: row.predecessor ? (getEmpCurrentYears(pred, targetYear - 1, false) || '') : '',
+        predTitleYears: row.predecessor ? getEmpTitleYears(pred) : '',
         predGradeYears: pred ? calculateGradeYears(pred, targetYear) : '',
         predReason: predReason,
         succName: displaySuccName,
         succAge: displaySuccAge,
         succCurrentYears: displaySuccCurrentYears,
+        succTitleYears: displaySuccTitleYears,
         succGradeYears: displaySuccGradeYears,
         succPostLabel: displaySuccPostLabel,
         succRemark: succRemark
@@ -615,17 +618,19 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     ];
 
     const headerColsBottom = [
-      { label: '氏名', key: 'predName', cls: 'text-center bg-gray-50' },
-      { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'predAge', cls: 'text-center bg-gray-50' },
-      { label: `現職年数<br>R${targetYearR}.3.31時点`, key: 'predCurrentYears', cls: 'text-center bg-gray-50' },
-      { label: `現格付年数<br>R${targetYearR}.3.31時点`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
+      { label: '氏　名', key: 'predName', cls: 'text-center bg-gray-50' },
+      { label: `年齢<br>R${targetYearR}.4.1<br>時点`, key: 'predAge', cls: 'text-center bg-gray-50 leading-tight' },
+      { label: `現所属<br>年数<br>R${targetYearR}.3.31<br>時点`, key: 'predCurrentYears', cls: 'text-center bg-gray-50 leading-tight' },
+      { label: `在職<br>年数<br>R${targetYearR}.3.31<br>時点`, key: 'predTitleYears', cls: 'text-center bg-gray-50 leading-tight' },
+      { label: `現格付<br>年数<br>R${targetYearR}.3.31<br>時点`, key: 'predGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold leading-tight` },
       { label: '異動案', key: 'predReason', cls: 'text-center bg-blue-100/50 !border-r-[3px]' },
       { label: '氏名', key: 'succName', cls: 'text-center bg-gray-50' },
-      { label: `年齢<br>R${targetYearR}.4.1時点`, key: 'succAge', cls: 'text-center bg-gray-50' },
-      { label: `現職年数<br>R${targetYearR}.3.31時点`, key: 'succCurrentYears', cls: 'text-center bg-gray-50' },
-      { label: `現格付年数<br>R${targetYearR}.3.31時点`, key: 'succGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold` },
-      { label: `R${prevYearR}年度<br>所属・職名`, key: 'succPostLabel', cls: 'text-left min-w-[120px]' },
-      { label: '備考', key: 'succRemark', cls: 'text-left min-w-[80px]' }
+      { label: `年齢<br>R${targetYearR}.4.1<br>時点`, key: 'succAge', cls: 'text-center bg-gray-50 leading-tight' },
+      { label: `現所属<br>年数<br>R${targetYearR}.3.31<br>時点`, key: 'succCurrentYears', cls: 'text-center bg-gray-50 leading-tight' },
+      { label: `在職<br>年数<br>R${targetYearR}.3.31<br>時点`, key: 'succTitleYears', cls: 'text-center bg-gray-50 leading-tight' },
+      { label: `現格付<br>年数<br>R${targetYearR}.3.31<br>時点`, key: 'succGradeYears', cls: `text-center bg-[#03AF7A]/10 ${COLORS.RETAINING} font-bold leading-tight` },
+      { label: `R${prevYearR}年度 所属・職名`, key: 'succPostLabel', cls: 'text-center min-w-[120px]' },
+      { label: '備　考', key: 'succRemark', cls: 'text-center min-w-[80px]' }
     ];
 
     return (
@@ -639,8 +644,8 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
             <thead className="sticky top-0 z-10 bg-white shadow-[0_3px_0_0_black]">
               <tr>
                 {headerColsTop.map(c => renderTh(c.label, c.key, handleSortClick, true, c.cls, c.rowspan))}
-                <th colSpan="5" className="border-r-[3px] border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
-                <th colSpan="6" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">令和{targetYearR}年度配置（案）</th>
+                <th colSpan="6" className="border-r-[3px] border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">{currentConfigTitle}</th>
+                <th colSpan="7" className="border-r border-b border-black px-1.5 py-1.5 font-normal text-center bg-gray-50">令和{targetYearR}年度配置（案）</th>
               </tr>
               <tr>
                 {headerColsBottom.map(c => renderTh(c.label, c.key, handleSortClick, true, c.cls))}
@@ -660,6 +665,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className="border-r border-black p-1.5 whitespace-pre-wrap">{r.predName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.predCurrentYears}</td>
+                    <td className="border-r border-black p-1.5 text-center">{r.predTitleYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
                       {r.predGradeYears}
                     </td>
@@ -667,6 +673,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
                     <td className={`border-r border-black p-1.5 whitespace-pre-wrap ${succNameClass}`}>{r.succName}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succAge}</td>
                     <td className="border-r border-black p-1.5 text-center">{r.succCurrentYears}</td>
+                    <td className="border-r border-black p-1.5 text-center">{r.succTitleYears}</td>
                     <td className={`border-r border-black p-1.5 text-center font-bold ${COLORS.RETAINING} bg-[#03AF7A]/10`}>
                       {r.succGradeYears}
                     </td>

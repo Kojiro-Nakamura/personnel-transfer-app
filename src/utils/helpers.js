@@ -883,6 +883,25 @@ export const getEmpCurrentYears = (emp, targetYear, isNext = false) => {
   return isNext ? (emp.nextYears || '') : (emp.currentYears || '');
 };
 
+export const getEmpTitleYears = (emp) => {
+  if (!emp) return '';
+  const rawSkills = emp.currentSkillsStr !== undefined
+    ? String(emp.currentSkillsStr || '')
+    : (Array.isArray(emp.currentSkills) ? emp.currentSkills.join('+') : String(emp.currentSkills || ''));
+  const normalized = rawSkills
+    .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+    .replace(/＋/g, '+')
+    .trim();
+  if (normalized) {
+    const matches = normalized.match(/\d+(?:\.\d+)?/g);
+    if (matches && matches.length > 0) {
+      const val = Number(matches[matches.length - 1]);
+      if (!isNaN(val) && val > 0) return val;
+    }
+  }
+  return emp.currentYears || '';
+};
+
 export const getFormattedNameWithPrefix = (emp, isNext = false) => {
   if (!emp) return '';
   const note = emp.note || '';
