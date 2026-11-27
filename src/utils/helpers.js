@@ -977,10 +977,15 @@ export const getPromoRemark = (currentGrade, nextGrade) => {
   if (nLevel <= cLevel) return '';
 
   if (currentGrade.includes('課長級') && nextGrade.includes('所属長級')) return '昇格';
-  if (currentGrade.includes('補佐級II') && nextGrade.includes('補佐級III')) return '昇格';
-  if (currentGrade.includes('補佐級I') && nextGrade.includes('補佐級II')) return '昇格';
+  if (currentGrade.includes('補佐級') && (nextGrade.includes('補佐級II') || nextGrade.includes('補佐級III'))) return '昇格';
 
-  if (nextGrade.includes('部長級') || nextGrade.includes('次長級') || nextGrade.includes('課長級') || nextGrade.includes('補佐級I')) {
+  if (
+    nextGrade.includes('部長級') ||
+    nextGrade.includes('次長級') ||
+    nextGrade.includes('所属長級') ||
+    nextGrade.includes('課長級') ||
+    nextGrade.includes('補佐級')
+  ) {
     return '昇任';
   }
 

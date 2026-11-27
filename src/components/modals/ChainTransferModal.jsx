@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, GitMerge, List, Award, ArrowLeftRight, RotateCcw, Calculator, FileSpreadsheet, Printer, AlertCircle, TrendingUp } from 'lucide-react';
+import { X, GitMerge, List, Award, ArrowLeftRight, RotateCcw, Calculator, FileSpreadsheet, Printer, AlertCircle, TrendingUp, ChevronsUp } from 'lucide-react';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from '../../utils/chainTransferParser.js';
 import { generateReasonStats } from '../../utils/reasonUtils.js';
 import { generateDesignatedChangeStats } from '../../utils/designatedChangeUtils.js';
+import { extractDesignatedPromoLists } from '../../utils/promotionUtils.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../../constants/config.js';
-import { getEmpCurrentYears, getEmpTitleYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
+import { getEmpCurrentYears, getEmpTitleYears, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from '../../utils/helpers.js';
 
 const COLORS = {
   RETIRING: 'text-[#FF4B00]', // CUD 赤
@@ -121,6 +122,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
     { id: 'short_tenure', icon: <AlertCircle className="w-4 h-4" />, label: '3年未満特記' },
     { id: 'long_tenure', icon: <AlertCircle className="w-4 h-4" />, label: '6年以上特記' },
     { id: 'promotion', icon: <TrendingUp className="w-4 h-4" />, label: '昇任者一覧' },
+    { id: 'advancement', icon: <ChevronsUp className="w-4 h-4" />, label: '昇格者一覧' },
     { id: 'chain', icon: <GitMerge className="w-4 h-4" />, label: 'つなぎ表' }
   ];
 
@@ -1017,103 +1019,111 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
   };
 
   const renderPromotionTable = () => {
-    let promotionRows = [];
-    
-    // Extract base grade (部長級, 次長級, 課長級, 補佐級, 係長級)
-    const getBaseGrade = (grade) => {
-      if (!grade) return '';
-      if (grade.includes('部長級')) return '部長級';
-      if (grade.includes('次長級')) return '次長級';
-      if (grade.includes('課長級')) return '課長級';
-      if (grade.includes('補佐級')) return '補佐級';
-      if (grade.includes('係長級')) return '係長級';
-      return grade;
-    };
-
-    employees.forEach(emp => {
-      // 退職者は除外
-      if (emp.nextDept === '退職') return;
-      // 昇任判定
-      if (emp.currentGrade && emp.nextGrade && isPromotedGrade(emp.currentGrade, emp.nextGrade)) {
-        const currentYearsStr = getEmpCurrentYears(emp, targetYear - 1, false);
-        const gradeYearsStr = calculateGradeYears(emp, targetYear);
-        
-        const cDeptName = departments.find(d => d.id === emp.currentDeptId)?.name || '';
-        const nDeptName = departments.find(d => d.id === emp.departmentId)?.name || '';
-        
-        promotionRows.push({
-          emp: emp,
-          nextGradeLabel: getBaseGrade(emp.nextGrade),
-          name: emp.name || '',
-          age: calculateAge(emp.birthDate, targetYear) || '',
-          oldPost: cDeptName + (cDeptName && emp.currentTitle ? '　' : '') + (emp.currentTitle || ''),
-          newPost: nDeptName + (nDeptName && emp.nextTitle ? '　' : '') + (emp.nextTitle || ''),
-          currentYears: currentYearsStr,
-          gradeYears: gradeYearsStr,
-          nextLevel: getGradeLevel(emp.nextGrade)
-        });
-      }
-    });
-
-    // 昇任後格付（レベル）の降順でソート
-    promotionRows.sort((a, b) => {
-      if (b.nextLevel !== a.nextLevel) {
-        return b.nextLevel - a.nextLevel;
-      }
-      return a.oldPost.localeCompare(b.oldPost);
-    });
+    const { promotionRows } = extractDesignatedPromoLists(employees, departments, targetYear);
+    const targetYearR = toReiwa(targetYear);
 
     return (
-      <div className="overflow-auto max-h-[75vh] w-full text-sm">
-        <div className="mb-4 text-gray-700 max-w-[1200px] mx-auto">
-          <div className="flex justify-between items-end mb-1">
-            <p className="font-bold text-lg">〇昇任者一覧</p>
-            <p className="text-xs">令和{targetYear - 2018}年2月5日</p>
-          </div>
-          <p className="text-xs font-bold mb-2">※ 格付順に記載して下さい。</p>
-          <div className="flex justify-end text-xs mt-2">
-            <p>職種（　　　　） 担当者所属・氏名（　　　　　　　　　　　　　　）</p>
+      <div className="overflow-auto max-h-[75vh] print:max-h-none print:overflow-visible w-full text-sm">
+        <div className="mb-3 text-gray-800 max-w-[1250px] mx-auto">
+          <p className="font-bold text-lg mb-2">■指定職昇任者一覧様式</p>
+          <div className="flex flex-wrap justify-between items-end gap-2 text-xs">
+            <p className="font-bold">※　格付順に記載して下さい。</p>
+            <p>職種（　　　　　　　　　　）　　担当者所属・氏名（　　　　　　　　　　　　　　　　　　　）</p>
           </div>
         </div>
-        <div className="max-w-[1200px] mx-auto border-2 border-black">
+        <div className="max-w-[1250px] mx-auto border-2 border-black">
           <table className="w-full text-left border-collapse bg-white">
             <thead className="sticky top-0 z-10 whitespace-nowrap">
               <tr>
-                <th className="border border-black p-2 font-bold w-[8%] text-center bg-white shadow-sm leading-tight">昇任後<br/>格付</th>
-                <th className="border border-black p-2 font-bold w-[12%] text-center bg-white shadow-sm">氏名</th>
-                <th className="border border-black p-2 font-bold w-[4%] text-center bg-white shadow-sm leading-tight">R{targetYear - 2018}.4<br/>年齢</th>
-                <th className="border border-black p-2 font-bold w-[25%] text-center bg-white shadow-sm">旧所属名及び職名</th>
-                <th className="border border-black p-2 font-bold w-[25%] text-center bg-white shadow-sm">新所属名及び職名</th>
-                <th className="border border-black p-2 font-bold w-[4%] text-center bg-white shadow-sm leading-tight">職<br/>年数</th>
-                <th className="border border-black p-2 font-bold w-[4%] text-center bg-white shadow-sm leading-tight">現格付<br/>年数</th>
-                <th className="border border-black p-2 font-bold w-[18%] text-center bg-white shadow-sm">理由</th>
+                <th className="border border-black p-2 font-bold w-[8%] text-center bg-gray-50 shadow-sm leading-tight">昇任後<br/>格付</th>
+                <th className="border border-black p-2 font-bold w-[13%] text-center bg-gray-50 shadow-sm">氏　　名</th>
+                <th className="border border-black p-2 font-bold w-[22%] text-center bg-gray-50 shadow-sm">旧所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[22%] text-center bg-gray-50 shadow-sm">新所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[6%] text-center bg-gray-50 shadow-sm leading-tight">R{targetYearR}.4<br/>年齢</th>
+                <th className="border border-black p-2 font-bold w-[6%] text-center bg-gray-50 shadow-sm leading-tight">現格付<br/>年数</th>
+                <th className="border border-black p-2 font-bold w-[23%] text-center bg-gray-50 shadow-sm">理　　　　　　由</th>
               </tr>
             </thead>
             <tbody>
               {promotionRows.map((row, idx) => (
-                <tr key={idx} className="hover:bg-gray-50 border-b border-black">
-                  <td className="border-r border-black p-2 text-center align-top">{row.nextGradeLabel}</td>
-                  <td className="border-r border-black p-2 text-center align-top">{row.name}</td>
-                  <td className="border-r border-black p-2 text-center align-top">{row.age}</td>
-                  <td className="border-r border-black p-2 align-top">{row.oldPost}</td>
-                  <td className="border-r border-black p-2 align-top">{row.newPost}</td>
-                  <td className="border-r border-black p-2 text-center align-top">{row.currentYears}</td>
-                  <td className="border-r border-black p-2 text-center align-top">{row.gradeYears}</td>
-                  <td className="border-r border-black p-2 bg-yellow-50/20 align-top text-xs min-h-[4rem]"></td>
+                <tr key={idx} className="hover:bg-gray-50 border-b border-black print-break-inside-avoid">
+                  <td className="border-r border-black p-2 text-center align-middle">{row.gradeLabel}</td>
+                  <td className="border-r border-black p-2 text-center align-middle">{row.name}</td>
+                  <td className="border-r border-black p-2 align-middle">{row.oldPost}</td>
+                  <td className="border-r border-black p-2 align-middle">{row.newPost}</td>
+                  <td className="border-r border-black p-2 text-center align-middle">{row.age}</td>
+                  <td className="border-r border-black p-2 text-center align-middle">{row.gradeYears}</td>
+                  <td className="p-2 bg-yellow-50/20 align-top text-xs min-h-[3.5rem] h-12"></td>
                 </tr>
               ))}
               {promotionRows.length === 0 && (
-                <tr><td colSpan="8" className="text-center p-8 text-gray-500">昇任者はいません</td></tr>
+                <tr><td colSpan="7" className="text-center p-8 text-gray-500">該当する昇任者はいません</td></tr>
               )}
             </tbody>
           </table>
         </div>
-        <div className="mt-4 text-xs text-gray-600 space-y-1 max-w-[1200px] mx-auto border p-2 bg-gray-50">
-          <p>① ここでいう「昇格者」とは、同一の格付内で現に任用している職より上位の職へ任用する者をいいます。</p>
-          <p>② 格付欄は、「部長級・次長級・課長級・補佐級・係長級」の別を記載して下さい。</p>
-          <p>③ 年齢は令和{targetYear - 2018}年4月1日現在で、職年数は現任（昇格前）の職の年数を記載願います。</p>
-          <p>④ 理由については、これまでの実績・成果を含め詳細に記載願います。</p>
-          <p>⑤ お手数をおかけして恐縮ですが、先に提出いただいた指定職の昇任についても改めて記載ください。</p>
+        <div className="mt-4 text-xs text-gray-600 space-y-1 max-w-[1250px] mx-auto border p-2.5 bg-gray-50 rounded">
+          <p>①　新指定職（補佐級（班長級）以上）の職員のうち、昇任を推薦する者について記載してください。</p>
+          <p>②　格付欄は、昇任後の格付（「部長級・次長級・課長級・補佐級」の別）を記載してください。</p>
+          <p>③　理由については、これまでの実績・成果を含め詳細に記載願います。</p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAdvancementTable = () => {
+    const { advancementRows } = extractDesignatedPromoLists(employees, departments, targetYear);
+    const targetYearR = toReiwa(targetYear);
+
+    return (
+      <div className="overflow-auto max-h-[75vh] print:max-h-none print:overflow-visible w-full text-sm">
+        <div className="mb-3 text-gray-800 max-w-[1250px] mx-auto">
+          <p className="font-bold text-lg mb-2">■指定職昇格者一覧様式</p>
+          <div className="flex flex-wrap justify-between items-end gap-2 text-xs">
+            <p className="font-bold">※　格付順に記載して下さい。</p>
+            <p>職種（　　　　　　　　　　）　　担当者所属・氏名（　　　　　　　　　　　　　　　　　　　）</p>
+          </div>
+        </div>
+        <div className="max-w-[1250px] mx-auto border-2 border-black">
+          <table className="w-full text-left border-collapse bg-white">
+            <thead className="sticky top-0 z-10 whitespace-nowrap">
+              <tr>
+                <th className="border border-black p-2 font-bold w-[8%] text-center bg-gray-50 shadow-sm">格付</th>
+                <th className="border border-black p-2 font-bold w-[13%] text-center bg-gray-50 shadow-sm">氏　　名</th>
+                <th className="border border-black p-2 font-bold w-[6%] text-center bg-gray-50 shadow-sm leading-tight">R{targetYearR}.4<br/>年齢</th>
+                <th className="border border-black p-2 font-bold w-[22%] text-center bg-gray-50 shadow-sm">旧所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[6%] text-center bg-gray-50 shadow-sm">職年数</th>
+                <th className="border border-black p-2 font-bold w-[22%] text-center bg-gray-50 shadow-sm">新所属名及び職名</th>
+                <th className="border border-black p-2 font-bold w-[23%] text-center bg-gray-50 shadow-sm">理　　由</th>
+              </tr>
+            </thead>
+            <tbody>
+              {advancementRows.map((row, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 border-b border-black print-break-inside-avoid">
+                  <td className="border-r border-black p-2 text-center align-middle">{row.gradeLabel}</td>
+                  <td className="border-r border-black p-2 text-center align-middle">{row.name}</td>
+                  <td className="border-r border-black p-2 text-center align-middle">{row.age}</td>
+                  <td className="border-r border-black p-2 align-middle">{row.oldPost}</td>
+                  <td className="border-r border-black p-2 text-center align-middle">{row.titleYears}</td>
+                  <td className="border-r border-black p-2 align-middle">{row.newPost}</td>
+                  <td className="p-2 bg-yellow-50/20 align-top text-xs min-h-[3.5rem] h-12"></td>
+                </tr>
+              ))}
+              {advancementRows.length === 0 && (
+                <tr><td colSpan="7" className="text-center p-8 text-gray-500">該当する昇格者はいません</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 text-xs text-gray-600 space-y-1 max-w-[1250px] mx-auto border p-2.5 bg-gray-50 rounded">
+          <p>①　新指定職（補佐級（班長級）以上）の職員のうち、昇格を推薦する者について記載してください。</p>
+          <p>②　ここでいう「昇格者」とは、同一の格付内で現に任用している職より上位の職へ任用する者をいいます。</p>
+          <p className="pl-6">※ 「スタッフ職　→　ポスト職　　例えば　主任　→　本庁班長又は出先課長」を記載して下さい。</p>
+          <p className="pl-6">※ 「課長級　→　所属長級　例えば　本庁副課長又は振興局副部長　→　本庁課長又は振興局部長」を記載して下さい。</p>
+          <p className="pl-6">※本庁の「◯◯班長　→　課長補佐兼◯◯班長」も記載して下さい。　※対象者は、「課長補佐級経験5年以上かつ本庁班長・出先課長3年以上経験」の職員です。</p>
+          <p>③　格付欄は、「部長級・次長級・課長級・補佐級」の別を記載して下さい。</p>
+          <p>④　年齢は令和{targetYearR}年4月1日現在で、職年数は現在（昇格前）の職の年数を記載願います。</p>
+          <p>⑤　理由については、これまでの実績・成果を含め詳細に記載願います。</p>
         </div>
       </div>
     );
@@ -1151,12 +1161,12 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
       <main className="flex-1 overflow-auto p-4 sm:p-8 w-full print:p-0 print:overflow-visible">
         {/* Tabs */}
         <div className="flex justify-between items-end border-b-2 border-gray-300 mb-4 no-print">
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-1 flex-wrap">
             {tabs.map(t => (
               <button 
                 key={t.id}
                 onClick={() => setCurrentTab(t.id)} 
-                className={`px-4 py-2.5 text-sm font-bold rounded-t-lg transition-colors flex items-center gap-1.5 whitespace-nowrap ${currentTab === t.id ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                className={`px-3.5 py-2 text-xs sm:text-sm font-bold rounded-t-lg transition-colors flex items-center gap-1.5 whitespace-nowrap ${currentTab === t.id ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
               >
                 {t.icon} {t.label}
               </button>
@@ -1178,6 +1188,7 @@ export const ChainTransferModal = ({ isOpen, onClose, employees, departments, ta
         {currentTab === 'short_tenure' && renderShortTenureTable()}
         {currentTab === 'long_tenure' && renderLongTenureTable()}
         {currentTab === 'promotion' && renderPromotionTable()}
+        {currentTab === 'advancement' && renderAdvancementTable()}
         {currentTab === 'designated' && renderDesignatedTable()}
         {currentTab === 'designated_change' && renderDesignatedChangeTable()}
       </main>

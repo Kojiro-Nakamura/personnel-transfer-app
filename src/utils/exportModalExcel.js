@@ -1,10 +1,11 @@
 import ExcelJS from 'exceljs';
 import { analyzeChainTransfers, getReason, toReiwa, chunkArray } from './chainTransferParser.js';
 import { GRADE_TO_PROMO_KEY, GRADE_LEVELS } from '../constants/config.js';
-import { getEmpCurrentYears, getEmpTitleYears, isPromotedGrade, calculateAge, getGradeLevel, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
+import { getEmpCurrentYears, getEmpTitleYears, getFormattedNameWithPrefix, calculateGradeYears, getMidYearPromoRemark, getPromoRemark, buildDeptMap, traverseOrgTree } from './helpers.js';
 import { saveWorkbook } from './exportExcel.js';
 import { addReasonSheet } from './exportReasonSheet.js';
 import { generateDesignatedChangeStats } from './designatedChangeUtils.js';
+import { extractDesignatedPromoLists } from './promotionUtils.js';
 
 // Utils
 const isDesignated = (grade, title) => {
@@ -682,67 +683,207 @@ const addModalLongTenureSheet = (workbook, sheetName, targetYear, employees, dep
   ];
 };
 
-// 6. 昇任者一覧
-const addModalPromotionSheet = (workbook, sheetName, targetYear, employees, deptMap) => {
-  const sheet = workbook.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
-  
-  let promotionRows = [];
-  const getBaseGrade = (grade) => {
-    if (!grade) return '';
-    if (grade.includes('部長級')) return '部長級';
-    if (grade.includes('次長級')) return '次長級';
-    if (grade.includes('課長級')) return '課長級';
-    if (grade.includes('補佐級')) return '補佐級';
-    if (grade.includes('係長級')) return '係長級';
-    return grade;
-  };
-
-  employees.forEach(emp => {
-    if (emp.nextDept === '退職') return;
-    if (emp.currentGrade && emp.nextGrade && isPromotedGrade(emp.currentGrade, emp.nextGrade)) {
-      const cDeptName = deptMap[emp.currentDeptId]?.name || '';
-      const nDeptName = deptMap[emp.departmentId]?.name || '';
-      
-      promotionRows.push({
-        nextGradeLabel: getBaseGrade(emp.nextGrade),
-        name: emp.name || '',
-        age: calculateAge(emp.birthDate, targetYear) || '',
-        oldPost: cDeptName + (cDeptName && emp.currentTitle ? '　' : '') + (emp.currentTitle || ''),
-        newPost: nDeptName + (nDeptName && emp.nextTitle ? '　' : '') + (emp.nextTitle || ''),
-        currentYears: getEmpCurrentYears(emp, targetYear - 1, false),
-        gradeYears: calculateGradeYears(emp, targetYear),
-        nextLevel: getGradeLevel(emp.nextGrade)
-      });
-    }
+// 6-1. 昇任者一覧（■指定職昇任者一覧様式）
+const addModalPromotionSheet = (workbook, sheetName, targetYear, employees, departments) => {
+  const sheet = workbook.addWorksheet(sheetName, {
+    views: [{ showGridLines: true }],
+    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
   });
 
-  promotionRows.sort((a, b) => {
-    if (b.nextLevel !== a.nextLevel) return b.nextLevel - a.nextLevel;
-    return a.oldPost.localeCompare(b.oldPost);
-  });
-
-  const headers = [
-    '昇任後\n格付', '氏名', `R${targetYear - 2018}.4\n年齢`, '旧所属名及び職名', '新所属名及び職名', '職\n年数', '現格付\n年数', '理由'
-  ];
-  const headerRow = sheet.addRow(headers);
-  headerRow.eachCell(cell => {
-    cell.font = { bold: true };
-    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
-  });
-
-  promotionRows.forEach(r => {
-    const row = sheet.addRow([r.nextGradeLabel, r.name, r.age, r.oldPost, r.newPost, r.currentYears, r.gradeYears, '']);
-    row.eachCell((cell, colNumber) => {
-      cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-      cell.alignment = { vertical: 'middle', horizontal: [4, 5, 8].includes(colNumber) ? 'left' : 'center', wrapText: true };
-    });
-  });
+  const { promotionRows } = extractDesignatedPromoLists(employees, departments, targetYear);
+  const targetYearR = toReiwa(targetYear);
+  const grayFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
 
   sheet.columns = [
-    { width: 10 }, { width: 15 }, { width: 8 }, { width: 30 }, { width: 30 }, { width: 8 }, { width: 8 }, { width: 30 }
+    { width: 10 }, // A: 昇任後格付
+    { width: 18 }, // B: 氏　　名
+    { width: 25 }, // C: 旧所属名及び職名
+    { width: 25 }, // D: 新所属名及び職名
+    { width: 8 },  // E: R9.4 年齢
+    { width: 8 },  // F: 現格付年数
+    { width: 46 }  // G: 理　　　　　　由
   ];
+
+  sheet.getCell('A1').value = '■指定職昇任者一覧様式';
+  sheet.getCell('A1').font = { bold: true, size: 12 };
+  sheet.getRow(1).height = 20;
+
+  sheet.getCell('A3').value = '※　格付順に記載して下さい。';
+  sheet.mergeCells('D3:G3');
+  sheet.getCell('D3').value = '職種（　　　　　　　　　　）　　担当者所属・氏名（　　　　　　　　　　　　　　　　　　　）';
+  sheet.getCell('D3').alignment = { horizontal: 'right', vertical: 'middle' };
+  sheet.getRow(3).height = 18;
+  sheet.getRow(4).height = 6;
+
+  const headers = [
+    '昇任後\n格付',
+    '氏　　名',
+    '旧所属名及び職名',
+    '新所属名及び職名',
+    `R${targetYearR}.4\n年齢`,
+    '現格付\n年数',
+    '理　　　　　　由'
+  ];
+  sheet.getRow(5).height = 30;
+  headers.forEach((h, idx) => {
+    const cell = sheet.getCell(5, idx + 1);
+    cell.value = h;
+    cell.font = { bold: true };
+    cell.fill = grayFill;
+    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    cell.border = {
+      top: { style: 'medium' },
+      bottom: { style: 'medium' },
+      left: { style: idx === 0 ? 'medium' : 'thin' },
+      right: { style: idx === 6 ? 'medium' : 'thin' }
+    };
+  });
+
+  const totalSlots = Math.max(promotionRows.length, 8);
+  for (let i = 0; i < totalSlots; i++) {
+    const rIdx = 6 + i;
+    const rowData = promotionRows[i];
+    const row = sheet.getRow(rIdx);
+    row.height = 30.75;
+
+    const vals = rowData
+      ? [rowData.gradeLabel, rowData.name, rowData.oldPost, rowData.newPost, rowData.age, rowData.gradeYears, '']
+      : ['', '', '', '', '', '', ''];
+
+    vals.forEach((val, cIdx) => {
+      const colNumber = cIdx + 1;
+      const cell = sheet.getCell(rIdx, colNumber);
+      cell.value = val;
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: [3, 4, 7].includes(colNumber) ? 'left' : 'center',
+        wrapText: true
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        bottom: { style: i === totalSlots - 1 ? 'medium' : 'thin' },
+        left: { style: colNumber === 1 ? 'medium' : 'thin' },
+        right: { style: colNumber === 7 ? 'medium' : 'thin' }
+      };
+    });
+  }
+
+  const noteStartRow = 6 + totalSlots + 1;
+  const notesLines = [
+    '①　新指定職（補佐級（班長級）以上）の職員のうち、昇任を推薦する者について記載してください。',
+    '②　格付欄は、昇任後の格付（「部長級・次長級・課長級・補佐級」の別）を記載してください。',
+    '③　理由については、これまでの実績・成果を含め詳細に記載願います。'
+  ];
+  notesLines.forEach((line, idx) => {
+    const r = noteStartRow + idx;
+    sheet.getCell(r, 1).value = line;
+    sheet.getCell(r, 1).font = { size: 9.5 };
+    sheet.getRow(r).height = 17;
+  });
+};
+
+// 6-2. 昇格者一覧（■指定職昇格者一覧様式）
+const addModalAdvancementSheet = (workbook, sheetName, targetYear, employees, departments) => {
+  const sheet = workbook.addWorksheet(sheetName, {
+    views: [{ showGridLines: true }],
+    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
+  });
+
+  const { advancementRows } = extractDesignatedPromoLists(employees, departments, targetYear);
+  const targetYearR = toReiwa(targetYear);
+  const grayFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+
+  sheet.columns = [
+    { width: 10 }, // A: 格付
+    { width: 18 }, // B: 氏　　名
+    { width: 8 },  // C: R9.4 年齢
+    { width: 25 }, // D: 旧所属名及び職名
+    { width: 8 },  // E: 職年数
+    { width: 25 }, // F: 新所属名及び職名
+    { width: 50 }  // G: 理　　由
+  ];
+
+  sheet.getCell('A1').value = '■指定職昇格者一覧様式';
+  sheet.getCell('A1').font = { bold: true, size: 12 };
+  sheet.getRow(1).height = 20;
+
+  sheet.getCell('A3').value = '※　格付順に記載して下さい。';
+  sheet.mergeCells('F3:G3');
+  sheet.getCell('F3').value = '職種（　　　　　　　　　　）　　担当者所属・氏名（　　　　　　　　　　　　　　　　　　　）';
+  sheet.getCell('F3').alignment = { horizontal: 'right', vertical: 'middle' };
+  sheet.getRow(3).height = 18;
+  sheet.getRow(4).height = 6;
+
+  const headers = [
+    '格付',
+    '氏　　名',
+    `R${targetYearR}.4\n年齢`,
+    '旧所属名及び職名',
+    '職年数',
+    '新所属名及び職名',
+    '理　　由'
+  ];
+  sheet.getRow(5).height = 30;
+  headers.forEach((h, idx) => {
+    const cell = sheet.getCell(5, idx + 1);
+    cell.value = h;
+    cell.font = { bold: true };
+    cell.fill = grayFill;
+    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+    cell.border = {
+      top: { style: 'medium' },
+      bottom: { style: 'medium' },
+      left: { style: idx === 0 ? 'medium' : 'thin' },
+      right: { style: idx === 6 ? 'medium' : 'thin' }
+    };
+  });
+
+  const totalSlots = Math.max(advancementRows.length, 8);
+  for (let i = 0; i < totalSlots; i++) {
+    const rIdx = 6 + i;
+    const rowData = advancementRows[i];
+    const row = sheet.getRow(rIdx);
+    row.height = 31.5;
+
+    const vals = rowData
+      ? [rowData.gradeLabel, rowData.name, rowData.age, rowData.oldPost, rowData.titleYears, rowData.newPost, '']
+      : ['', '', '', '', '', '', ''];
+
+    vals.forEach((val, cIdx) => {
+      const colNumber = cIdx + 1;
+      const cell = sheet.getCell(rIdx, colNumber);
+      cell.value = val;
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: [4, 6, 7].includes(colNumber) ? 'left' : 'center',
+        wrapText: true
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        bottom: { style: i === totalSlots - 1 ? 'medium' : 'thin' },
+        left: { style: colNumber === 1 ? 'medium' : 'thin' },
+        right: { style: colNumber === 7 ? 'medium' : 'thin' }
+      };
+    });
+  }
+
+  const noteStartRow = 6 + totalSlots + 1;
+  const notesLines = [
+    [1, '①　新指定職（補佐級（班長級）以上）の職員のうち、昇格を推薦する者について記載してください。'],
+    [1, '②　ここでいう「昇格者」とは、同一の格付内で現に任用している職より上位の職へ任用する者をいいます。'],
+    [2, '※ 「スタッフ職　→　ポスト職　　例えば　主任　→　本庁班長又は出先課長」を記載して下さい。'],
+    [2, '※ 「課長級　→　所属長級　例えば　本庁副課長又は振興局副部長　→　本庁課長又は振興局部長」を記載して下さい。'],
+    [2, '※本庁の「◯◯班長　→　課長補佐兼◯◯班長」も記載して下さい。　※対象者は、「課長補佐級経験5年以上かつ本庁班長・出先課長3年以上経験」の職員です。'],
+    [1, '③　格付欄は、「部長級・次長級・課長級・補佐級」の別を記載して下さい。'],
+    [1, `④　年齢は令和${targetYearR}年４月１日現在で、職年数は現在（昇格前）の職の年数を記載願います。`],
+    [1, '⑤　理由については、これまでの実績・成果を含め詳細に記載願います。']
+  ];
+  notesLines.forEach(([col, line], idx) => {
+    const r = noteStartRow + idx;
+    sheet.getCell(r, col).value = line;
+    sheet.getCell(r, col).font = { size: 9.5 };
+    sheet.getRow(r).height = 17;
+  });
 };
 
 // 7. つなぎ表 (List style, max 4 chain links)
@@ -817,11 +958,6 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   addModalDesignatedChangeSheet(workbook, '指定職の増減', targetYear, departments, employees);
   addModalListSheet(workbook, '異動案リスト', targetYear, moves, movesByToPost, departments, retentions, employees);
   
-  // NOTE: addReasonSheet needs deptMap, currMap, nextMap. We will just pass empty objects or build them.
-  // Actually, addReasonSheet from exportExcel.js expects these to just ignore if missing? No, it uses them.
-  // Wait, let's check addReasonSheet signature.
-  // addReasonSheet(workbook, sheetName, targetYear, departments, deptMap, currMap, nextMap, employees, notes)
-  // We can just construct deptMap, currMap, nextMap quickly here.
   const deptMap = {};
   departments.forEach(d => { deptMap[d.id] = d; });
   const currMap = {};
@@ -830,7 +966,8 @@ export const exportModalExcel = async (fileName, targetYear, employees, departme
   addReasonSheet(workbook, '増減理由', targetYear, departments, deptMap, currMap, nextMap, employees, notes);
   addModalShortTenureSheet(workbook, '3年未満特記', targetYear, moves);
   addModalLongTenureSheet(workbook, '6年以上特記', targetYear, employees, deptMap);
-  addModalPromotionSheet(workbook, '昇任者一覧', targetYear, employees, deptMap);
+  addModalPromotionSheet(workbook, '昇任者一覧', targetYear, employees, departments);
+  addModalAdvancementSheet(workbook, '昇格者一覧', targetYear, employees, departments);
   addModalChainSheet(workbook, 'つなぎ表', chains, movesByFromPost, movesByToPost);
 
   await saveWorkbook(workbook, fileName);
