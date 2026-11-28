@@ -969,18 +969,22 @@ export const RecruitmentSimulatorModal = ({
     const ages = [];
     for (let a = 64; a >= 22; a--) ages.push(a);
 
-    const rowH = compact ? (isPrint ? 10.1 : 11.2) : isPrint ? 13.4 : 14.5;
-    const topPad = isPrint ? 4 : 6;
-    const svgW = compact ? (isPrint ? 226 : 300) : isPrint ? 650 : 680;
-    const labelW = compact ? 28 : 34;
-    const rightPad = compact ? (isPrint ? 48 : 56) : 86;
+    const rowH = isPrint ? (compact ? 10.1 : 13.4) : compact ? 7.6 : 8.2;
+    const topPad = isPrint ? 4 : 3;
+    const svgW = isPrint ? (compact ? 226 : 650) : compact ? 310 : 620;
+    const labelW = compact ? (isPrint ? 28 : 26) : isPrint ? 34 : 30;
+    const rightPad = compact ? (isPrint ? 48 : 54) : isPrint ? 86 : 74;
     const barMaxW = svgW - labelW - rightPad;
-    const svgH = topPad + ages.length * rowH + (isPrint ? 4 : 6);
+    const svgH = topPad + ages.length * rowH + (isPrint ? 4 : 3);
     const vermPat = `pyr-verm-${idKey}`;
     const skyPat = `pyr-sky-${idKey}`;
 
     return (
-      <div className={`border border-slate-300 rounded-md ${isPrint ? 'p-1.5' : 'p-2.5'} bg-white sim-avoid-break`}>
+      <div
+        className={`border border-slate-300 rounded-md ${
+          isPrint ? 'p-1.5' : compact ? 'p-2' : 'p-2.5 max-w-[920px] mx-auto w-full'
+        } bg-white sim-avoid-break`}
+      >
         {compact && isPrint ? (
           <div className="border-b border-slate-200 pb-1 mb-1 leading-tight">
             <div className="font-bold text-[10px] text-slate-900">{colTitle}</div>
@@ -989,7 +993,7 @@ export const RecruitmentSimulatorModal = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-wrap items-baseline justify-between gap-1 border-b border-slate-200 pb-1.5 mb-1.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-1 border-b border-slate-200 pb-1 mb-1">
             <span className="font-bold text-xs text-slate-900">{colTitle}</span>
             <span className="font-mono text-[11px] text-slate-600">
               計<b>{Math.round(snap.total)}</b>名 (59以下:{Math.round(snap.under60)} / 60-64:{Math.round(snap.age60to64)})
@@ -1010,7 +1014,9 @@ export const RecruitmentSimulatorModal = ({
 
           {ages.map((age, idx) => {
             const y = topPad + idx * rowH;
-            const barH = rowH - 2.0;
+            const barH = Math.max(4, rowH - (isPrint ? 2.0 : 1.3));
+            const textBaseY = y + barH - (isPrint ? 1.2 : 0.6);
+            const innerBaseY = y + barH - (isPrint ? 1.5 : 0.8);
             const bin = snap.ageBins[age] || { existing: 0, hired: 0 };
             const exW = Math.max(0, (bin.existing / scaleMax) * barMaxW);
             const hiW = Math.max(0, (bin.hired / scaleMax) * barMaxW);
@@ -1030,9 +1036,9 @@ export const RecruitmentSimulatorModal = ({
                 {age === 59 && (
                   <line
                     x1={0}
-                    y1={y - 1.0}
+                    y1={y - 0.8}
                     x2={svgW}
-                    y2={y - 1.0}
+                    y2={y - 0.8}
                     stroke={CUD.vermilion}
                     strokeWidth="1.1"
                     strokeDasharray="4,3"
@@ -1040,15 +1046,15 @@ export const RecruitmentSimulatorModal = ({
                 )}
                 <text
                   x={labelW - 4}
-                  y={y + barH - 1.2}
+                  y={textBaseY}
                   textAnchor="end"
-                  fontSize={compact ? '8.0' : '10'}
+                  fontSize={isPrint ? (compact ? '8.0' : '10') : compact ? '7.0' : '7.6'}
                   fontFamily="monospace"
                   fill="#64748b"
                 >
                   {age}歳
                 </text>
-                <rect x={labelW} y={y} width={barMaxW} height={barH} rx="1.2" fill="#f1f5f9" />
+                <rect x={labelW} y={y} width={barMaxW} height={barH} rx="1" fill="#f1f5f9" />
                 {exW > 0.2 && (
                   <rect
                     x={labelW}
@@ -1076,9 +1082,9 @@ export const RecruitmentSimulatorModal = ({
                 {hasBoth && exW >= innerMinW && (
                   <text
                     x={labelW + exW / 2}
-                    y={y + barH - 1.5}
+                    y={innerBaseY}
                     textAnchor="middle"
-                    fontSize={compact ? '7.2' : '8.5'}
+                    fontSize={isPrint ? (compact ? '7.2' : '8.5') : compact ? '6.6' : '7.2'}
                     fontFamily="monospace"
                     fontWeight="700"
                     fill={age >= 60 ? '#0F172A' : '#FFFFFF'}
@@ -1090,9 +1096,9 @@ export const RecruitmentSimulatorModal = ({
                 {hasBoth && hiW >= innerMinW && (
                   <text
                     x={labelW + exW + hiW / 2}
-                    y={y + barH - 1.5}
+                    y={innerBaseY}
                     textAnchor="middle"
-                    fontSize={compact ? '7.2' : '8.5'}
+                    fontSize={isPrint ? (compact ? '7.2' : '8.5') : compact ? '6.6' : '7.2'}
                     fontFamily="monospace"
                     fontWeight="700"
                     fill="#0F172A"
@@ -1103,9 +1109,9 @@ export const RecruitmentSimulatorModal = ({
                 )}
                 <text
                   x={labelW + exW + hiW + 3.5}
-                  y={y + barH - 1.2}
+                  y={textBaseY}
                   textAnchor="start"
-                  fontSize={compact ? '7.8' : '9.5'}
+                  fontSize={isPrint ? (compact ? '7.8' : '9.5') : compact ? '7.0' : '7.8'}
                   fontFamily="monospace"
                   fontWeight={tot >= 0.05 ? '700' : '400'}
                   fill={tot >= 0.05 ? '#0f172a' : '#94a3b8'}
@@ -1137,7 +1143,7 @@ export const RecruitmentSimulatorModal = ({
     const showCompare = forceCompare3 || pyramidViewMode === 'compare3';
 
     return (
-      <div className={isPrint ? 'space-y-1.5 sim-avoid-break' : 'space-y-3 sim-avoid-break'}>
+      <div className={isPrint ? 'space-y-1.5 sim-avoid-break' : 'space-y-2 sim-avoid-break'}>
         <div className={`flex flex-wrap items-center justify-between gap-1.5 ${isPrint ? 'text-[10.5px]' : 'text-xs'}`}>
           <div className="font-bold text-slate-800">
             ③ 将来年齢ピラミッド推移
@@ -1160,7 +1166,7 @@ export const RecruitmentSimulatorModal = ({
         </div>
 
         {!isPrint && !forceCompare3 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-lg bg-slate-100 border border-slate-200 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs">
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
@@ -1216,7 +1222,7 @@ export const RecruitmentSimulatorModal = ({
         )}
 
         {showCompare ? (
-          <div className={`grid ${isPrint ? (compareIndices.length === 3 ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-2') : compareIndices.length === 3 ? 'grid-cols-1 md:grid-cols-3 gap-3' : 'grid-cols-1 md:grid-cols-2 gap-3'}`}>
+          <div className={`grid ${isPrint ? (compareIndices.length === 3 ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-2') : compareIndices.length === 3 ? 'grid-cols-1 md:grid-cols-3 gap-2.5' : 'grid-cols-1 md:grid-cols-2 gap-2.5'}`}>
             {compareIndices.map(idx => {
               const s = sim.yearly[idx];
               const tag = s.isBase
